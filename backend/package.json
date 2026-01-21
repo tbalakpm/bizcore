@@ -1,0 +1,37 @@
+{
+  "name": "persons-accountant-node",
+  "version": "1.0.0",
+  "description": "Personal account manager backend (Node + Express + SQLite + JWT + i18n)",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon --exec ts-node-dev src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "postbuild": "cp -R src/i18n dist/i18n && cp -R src/public dist/public && cp package.json dist/package.json"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg-hstore": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.3",
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.10.1",
+    "drizzle-kit": "^0.18.1",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}

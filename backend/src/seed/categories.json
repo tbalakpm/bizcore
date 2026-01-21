@@ -1,0 +1,143 @@
+{
+  "categories": [
+    {
+      "code": "INCOME",
+      "name": "Income",
+      "description": "Salary, Service charges, Business incomes",
+      "type": "I",
+      "is_active": 1
+    },
+    {
+      "name": "Rent (Income)",
+      "description": "Income from rent",
+      "type": "I",
+      "is_active": 1
+    },
+    {
+      "name": "Interest Received",
+      "description": "Interest income from bank, post office, others",
+      "type": "I",
+      "is_active": 1
+    },
+    {
+      "name": "Food",
+      "description": "Groceries, Vegetables, Food, Milk, Restaurants",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Rent (Expense)",
+      "description": "Rent payment",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Dress",
+      "description": "Ready-made, materials",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Mobile Recharge",
+      "description": "Mobile recharge",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Repairs and Maintenance",
+      "description": "Repairs and maintenance",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Electricity",
+      "description": "Electricity",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Transport",
+      "description": "Bus, train, cab, flight, auto",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Fuel",
+      "description": "Petrol or diesel expenses",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Doctor Fees",
+      "description": "Doctor fees",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Medicines",
+      "description": "Medicines",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "School/College Fees",
+      "description": "School or college fees",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Grooming",
+      "description": "Shoes, cosmetics, haircut, others",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Interest Paid",
+      "description": "Interest paid",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Entertainment",
+      "description": "Movie, OTT/Youtube subscription",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Personal Expenses",
+      "description": "Personal expenses to family members",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Donations",
+      "description": "Donations, charity, others",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Gifts",
+      "description": "Gifts to Wedding/Birthday/Other ceremony in cash or articles",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Income Tax",
+      "description": "Income tax",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Sales Tax",
+      "description": "GST, VAT",
+      "type": "E",
+      "is_active": 1
+    },
+    {
+      "name": "Auditor Fees",
+      "description": "Auditor fees",
+      "type": "E",
+      "is_active": 1
+    }
+  ]
+}

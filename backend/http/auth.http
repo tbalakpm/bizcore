@@ -1,0 +1,28 @@
+# @baseUrl=http://localhost:4000/api
+@baseUrl=https://expense-tracker-lbw9.onrender.com/api
+
+@username=vallalar
+@password=2026
+
+### Login User
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+
+### Register User
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+
+### Get All Users
+GET {{baseUrl}}/users

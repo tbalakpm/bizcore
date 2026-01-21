@@ -1,0 +1,184 @@
+<div class="flex flex-col min-h-screen">
+  <!-- Top bar -->
+  <header
+    class="flex justify-between items-center px-4 py-2 bg-slate-800 text-white shadow border border-slate-900"
+  >
+    <!-- <div class="flex items-center justify-center gap-2"> -->
+    <a routerLink="/" class="flex items-center justify-center align-middle gap-2">
+      <!-- Simple Flowbite-esque logo/icon -->
+      <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700">
+        <!-- icon (heroicon-style) -->
+        <svg
+          class="w-6 h-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 8H5m12 0a1 1 0 0 1 1 1v2.6M17 8l-4-4M5 8a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.6M5 8l4-4 4 4m6 4h-4a2 2 0 1 0 0 4h4a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1Z"
+          />
+        </svg>
+      </span>
+      <span class="font-bold text-lg items-center">
+        {{ 'APP_TITLE' | translate }}
+      </span>
+    </a>
+    <!-- </div> -->
+
+    <div class="flex items-center gap-2">
+      <!-- Language switch -->
+      <button
+        (click)="switchLang('en')"
+        class="px-2 py-1 border rounded text-xs bg-white text-slate-900 cursor-pointer"
+      >
+        EN
+      </button>
+      <button
+        (click)="switchLang('ta')"
+        class="px-3 py-1 border rounded text-xs bg-white text-slate-900 cursor-pointer"
+      >
+        த
+      </button>
+      <button
+        (click)="switchLang('hi')"
+        class="px-3 py-1 border rounded text-xs bg-white text-slate-900 cursor-pointer"
+      >
+        हिं
+      </button>
+      @if(this.auth.isLoggedIn){
+      <button (click)="logout()" class="ml-4 underline cursor-pointer">
+        {{ 'MENU.LOGOUT' | translate }}
+      </button>
+      }
+    </div>
+  </header>
+
+  <div class="flex grow">
+    @if(this.auth.isLoggedIn){
+    <aside class="w-72 bg-slate-800 text-white p-4 space-y-2">
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="bg-slate-700 font-semibold"
+        class="flex px-3 py-2 rounded hover:bg-slate-600 items-center gap-2 w-60"
+      >
+        <!-- <span class="flex justify-center items-center text-center gap-2"> -->
+        <svg
+          class="w-6 h-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M9 15a6 6 0 1 1 12 0 6 6 0 0 1-12 0Zm3.845-1.855a2.4 2.4 0 0 1 1.2-1.226 1 1 0 0 1 1.992-.026c.426.15.809.408 1.111.749a1 1 0 1 1-1.496 1.327.682.682 0 0 0-.36-.213.997.997 0 0 1-.113-.032.4.4 0 0 0-.394.074.93.93 0 0 0 .455.254 2.914 2.914 0 0 1 1.504.9c.373.433.669 1.092.464 1.823a.996.996 0 0 1-.046.129c-.226.519-.627.94-1.132 1.192a1 1 0 0 1-1.956.093 2.68 2.68 0 0 1-1.227-.798 1 1 0 1 1 1.506-1.315.682.682 0 0 0 .363.216c.038.009.075.02.111.032a.4.4 0 0 0 .395-.074.93.93 0 0 0-.455-.254 2.91 2.91 0 0 1-1.503-.9c-.375-.433-.666-1.089-.466-1.817a.994.994 0 0 1 .047-.134Zm1.884.573.003.008c-.003-.005-.003-.008-.003-.008Zm.55 2.613s-.002-.002-.003-.007a.032.032 0 0 1 .003.007ZM4 14a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1Zm3-2a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Zm6.5-8a1 1 0 0 1 1-1H18a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-.796l-2.341 2.049a1 1 0 0 1-1.24.06l-2.894-2.066L6.614 9.29a1 1 0 1 1-1.228-1.578l4.5-3.5a1 1 0 0 1 1.195-.025l2.856 2.04L15.34 5h-.84a1 1 0 0 1-1-1Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        {{ 'MENU.DASHBOARD' | translate }}
+        <!-- </span> -->
+      </a>
+
+      <a
+        routerLink="/entries"
+        routerLinkActive="bg-slate-700 font-semibold"
+        class="flex px-3 py-2 rounded hover:bg-slate-600 items-center gap-2 w-60"
+      >
+        <svg
+          class="w-6 h-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6.03v13m0-13c-2.819-.831-4.715-1.076-8.029-1.023A.99.99 0 0 0 3 6v11c0 .563.466 1.014 1.03 1.007 3.122-.043 5.018.212 7.97 1.023m0-13c2.819-.831 4.715-1.076 8.029-1.023A.99.99 0 0 1 21 6v11c0 .563-.466 1.014-1.03 1.007-3.122-.043-5.018.212-7.97 1.023"
+          />
+        </svg>
+
+        {{ 'MENU.ENTRIES' | translate }}
+      </a>
+
+      <a
+        routerLink="/registers"
+        routerLinkActive="bg-slate-700 font-semibold"
+        class="flex px-3 py-2 rounded hover:bg-slate-600 items-center gap-2 w-60"
+      >
+        <svg
+          class="w-6 h-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+          />
+        </svg>
+
+        {{ 'MENU.REGISTERS' | translate }}
+      </a>
+
+      <a
+        routerLink="/categories"
+        routerLinkActive="bg-slate-700 font-semibold"
+        class="flex px-3 py-2 rounded hover:bg-slate-600 items-center gap-2 w-60"
+      >
+        <svg
+          class="w-6 h-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 19V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13H7a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M9 3v14m7 0v4"
+          />
+        </svg>
+
+        {{ 'MENU.CATEGORIES' | translate }}
+      </a>
+    </aside>
+    }
+    <div class="w-full m-4 p-4 bg-slate-200 rounded">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+
+  <!-- @if(!this.auth.isLoggedIn){ -->
+  <footer class="p-3 bg-slate-800 text-white text-center text-sm border border-slate-900">
+    <span
+      >&copy; {{ today | date : 'yyyy' }}
+      <a href="https://fandatech.net" target="_blank">FandaTech</a>.
+      {{ 'ALL_RIGHTS_RESERVED' | translate }}.</span
+    >
+  </footer>
+  <!-- } -->
+</div>

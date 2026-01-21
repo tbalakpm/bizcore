@@ -1,0 +1,101 @@
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CategoryService, Category } from './category-service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-categories',
+  imports: [TranslatePipe, FormsModule, CommonModule],
+  templateUrl: './categories.html',
+})
+export class Categories implements OnInit {
+  categoryService = inject(CategoryService);
+
+  categories = signal<Category[]>([]);
+  newCategory: Partial<Category> = { name: '', description: '', isActive: true };
+  loading = false;
+  error: string | null = null;
+
+  editing: Category | null = null;
+  categoryTypes: { [key: string]: string } = {
+    I: 'CATEGORY.INCOME',
+    E: 'CATEGORY.EXPENSE',
+    A: 'CATEGORY.ASSET',
+    L: 'CATEGORY.LIABILITY',
+  };
+
+  ngOnInit(): void {
+    this.loadCategories();
+  }
+
+  loadCategories() {
+    this.loading = true;
+    this.categoryService.getAll().subscribe({
+      next: (cats) => {
+        this.categories.set(cats);
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = err.error?.error || 'Failed to load categories';
+        this.loading = false;
+      },
+    });
+  }
+
+  addCategory() {
+    if (!this.newCategory.name) return;
+    this.categoryService.create(this.newCategory).subscribe({
+      next: () => {
+        this.newCategory = { name: '', type: '', description: '', isActive: true };
+        this.loadCategories();
+        this.error = null;
+      },
+      error: (err) => {
+        this.error = err.error?.error || 'Failed to add category';
+      },
+    });
+  }
+
+  startEdit(cat: Category) {
+    this.editing = { ...cat };
+  }
+
+  saveEdit() {
+    if (!this.editing) return;
+    this.categoryService.update(this.editing.id, this.editing).subscribe({
+      next: () => {
+        this.editing = null;
+        this.loadCategories();
+        this.error = null;
+      },
+      error: (err) => {
+        this.error = err.error?.error || 'Failed to update category';
+      },
+    });
+  }
+
+  cancelEdit() {
+    this.editing = null;
+    this.error = null;
+  }
+
+  toggleActive(cat: Category) {
+    this.categoryService.update(cat.id, { isActive: !cat.isActive }).subscribe({
+      next: () => this.loadCategories(),
+    });
+  }
+
+  deleteCategory(cat: Category) {
+    if (!confirm(`Delete category "${cat.name}"?`)) return;
+    this.categoryService.delete(cat.id).subscribe({
+      next: () => {
+        this.loadCategories();
+        this.error = null;
+      },
+      error: (err) => {
+        this.error = err.error?.error || 'Failed to delete category';
+      },
+    });
+  }
+}

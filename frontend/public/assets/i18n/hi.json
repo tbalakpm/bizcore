@@ -1,0 +1,44 @@
+{
+  "APP_TITLE": "यक्तिगत लेखाकार",
+  "ALL_RIGHTS_RESERVED": "सभी अधिकार सुरक्षित हैं",
+  "SUBMIT": "जमा करना",
+  "SAVE": "बचाना",
+  "CANCEL": "रद्द करना",
+  "ADD": "जोड़ना",
+  "EDIT": "संपादन करना",
+  "DELETE": "मिटाना",
+  "ACTIONS": "कार्रवाई",
+  "NAME": "नाम",
+  "TYPE": "प्रकार",
+  "DESCRIPTION": "विवरण",
+  "ACTIVE": "सक्रिय",
+  "MENU": {
+    "DASHBOARD": "डैशबोर्ड",
+    "CATEGORIES": "श्रेणियाँ",
+    "REGISTERS": "रजिस्टर",
+    "ENTRIES": "प्रविष्टियां",
+    "LOGOUT": "लॉग आउट"
+  },
+  "LOGIN": {
+    "TITLE": "लॉग इन करें",
+    "USERNAME": "उपयोगकर्ता नाम",
+    "PASSWORD": "पासवर्ड",
+    "SUBMIT": "दाखिल करना"
+  },
+  "REGISTER": {
+    "TITLE": "पंजीकरण करवाना",
+    "USERNAME": "उपयोगकर्ता नाम",
+    "PASSWORD": "पासवर्ड",
+    "NO_REGISTERS_YET": "अभी तक कोई रजिस्टर नहीं"
+  },
+  "CATEGORY": {
+    "TITLE": "वर्ग",
+    "ADD": "श्रेणी जोड़ना",
+    "INCOME": "आय",
+    "EXPENSE": "व्यय",
+    "ASSET": "संपत्ति",
+    "LIABILITY": "देयता",
+    "TYPES": ["I:आय", "E:व्यय", "A:संपत्ति", "L:देयता"],
+    "NO_CATEGORIES_YET": "अभी तक कोई श्रेणियां नहीं"
+  }
+}

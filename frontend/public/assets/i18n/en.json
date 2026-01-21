@@ -1,0 +1,44 @@
+{
+  "APP_TITLE": "Personal Accountant",
+  "ALL_RIGHTS_RESERVED": "All Rights Reserved",
+  "SUBMIT": "Submit",
+  "SAVE": "Save",
+  "CANCEL": "Cancel",
+  "ADD": "Add",
+  "EDIT": "Edit",
+  "DELETE": "Delete",
+  "ACTIONS": "Actions",
+  "NAME": "Name",
+  "TYPE": "Type",
+  "DESCRIPTION": "Description",
+  "ACTIVE": "Active",
+  "MENU": {
+    "DASHBOARD": "Dashboard",
+    "CATEGORIES": "Categories",
+    "REGISTERS": "Registers",
+    "ENTRIES": "Entries",
+    "LOGOUT": "Logout"
+  },
+  "LOGIN": {
+    "TITLE": "Login",
+    "USERNAME": "Username",
+    "PASSWORD": "Password",
+    "SUBMIT": "Sign in"
+  },
+  "REGISTER": {
+    "TITLE": "Register",
+    "USERNAME": "Username",
+    "PASSWORD": "Password",
+    "NO_REGISTERS_YET": "No registers yet"
+  },
+  "CATEGORY": {
+    "TITLE": "Category",
+    "ADD": "Add Category",
+    "INCOME": "Income",
+    "EXPENSE": "Expense",
+    "ASSET": "Asset",
+    "LIABILITY": "Liability",
+    "TYPES": ["I:Income", "E:Expense", "A:Asset", "L:Liability"],
+    "NO_CATEGORIES_YET": "No categories yet"
+  }
+}

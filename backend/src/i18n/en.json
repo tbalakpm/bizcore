@@ -1,0 +1,10 @@
+{
+  "user.exists": "User already exists.",
+  "user.created": "User registered successfully.",
+  "auth.invalid": "Invalid username or password.",
+  "auth.required": "Authentication required.",
+  "category.exists": "Category already exists.",
+  "category.notFound": "Category not found.",
+  "entry.invalidDate": "Invalid date format. Expected yyyy-MM-dd.",
+  "entry.notFound": "Entry not found."
+}

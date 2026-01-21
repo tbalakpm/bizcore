@@ -1,0 +1,41 @@
+@baseUrl=http://localhost:4000/api
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoidGJhbGEiLCJpYXQiOjE3NjYwMjM3OTksImV4cCI6MTc2NjYyODU5OX0.MAluOIEI9_IJs3B0LHSRqMJXMEBFglu7xj0lpOMyI5Q
+
+### Get all categories
+GET {{baseUrl}}/categories
+Authorization: Bearer {{token}}
+
+
+### Create Category
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Short term investment",
+  "description": "Investments for a short term period",
+  "type": "A"
+}
+
+
+###
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Long term investment",
+  "description": "Investments for a long term period",
+  "type": "Asset"
+}
+
+###
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Personal expenses",
+  "description": "Personal expenses",
+  "type": "Expense"
+}

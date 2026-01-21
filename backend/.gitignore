@@ -1,0 +1,11 @@
+# Turso
+# libsql://entries-tbalakpm2.aws-us-east-1.turso.io
+# eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NjU5Njc1NzgsImlkIjoiZWJiOTBmYWYtZWMxOS00MWZkLTg3ZjAtODg2N2RlZmVkOTdkIiwicmlkIjoiNGI1YWI0M2UtNzhhMy00Zjg4LWExNDktYWRhNTYzNDIwNmVhIn0.ROf1QOPiqvI3NVwng_7eoNN-_eLm4zImFRh19L1nnrhgRGY2ucfwZs1ujt_Rx4MOM4_QrUtp1HV7N1LXX2haDA
+
+node_modules
+.env
+dist
+coverage
+.DS_Store
+.vscode
+*.db

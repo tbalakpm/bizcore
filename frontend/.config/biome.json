@@ -1,0 +1,24 @@
+{
+  "files": {
+    "includes": ["**/*.ts", "**/*.json"],
+    "ignoreUnknown": true
+  },
+  "linter": {
+    "enabled": true,
+    "includes": ["**/*.ts"]
+  },
+  "formatter": {
+    "enabled": true,
+    "includes": ["**/*.ts", "**/*.json"]
+  },
+  "html": {
+    "parser": {
+      "interpolation": true
+    }
+  },
+  "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  }
+}
