@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import express, { type Request, type Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../config';
+import { config } from '../config';
 import seedCategoryData from '../seed/categories.json'; //with { type: "json" };
 import { db } from '../db';
 import { categories, NewCategory, users } from '../schema';
@@ -48,7 +48,7 @@ authRouter.post('/login', async (req: Request, res: Response) => {
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) return res.status(401).json({ error: req.i18n?.t('auth.invalid') });
 
-  const token = jwt.sign({ sub: user.id, username: user.username }, JWT_SECRET, { expiresIn: '7d' });
+  const token = jwt.sign({ sub: user.id, username: user.username }, config.jwtSecret, { expiresIn: '7d' });
 
   return res.json({ token });
 });

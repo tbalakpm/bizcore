@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 
-import { JWT_SECRET } from '../config';
+import { config } from '../config';
 import { db } from '../db';
 import { users } from '../schema';
 import { eq } from 'drizzle-orm';
@@ -16,7 +16,7 @@ export async function authRequired(req: Request, res: Response, next: NextFuncti
   const token = header.substring(7);
 
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const payload = jwt.verify(token, config.jwtSecret) as JwtPayload;
 
     const user = await db
       .select({

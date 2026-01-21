@@ -51,25 +51,6 @@ entryRouter.get('/', async (req: Request, res: Response) => {
     .orderBy(asc(entries.date), desc(categories.type))
     .all();
 
-  //   {
-  //     userId: req.user?.id,
-  //     date: {
-  //       [Op.between]: [startDate, endDate],
-  //     },
-  //   },
-  //   include: [
-  //     {
-  //       model: Register,
-  //       attributes: ["id", "name"],
-  //       include: [{ model: Category, attributes: ["id", "name", "type"] }],
-  //     },
-  //   ],
-  //   order: [
-  //     ["date", "ASC"],
-  //     ["register", "category", "type", "DESC"],
-  //   ],
-  // });
-
   const totalIncome = result.filter((e) => e.categoryType === 'I').reduce((sum, e) => sum + e.amount, 0);
   const totalExpenses = result.filter((e) => e.categoryType !== 'I').reduce((sum, e) => sum + e.amount, 0);
   // const total = entries.reduce((sum, e) => sum + parseFloat(e.amount), 0);
@@ -80,7 +61,7 @@ entryRouter.get('/', async (req: Request, res: Response) => {
 entryRouter.get('/:id', async (req: Request, res: Response) => {
   if (!req.user?.id) return res.status(401).json({ error: 'User not authenticated.' });
 
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const entry = await db.select().from(entries).where(eq(entries.id, id)).get();
   if (!entry) return res.status(404).json({ error: req.i18n?.t('entry.notFound') });
 

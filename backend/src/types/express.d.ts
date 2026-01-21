@@ -3,6 +3,8 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: Ignore */
 import express from 'express';
 
+declare module 'cors';
+
 declare global {
   namespace Express {
     interface Request {

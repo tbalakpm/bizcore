@@ -1,8 +1,8 @@
 import cors from 'cors';
 import express, { type Request, type Response } from 'express';
 
-import { PORT, CORS_ORIGINS } from './config';
-import { initializeDatabase } from './db';
+import { config } from './config';
+import { migrateDatabase } from './db';
 import { i18nMiddleware } from './middleware/i18n';
 
 import { authRouter } from './routes/auth';
@@ -14,12 +14,12 @@ import path from 'node:path';
 console.log('Starting server...');
 
 async function start() {
-  await initializeDatabase();
+  await migrateDatabase();
   const app = express();
 
   app.use(
     cors({
-      origin: CORS_ORIGINS!,
+      origin: config.corsOrigins!,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
     }),
@@ -47,8 +47,8 @@ async function start() {
 
   // await sequelize.sync();
 
-  app.listen(PORT, () => {
-    console.log(`Server (api) listening on http://localhost:${PORT}`);
+  app.listen(config.port, () => {
+    console.log(`Server (api) listening on http://localhost:${config.port}`);
   });
 }
 
