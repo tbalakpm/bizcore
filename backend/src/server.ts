@@ -1,19 +1,20 @@
+import path from 'node:path';
 import cors from 'cors';
 import express, { type Request, type Response } from 'express';
 
 import { config } from './config';
-import { migrateDatabase } from './db';
+import { initializeDatabase, migrateDatabase } from './db';
 import { i18nMiddleware } from './middleware/i18n';
 
 import { authRouter } from './routes/auth';
 import { categoriesRouter } from './routes/categories';
 import { entryRouter } from './routes/entries';
 import { registersRouter } from './routes/registers';
-import path from 'node:path';
 
 console.log('Starting server...');
 
-async function start() {
+export async function start() {
+  await initializeDatabase();
   await migrateDatabase();
   const app = express();
 
@@ -41,21 +42,15 @@ async function start() {
   app.use('/api/entries', entryRouter);
 
   // Handle any requests that don't match the static files by serving the index.html file
-  app.get('/{*any}', (_req, res) => {
-    res.sendFile(path.join(__dirname, '/public/index.html')); //
+  app.get('/{*any}', (_req, res, next) => {
+    res.sendFile(path.join(__dirname, '/public/index.html'), (err) => {
+      if (err) {
+        next(err);
+      }
+    });
   });
-
-  // await sequelize.sync();
 
   app.listen(config.port, () => {
     console.log(`Server (api) listening on http://localhost:${config.port}`);
   });
 }
-
-start()
-  .then(() => {
-    console.log('Server started successfully');
-  })
-  .catch((err) => {
-    console.error('Failed to start server:', err);
-  });

@@ -2,17 +2,20 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "moduleResolution": "node",
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "strict": true,
     "resolveJsonModule": true,
-    "typeRoots": ["./src/types", "./node_modules/@types"]
+    "skipLibCheck": true,
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true,
+    // "experimentalDecorators": true,
+    // "emitDecoratorMetadata": true,
+    "typeRoots": ["./src/@types", "./node_modules/@types"]
   },
-  "include": ["src/**/*", "src/types/**/*.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src"]
+  // "include": ["src/**/*", "src/@types/**/*.d.ts"],
+  // "exclude": ["node_modules", "dist"]
 }

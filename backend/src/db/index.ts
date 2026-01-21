@@ -10,6 +10,13 @@ const client = createClient({
 
 export const db = drizzle(client, { logger: true, casing: 'snake_case' });
 
+export const initializeDatabase = async () => {
+  await db.run(`
+    PRAGMA journal_mode = WAL;
+    PRAGMA synchronous = NORMAL;
+    PRAGMA foreign_keys=ON;`);
+};
+
 export const migrateDatabase = async () => {
   await migrate(db, { migrationsFolder: './drizzle' });
 };
