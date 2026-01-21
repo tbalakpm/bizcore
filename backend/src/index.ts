@@ -1,8 +1,11 @@
-import { start } from './server';
+import { app } from './app';
+import { config } from './config';
 
-start()
-  .then(() => {
-    console.log('Server started successfully');
+app()
+  .then((server) => {
+    server.listen(config.port, () => {
+      console.log(`Server (api) listening on http://localhost:${config.port}`);
+    });
   })
   .catch((err) => {
     console.error('Failed to start server:', err);

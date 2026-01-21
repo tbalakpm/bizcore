@@ -11,16 +11,14 @@ import { categoriesRouter } from './routes/categories';
 import { entryRouter } from './routes/entries';
 import { registersRouter } from './routes/registers';
 
-console.log('Starting server...');
-
-export async function start() {
+export async function app() {
   await initializeDatabase();
   await migrateDatabase();
-  const app = express();
 
+  const app = express();
   app.use(
     cors({
-      origin: config.corsOrigins!,
+      origin: config.corsOrigins,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
     }),
@@ -33,7 +31,7 @@ export async function start() {
   app.use(express.static(path.join(__dirname, '/public')));
 
   app.get('/api/health', (req: Request, res: Response): void => {
-    res.json({ status: 'ok', lang: req.i18n?.lang || 'en' });
+    res.json({ status: 'ok', username: req.user?.username || '', lang: req.i18n?.lang || 'en' });
   });
 
   app.use('/api/auth', authRouter);
@@ -50,7 +48,5 @@ export async function start() {
     });
   });
 
-  app.listen(config.port, () => {
-    console.log(`Server (api) listening on http://localhost:${config.port}`);
-  });
+  return app;
 }

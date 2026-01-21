@@ -15,6 +15,13 @@
       "when": 1768995058100,
       "tag": "0001_user_role_check",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1769002701998,
+      "tag": "0002_masters",
+      "breakpoints": true
     }
   ]
 }

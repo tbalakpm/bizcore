@@ -4,18 +4,13 @@
     "module": "commonjs",
     "outDir": "dist",
     "rootDir": "src",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
     "strict": true,
-    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node"],
     "forceConsistentCasingInFileNames": true,
-    // "experimentalDecorators": true,
-    // "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
     "typeRoots": ["./src/@types", "./node_modules/@types"]
   },
-  "include": ["src"]
-  // "include": ["src/**/*", "src/@types/**/*.d.ts"],
-  // "exclude": ["node_modules", "dist"]
+  "include": ["src"], //["src/**/*", "src/@types/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }
