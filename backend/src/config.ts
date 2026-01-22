@@ -15,6 +15,7 @@ export const config = {
   tursoAuthToken: process.env.TURSO_AUTH_TOKEN || '',
   supportedLangs: ['en', 'ta'],
   defaultLang: 'en',
+  isDevelopment,
 };
 
 // export const NODE_ENV = process.env.NODE_ENV || 'development';

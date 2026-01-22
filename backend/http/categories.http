@@ -1,5 +1,5 @@
 @baseUrl=http://localhost:4000/api
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoidGJhbGEiLCJpYXQiOjE3NjYwMjM3OTksImV4cCI6MTc2NjYyODU5OX0.MAluOIEI9_IJs3B0LHSRqMJXMEBFglu7xj0lpOMyI5Q
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsInVzZXJuYW1lIjoiYnNlZXRoYSIsImlhdCI6MTc2OTA0NTM2NCwiZXhwIjoxNzY5NjUwMTY0fQ.5pjAJP1fni3Ga4JixsoJQCJroVizxIZ0cXu85oYpBLc
 
 ### Get all categories
 GET {{baseUrl}}/categories
@@ -12,9 +12,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Short term investment",
+  "name": "",
   "description": "Investments for a short term period",
-  "type": "A"
 }
 
 

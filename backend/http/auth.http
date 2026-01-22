@@ -1,8 +1,7 @@
-# @baseUrl=http://localhost:4000/api
-@baseUrl=https://expense-tracker-lbw9.onrender.com/api
+@baseUrl=http://localhost:4000/api
 
-@username=vallalar
-@password=2026
+@username=bseetha
+@password=1234
 
 ### Login User
 POST {{baseUrl}}/auth/login

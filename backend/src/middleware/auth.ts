@@ -3,17 +3,16 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 
 import { config } from '../config';
 import { db } from '../db';
-import { users } from '../schema';
+import { users } from '../db';
 import { eq } from 'drizzle-orm';
 
 export async function authRequired(req: Request, res: Response, next: NextFunction) {
   const header = req.headers.authorization;
-  //req.headers.get("Authorization") || req.headers.get("authorization");
   if (!header || !header.startsWith('Bearer ')) {
     return res.status(401).json({ error: req.i18n?.t('auth.required') });
   }
 
-  const token = header.substring(7);
+  const token = header.slice(7);
 
   try {
     const payload = jwt.verify(token, config.jwtSecret) as JwtPayload;

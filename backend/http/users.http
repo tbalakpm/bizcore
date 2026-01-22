@@ -1,0 +1,45 @@
+@baseUrl=http://localhost:4000/api
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsInVzZXJuYW1lIjoiYnNlZXRoYSIsImlhdCI6MTc2OTA0NTM2NCwiZXhwIjoxNzY5NjUwMTY0fQ.5pjAJP1fni3Ga4JixsoJQCJroVizxIZ0cXu85oYpBLc
+
+
+### GET all users
+GET {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Get user by id
+GET {{baseUrl}}/users/5
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### POST create new user
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "username": "john.doe",
+  "password": "SecurePass123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "role": "user",
+  "isActive": true
+}
+
+### PUT update user by id
+PUT {{baseUrl}}/users/4
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "username": "john.smith",
+  "firstName": "John",
+  "lastName": "Smith",
+  "role": "admin",
+  "isActive": true
+}
+
+### DELETE user by id
+DELETE {{baseUrl}}/users/4
+Content-Type: application/json
+Authorization: Bearer {{token}}

@@ -1,0 +1,14 @@
+@baseUrl=http://localhost:4000
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsInVzZXJuYW1lIjoiYnNlZXRoYSIsImlhdCI6MTc2OTA0NTM2NCwiZXhwIjoxNzY5NjUwMTY0fQ.5pjAJP1fni3Ga4JixsoJQCJroVizxIZ0cXu85oYpBLc
+
+### root
+GET {{baseUrl}}
+
+
+### api root
+GET {{baseUrl}}/api
+
+### health
+GET {{baseUrl}}/api/health
+Content-Type: application/json
+Authorization: Bearer {{token}}

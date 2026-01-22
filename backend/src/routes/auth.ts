@@ -1,19 +1,21 @@
-import bcrypt from 'bcryptjs';
 import express, { type Request, type Response } from 'express';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { config } from '../config';
-import seedCategoryData from '../seed/categories.json'; //with { type: "json" };
-import { db } from '../db';
-import { categories, NewCategory, users } from '../schema';
 import { eq } from 'drizzle-orm';
+
+import { config } from '../config';
+import { db, users } from '../db';
 
 export const authRouter = express.Router();
 
 authRouter.post('/register', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
-  if (!username || !password || password.length < 4) {
-    return res.status(400).json({ error: req.i18n?.t('user.invalid') });
+  if (!username || !password) {
+    return res.status(400).json({ error: req.i18n?.t('auth.invalid') });
+  }
+  if (password.length < 4) {
+    return res.status(400).json({ error: 'Password is less than 4 chars' });
   }
 
   const existing = await db.select({ id: users.id }).from(users).where(eq(users.username, username)).get();
@@ -22,10 +24,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const newUser = await db.insert(users).values({ username, passwordHash }).returning({ id: users.id }).get();
-
-  // seed data
-  await seedCategories(newUser.id);
+  await db.insert(users).values({ username, passwordHash }).returning({ id: users.id }).get();
 
   return res.status(201).json({ message: req.i18n?.t('user.created') });
 });
@@ -53,12 +52,12 @@ authRouter.post('/login', async (req: Request, res: Response) => {
   return res.json({ token });
 });
 
-const seedCategories = async (userId: number) => {
-  // console.log(seedCategoryData);
-  const userCategories = seedCategoryData.categories.map((c: Partial<NewCategory>) => {
-    c.userId = userId;
-    return c;
-  });
+// const seedCategories = async (userId: number) => {
+//   // console.log(seedCategoryData);
+//   const userCategories = seedCategoryData.categories.map((c: Partial<NewCategory>) => {
+//     c.userId = userId;
+//     return c;
+//   });
 
-  await db.insert(categories).values(userCategories as NewCategory[]);
-};
+//   await db.insert(categories).values(userCategories as NewCategory[]);
+// };

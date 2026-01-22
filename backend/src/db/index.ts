@@ -3,12 +3,14 @@ import { migrate } from 'drizzle-orm/libsql/migrator';
 import { createClient } from '@libsql/client';
 import { config } from '../config';
 
+export * from './schema';
+
 const client = createClient({
   url: config.tursoDatabaseUrl,
   authToken: config.tursoAuthToken,
 });
 
-export const db = drizzle(client, { logger: true, casing: 'snake_case' });
+export const db = drizzle(client, { logger: config.isDevelopment, casing: 'snake_case' });
 
 export const initializeDatabase = async () => {
   console.log('Initializing database');

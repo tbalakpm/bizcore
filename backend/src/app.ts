@@ -1,6 +1,6 @@
 import path from 'node:path';
 import cors from 'cors';
-import express, { type Request, type Response } from 'express';
+import express, { NextFunction, type Request, type Response } from 'express';
 
 import { config } from './config';
 import { initializeDatabase, migrateDatabase } from './db';
@@ -8,10 +8,12 @@ import { i18nMiddleware } from './middleware/i18n';
 
 import { authRouter } from './routes/auth';
 import { categoriesRouter } from './routes/categories';
-import { entryRouter } from './routes/entries';
-import { registersRouter } from './routes/registers';
+import { authRequired } from './middleware/auth';
+import { usersRouter } from './routes/users';
+import { productsRouter } from './routes/products';
 
 export async function app() {
+  console.log(`Environment: ${config.environment}`);
   await initializeDatabase();
   await migrateDatabase();
 
@@ -20,24 +22,25 @@ export async function app() {
     cors({
       origin: config.corsOrigins,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept-Language'],
     }),
   );
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
   app.use(i18nMiddleware);
 
   // Serve the static files from the Angular dist directory
   // Replace 'my-angular-app' with your actual project name from the dist folder
   app.use(express.static(path.join(__dirname, '/public')));
 
-  app.get('/api/health', (req: Request, res: Response): void => {
+  app.get('/api/health', (req: Request, res: Response, next: NextFunction): void => {
     res.json({ status: 'ok', username: req.user?.username || '', lang: req.i18n?.lang || 'en' });
+    // next();
   });
-
   app.use('/api/auth', authRouter);
-  app.use('/api/categories', categoriesRouter);
-  app.use('/api/registers', registersRouter);
-  app.use('/api/entries', entryRouter);
+  app.use('/api/users', authRequired, usersRouter);
+  app.use('/api/categories', authRequired, categoriesRouter);
+  app.use('/api/products', authRequired, productsRouter);
 
   // Handle any requests that don't match the static files by serving the index.html file
   app.get('/{*any}', (_req, res, next) => {
@@ -48,5 +51,5 @@ export async function app() {
     });
   });
 
-  return app;
+  return { express: app, port: config.port };
 }
