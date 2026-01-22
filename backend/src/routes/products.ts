@@ -1,20 +1,25 @@
 import express, { type Request, type Response } from 'express';
-import { asc, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 import { db, products } from '../db';
 
 export const productsRouter = express.Router();
 
 productsRouter.get('/', async (_req: Request, res: Response) => {
-  const result = await db.select().from(products).orderBy(asc(products.name));
+  const result = await db.select().from(products).all();
 
   res.json(result);
 });
 
 productsRouter.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'Invalid product ID' });
+  }
+
   const product = await db.select().from(products).where(eq(products.id, id)).get();
-  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') });
+  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
+
   res.json(product);
 });
 
@@ -44,7 +49,7 @@ productsRouter.post('/', async (req, res) => {
     res.status(201).json(product);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: req.i18n?.t('product.exists') });
+    res.status(400).json({ error: req.i18n?.t('product.exists') || 'Product already exists' });
   }
 });
 
@@ -53,7 +58,7 @@ productsRouter.put('/:id', async (req, res) => {
   const { code, name, description, categoryId, qtyPerUnit, unitPrice, unitsInStock, isActive } = req.body;
 
   const product = await db.select().from(products).where(eq(products.id, id)).get();
-  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') });
+  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
 
   if (code) product.code = code;
   if (name) product.name = name;
@@ -86,7 +91,7 @@ productsRouter.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
   const product = await db.select({ id: products.id }).from(products).where(eq(products.id, id)).get();
-  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') });
+  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
 
   await db.delete(products).where(eq(products.id, id)).run();
   res.status(204).send();

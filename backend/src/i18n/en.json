@@ -7,5 +7,7 @@
   "category.exists": "Category already exists.",
   "category.notFound": "Category not found",
   "product.exists": "Product already exists.",
-  "product.notFound": "Product not found"
+  "product.notFound": "Product not found",
+  "customer.exists": "Customer already exists.",
+  "customer.notFound": "Customer not found"
 }

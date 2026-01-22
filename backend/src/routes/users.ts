@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { asc, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 import { db, users } from '../db';
 
@@ -8,15 +8,19 @@ export const usersRouter = express.Router();
 
 usersRouter.get('/', async (_req: Request, res: Response) => {
   const result = await db.select().from(users);
-  //.orderBy(asc(users.username)).all();
 
   res.json(result);
 });
 
 usersRouter.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'Invalid product ID' });
+  }
+
   const user = await db.select().from(users).where(eq(users.id, id)).get();
   if (!user) return res.status(404).json({ error: req.i18n?.t('user.notFound') });
+
   res.json(user);
 });
 

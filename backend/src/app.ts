@@ -11,6 +11,7 @@ import { categoriesRouter } from './routes/categories';
 import { authRequired } from './middleware/auth';
 import { usersRouter } from './routes/users';
 import { productsRouter } from './routes/products';
+import { customersRouter } from './routes/customers';
 
 export async function app() {
   console.log(`Environment: ${config.environment}`);
@@ -41,6 +42,7 @@ export async function app() {
   app.use('/api/users', authRequired, usersRouter);
   app.use('/api/categories', authRequired, categoriesRouter);
   app.use('/api/products', authRequired, productsRouter);
+  app.use('/api/customers', authRequired, customersRouter);
 
   // Handle any requests that don't match the static files by serving the index.html file
   app.get('/{*any}', (_req, res, next) => {

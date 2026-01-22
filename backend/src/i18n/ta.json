@@ -5,6 +5,8 @@
   "auth.required": "உள்நுழைவு அவசியம்.",
   "category.exists": "வகை ஏற்கனவே உள்ளது.",
   "category.notFound": "வகை காணப்படவில்லை.",
+  "customer.exists": "வாடிக்கையாளர் ஏற்கனவே உள்ளனர்.",
+  "customer.notFound": "வாடிக்கையாளர் காணப்படவில்லை.",
   "entry.invalidDate": "தேதி வடிவம் தவறானது. yyyy-MM-dd வடிவத்தில் இருக்க வேண்டும்.",
   "entry.notFound": "செலவு காணப்படவில்லை."
 }
