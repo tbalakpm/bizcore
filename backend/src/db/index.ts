@@ -10,7 +10,7 @@ const client = createClient({
   authToken: config.tursoAuthToken,
 });
 
-export const db = drizzle(client, { logger: config.isDevelopment, casing: 'snake_case' });
+export const db = drizzle(client, { logger: false /*config.isDevelopment*/, casing: 'snake_case' });
 
 export const initializeDatabase = async () => {
   console.log('Initializing database');

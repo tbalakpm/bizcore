@@ -3,8 +3,6 @@ import path from 'node:path';
 import { NextFunction, Request, Response } from 'express';
 import { config } from '../config';
 
-// console.log('i18n-dirname', __dirname);
-
 const translations: any = {};
 
 for (const lang of config.supportedLangs) {

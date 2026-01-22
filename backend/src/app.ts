@@ -12,6 +12,7 @@ import { authRequired } from './middleware/auth';
 import { usersRouter } from './routes/users';
 import { productsRouter } from './routes/products';
 import { customersRouter } from './routes/customers';
+import { logger } from './middleware/logger';
 
 export async function app() {
   console.log(`Environment: ${config.environment}`);
@@ -28,6 +29,7 @@ export async function app() {
   );
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(logger);
   app.use(i18nMiddleware);
 
   // Serve the static files from the Angular dist directory

@@ -12,7 +12,6 @@ Content-Type: application/json
   "password": "{{password}}"
 }
 
-
 ### Register User
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
@@ -21,7 +20,6 @@ Content-Type: application/json
   "username": "{{username}}",
   "password": "{{password}}"
 }
-
 
 ### Get All Users
 GET {{baseUrl}}/users
