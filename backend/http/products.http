@@ -20,7 +20,7 @@ Authorization: Bearer {{token}}
   "code": "PROD001",
   "name": "Laptop",
   "description": "High-performance laptop for professionals",
-  "categoryId": 1,
+  "categoryId": 2,
   "qtyPerUnit": "1 unit",
   "unitPrice": "999.99",
   "unitsInStock": 50,

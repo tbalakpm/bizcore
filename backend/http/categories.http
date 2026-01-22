@@ -6,35 +6,18 @@ GET {{baseUrl}}/categories
 Authorization: Bearer {{token}}
 
 
+### Category by id
+GET {{baseUrl}}/categories/1
+Authorization: Bearer {{token}}
+
+
 ### Create Category
 POST {{baseUrl}}/categories
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "",
-  "description": "Investments for a short term period",
-}
-
-
-###
-POST {{baseUrl}}/categories
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-  "name": "Long term investment",
-  "description": "Investments for a long term period",
-  "type": "Asset"
-}
-
-###
-POST {{baseUrl}}/categories
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-  "name": "Personal expenses",
-  "description": "Personal expenses",
-  "type": "Expense"
+  "code": "ELEC",
+  "name": "Electronics",
+  "description": "Electronic items"
 }
