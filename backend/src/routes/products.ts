@@ -1,12 +1,24 @@
 import express, { type Request, type Response } from 'express';
 import { eq } from 'drizzle-orm';
 
-import { db, products } from '../db';
+import { categories, db, products } from '../db';
 
 export const productsRouter = express.Router();
 
 productsRouter.get('/', async (_req: Request, res: Response) => {
-  const result = await db.select().from(products).all();
+  const result = await db
+    .select({
+      id: products.id,
+      code: products.code,
+      name: products.name,
+      description: products.description,
+      categoryId: products.categoryId,
+      categoryName: categories.name,
+      isActive: products.isActive,
+    })
+    .from(products)
+    .leftJoin(categories, eq(categories.id, products.categoryId))
+    .all();
 
   res.json(result);
 });

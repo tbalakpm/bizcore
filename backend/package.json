@@ -1,5 +1,5 @@
 {
-  "name": "bizcore",
+  "name": "bizcore-api",
   "version": "1.0.0",
   "description": "BizCore backend (Node + Express + SQLite + JWT + i18n)",
   "main": "dist/index.js",

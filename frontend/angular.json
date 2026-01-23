@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "personal-accountant-web": {
+    "bizcore-app": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -62,10 +62,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "personal-accountant-web:build:production"
+              "buildTarget": "bizcore-app:build:production"
             },
             "development": {
-              "buildTarget": "personal-accountant-web:build:development"
+              "buildTarget": "bizcore-app:build:development"
             }
           },
           "defaultConfiguration": "development"

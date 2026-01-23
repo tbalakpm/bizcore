@@ -1,5 +1,5 @@
 {
-  "APP_TITLE": "Personal Accountant",
+  "APP_TITLE": "BizCore",
   "ALL_RIGHTS_RESERVED": "All Rights Reserved",
   "SUBMIT": "Submit",
   "SAVE": "Save",
@@ -8,6 +8,7 @@
   "EDIT": "Edit",
   "DELETE": "Delete",
   "ACTIONS": "Actions",
+  "CODE": "Code",
   "NAME": "Name",
   "TYPE": "Type",
   "DESCRIPTION": "Description",
@@ -15,8 +16,9 @@
   "MENU": {
     "DASHBOARD": "Dashboard",
     "CATEGORIES": "Categories",
-    "REGISTERS": "Registers",
-    "ENTRIES": "Entries",
+    "PRODUCTS": "Products",
+    "USERS": "Users",
+    "CUSTOMERS": "Customers",
     "LOGOUT": "Logout"
   },
   "LOGIN": {
@@ -25,8 +27,8 @@
     "PASSWORD": "Password",
     "SUBMIT": "Sign in"
   },
-  "REGISTER": {
-    "TITLE": "Register",
+  "PRODUCT": {
+    "TITLE": "Product",
     "USERNAME": "Username",
     "PASSWORD": "Password",
     "NO_REGISTERS_YET": "No registers yet"

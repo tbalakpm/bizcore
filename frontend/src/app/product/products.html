@@ -1,0 +1,249 @@
+<div class="flex justify-between items-center mb-4">
+  <h1 class="flex text-2xl font-bold items-center gap-2">
+    <svg
+      class="w-7 h-7 text-gray-800"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2.5"
+        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+      />
+    </svg>
+    {{ 'MENU.PRODUCTS' | translate }}
+  </h1>
+</div>
+
+<div class="grid grid-cols-1 gap-4">
+  <!-- Add form -->
+  <div class="bg-white p-4 rounded-lg shadow max-h-max">
+    <h2 class="text-lg font-semibold mb-3">
+      {{ editingProduct.id ? ('EDIT' | translate) : ('ADD' | translate) }}
+      {{ 'PRODUCT.TITLE' | translate }}
+    </h2>
+    <form (ngSubmit)="onSubmit()" class="grid grid-cols-4 gap-2">
+      <div>
+        <label class="block text-sm font-medium"
+          >{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</label
+        >
+        <input
+          type="text"
+          [(ngModel)]="editingProduct.code"
+          name="newProductCode"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+          autofocus
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium"
+          >{{ 'PRODUCT.TITLE' | translate }} {{ 'NAME' | translate }}</label
+        >
+        <input
+          type="text"
+          [(ngModel)]="editingProduct.name"
+          name="newProductName"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+          autofocus
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium">{{ 'DESCRIPTION' | translate }}</label>
+        <textarea
+          rows="1"
+          [(ngModel)]="editingProduct.description"
+          name="newProductDescription"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+        ></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-medium">{{ 'CATEGORY.TITLE' | translate }}</label>
+        <select
+          [(ngModel)]="editingProduct.categoryId"
+          name="newProductCategory"
+          class="block w-full px-2 py-1.5 mt-1 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer focus:ring-brand focus:border-brand placeholder:text-body"
+        >
+          <!-- <option [ngValue]="null">-- Select --</option> -->
+          @for (c of categories(); track c.id) {
+            <option [ngValue]="c.id" selected="{{ editingProduct.categoryId === c.id }}">
+              {{ c.name }}
+            </option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Qty Per Unit</label>
+        <input
+          type="text"
+          [(ngModel)]="editingProduct.qtyPerUnit"
+          name="newProductQtyPerUnit"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+          autofocus
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Unit Price</label>
+        <input
+          type="number"
+          step="1.00"
+          [(ngModel)]="editingProduct.unitPrice"
+          name="newProductUnitPrice"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 disabled:bg-gray-100 disabled:border-gray-400"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Unit In Stock</label>
+        <input
+          type="number"
+          step="1.00"
+          [(ngModel)]="editingProduct.unitsInStock"
+          name="newProductUnitsInStock"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 disabled:bg-gray-100 disabled:border-gray-400"
+        />
+      </div>
+      <!-- <div>
+        <label class="block text-sm font-medium">Balance as on (for asset/liability)</label>
+        <input
+          type="date"
+          [(ngModel)]="editingProduct.date"
+          name="newRegisterDate"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 cursor-pointer disabled:bg-gray-100 disabled:border-gray-400 disabled:cursor-default"
+          [disabled]="
+            !(editingProduct.categoryType && ['A', 'L'].includes(editingProduct.categoryType))
+          "
+        />
+      </div> -->
+      <!-- <div class="flex items-center">
+        <input
+          id="newCategoryActive"
+          type="checkbox"
+          value=""
+          [(ngModel)]="editingProduct.isActive"
+          name="newCategoryActive"
+          class="w-4 h-4 border bg-slate-500 accent-slate-700 rounded-md focus:ring focus:ring-slate-700 focus:outline-none cursor-pointer"
+        />
+        <label
+          for="newCategoryActive"
+          class="select-none ms-2 text-sm font-medium text-heading cursor-pointer"
+          >Active</label
+        >
+      </div> -->
+      <div class="gap-4 col-start-4 flex items-end">
+        <button
+          type="submit"
+          class="py-1.5 w-full border bg-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-white text-sm cursor-pointer"
+        >
+          Save
+        </button>
+        @if (editingProduct.id) {
+          <button
+            type="button"
+            class="py-1.5 w-full border border-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-sm cursor-pointer"
+            (click)="onCancel()"
+          >
+            Cancel
+          </button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <!-- List -->
+  <div class="bg-white p-4 rounded-lg shadow">
+    <div class="flex justify-between mb-2">
+      <h2 class="text-lg font-semibold">{{ 'MENU.PRODUCTS' | translate }}</h2>
+    </div>
+
+    <!-- <div class="h-210 overflow-auto"> -->
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50">
+        <tr class="border-b border-slate-400">
+          <th class="text-left py-2">{{ 'CODE' | translate }}</th>
+          <th class="text-left py-2">{{ 'NAME' | translate }}</th>
+          <th class="text-left py-2">{{ 'DESCRIPTION' | translate }}</th>
+          <th class="text-left py-2">{{ 'CATEGORY.TITLE' | translate }}</th>
+          <th class="text-center w-16 py-2">{{ 'ACTIVE' | translate }}</th>
+          <th class="py-2 text-right">{{ 'ACTIONS' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of products(); track r.id) {
+          <tr class="border-b border-slate-200 hover:bg-slate-100">
+            <td class="py-2">{{ r.code }}</td>
+            <td class="py-2">{{ r.name }}</td>
+            <td class="py-2">{{ r.description }}</td>
+            <td class="py-2">{{ r.categoryName || '-' }}</td>
+            <td class="text-center">
+              <button
+                type="button"
+                (click)="toggleActive(r)"
+                class="inline-flex items-center justify-center w-4.5 h-4.5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:ring-slate-700 hover:outline-none rounded hover:bg-gray-100 transition cursor-pointer"
+                [ngClass]="
+                  r.isActive ? 'border-green-500 text-green-600' : 'border-gray-300 text-gray-400'
+                "
+              >
+                <svg
+                  *ngIf="r.isActive"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <svg
+                  *ngIf="!r.isActive"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </td>
+            <td class="py-2 px-2 text-right space-x-2">
+              <button
+                (click)="editProduct(r.id)"
+                class="text-blue-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer"
+              >
+                {{ 'EDIT' | translate }}
+              </button>
+              <button
+                (click)="deleteProduct(r.id)"
+                class="text-red-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer"
+              >
+                {{ 'DELETE' | translate }}
+              </button>
+            </td>
+          </tr>
+        }
+        <!---->
+        @if (!products().length) {
+          <tr>
+            <td colspan="5" class="py-2 text-center text-gray-400">
+              {{ 'REGISTER.NO_REGISTERS_YET' | translate }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <!-- </div> -->
+  </div>
+</div>

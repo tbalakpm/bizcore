@@ -4,7 +4,8 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-BizCore is a full-stack personal accounting/business management application with:
+BizCore is a full-stack business management application with:
+
 - **Backend**: Node.js + Express + TypeScript + Drizzle ORM + libSQL/Turso
 - **Frontend**: Angular 20 + TailwindCSS + ngx-translate (i18n)
 - **Database**: SQLite (local development) or Turso (production)
@@ -61,11 +62,13 @@ npm test
 ### Full Stack Development Workflow
 
 1. **Terminal 1**: Start backend dev server from `backend/`:
+
    ```bash
    npm run dev
    ```
 
 2. **Terminal 2**: Start frontend dev server from `frontend/`:
+
    ```bash
    npm start
    ```
@@ -82,6 +85,7 @@ npm test
 **Entry Point**: `backend/src/index.ts` → initializes Express app from `app.ts`
 
 **Core Structure**:
+
 - **Database Layer** (`src/db/`):
   - `index.ts`: Initializes libSQL client, exports `db` instance
   - `schema/`: Drizzle ORM table definitions (users, categories, products, customers)
@@ -116,6 +120,7 @@ npm test
 **Entry Point**: `frontend/src/main.ts` → bootstraps Angular app
 
 **Core Structure**:
+
 - **App Configuration** (`src/app/app.config.ts`):
   - HTTP interceptor (`authInterceptor`) adds JWT token and `Accept-Language` header to all API requests
   - ngx-translate configured for i18n with translations in `/assets/i18n/*.json`
@@ -146,6 +151,7 @@ npm test
 ### Database Schema Patterns
 
 All tables follow this pattern:
+
 - Primary key: `id` (auto-increment integer)
 - Unique identifiers: `code`, `username`, etc.
 - Soft deletes: `isActive` boolean column
@@ -153,6 +159,7 @@ All tables follow this pattern:
 - Foreign keys use snake_case: `category_id` references `categories.id`
 
 **Key Entities**:
+
 - `users`: Authentication and user management, has `role` (user/manager/admin)
 - `categories`: Product categories
 - `products`: Inventory items with `categoryId` FK
@@ -168,11 +175,13 @@ All tables follow this pattern:
 ### Internationalization (i18n)
 
 **Backend**:
+
 - `i18nMiddleware` reads `Accept-Language` header
 - Loads translations from `src/i18n/{lang}.json`
 - Provides `req.i18n.t(key)` for translation in route handlers
 
 **Frontend**:
+
 - ngx-translate loads from `/assets/i18n/{lang}.json`
 - `authInterceptor` sends current language in `Accept-Language` header
 - Components use `TranslateService` or `translate` pipe
@@ -190,10 +199,12 @@ npm run db:migrate   # Applies migrations (also runs on server start)
 ## Environment Configuration
 
 Create environment files:
+
 - `backend/.env/.env.local` - for development
 - `backend/.env/.env.production` - for production
 
 Required variables:
+
 ```
 NODE_ENV=development|production
 PORT=4000
@@ -204,6 +215,7 @@ TURSO_AUTH_TOKEN=  # required only for Turso cloud
 ```
 
 For local development with SQLite, use:
+
 ```
 TURSO_DATABASE_URL=file:bizcore.db
 TURSO_AUTH_TOKEN=
@@ -212,36 +224,31 @@ TURSO_AUTH_TOKEN=
 ## Drizzle ORM Patterns
 
 **Query Examples**:
+
 ```typescript
 // Select with condition
-const user = await db
-  .select({ id: users.id, username: users.username })
-  .from(users)
-  .where(eq(users.id, userId))
-  .get();  // .get() returns single row, .all() returns array
+const user = await db.select({ id: users.id, username: users.username }).from(users).where(eq(users.id, userId)).get(); // .get() returns single row, .all() returns array
 
 // Insert
 await db.insert(users).values({ username, passwordHash });
 
 // Update
-await db.update(users)
-  .set({ isActive: false })
-  .where(eq(users.id, userId));
+await db.update(users).set({ isActive: false }).where(eq(users.id, userId));
 
 // Joins
-await db
-  .select()
-  .from(products)
-  .leftJoin(categories, eq(products.categoryId, categories.id));
+await db.select().from(products).leftJoin(categories, eq(products.categoryId, categories.id));
 ```
 
 **Schema Definition Pattern**:
+
 ```typescript
 export const tableName = sqliteTable('table_name', {
   id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
   name: text('name', { length: 50 }).notNull(),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
-  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+  createdAt: text('created_at')
+    .notNull()
+    .default(sql`(CURRENT_TIMESTAMP)`),
 });
 
 export type TableName = typeof tableName.$inferSelect;
@@ -251,11 +258,12 @@ export type NewTableName = typeof tableName.$inferInsert;
 ## Angular Patterns
 
 **Service Pattern**:
+
 ```typescript
 @Injectable({ providedIn: 'root' })
 export class FeatureService {
   private http = inject(HttpClient);
-  
+
   getAll() {
     return this.http.get<Type[]>(`${environment.apiUrl}/endpoint`);
   }
@@ -263,20 +271,21 @@ export class FeatureService {
 ```
 
 **Component Pattern**:
+
 ```typescript
 export class FeatureComponent {
   private service = inject(FeatureService);
   items = signal<Type[]>([]);
-  
+
   ngOnInit() {
-    this.service.getAll().subscribe(data => this.items.set(data));
+    this.service.getAll().subscribe((data) => this.items.set(data));
   }
 }
 ```
 
 ## Code Style and Conventions
 
-- **Backend**: 
+- **Backend**:
   - Drizzle schema uses snake_case for column names
   - TypeScript/JavaScript uses camelCase
   - Express routes export Router instances
@@ -291,6 +300,7 @@ export class FeatureComponent {
 ## Testing
 
 No test framework is currently configured. To add tests:
+
 - **Backend**: Consider adding Jest or Vitest
 - **Frontend**: Karma + Jasmine already configured, use `npm test` in frontend/
 

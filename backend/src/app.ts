@@ -47,7 +47,11 @@ export async function app() {
   app.use('/api/customers', authRequired, customersRouter);
 
   // Handle any requests that don't match the static files by serving the index.html file
-  app.get('/{*any}', (_req, res, next) => {
+  app.get('/{*any}', (req, res, next) => {
+    if (req.url.startsWith('/api')) {
+      return res.status(404).json({ message: `Url '${req.url}' not found` });
+    }
+
     res.sendFile(path.join(__dirname, '/public/index.html'), (err) => {
       if (err) {
         next(err);

@@ -5,8 +5,8 @@ import { environment } from '../../environments/environment';
 
 export interface Category {
   id: number;
+  code: string;
   name: string;
-  type: string;
   description?: string;
   isActive: boolean;
 }

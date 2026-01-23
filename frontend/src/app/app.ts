@@ -17,7 +17,7 @@ export class App {
 
   today = new Date();
 
-  protected readonly title = signal('Personal Accountant');
+  protected readonly title = signal('BizCore');
 
   constructor() {
     this.translate.addLangs(['en', 'ta']);

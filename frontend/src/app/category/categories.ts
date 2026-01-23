@@ -13,17 +13,17 @@ export class Categories implements OnInit {
   categoryService = inject(CategoryService);
 
   categories = signal<Category[]>([]);
-  newCategory: Partial<Category> = { name: '', description: '', isActive: true };
+  newCategory: Partial<Category> = { code: '', name: '', description: '', isActive: true };
   loading = false;
   error: string | null = null;
 
   editing: Category | null = null;
-  categoryTypes: { [key: string]: string } = {
-    I: 'CATEGORY.INCOME',
-    E: 'CATEGORY.EXPENSE',
-    A: 'CATEGORY.ASSET',
-    L: 'CATEGORY.LIABILITY',
-  };
+  // categoryTypes: { [key: string]: string } = {
+  //   I: 'CATEGORY.INCOME',
+  //   E: 'CATEGORY.EXPENSE',
+  //   A: 'CATEGORY.ASSET',
+  //   L: 'CATEGORY.LIABILITY',
+  // };
 
   ngOnInit(): void {
     this.loadCategories();
@@ -47,7 +47,7 @@ export class Categories implements OnInit {
     if (!this.newCategory.name) return;
     this.categoryService.create(this.newCategory).subscribe({
       next: () => {
-        this.newCategory = { name: '', type: '', description: '', isActive: true };
+        this.newCategory = { code: '', name: '', description: '', isActive: true };
         this.loadCategories();
         this.error = null;
       },

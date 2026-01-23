@@ -1,0 +1,44 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import type { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+export interface Product {
+  id: number;
+  code: string;
+  name: string;
+  description?: string;
+  categoryId: number;
+  qtyPerUnit?: string;
+  unitPrice?: number;
+  unitsInStock?: number;
+  categoryName?: string;
+  isActive: boolean;
+}
+
+@Injectable({ providedIn: 'root' })
+export class ProductService {
+  private http = inject(HttpClient);
+
+  getAll(): Observable<Product[]> {
+    let params = new HttpParams();
+    return this.http.get<Product[]>(`${environment.apiUrl}/products`, { params });
+  }
+
+  getById(id: number): Observable<Product> {
+    let params = new HttpParams();
+    return this.http.get<Product>(`${environment.apiUrl}/products/${id}`, { params });
+  }
+
+  create(product: Partial<Product>): Observable<Product> {
+    return this.http.post<Product>(`${environment.apiUrl}/products`, product);
+  }
+
+  update(id: number, product: Partial<Product>): Observable<Product> {
+    return this.http.put<Product>(`${environment.apiUrl}/products/${id}`, product);
+  }
+
+  delete(id: number) {
+    return this.http.delete(`${environment.apiUrl}/products/${id}`);
+  }
+}

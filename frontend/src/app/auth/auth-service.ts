@@ -10,7 +10,7 @@ export interface AuthResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http: HttpClient = inject(HttpClient);
-  private tokenKey = 'et_token';
+  private tokenKey = 'bc_token';
 
   login(username: string, password: string) {
     return this.http

@@ -1,11 +1,12 @@
 {
-  "name": "personal-accountant-web",
+  "name": "bizcore-app",
   "version": "1.0.0",
+  "description": "BizCore frontend (Angular + TailwindCSS + Chart.js)",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "postbuild": "rm -rf ../backend/src/public && mkdir -p ../backend/src/public && cp -R ./dist/personal-accountant-web/browser/* ../backend/src/public/",
+    "postbuild": "rm -rf ../backend/src/public && mkdir -p ../backend/src/public && cp -R ./dist/bizcore-app/browser/* ../backend/src/public/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
