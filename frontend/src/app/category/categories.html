@@ -33,24 +33,27 @@
         <table class="min-w-full text-sm">
           <thead class="bg-gray-50">
             <tr class="border-b border-slate-400">
-              <th class="text-left py-2 w-32">{{ 'CODE' | translate }}</th>
-              <th class="text-left py-2 w-50">{{ 'NAME' | translate }}</th>
-              <th class="text-left py-2">{{ 'DESCRIPTION' | translate }}</th>
-              <th class="text-center py-2 w-16">{{ 'ACTIVE' | translate }}</th>
-              <th class="text-right py-2 w-32">{{ 'ACTIONS' | translate }}</th>
+              <th class="text-left px-1 py-2 w-32">{{ 'CODE' | translate }}</th>
+              <th class="text-left px-1 py-2 w-50">{{ 'NAME' | translate }}</th>
+              <th class="text-left px-1 py-2">{{ 'DESCRIPTION' | translate }}</th>
+              <th class="text-center px-1 py-2 w-16">{{ 'ACTIVE' | translate }}</th>
+              <th class="text-right px-1 py-2 w-32">{{ 'ACTIONS' | translate }}</th>
             </tr>
           </thead>
 
           <tbody>
             @for (c of categories(); track c.id) {
-              <tr class="border-b border-slate-200 hover:bg-slate-100">
+              <tr
+                class="border-b border-slate-200 hover:bg-slate-100"
+                [ngClass]="{ 'bg-slate-200': editing?.id == c.id }"
+              >
                 <!-- Code -->
-                <td class="py-1">
+                <td class="px-1 py-1">
                   @if (editing?.id == c.id) {
                     <input
                       [(ngModel)]="editing!.code"
                       name="editCode"
-                      class="w-30 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-1 py-1 text-sm"
+                      class="w-30 border bg-white border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-1 py-1 text-sm"
                     />
                   } @else {
                     {{ c.code }}
@@ -58,88 +61,75 @@
                 </td>
 
                 <!-- Name -->
-                <td class="py-1">
+                <td class="px-1 py-1">
                   @if (editing?.id == c.id) {
                     <input
                       [(ngModel)]="editing!.name"
                       name="editName"
-                      class="w-48 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-1 py-1 text-sm"
+                      class="w-48 border bg-white border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-1 py-1 text-sm"
                     />
                   } @else {
                     {{ c.name }}
                   }
                 </td>
 
-                <td class="py-1">
+                <td class="px-1 py-1">
                   @if (editing?.id == c.id) {
                     <input
                       [(ngModel)]="editing!.description"
                       name="editDesc"
-                      class="w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-1 py-1 text-sm"
+                      class="w-full border bg-white border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-1 py-1 text-sm"
                     />
                   } @else {
                     {{ c.description }}
                   }
                 </td>
 
-                <td class="text-center">
+                <td class="px-1 py-2 text-center items-center">
                   <button
                     type="button"
                     (click)="toggleActive(c)"
-                    class="inline-flex items-center justify-center w-4.5 h-4.5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:ring-slate-700 rounded hover:bg-gray-100 transition cursor-pointer"
+                    class="inline-flex items-center w-4.5 h-4.5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:ring-slate-700 rounded hover:bg-gray-100 transition cursor-pointer"
                     [ngClass]="
                       c.isActive
                         ? 'border-green-500 text-green-600'
                         : 'border-gray-300 text-gray-400'
                     "
                   >
-                    <svg
-                      *ngIf="c.isActive"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <svg
-                      *ngIf="!c.isActive"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    @if (c.isActive) {
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    } @else {
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    }
                   </button>
                 </td>
 
-                <td class="py-2 px-2 text-right space-x-2">
-                  <ng-container *ngIf="editing?.id !== c.id; else editActions">
-                    <button
-                      class="text-blue-700 border-slate-400 focus:ring-2 focus:ring-slate-700 focus:outline-none rounded text-sm hover:underline cursor-pointer"
-                      (click)="startEdit(c)"
-                    >
-                      {{ 'EDIT' | translate }}
-                    </button>
-                    <button
-                      class="text-red-700 border-slate-400 focus:ring-2 focus:ring-slate-700 focus:outline-none rounded text-sm hover:underline cursor-pointer"
-                      (click)="deleteCategory(c)"
-                    >
-                      {{ 'DELETE' | translate }}
-                    </button>
-                  </ng-container>
-                  <ng-template #editActions>
+                <td class="px-1 py-2 text-right space-x-2 items-center">
+                  @if (editing?.id == c.id) {
                     <button
                       class="text-green-700 border-slate-400 focus:ring-2 focus:ring-slate-700 focus:outline-none rounded text-sm hover:underline cursor-pointer"
                       (click)="saveEdit()"
@@ -152,23 +142,40 @@
                     >
                       {{ 'CANCEL' | translate }}
                     </button>
-                  </ng-template>
+                  } @else {
+                    <button
+                      class="text-blue-700 border-slate-400 focus:ring-2 focus:ring-slate-700 focus:outline-none rounded text-sm hover:underline cursor-pointer"
+                      (click)="startEdit(c)"
+                    >
+                      {{ 'EDIT' | translate }}
+                    </button>
+                    <button
+                      class="text-red-700 border-slate-400 focus:ring-2 focus:ring-slate-700 focus:outline-none rounded text-sm hover:underline cursor-pointer"
+                      (click)="deleteCategory(c)"
+                    >
+                      {{ 'DELETE' | translate }}
+                    </button>
+                  }
                 </td>
               </tr>
             }
             <!---->
-            <tr *ngIf="!categories().length">
-              <td colspan="5" class="py-3 text-center text-gray-400">
-                {{ 'CATEGORY.NO_CATEGORIES_YET' | translate }}.
-              </td>
-            </tr>
+            @if (categories().length == 0) {
+              <tr>
+                <td colspan="5" class="py-3 text-center text-gray-400">
+                  {{ 'CATEGORY.NO_CATEGORIES_YET' | translate }}.
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
 
-      <p *ngIf="error" class="text-red-600 text-xs mt-4">
-        {{ error }}
-      </p>
+      @if (error) {
+        <p class="text-red-600 text-xs mt-4">
+          {{ error }}
+        </p>
+      }
     </div>
 
     <!-- Add form -->
@@ -182,6 +189,7 @@
             [(ngModel)]="newCategory.code"
             name="newCategoryCode"
             class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+            autofocus
           />
         </div>
 

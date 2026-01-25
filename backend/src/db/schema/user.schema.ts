@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { check, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { auditFields } from './base';
 
 export const users = sqliteTable(
   'users',
@@ -10,13 +11,7 @@ export const users = sqliteTable(
     firstName: text('first_name', { length: 50 }),
     lastName: text('last_name', { length: 50 }),
     role: text('role', { length: 16 }).notNull().default('user'),
-    isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(CURRENT_TIMESTAMP)`),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(CURRENT_TIMESTAMP)`),
+    ...auditFields,
   },
   (t) => [check('role_must_be_listed', sql`${t.role} IN ('user', 'manager', 'admin')`)],
 );
