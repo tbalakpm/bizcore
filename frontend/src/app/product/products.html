@@ -242,12 +242,23 @@
         @if (!products().length) {
           <tr>
             <td colspan="5" class="py-2 text-center text-gray-400">
-              {{ 'REGISTER.NO_REGISTERS_YET' | translate }}
+              @if (error) {
+                <p class="text-red-600 text-xs mt-4">
+                  {{ error }}
+                </p>
+              } @else {
+                {{ 'PRODUCT.NO_PRODUCTS_YET' | translate }}
+              }
             </td>
           </tr>
         }
       </tbody>
     </table>
     <!-- </div> -->
+    <!-- @if (error) {
+      <p class="text-red-600 text-xs mt-4">
+        {{ error }}
+      </p>
+    } -->
   </div>
 </div>

@@ -163,7 +163,13 @@
             @if (categories().length == 0) {
               <tr>
                 <td colspan="5" class="py-3 text-center text-gray-400">
-                  {{ 'CATEGORY.NO_CATEGORIES_YET' | translate }}.
+                  @if (error) {
+                    <p class="text-red-600 text-xs mt-4">
+                      {{ error }}
+                    </p>
+                  } @else {
+                    {{ 'CATEGORY.NO_CATEGORIES_YET' | translate }}.
+                  }
                 </td>
               </tr>
             }
@@ -171,11 +177,11 @@
         </table>
       </div>
 
-      @if (error) {
+      <!-- @if (error) {
         <p class="text-red-600 text-xs mt-4">
           {{ error }}
         </p>
-      }
+      } -->
     </div>
 
     <!-- Add form -->

@@ -31,7 +31,7 @@
     "TITLE": "Product",
     "USERNAME": "Username",
     "PASSWORD": "Password",
-    "NO_REGISTERS_YET": "No registers yet"
+    "NO_PRODUCTS_YET": "No products yet"
   },
   "CATEGORY": {
     "TITLE": "Category",
