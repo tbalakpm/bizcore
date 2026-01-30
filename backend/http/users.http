@@ -1,11 +1,54 @@
 @baseUrl=http://localhost:4000/api
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsInVzZXJuYW1lIjoiYnNlZXRoYSIsImlhdCI6MTc2OTA0NTM2NCwiZXhwIjoxNzY5NjUwMTY0fQ.5pjAJP1fni3Ga4JixsoJQCJroVizxIZ0cXu85oYpBLc
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoidGJhbGEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Njk2OTI3NDMsImV4cCI6MTc3MDI5NzU0M30.aaqVFvywasfzvQy_yuLyIzAyQsBXo-wzYb5j-8X4X3s
 
 
 ### GET all users
 GET {{baseUrl}}/users
 Content-Type: application/json
 Authorization: Bearer {{token}}
+
+
+### GET all users with simple sort test
+GET {{baseUrl}}/users?sort=username:asc
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET all users with query params for pagination, filtering, sorting
+GET {{baseUrl}}/users?role=user&sort=username:asc
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Test sorting with multiple fields
+GET {{baseUrl}}/users?sort=firstName:asc,createdAt:desc
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Test sorting with invalid field (should be ignored)
+GET {{baseUrl}}/users?sort=invalidField:asc,username:desc
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+### Basic pagination
+GET {{baseUrl}}/users?limit=5&page=2
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Filtering
+GET {{baseUrl}}/users?role=admin&isActive=true&firstName=John
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Sorting
+GET {{baseUrl}}/users?sort=username:asc,createdAt:desc
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Combined
+GET {{baseUrl}}/users?role=user&isActive=true&sort=lastName:asc&limit=25&page=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
 
 ### Get user by id
 GET {{baseUrl}}/users/5
