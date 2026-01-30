@@ -1,15 +1,37 @@
 @baseUrl=http://localhost:4000/api
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsInVzZXJuYW1lIjoiYnNlZXRoYSIsImlhdCI6MTc2OTA0NTM2NCwiZXhwIjoxNzY5NjUwMTY0fQ.5pjAJP1fni3Ga4JixsoJQCJroVizxIZ0cXu85oYpBLc
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoidGJhbGEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Njk2OTI3NDMsImV4cCI6MTc3MDI5NzU0M30.aaqVFvywasfzvQy_yuLyIzAyQsBXo-wzYb5j-8X4X3s
 
-### Get all categories
+### Get all categories (basic)
 GET {{baseUrl}}/categories
 Authorization: Bearer {{token}}
 
+### Get categories with pagination
+GET {{baseUrl}}/categories?limit=5&page=1
+Authorization: Bearer {{token}}
+
+### Get categories with filtering
+GET {{baseUrl}}/categories?name=Electronics&isActive=true
+Authorization: Bearer {{token}}
+
+### Get categories with sorting
+GET {{baseUrl}}/categories?sort=name:asc
+Authorization: Bearer {{token}}
+
+### Get categories with combined pagination, filtering, and sorting
+GET {{baseUrl}}/categories?name=E&sort=name:asc,createdAt:desc&limit=10&page=1
+Authorization: Bearer {{token}}
+
+### Test sorting with multiple fields
+GET {{baseUrl}}/categories?sort=code:asc,name:desc
+Authorization: Bearer {{token}}
+
+### Test sorting with invalid field (should be ignored)
+GET {{baseUrl}}/categories?sort=invalidField:asc,name:desc
+Authorization: Bearer {{token}}
 
 ### Category by id
 GET {{baseUrl}}/categories/1
 Authorization: Bearer {{token}}
-
 
 ### Create Category
 POST {{baseUrl}}/categories

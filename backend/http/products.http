@@ -1,8 +1,68 @@
 @baseUrl=http://localhost:4000/api
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsInVzZXJuYW1lIjoiYnNlZXRoYSIsImlhdCI6MTc2OTA0NTM2NCwiZXhwIjoxNzY5NjUwMTY0fQ.5pjAJP1fni3Ga4JixsoJQCJroVizxIZ0cXu85oYpBLc
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoidGJhbGEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Njk2OTI3NDMsImV4cCI6MTc3MDI5NzU0M30.aaqVFvywasfzvQy_yuLyIzAyQsBXo-wzYb5j-8X4X3s
 
-### GET all products
+### GET all products (basic)
 GET {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products with pagination
+GET {{baseUrl}}/products?limit=5&page=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products with filtering by name and category name
+GET {{baseUrl}}/products?name=Laptop&categoryName=Electronics&isActive=true
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products filtered by category ID
+GET {{baseUrl}}/products?categoryId=2
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products filtered by category name only
+GET {{baseUrl}}/products?categoryName=Electronics
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products with both category filters (ID and name)
+GET {{baseUrl}}/products?categoryId=2&categoryName=Elect
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products with price range filtering
+GET {{baseUrl}}/products?minPrice=100&maxPrice=1000
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products with stock range filtering
+GET {{baseUrl}}/products?minStock=10&maxStock=100
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products with sorting
+GET {{baseUrl}}/products?sort=name:asc
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products with multiple field sorting (including categoryName)
+GET {{baseUrl}}/products?sort=categoryName:asc,unitPrice:desc
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products sorted by category name only
+GET {{baseUrl}}/products?sort=categoryName:asc
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### GET products with combined pagination, filtering, and sorting
+GET {{baseUrl}}/products?name=L&categoryName=Electronics&minPrice=500&sort=name:asc,unitPrice:desc&limit=10&page=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Test sorting with invalid field (should be ignored)
+GET {{baseUrl}}/products?sort=invalidField:asc,name:desc
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

@@ -1,15 +1,53 @@
 @baseUrl=http://localhost:4000/api
 @token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsInVzZXJuYW1lIjoiYnNlZXRoYSIsImlhdCI6MTc2OTA0NTM2NCwiZXhwIjoxNzY5NjUwMTY0fQ.5pjAJP1fni3Ga4JixsoJQCJroVizxIZ0cXu85oYpBLc
 
-### Get all customers
+### Get all customers (basic)
 GET {{baseUrl}}/customers
 Authorization: Bearer {{token}}
 
+### Get customers with pagination
+GET {{baseUrl}}/customers?limit=5&page=1
+Authorization: Bearer {{token}}
+
+### Get customers with filtering by name
+GET {{baseUrl}}/customers?name=John&isActive=true
+Authorization: Bearer {{token}}
+
+### Get customers filtered by type
+GET {{baseUrl}}/customers?type=retail
+Authorization: Bearer {{token}}
+
+### Get customers filtered by type (wholesale)
+GET {{baseUrl}}/customers?type=wholesale
+Authorization: Bearer {{token}}
+
+### Get customers with code filtering
+GET {{baseUrl}}/customers?code=CUST
+Authorization: Bearer {{token}}
+
+### Get customers with notes filtering
+GET {{baseUrl}}/customers?notes=Regular
+Authorization: Bearer {{token}}
+
+### Get customers with sorting by name
+GET {{baseUrl}}/customers?sort=name:asc
+Authorization: Bearer {{token}}
+
+### Get customers with multiple field sorting
+GET {{baseUrl}}/customers?sort=type:asc,name:desc
+Authorization: Bearer {{token}}
+
+### Get customers with combined pagination, filtering, and sorting
+GET {{baseUrl}}/customers?name=C&type=retail&sort=name:asc&limit=10&page=1
+Authorization: Bearer {{token}}
+
+### Test sorting with invalid field (should be ignored)
+GET {{baseUrl}}/customers?sort=invalidField:asc,name:desc
+Authorization: Bearer {{token}}
 
 ### Get customer by ID
 GET {{baseUrl}}/customers/1
 Authorization: Bearer {{token}}
-
 
 ### Create Customer - Retail
 POST {{baseUrl}}/customers
@@ -24,7 +62,6 @@ Authorization: Bearer {{token}}
   "isActive": true
 }
 
-
 ### Create Customer - Wholesale
 POST {{baseUrl}}/customers
 Content-Type: application/json
@@ -37,7 +74,6 @@ Authorization: Bearer {{token}}
   "notes": "Wholesale distributor"
 }
 
-
 ### Create Customer - Minimal (type defaults to retail)
 POST {{baseUrl}}/customers
 Content-Type: application/json
@@ -47,7 +83,6 @@ Authorization: Bearer {{token}}
   "code": "CUST003",
   "name": "Jane Smith"
 }
-
 
 ### Update Customer
 PUT {{baseUrl}}/customers/1
@@ -61,7 +96,6 @@ Authorization: Bearer {{token}}
   "isActive": true
 }
 
-
 ### Update Customer - Partial
 PUT {{baseUrl}}/customers/1
 Content-Type: application/json
@@ -70,7 +104,6 @@ Authorization: Bearer {{token}}
 {
   "notes": "Updated notes only"
 }
-
 
 ### Deactivate Customer
 PUT {{baseUrl}}/customers/1
@@ -81,16 +114,13 @@ Authorization: Bearer {{token}}
   "isActive": false
 }
 
-
 ### Delete Customer
 DELETE {{baseUrl}}/customers/1
 Authorization: Bearer {{token}}
 
-
 ### Test Invalid ID
 GET {{baseUrl}}/customers/invalid
 Authorization: Bearer {{token}}
-
 
 ### Test Non-existent Customer
 GET {{baseUrl}}/customers/99999
