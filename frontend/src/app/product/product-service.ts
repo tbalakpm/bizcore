@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { pagination } from '../models/pagination';
 
 export interface Product {
   id: number;
@@ -16,13 +17,18 @@ export interface Product {
   isActive: boolean;
 }
 
+export interface ProductList {
+  data: Product[];
+  pagination: pagination;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private http = inject(HttpClient);
 
-  getAll(): Observable<Product[]> {
+  getAll(): Observable<ProductList> {
     let params = new HttpParams();
-    return this.http.get<Product[]>(`${environment.apiUrl}/products`, { params });
+    return this.http.get<ProductList>(`${environment.apiUrl}/products`, { params });
   }
 
   getById(id: number): Observable<Product> {

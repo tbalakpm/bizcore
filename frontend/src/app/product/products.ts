@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { type Category, CategoryService } from '../category/category-service';
-import { type Product, ProductService } from './product-service';
+import { type Category, CategoryList, CategoryService } from '../category/category-service';
+import { type Product, ProductList, ProductService } from './product-service';
 
 @Component({
   selector: 'app-products',
@@ -38,14 +38,14 @@ export class Products implements OnInit {
   }
 
   loadCategories() {
-    this.categoryService.getAll().subscribe((categories) => this.categories.set(categories));
+    this.categoryService.getAll().subscribe((cats: CategoryList) => this.categories.set(cats.data));
   }
 
   loadProducts() {
     this.loading = true;
     this.productService.getAll().subscribe({
-      next: (res: Product[]) => {
-        this.products.set(res);
+      next: (res: ProductList) => {
+        this.products.set(res.data);
         this.loading = false;
       },
       error: (err) => {

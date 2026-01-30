@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { pagination } from '../models/pagination';
 
 export interface Category {
   id: number;
@@ -11,12 +12,17 @@ export interface Category {
   isActive: boolean;
 }
 
+export interface CategoryList {
+  data: Category[];
+  pagination: pagination;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
   private http = inject(HttpClient);
 
-  getAll(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${environment.apiUrl}/categories`);
+  getAll(): Observable<CategoryList> {
+    return this.http.get<CategoryList>(`${environment.apiUrl}/categories`);
   }
 
   create(category: Partial<Category>): Observable<Category> {

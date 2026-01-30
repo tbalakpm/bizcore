@@ -40,7 +40,7 @@ export class Registers implements OnInit {
   }
 
   loadCategories() {
-    this.categoryService.getAll().subscribe((categories) => this.categories.set(categories));
+    this.categoryService.getAll().subscribe((categories) => this.categories.set(categories.data));
   }
 
   loadRegisters() {

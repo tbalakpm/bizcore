@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CategoryService, Category } from './category-service';
+import { CategoryService, Category, CategoryList } from './category-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -32,8 +32,8 @@ export class Categories implements OnInit {
   loadCategories() {
     this.loading = true;
     this.categoryService.getAll().subscribe({
-      next: (cats) => {
-        this.categories.set(cats);
+      next: (cats: CategoryList) => {
+        this.categories.set(cats.data);
         this.loading = false;
       },
       error: (err) => {
