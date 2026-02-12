@@ -18,7 +18,7 @@ export class AuthService {
         username,
         password,
       })
-      .pipe(tap((res) => localStorage.setItem(this.tokenKey, res.token)));
+      .pipe(tap((res) => sessionStorage.setItem(this.tokenKey, res.token)));
   }
 
   register(username: string, password: string) {
@@ -26,11 +26,11 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem(this.tokenKey);
+    sessionStorage.removeItem(this.tokenKey);
   }
 
   get token(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return sessionStorage.getItem(this.tokenKey);
   }
 
   get isLoggedIn(): boolean {

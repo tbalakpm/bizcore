@@ -1,22 +1,19 @@
-import { and, asc, desc, eq, like, sql } from "drizzle-orm";
-import express, { type Request, type Response } from "express";
+import { and, asc, desc, eq, like, sql } from 'drizzle-orm';
+import express, { type Request, type Response } from 'express';
 
-import { categories, db } from "../db";
+import { categories, db } from '../db';
 
 export const categoriesRouter = express.Router();
 
-categoriesRouter.get("/", async (req: Request, res: Response) => {
+categoriesRouter.get('/', async (req: Request, res: Response) => {
   try {
     // Pagination
     const limit = Math.min(parseInt(req.query.limit as string, 10) || 10, 100);
     const offsetParam = req.query.offset as string | undefined;
-    const pageParam = (req.query.pageNum ?? req.query.page) as
-      | string
-      | undefined;
+    const pageParam = (req.query.pageNum ?? req.query.page) as string | undefined;
 
     const pageNumRaw = pageParam ? parseInt(pageParam, 10) : NaN;
-    const pageNum =
-      Number.isFinite(pageNumRaw) && pageNumRaw > 0 ? pageNumRaw : undefined;
+    const pageNum = Number.isFinite(pageNumRaw) && pageNumRaw > 0 ? pageNumRaw : undefined;
 
     // Backward compatible:
     // - If `offset` is provided, use it.
@@ -27,14 +24,8 @@ categoriesRouter.get("/", async (req: Request, res: Response) => {
 
     // Build filters dynamically
     const filters: any[] = [];
-    const filterableFields = ["code", "name", "description"] as const;
-    const sortableFields = [
-      "id",
-      ...filterableFields,
-      "isActive",
-      "createdAt",
-      "updatedAt",
-    ] as const;
+    const filterableFields = ['code', 'name', 'description'] as const;
+    const sortableFields = ['id', ...filterableFields, 'isActive', 'createdAt', 'updatedAt'] as const;
     type SortableField = (typeof sortableFields)[number];
     const isSortableField = (value: string): value is SortableField =>
       (sortableFields as readonly string[]).includes(value);
@@ -50,42 +41,37 @@ categoriesRouter.get("/", async (req: Request, res: Response) => {
 
     // Filter by active status
     if (req.query.isActive !== undefined) {
-      const isActive = req.query.isActive === "true";
+      const isActive = req.query.isActive === 'true';
       filters.push(eq(categories.isActive, isActive));
     }
 
     // Build sort dynamically
     const orderBy: any[] = [];
     if (req.query.sort) {
-      const sortParams = (req.query.sort as string).split(",");
-      console.log("Sort params:", sortParams);
+      const sortParams = (req.query.sort as string).split(',');
+      console.log('Sort params:', sortParams);
 
       for (const param of sortParams) {
-        const [field, direction] = param.split(":");
-        const dir = direction?.toLowerCase() === "desc" ? desc : asc;
+        const [field, direction] = param.split(':');
+        const dir = direction?.toLowerCase() === 'desc' ? desc : asc;
 
         if (!field || !isSortableField(field)) {
-          console.log(
-            field,
-            "not sortable - available fields:",
-            sortableFields,
-          );
+          console.log(field, 'not sortable - available fields:', sortableFields);
           continue;
         }
 
-        console.log("Processing sortable field:", field);
+        console.log('Processing sortable field:', field);
         const column = categories[field];
         if (column) {
           orderBy.push(dir(column));
-          console.log("Added to orderBy:", field, direction || "asc");
+          console.log('Added to orderBy:', field, direction || 'asc');
         } else {
-          console.log("Column not found for field:", field);
+          console.log('Column not found for field:', field);
         }
       }
     } else {
       orderBy.push(desc(categories.id));
     }
-    console.log("Final orderBy array length:", orderBy.length);
 
     // Build the query
     let query = db.select().from(categories);
@@ -95,9 +81,7 @@ categoriesRouter.get("/", async (req: Request, res: Response) => {
     }
 
     // Get total count
-    const countResult = await db
-      .select({ count: sql<number>`cast(count(*) as integer)` })
-      .from(categories);
+    const countResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(categories);
 
     const whereCondition = filters.length > 0 ? and(...filters) : undefined;
     const filteredCount = whereCondition
@@ -128,36 +112,31 @@ categoriesRouter.get("/", async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Failed to fetch categories" });
+    res.status(500).json({ error: 'Failed to fetch categories' });
   }
 });
 
-categoriesRouter.get("/:id", async (req: Request, res: Response) => {
+categoriesRouter.get('/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id as string, 10);
   if (Number.isNaN(id)) {
-    return res.status(400).json({ error: "Invalid category ID" });
+    return res.status(400).json({ error: 'Invalid category ID' });
   }
 
-  const category = await db
-    .select()
-    .from(categories)
-    .where(eq(categories.id, id))
-    .get();
+  const category = await db.select().from(categories).where(eq(categories.id, id)).get();
   if (!category)
     return res.status(404).json({
-      error: req.i18n?.t("category.notFound") || "Category not found",
+      error: req.i18n?.t('category.notFound') || 'Category not found',
     });
 
   res.json(category);
 });
 
-categoriesRouter.post("/", async (req, res) => {
+categoriesRouter.post('/', async (req, res) => {
   const { code, name, description, isActive } = req.body;
 
-  if (!name) return res.status(400).json({ error: "Name is required" });
-  if (!code) return res.status(400).json({ error: "Code is required" });
-  if (!req.user?.id)
-    return res.status(401).json({ error: "User not authenticated" });
+  if (!name) return res.status(400).json({ error: 'Name is required' });
+  if (!code) return res.status(400).json({ error: 'Code is required' });
+  if (!req.user?.id) return res.status(401).json({ error: 'User not authenticated' });
 
   try {
     const category = await db
@@ -175,29 +154,25 @@ categoriesRouter.post("/", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(400).json({
-      error: req.i18n?.t("category.exists") || "Category already exists",
+      error: req.i18n?.t('category.exists') || 'Category already exists',
     });
   }
 });
 
-categoriesRouter.put("/:id", async (req, res) => {
+categoriesRouter.put('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const category = await db
-    .select()
-    .from(categories)
-    .where(eq(categories.id, id))
-    .get();
+  const category = await db.select().from(categories).where(eq(categories.id, id)).get();
   if (!category)
     return res.status(404).json({
-      error: req.i18n?.t("category.notFound") || "Category not found",
+      error: req.i18n?.t('category.notFound') || 'Category not found',
     });
 
   const { code, name, description, isActive } = req.body;
   if (code !== undefined) category.code = code;
   if (name !== undefined) category.name = name;
   if (description !== undefined) category.description = description;
-  if (typeof isActive === "boolean") category.isActive = isActive;
+  if (typeof isActive === 'boolean') category.isActive = isActive;
 
   await db
     .update(categories)
@@ -213,17 +188,13 @@ categoriesRouter.put("/:id", async (req, res) => {
   res.json(category);
 });
 
-categoriesRouter.delete("/:id", async (req, res) => {
+categoriesRouter.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const category = await db
-    .select({ id: categories.id })
-    .from(categories)
-    .where(eq(categories.id, id))
-    .get();
+  const category = await db.select({ id: categories.id }).from(categories).where(eq(categories.id, id)).get();
   if (!category)
     return res.status(404).json({
-      error: req.i18n?.t("category.notFound") || "Category not found",
+      error: req.i18n?.t('category.notFound') || 'Category not found',
     });
 
   await db.delete(categories).where(eq(categories.id, id)).run();

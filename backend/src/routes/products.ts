@@ -1,22 +1,19 @@
-import { and, asc, desc, eq, like, sql } from "drizzle-orm";
-import express, { type Request, type Response } from "express";
+import { and, asc, desc, eq, like, sql } from 'drizzle-orm';
+import express, { type Request, type Response } from 'express';
 
-import { categories, db, products } from "../db";
+import { categories, db, products } from '../db';
 
 export const productsRouter = express.Router();
 
-productsRouter.get("/", async (req: Request, res: Response) => {
+productsRouter.get('/', async (req: Request, res: Response) => {
   try {
     // Pagination
     const limit = Math.min(parseInt(req.query.limit as string, 10) || 10, 100);
     const offsetParam = req.query.offset as string | undefined;
-    const pageParam = (req.query.pageNum ?? req.query.page) as
-      | string
-      | undefined;
+    const pageParam = (req.query.pageNum ?? req.query.page) as string | undefined;
 
     const pageNumRaw = pageParam ? parseInt(pageParam, 10) : NaN;
-    const pageNum =
-      Number.isFinite(pageNumRaw) && pageNumRaw > 0 ? pageNumRaw : undefined;
+    const pageNum = Number.isFinite(pageNumRaw) && pageNumRaw > 0 ? pageNumRaw : undefined;
 
     // Backward compatible:
     // - If `offset` is provided, use it.
@@ -27,21 +24,16 @@ productsRouter.get("/", async (req: Request, res: Response) => {
 
     // Build filters dynamically
     const filters: any[] = [];
-    const filterableFields = [
-      "code",
-      "name",
-      "description",
-      "qtyPerUnit",
-    ] as const;
+    const filterableFields = ['code', 'name', 'description', 'qtyPerUnit'] as const;
     const sortableFields = [
-      "id",
+      'id',
       ...filterableFields,
-      "categoryName",
-      "unitPrice",
-      "unitsInStock",
-      "isActive",
-      "createdAt",
-      "updatedAt",
+      'categoryName',
+      'unitPrice',
+      'unitsInStock',
+      'isActive',
+      'createdAt',
+      'updatedAt',
     ] as const;
     type SortableField = (typeof sortableFields)[number];
     const isSortableField = (value: string): value is SortableField =>
@@ -69,7 +61,7 @@ productsRouter.get("/", async (req: Request, res: Response) => {
 
     // Filter by active status
     if (req.query.isActive !== undefined) {
-      const isActive = req.query.isActive === "true";
+      const isActive = req.query.isActive === 'true';
       filters.push(eq(products.isActive, isActive));
     }
 
@@ -106,42 +98,37 @@ productsRouter.get("/", async (req: Request, res: Response) => {
     // Build sort dynamically
     const orderBy: any[] = [];
     if (req.query.sort) {
-      const sortParams = (req.query.sort as string).split(",");
-      console.log("Sort params:", sortParams);
+      const sortParams = (req.query.sort as string).split(',');
+      console.log('Sort params:', sortParams);
 
       for (const param of sortParams) {
-        const [field, direction] = param.split(":");
-        const dir = direction?.toLowerCase() === "desc" ? desc : asc;
+        const [field, direction] = param.split(':');
+        const dir = direction?.toLowerCase() === 'desc' ? desc : asc;
 
         if (!field || !isSortableField(field)) {
-          console.log(
-            field,
-            "not sortable - available fields:",
-            sortableFields,
-          );
+          console.log(field, 'not sortable - available fields:', sortableFields);
           continue;
         }
 
-        console.log("Processing sortable field:", field);
+        console.log('Processing sortable field:', field);
 
         // Handle categoryName sorting (from joined categories table)
-        if (field === "categoryName") {
+        if (field === 'categoryName') {
           orderBy.push(dir(categories.name));
-          console.log("Added to orderBy:", field, direction || "asc");
+          console.log('Added to orderBy:', field, direction || 'asc');
         } else {
           const column = products[field];
           if (column) {
             orderBy.push(dir(column));
-            console.log("Added to orderBy:", field, direction || "asc");
+            console.log('Added to orderBy:', field, direction || 'asc');
           } else {
-            console.log("Column not found for field:", field);
+            console.log('Column not found for field:', field);
           }
         }
       }
     } else {
       orderBy.push(desc(products.id));
     }
-    console.log("Final orderBy array length:", orderBy.length);
 
     // Build the query with join
     let query = db
@@ -173,24 +160,16 @@ productsRouter.get("/", async (req: Request, res: Response) => {
     }
 
     // Get total count
-    const countResult = await db
-      .select({ count: sql<number>`cast(count(*) as integer)` })
-      .from(products);
+    const countResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(products);
 
     // Build count query with same filters including categoryName
-    let countQuery = db
-      .select({ count: sql<number>`cast(count(*) as integer)` })
-      .from(products);
+    let countQuery = db.select({ count: sql<number>`cast(count(*) as integer)` }).from(products);
 
     if (req.query.categoryName) {
-      countQuery = countQuery.leftJoin(
-        categories,
-        eq(categories.id, products.categoryId),
-      ) as any;
+      countQuery = countQuery.leftJoin(categories, eq(categories.id, products.categoryId)) as any;
     }
 
-    const whereCondition =
-      allFilters.length > 0 ? and(...allFilters) : undefined;
+    const whereCondition = allFilters.length > 0 ? and(...allFilters) : undefined;
     const filteredCount = whereCondition
       ? (await (countQuery as any).where(whereCondition))[0].count
       : countResult[0].count;
@@ -214,45 +193,28 @@ productsRouter.get("/", async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Failed to fetch products" });
+    res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
 
-productsRouter.get("/:id", async (req, res) => {
+productsRouter.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (Number.isNaN(id)) {
-    return res.status(400).json({ error: "Invalid product ID" });
+    return res.status(400).json({ error: 'Invalid product ID' });
   }
 
-  const product = await db
-    .select()
-    .from(products)
-    .where(eq(products.id, id))
-    .get();
-  if (!product)
-    return res
-      .status(404)
-      .json({ error: req.i18n?.t("product.notFound") || "Product not found" });
+  const product = await db.select().from(products).where(eq(products.id, id)).get();
+  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
 
   res.json(product);
 });
 
-productsRouter.post("/", async (req, res) => {
-  const {
-    code,
-    name,
-    description,
-    categoryId,
-    qtyPerUnit,
-    unitPrice,
-    unitsInStock,
-    isActive,
-  } = req.body;
+productsRouter.post('/', async (req, res) => {
+  const { code, name, description, categoryId, qtyPerUnit, unitPrice, unitsInStock, isActive } = req.body;
 
-  if (!code) return res.status(400).json({ error: "Code is required" });
-  if (!name) return res.status(400).json({ error: "Name is required" });
-  if (!categoryId)
-    return res.status(400).json({ error: "Category ID is required" });
+  if (!code) return res.status(400).json({ error: 'Code is required' });
+  if (!name) return res.status(400).json({ error: 'Name is required' });
+  if (!categoryId) return res.status(400).json({ error: 'Category ID is required' });
 
   try {
     const product = await db
@@ -274,33 +236,17 @@ productsRouter.post("/", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(400).json({
-      error: req.i18n?.t("product.exists") || "Product already exists",
+      error: req.i18n?.t('product.exists') || 'Product already exists',
     });
   }
 });
 
-productsRouter.put("/:id", async (req, res) => {
+productsRouter.put('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const {
-    code,
-    name,
-    description,
-    categoryId,
-    qtyPerUnit,
-    unitPrice,
-    unitsInStock,
-    isActive,
-  } = req.body;
+  const { code, name, description, categoryId, qtyPerUnit, unitPrice, unitsInStock, isActive } = req.body;
 
-  const product = await db
-    .select()
-    .from(products)
-    .where(eq(products.id, id))
-    .get();
-  if (!product)
-    return res
-      .status(404)
-      .json({ error: req.i18n?.t("product.notFound") || "Product not found" });
+  const product = await db.select().from(products).where(eq(products.id, id)).get();
+  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
 
   if (code) product.code = code;
   if (name) product.name = name;
@@ -309,7 +255,7 @@ productsRouter.put("/:id", async (req, res) => {
   if (qtyPerUnit) product.qtyPerUnit = qtyPerUnit;
   if (unitPrice) product.unitPrice = unitPrice?.toString();
   if (unitsInStock !== undefined) product.unitsInStock = unitsInStock;
-  if (typeof isActive === "boolean") product.isActive = isActive;
+  if (typeof isActive === 'boolean') product.isActive = isActive;
 
   await db
     .update(products)
@@ -329,18 +275,11 @@ productsRouter.put("/:id", async (req, res) => {
   res.json(product);
 });
 
-productsRouter.delete("/:id", async (req, res) => {
+productsRouter.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const product = await db
-    .select({ id: products.id })
-    .from(products)
-    .where(eq(products.id, id))
-    .get();
-  if (!product)
-    return res
-      .status(404)
-      .json({ error: req.i18n?.t("product.notFound") || "Product not found" });
+  const product = await db.select({ id: products.id }).from(products).where(eq(products.id, id)).get();
+  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
 
   await db.delete(products).where(eq(products.id, id)).run();
   res.status(204).send();

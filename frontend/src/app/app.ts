@@ -23,7 +23,7 @@ export class App {
     this.translate.addLangs(['en', 'ta']);
     this.translate.setFallbackLang('en');
 
-    const storedLang = localStorage.getItem(this.langKey) || 'en';
+    const storedLang = sessionStorage.getItem(this.langKey) || 'en';
     this.translate.use(storedLang);
   }
 
@@ -34,6 +34,6 @@ export class App {
 
   switchLang(lang: string) {
     this.translate.use(lang);
-    localStorage.setItem(this.langKey, lang);
+    sessionStorage.setItem(this.langKey, lang);
   }
 }

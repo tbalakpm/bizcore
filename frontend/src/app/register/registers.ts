@@ -1,6 +1,3 @@
-/** biome-ignore-all lint/style/useImportType: Ignore */
-/** biome-ignore-all lint/suspicious/noAssignInExpressions: Ignore */
-
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
