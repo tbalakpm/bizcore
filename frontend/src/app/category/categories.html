@@ -226,6 +226,11 @@
           {{ 'SAVE' | translate }}
         </button>
       </form>
+      @if (error) {
+        <p class="text-red-600 text-xs mt-2">
+          {{ error }}
+        </p>
+      }
     </div>
   </div>
 </div>

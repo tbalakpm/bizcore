@@ -124,10 +124,11 @@ usersRouter.get('/:id', async (req, res) => {
 
 usersRouter.post('/', async (req, res) => {
   const { username, password, firstName, lastName, role, isActive } = req.body;
+  let pwd: string = password;
 
   if (!username) return res.status(400).json({ error: 'Name is required' });
-  if (!password) return res.status(400).json({ error: 'Password is required' });
-  if (password.length < 4) {
+  if (!pwd) pwd = 'Welcome!23'; //return res.status(400).json({ error: 'Password is required' });
+  if (pwd.length < 4) {
     return res.status(400).json({ error: 'Password is less than 4 chars' });
   }
 
@@ -136,7 +137,7 @@ usersRouter.post('/', async (req, res) => {
       .insert(users)
       .values({
         username,
-        passwordHash: await bcrypt.hash(password, 10),
+        passwordHash: await bcrypt.hash(pwd, 10),
         firstName,
         lastName,
         role,

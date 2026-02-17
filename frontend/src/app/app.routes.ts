@@ -4,6 +4,8 @@ import { Login } from './auth/login';
 import { Dashboard } from './dashboard/dashboard';
 import { Categories } from './category/categories';
 import { Products } from './product/products';
+import { Customers } from './customer/customers';
+import { Users } from './user/users';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -14,7 +16,8 @@ export const routes: Routes = [
       { path: 'dashboard', component: Dashboard },
       { path: 'categories', component: Categories },
       { path: 'products', component: Products },
-      // { path: 'users', component: Entries },
+      { path: 'customers', component: Customers },
+      { path: 'users', component: Users },
       // { path: 'customers', component: Entries },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

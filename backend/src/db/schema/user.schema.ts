@@ -13,7 +13,7 @@ export const users = sqliteTable(
     role: text('role', { length: 16 }).notNull().default('user'),
     ...auditFields,
   },
-  (t) => [check('role_must_be_listed', sql`${t.role} IN ('user', 'manager', 'admin')`)],
+  (t) => [check('role_must_be_in_list', sql`${t.role} IN ('user', 'manager', 'admin')`)],
 );
 
 export type User = typeof users.$inferSelect;

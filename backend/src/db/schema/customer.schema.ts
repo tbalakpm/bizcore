@@ -11,7 +11,7 @@ export const customers = sqliteTable(
     ...auditFields,
   },
   (t) => [
-    check('type_must_be_listed', sql`${t.type} IN ('retail','wholesale')`),
+    check('type_must_be_in_list', sql`${t.type} IN ('retail','wholesale')`),
     unique('customers_code_unique').on(t.code),
     unique('customers_name_unique').on(t.name),
   ],

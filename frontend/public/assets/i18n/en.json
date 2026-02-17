@@ -42,5 +42,13 @@
     "LIABILITY": "Liability",
     "TYPES": ["I:Income", "E:Expense", "A:Asset", "L:Liability"],
     "NO_CATEGORIES_YET": "No categories yet"
+  },
+  "USER": {
+    "TITLE": "User",
+    "USERNAME": "Username",
+    "FIRST_NAME": "First Name",
+    "LAST_NAME": "Last Name",
+    "ROLE": "Role",
+    "NO_USERS_YET": "No users yet"
   }
 }
