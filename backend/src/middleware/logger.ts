@@ -22,12 +22,29 @@ export function logger(req: Request, res: Response, next: NextFunction) {
       const responseSize = JSON.stringify(data).length || 0;
       const timeTaken = Date.now() - startTime;
       const statusCode = res.statusCode;
-      const logLevel = statusCode >= 400 ? 'WARN' : 'INFO';
-      const levelColor = statusCode >= 400 ? colors.warn : colors.info;
 
-      console.log(
-        `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${levelColor}[${logLevel}]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(3, ' ')}ms - Response size: ${responseSize.toString().padStart(5, ' ')} bytes`,
-      );
+      if (statusCode >= 500) {
+        // Log server errors with ERR level
+        console.error(
+          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.err}[ERR ]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(3, ' ')}ms - Response size: ${responseSize.toString().padStart(5, ' ')} bytes`,
+        );
+      } else if (statusCode >= 400 && statusCode < 500) {
+        // Log client errors with WARN level
+        console.warn(
+          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.warn}[WARN]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(3, ' ')}ms - Response size: ${responseSize.toString().padStart(5, ' ')} bytes`,
+        );
+      } else {
+        // Log successful requests with INFO level
+        console.log(
+          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.info}[INFO]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(3, ' ')}ms - Response size: ${responseSize.toString().padStart(5, ' ')} bytes`,
+        );
+      }
+      // const logLevel = statusCode >= 400 && statusCode < 500 ? 'WARN' : 'INFO';
+      // const levelColor = statusCode >= 400 && statusCode < 500 ? colors.warn : colors.info;
+
+      // console.log(
+      //   `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${levelColor}[${logLevel}]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(3, ' ')}ms - Response size: ${responseSize.toString().padStart(5, ' ')} bytes`,
+      // );
 
       return originalSend.call(this, data);
     };

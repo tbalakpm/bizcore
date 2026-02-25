@@ -1,13 +1,17 @@
 import { sql } from 'drizzle-orm';
-import { check, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
+import { check, integer, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
 import { auditFields, keyFields } from './base';
+import { addresses } from './address.schema';
 
 export const customers = sqliteTable(
   'customers',
   {
     ...keyFields,
-    type: text('type', { length: 16 }).notNull().default('retail'),
+    type: text('type', { length: 20 }).notNull().default('retail'),
     notes: text('notes', { length: 255 }),
+    gstin: text('gstin', { length: 20 }),
+    billingAddressId: integer('billing_address_id').references(() => addresses.id),
+    shippingAddressId: integer('shipping_address_id').references(() => addresses.id),
     ...auditFields,
   },
   (t) => [

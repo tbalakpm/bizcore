@@ -36,6 +36,20 @@
       "when": 1769297593600,
       "tag": "0004_create-unique-index",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1771329863480,
+      "tag": "0005_suppliers",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1771594953190,
+      "tag": "0006_gstin",
+      "breakpoints": true
     }
   ]
 }

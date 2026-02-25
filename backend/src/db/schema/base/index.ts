@@ -3,7 +3,7 @@ import { integer, text } from 'drizzle-orm/sqlite-core';
 
 export const keyFields = {
   id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
-  code: text('code', { length: 16 }).notNull(),
+  code: text('code', { length: 20 }).notNull(),
   name: text('name', { length: 50 }).notNull(),
 };
 

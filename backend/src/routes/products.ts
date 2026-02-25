@@ -30,7 +30,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
       ...filterableFields,
       'categoryName',
       'unitPrice',
-      'unitsInStock',
+      // 'unitsInStock',
       'isActive',
       'createdAt',
       'updatedAt',
@@ -81,19 +81,19 @@ productsRouter.get('/', async (req: Request, res: Response) => {
     }
 
     // Filter by stock range
-    if (req.query.minStock) {
-      const minStock = parseInt(req.query.minStock as string, 10);
-      if (!Number.isNaN(minStock)) {
-        filters.push(sql`${products.unitsInStock} >= ${minStock}`);
-      }
-    }
+    // if (req.query.minStock) {
+    //   const minStock = parseInt(req.query.minStock as string, 10);
+    //   if (!Number.isNaN(minStock)) {
+    //     filters.push(sql`${products.unitsInStock} >= ${minStock}`);
+    //   }
+    // }
 
-    if (req.query.maxStock) {
-      const maxStock = parseInt(req.query.maxStock as string, 10);
-      if (!Number.isNaN(maxStock)) {
-        filters.push(sql`${products.unitsInStock} <= ${maxStock}`);
-      }
-    }
+    // if (req.query.maxStock) {
+    //   const maxStock = parseInt(req.query.maxStock as string, 10);
+    //   if (!Number.isNaN(maxStock)) {
+    //     filters.push(sql`${products.unitsInStock} <= ${maxStock}`);
+    //   }
+    // }
 
     // Build sort dynamically
     const orderBy: any[] = [];
@@ -141,7 +141,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
         categoryName: categories.name,
         qtyPerUnit: products.qtyPerUnit,
         unitPrice: products.unitPrice,
-        unitsInStock: products.unitsInStock,
+        //unitsInStock: products.unitsInStock,
         isActive: products.isActive,
         createdAt: products.createdAt,
         updatedAt: products.updatedAt,
@@ -226,7 +226,7 @@ productsRouter.post('/', async (req, res) => {
         categoryId,
         qtyPerUnit,
         unitPrice: unitPrice?.toString(),
-        unitsInStock,
+        //unitsInStock,
         isActive: isActive !== false,
       })
       .returning()
@@ -254,7 +254,7 @@ productsRouter.put('/:id', async (req, res) => {
   if (categoryId) product.categoryId = categoryId;
   if (qtyPerUnit) product.qtyPerUnit = qtyPerUnit;
   if (unitPrice) product.unitPrice = unitPrice?.toString();
-  if (unitsInStock !== undefined) product.unitsInStock = unitsInStock;
+  // if (unitsInStock !== undefined) product.unitsInStock = unitsInStock;
   if (typeof isActive === 'boolean') product.isActive = isActive;
 
   await db
@@ -266,7 +266,7 @@ productsRouter.put('/:id', async (req, res) => {
       categoryId: product.categoryId,
       qtyPerUnit: product.qtyPerUnit,
       unitPrice: product.unitPrice,
-      unitsInStock: product.unitsInStock,
+      // unitsInStock: product.unitsInStock,
       isActive: product.isActive,
     })
     .where(eq(products.id, id))

@@ -6,11 +6,11 @@ export const users = sqliteTable(
   'users',
   {
     id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
-    username: text('username', { length: 16 }).unique().notNull(),
+    username: text('username', { length: 20 }).unique().notNull(),
     passwordHash: text('password_hash', { length: 255 }).notNull(),
     firstName: text('first_name', { length: 50 }),
     lastName: text('last_name', { length: 50 }),
-    role: text('role', { length: 16 }).notNull().default('user'),
+    role: text('role', { length: 20 }).notNull().default('user'),
     ...auditFields,
   },
   (t) => [check('role_must_be_in_list', sql`${t.role} IN ('user', 'manager', 'admin')`)],
