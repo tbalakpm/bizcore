@@ -1,30 +1,95 @@
-import { eq, sql } from 'drizzle-orm';
-import { serialNumbers } from '../db';
+import { asc, eq, sql } from 'drizzle-orm';
+import { db, serialNumbers } from '../db';
+import {
+  type DbTransaction,
+  formatSerialNumber,
+  resolvePrefixTemplate,
+  type SerialSequenceConfig,
+} from '../shared/serial-number.shared';
+
+const SERIAL_KEYS = {
+  stockInvoice: 'stock_invoice',
+  salesInvoice: 'sales_invoice',
+  purchaseInvoice: 'purchase_invoice',
+} as const;
+
+type InvoiceSerialType = keyof typeof SERIAL_KEYS;
+
+const defaultSerialConfig: Record<string, SerialSequenceConfig> = {
+  [SERIAL_KEYS.stockInvoice]: { prefix: 'STK-', length: 6, start: 1 },
+  [SERIAL_KEYS.salesInvoice]: { prefix: 'INV-', length: 6, start: 1 },
+  [SERIAL_KEYS.purchaseInvoice]: { prefix: 'PUR-', length: 6, start: 1 },
+};
 
 export const serialNumberService = {
-  //   testTran: async () => {
-  //     await db.transaction(async (tx) => {
-  //         await tx.insert
-  //       // Example usage of the generateSerialNumber function
-  //       const serialNumber = serialNumberService.generateSerialNumber('product123', tx);
-  //       console.log('Generated Serial Number:', serialNumber);
-  //     });
-  //   },
+  keys: SERIAL_KEYS,
 
-  incrementSerialNumber: (key: string, tx: any): string => {
-    // Generate a unique serial number based on the key and current timestamp
-    tx.update(serialNumbers)
-      .set({ current: sql`${serialNumbers.current} + 1` })
+  generateInvoiceNumber: async (
+    type: InvoiceSerialType,
+    tx?: DbTransaction,
+    date: Date = new Date(),
+  ): Promise<string> => {
+    const key = SERIAL_KEYS[type];
+    if (!key) {
+      throw new Error(`Unsupported serial number type: ${type}`);
+    }
+
+    if (tx) {
+      return serialNumberService.generateNextNumberInTransaction(key, tx, date);
+    }
+
+    return db.transaction(async (transaction) => {
+      return serialNumberService.generateNextNumberInTransaction(key, transaction, date);
+    });
+  },
+
+  generateNextNumberInTransaction: async (key: string, tx: DbTransaction, date: Date = new Date()): Promise<string> => {
+    const config = defaultSerialConfig[key] ?? {
+      prefix: `${key.toUpperCase()}-`,
+      length: 6,
+      start: 1,
+    };
+
+    let [currentRecord] = await tx
+      .select()
+      .from(serialNumbers)
       .where(eq(serialNumbers.key, key))
-      .run();
+      .orderBy(asc(serialNumbers.id))
+      .limit(1);
 
-    const currentRecord = tx.select().from(serialNumbers).where(eq(serialNumbers.key, key)).get();
+    if (!currentRecord) {
+      await tx.insert(serialNumbers).values({
+        key,
+        prefix: config.prefix,
+        current: config.start,
+        length: config.length,
+      });
 
-    const serialNumber = `${currentRecord.prefix}${currentRecord.current.toString().padStart(currentRecord.length, '0')}`;
-    return serialNumber;
+      [currentRecord] = await tx
+        .select()
+        .from(serialNumbers)
+        .where(eq(serialNumbers.key, key))
+        .orderBy(asc(serialNumbers.id))
+        .limit(1);
+    }
 
-    // const timestamp = Date.now();
-    // const randomPart = Math.floor(Math.random() * 10000); // Random number for extra uniqueness
-    // return `${key}-${timestamp}-${randomPart}`;
+    if (!currentRecord) {
+      throw new Error(`Unable to initialize serial number configuration for key: ${key}`);
+    }
+
+    const [updatedRecord] = await tx
+      .update(serialNumbers)
+      .set({ current: sql`${serialNumbers.current} + 1` })
+      .where(eq(serialNumbers.id, currentRecord.id))
+      .returning({ current: serialNumbers.current });
+
+    if (!updatedRecord) {
+      throw new Error(`Unable to increment serial number for key: ${key}`);
+    }
+
+    const serialValue = updatedRecord.current - 1;
+    const prefix = resolvePrefixTemplate(currentRecord.prefix ?? config.prefix, date);
+
+    return formatSerialNumber(prefix, serialValue, currentRecord.length);
   },
 };

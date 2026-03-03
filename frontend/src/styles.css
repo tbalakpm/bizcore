@@ -49,6 +49,10 @@ label {
   color: #f1f5f9;
 }
 
+.dark .shadow {
+  border: 1px solid #475569;
+}
+
 .dark .text-blue-700 {
   color: #93c5fd;
 }
@@ -64,4 +68,11 @@ label {
 
 .dark .text-gray-400 {
   color: #94a3b8;
+}
+
+.dark .text-gray-800,
+.dark .text-gray-700,
+.dark .text-slate-700,
+.dark .text-slate-600 {
+  color: #e2e8f0;
 }
