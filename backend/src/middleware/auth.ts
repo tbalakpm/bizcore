@@ -21,6 +21,7 @@ export async function authRequired(req: Request, res: Response, next: NextFuncti
       .select({
         id: users.id,
         username: users.username,
+        role: users.role,
         isActive: users.isActive,
       })
       .from(users)
@@ -36,7 +37,19 @@ export async function authRequired(req: Request, res: Response, next: NextFuncti
     next();
   } catch (err) {
     req.user = undefined;
-    console.error(err);
+    console.error('Auth verification failed');
     return res.status(401).json({ error: req.i18n?.t('auth.invalid') });
   }
+}
+
+export function requireRole(...allowedRoles: Array<'user' | 'manager' | 'admin'>) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const role = req.user?.role;
+
+    if (!role || !allowedRoles.some((allowedRole) => allowedRole === role)) {
+      return res.status(403).json({ error: req.i18n?.t('auth.forbidden') || 'Forbidden' });
+    }
+
+    next();
+  };
 }

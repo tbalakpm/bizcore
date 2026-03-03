@@ -25,6 +25,7 @@ declare global {
       user?: {
         id: number;
         username?: string;
+        role?: string;
         isActive?: boolean | null;
         // add anything else you need
       };

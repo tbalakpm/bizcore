@@ -9,7 +9,7 @@ body {
   color: #1e293b;
 }
 
-label {
+.app-shell label {
   color: #0f172a;
 }
 
@@ -18,61 +18,57 @@ label {
   color: #e2e8f0;
 }
 
-.dark label {
+.dark .app-shell label {
   color: #e2e8f0;
 }
 
-.dark .bg-white {
+.dark .app-shell .bg-white {
   background-color: #1e293b;
 }
 
-.dark .bg-slate-50,
-.dark .bg-slate-100,
-.dark .bg-slate-200 {
+.dark .app-shell .bg-slate-50,
+.dark .app-shell .bg-slate-100,
+.dark .app-shell .bg-slate-200 {
   background-color: #334155;
 }
 
-.dark .border-slate-200 {
+.dark .app-shell .border-slate-200 {
   border-color: #475569;
 }
 
-.dark .hover\:bg-slate-100:hover {
+.dark .app-shell .hover\:bg-slate-100:hover {
   background-color: #475569;
 }
 
-.dark thead,
-.dark .bg-gray-50 {
+.dark .app-shell thead,
+.dark .app-shell .bg-gray-50 {
   background-color: #334155;
 }
 
-.dark th {
+.dark .app-shell th {
   color: #f1f5f9;
 }
 
-.dark .shadow {
-  border: 1px solid #475569;
-}
-
-.dark .text-blue-700 {
+.dark .app-shell .text-blue-700 {
   color: #93c5fd;
 }
 
-.dark .text-red-700 {
+.dark .app-shell .text-red-700 {
   color: #fca5a5;
 }
 
-.dark .text-green-700,
-.dark .text-green-600 {
+.dark .app-shell .text-green-700,
+.dark .app-shell .text-green-600 {
   color: #86efac;
 }
 
-.dark .text-gray-400 {
+.dark .app-shell .text-gray-400 {
   color: #94a3b8;
 }
 
-.dark .text-gray-800,
-.dark .text-gray-700,
-.dark .text-slate-700,
-.dark .text-slate-600 {
+.dark .app-shell .text-gray-800,
+.dark .app-shell .text-gray-700,
+.dark .app-shell .text-slate-700,
+.dark .app-shell .text-slate-600 {
   color: #e2e8f0;
 }

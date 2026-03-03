@@ -1,29 +1,22 @@
-import { and, asc, desc, eq, like, sql } from 'drizzle-orm';
+import { and, eq, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
 import { categories, db, products } from '../db';
+import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query';
 
 export const productsRouter = express.Router();
 
 productsRouter.get('/', async (req: Request, res: Response) => {
   try {
-    // Pagination
-    const limit = Math.min(parseInt(req.query.limit as string, 10) || 10, 100);
-    const offsetParam = req.query.offset as string | undefined;
-    const pageParam = (req.query.pageNum ?? req.query.page) as string | undefined;
-
-    const pageNumRaw = pageParam ? parseInt(pageParam, 10) : NaN;
-    const pageNum = Number.isFinite(pageNumRaw) && pageNumRaw > 0 ? pageNumRaw : undefined;
-
-    // Backward compatible:
-    // - If `offset` is provided, use it.
-    // - Else if `page`/`pageNum` is provided, convert to offset.
-    const offset = offsetParam
-      ? Math.max(parseInt(offsetParam, 10) || 0, 0)
-      : Math.max(((pageNum ?? 1) - 1) * limit, 0);
+    const { limit, offset, pageNum } = parsePagination({
+      limit: req.query.limit as string | undefined,
+      offset: req.query.offset as string | undefined,
+      page: req.query.page as string | undefined,
+      pageNum: req.query.pageNum as string | undefined,
+    });
 
     // Build filters dynamically
-    const filters: any[] = [];
+    const filters: SQL[] = [];
     const filterableFields = ['code', 'name', 'description', 'qtyPerUnit'] as const;
     const sortableFields = [
       'id',
@@ -43,7 +36,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
       if (req.query[field]) {
         const column = products[field];
         if (column) {
-          filters.push(like(column as any, `%${req.query[field]}%`));
+          filters.push(like(column, `%${req.query[field]}%`));
         }
       }
     }
@@ -96,42 +89,34 @@ productsRouter.get('/', async (req: Request, res: Response) => {
     // }
 
     // Build sort dynamically
-    const orderBy: any[] = [];
+    const orderBy: SQL[] = [];
     if (req.query.sort) {
       const sortParams = (req.query.sort as string).split(',');
-      console.log('Sort params:', sortParams);
 
       for (const param of sortParams) {
         const [field, direction] = param.split(':');
-        const dir = direction?.toLowerCase() === 'desc' ? desc : asc;
+        const dir = resolveSortDirection(direction);
 
         if (!field || !isSortableField(field)) {
-          console.log(field, 'not sortable - available fields:', sortableFields);
           continue;
         }
-
-        console.log('Processing sortable field:', field);
 
         // Handle categoryName sorting (from joined categories table)
         if (field === 'categoryName') {
           orderBy.push(dir(categories.name));
-          console.log('Added to orderBy:', field, direction || 'asc');
         } else {
           const column = products[field];
           if (column) {
             orderBy.push(dir(column));
-            console.log('Added to orderBy:', field, direction || 'asc');
-          } else {
-            console.log('Column not found for field:', field);
           }
         }
       }
     } else {
-      orderBy.push(desc(products.id));
+      orderBy.push(resolveSortDirection('desc')(products.id));
     }
 
     // Build the query with join
-    let query = db
+    const baseQuery = db
       .select({
         id: products.id,
         code: products.code,
@@ -155,27 +140,24 @@ productsRouter.get('/', async (req: Request, res: Response) => {
       allFilters.push(like(categories.name, `%${req.query.categoryName}%`));
     }
 
-    if (allFilters.length > 0) {
-      query = query.where(and(...allFilters)) as any;
-    }
+    const query = allFilters.length > 0 ? baseQuery.where(and(...allFilters)) : baseQuery;
 
     // Get total count
     const countResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(products);
 
     // Build count query with same filters including categoryName
-    let countQuery = db.select({ count: sql<number>`cast(count(*) as integer)` }).from(products);
-
-    if (req.query.categoryName) {
-      countQuery = countQuery.leftJoin(categories, eq(categories.id, products.categoryId)) as any;
-    }
+    const countQuery = db
+      .select({ count: sql<number>`cast(count(*) as integer)` })
+      .from(products)
+      .leftJoin(categories, eq(categories.id, products.categoryId));
 
     const whereCondition = allFilters.length > 0 ? and(...allFilters) : undefined;
     const filteredCount = whereCondition
-      ? (await (countQuery as any).where(whereCondition))[0].count
+      ? (await countQuery.where(whereCondition))[0].count
       : countResult[0].count;
 
     // Get paginated results
-    const result = await (query as any)
+    const result = await query
       .orderBy(...orderBy)
       .limit(limit)
       .offset(offset)
@@ -183,16 +165,10 @@ productsRouter.get('/', async (req: Request, res: Response) => {
 
     res.json({
       data: result,
-      pagination: {
-        limit,
-        offset,
-        total: filteredCount,
-        page: pageNum ?? Math.floor(offset / limit) + 1,
-        totalPages: Math.ceil(filteredCount / limit),
-      },
+      pagination: toPagination(limit, offset, filteredCount, pageNum),
     });
   } catch (error) {
-    console.log(error);
+    console.error('Failed to fetch products');
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });

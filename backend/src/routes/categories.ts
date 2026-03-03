@@ -1,29 +1,22 @@
-import { and, asc, desc, eq, like, sql } from 'drizzle-orm';
+import { and, eq, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
 import { categories, db } from '../db';
+import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query';
 
 export const categoriesRouter = express.Router();
 
 categoriesRouter.get('/', async (req: Request, res: Response) => {
   try {
-    // Pagination
-    const limit = Math.min(parseInt(req.query.limit as string, 10) || 10, 100);
-    const offsetParam = req.query.offset as string | undefined;
-    const pageParam = (req.query.pageNum ?? req.query.page) as string | undefined;
-
-    const pageNumRaw = pageParam ? parseInt(pageParam, 10) : NaN;
-    const pageNum = Number.isFinite(pageNumRaw) && pageNumRaw > 0 ? pageNumRaw : undefined;
-
-    // Backward compatible:
-    // - If `offset` is provided, use it.
-    // - Else if `page`/`pageNum` is provided, convert to offset.
-    const offset = offsetParam
-      ? Math.max(parseInt(offsetParam, 10) || 0, 0)
-      : Math.max(((pageNum ?? 1) - 1) * limit, 0);
+    const { limit, offset, pageNum } = parsePagination({
+      limit: req.query.limit as string | undefined,
+      offset: req.query.offset as string | undefined,
+      page: req.query.page as string | undefined,
+      pageNum: req.query.pageNum as string | undefined,
+    });
 
     // Build filters dynamically
-    const filters: any[] = [];
+    const filters: SQL[] = [];
     const filterableFields = ['code', 'name', 'description'] as const;
     const sortableFields = ['id', ...filterableFields, 'isActive', 'createdAt', 'updatedAt'] as const;
     type SortableField = (typeof sortableFields)[number];
@@ -34,7 +27,7 @@ categoriesRouter.get('/', async (req: Request, res: Response) => {
       if (req.query[field]) {
         const column = categories[field];
         if (column) {
-          filters.push(like(column as any, `%${req.query[field]}%`));
+          filters.push(like(column, `%${req.query[field]}%`));
         }
       }
     }
@@ -46,39 +39,30 @@ categoriesRouter.get('/', async (req: Request, res: Response) => {
     }
 
     // Build sort dynamically
-    const orderBy: any[] = [];
+    const orderBy: SQL[] = [];
     if (req.query.sort) {
       const sortParams = (req.query.sort as string).split(',');
-      console.log('Sort params:', sortParams);
 
       for (const param of sortParams) {
         const [field, direction] = param.split(':');
-        const dir = direction?.toLowerCase() === 'desc' ? desc : asc;
+        const dir = resolveSortDirection(direction);
 
         if (!field || !isSortableField(field)) {
-          console.log(field, 'not sortable - available fields:', sortableFields);
           continue;
         }
 
-        console.log('Processing sortable field:', field);
         const column = categories[field];
         if (column) {
           orderBy.push(dir(column));
-          console.log('Added to orderBy:', field, direction || 'asc');
-        } else {
-          console.log('Column not found for field:', field);
         }
       }
     } else {
-      orderBy.push(desc(categories.id));
+      orderBy.push(resolveSortDirection('desc')(categories.id));
     }
 
     // Build the query
-    let query = db.select().from(categories);
-
-    if (filters.length > 0) {
-      query = query.where(and(...filters)) as any;
-    }
+    const baseQuery = db.select().from(categories);
+    const query = filters.length > 0 ? baseQuery.where(and(...filters)) : baseQuery;
 
     // Get total count
     const countResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(categories);
@@ -94,7 +78,7 @@ categoriesRouter.get('/', async (req: Request, res: Response) => {
       : countResult[0].count;
 
     // Get paginated results
-    const result = await (query as any)
+    const result = await query
       .orderBy(...orderBy)
       .limit(limit)
       .offset(offset)
@@ -102,16 +86,10 @@ categoriesRouter.get('/', async (req: Request, res: Response) => {
 
     res.json({
       data: result,
-      pagination: {
-        limit,
-        offset,
-        total: filteredCount,
-        page: pageNum ?? Math.floor(offset / limit) + 1,
-        totalPages: Math.ceil(filteredCount / limit),
-      },
+      pagination: toPagination(limit, offset, filteredCount, pageNum),
     });
   } catch (error) {
-    console.log(error);
+    console.error('Failed to fetch categories');
     res.status(500).json({ error: 'Failed to fetch categories' });
   }
 });
@@ -136,7 +114,6 @@ categoriesRouter.post('/', async (req, res) => {
 
   if (!name) return res.status(400).json({ error: 'Name is required' });
   if (!code) return res.status(400).json({ error: 'Code is required' });
-  if (!req.user?.id) return res.status(401).json({ error: 'User not authenticated' });
 
   try {
     const category = await db

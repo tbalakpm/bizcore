@@ -24,7 +24,7 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
     <!-- List -->
-    <div class="lg:col-span-2 bg-white p-4 rounded-lg shadow">
+    <div class="lg:col-span-2 bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700">
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-lg font-semibold">{{ 'MENU.CATEGORIES' | translate }}</h2>
       </div>
@@ -185,7 +185,7 @@
     </div>
 
     <!-- Add form -->
-    <div class="bg-white p-4 rounded-lg shadow max-h-max">
+    <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 max-h-max">
       <h2 class="text-lg font-semibold mb-3">{{ 'CATEGORY.ADD' | translate }}</h2>
       <form (ngSubmit)="addCategory()" class="space-y-3">
         <!-- Code -->

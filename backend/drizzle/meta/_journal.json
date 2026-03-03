@@ -57,6 +57,13 @@
       "when": 1772111603662,
       "tag": "0007_serial-number",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1772554327509,
+      "tag": "0008_misty_living_mummy",
+      "breakpoints": true
     }
   ]
 }

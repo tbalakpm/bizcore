@@ -5,6 +5,8 @@ import { eq } from 'drizzle-orm';
 
 import { config } from '../config';
 import { db, users } from '../db';
+import { rateLimit } from '../middleware/rate-limit';
+import { isStrongPassword } from '../utils/list-query';
 
 export const authRouter = express.Router();
 
@@ -14,8 +16,8 @@ authRouter.post('/register', async (req: Request, res: Response) => {
   if (!username || !password) {
     return res.status(400).json({ error: req.i18n?.t('auth.invalid') });
   }
-  if (password.length < 4) {
-    return res.status(400).json({ error: 'Password is less than 4 chars' });
+  if (!isStrongPassword(password)) {
+    return res.status(400).json({ error: 'Password must be at least 8 chars with upper, lower and number' });
   }
 
   const existing = await db.select({ id: users.id }).from(users).where(eq(users.username, username)).get();
@@ -29,7 +31,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
   return res.status(201).json({ message: req.i18n?.t('user.created') });
 });
 
-authRouter.post('/login', async (req: Request, res: Response) => {
+authRouter.post('/login', rateLimit({ windowMs: 60 * 1000, max: 10 }), async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   const user = await db

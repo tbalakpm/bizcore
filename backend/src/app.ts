@@ -1,6 +1,6 @@
 import path from 'node:path';
 import cors from 'cors';
-import express, { NextFunction, type Request, type Response } from 'express';
+import express, { type Request, type Response } from 'express';
 
 import { config } from './config';
 import { initializeDatabase, migrateDatabase } from './db';
@@ -8,16 +8,23 @@ import { i18nMiddleware } from './middleware/i18n';
 
 import { authRouter } from './routes/auth';
 import { categoriesRouter } from './routes/categories';
-import { authRequired } from './middleware/auth';
+import { authRequired, requireRole } from './middleware/auth';
 import { usersRouter } from './routes/users';
 import { productsRouter } from './routes/products';
 import { customersRouter } from './routes/customers';
 import { logger } from './middleware/logger';
+import { suppliersRouter } from './routes/suppliers';
+import { inventoriesRouter } from './routes/inventories';
+import { settingsRouter } from './routes/settings';
+import { invoicesRouter } from './routes/invoices';
+import { serialNumbersRouter } from './routes/serial-numbers';
 
 export async function app() {
   console.log(`Environment: ${config.environment}`);
   await initializeDatabase();
-  await migrateDatabase();
+  if (config.autoMigrateOnStartup) {
+    await migrateDatabase();
+  }
 
   const app = express();
   app.use(
@@ -36,15 +43,19 @@ export async function app() {
   // Replace 'my-angular-app' with your actual project name from the dist folder
   app.use(express.static(path.join(__dirname, '/public')));
 
-  app.get('/api/health', (req: Request, res: Response, next: NextFunction): void => {
+  app.get('/api/health', (req: Request, res: Response): void => {
     res.json({ status: 'ok', username: req.user?.username || '', lang: req.i18n?.lang || 'en' });
-    // next();
   });
   app.use('/api/auth', authRouter);
-  app.use('/api/users', authRequired, usersRouter);
+  app.use('/api/users', authRequired, requireRole('admin'), usersRouter);
   app.use('/api/categories', authRequired, categoriesRouter);
   app.use('/api/products', authRequired, productsRouter);
   app.use('/api/customers', authRequired, customersRouter);
+  app.use('/api/suppliers', authRequired, suppliersRouter);
+  app.use('/api/inventories', authRequired, inventoriesRouter);
+  app.use('/api/settings', authRequired, requireRole('admin'), settingsRouter);
+  app.use('/api/invoices', authRequired, invoicesRouter);
+  app.use('/api/serial-numbers', authRequired, serialNumbersRouter);
 
   // Handle any requests that don't match the static files by serving the index.html file
   app.get('/{*any}', (req, res, next) => {

@@ -1,14 +1,14 @@
 import { integer, numeric, sqliteTable } from 'drizzle-orm/sqlite-core';
 import { stockInvoices } from './stock-invoice.schema';
-import { inventories } from './inventory.schema';
+import { products } from './product.schema';
 
 export const stockInvoiceItems = sqliteTable('stock_invoice_items', {
   id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
-  invoiceId: integer('invoice_id')
+  stockInvoiceId: integer('stock_invoice_id')
     .references(() => stockInvoices.id)
     .notNull(),
-  inventoryId: integer('inventory_id')
-    .references(() => inventories.id)
+  productId: integer('product_id')
+    .references(() => products.id)
     .notNull(),
   qty: numeric('qty'),
   unitPrice: numeric('unit_price'),
