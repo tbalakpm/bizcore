@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth/auth-service';
@@ -9,13 +9,18 @@ import { DatePipe } from '@angular/common';
   imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, DatePipe],
   templateUrl: './app.html',
 })
-export class App {
+export class App implements OnDestroy {
   public auth = inject(AuthService);
   private translate = inject(TranslateService);
   private router = inject(Router);
   private langKey = 'current_lang';
+  private themeKey = 'theme_mode';
+  private mediaQuery: MediaQueryList | null = null;
+  private systemThemeListener: ((event: MediaQueryListEvent) => void) | null = null;
 
   today = new Date();
+  themeMode = signal<'system' | 'light' | 'dark'>('system');
+  isDarkTheme = signal(false);
 
   protected readonly title = signal('BizCore');
 
@@ -25,6 +30,13 @@ export class App {
 
     const storedLang = sessionStorage.getItem(this.langKey) || 'en';
     this.translate.use(storedLang);
+    this.initializeTheme();
+  }
+
+  ngOnDestroy() {
+    if (this.mediaQuery && this.systemThemeListener) {
+      this.mediaQuery.removeEventListener('change', this.systemThemeListener);
+    }
   }
 
   logout() {
@@ -35,5 +47,49 @@ export class App {
   switchLang(lang: string) {
     this.translate.use(lang);
     sessionStorage.setItem(this.langKey, lang);
+  }
+
+  toggleTheme() {
+    const nextTheme = this.isDarkTheme() ? 'light' : 'dark';
+    this.setTheme(nextTheme);
+  }
+
+  private initializeTheme() {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const storedTheme = localStorage.getItem(this.themeKey);
+    if (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'system') {
+      this.themeMode.set(storedTheme);
+    }
+
+    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this.systemThemeListener = (event: MediaQueryListEvent) => {
+      if (this.themeMode() === 'system') {
+        this.applyResolvedTheme(event.matches);
+      }
+    };
+
+    this.mediaQuery.addEventListener('change', this.systemThemeListener);
+    this.applyTheme();
+  }
+
+  private setTheme(mode: 'system' | 'light' | 'dark') {
+    this.themeMode.set(mode);
+    localStorage.setItem(this.themeKey, mode);
+    this.applyTheme();
+  }
+
+  private applyTheme() {
+    const resolvedDarkMode =
+      this.themeMode() === 'dark' || (this.themeMode() === 'system' && this.mediaQuery?.matches);
+    this.applyResolvedTheme(Boolean(resolvedDarkMode));
+  }
+
+  private applyResolvedTheme(isDark: boolean) {
+    this.isDarkTheme.set(isDark);
+    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
   }
 }

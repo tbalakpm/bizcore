@@ -1,4 +1,5 @@
 import { integer, numeric, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import type { NewStockInvoiceItem, StockInvoiceItem } from './stock-invoice-items.schema';
 
 export const stockInvoices = sqliteTable('stock_invoices', {
   id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
@@ -10,3 +11,5 @@ export const stockInvoices = sqliteTable('stock_invoices', {
 
 export type StockInvoice = typeof stockInvoices.$inferSelect;
 export type NewStockInvoice = typeof stockInvoices.$inferInsert;
+export type StockInvoiceWithItems = StockInvoice & { items: StockInvoiceItem[] };
+export type NewStockInvoiceWithItems = NewStockInvoice & { items: NewStockInvoiceItem[] };

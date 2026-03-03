@@ -8,6 +8,7 @@
   "EDIT": "Edit",
   "DELETE": "Delete",
   "ACTIONS": "Actions",
+  "CODE": "Code",
   "NAME": "Name",
   "TYPE": "Type",
   "DESCRIPTION": "Description",
@@ -15,8 +16,9 @@
   "MENU": {
     "DASHBOARD": "Dashboard",
     "CATEGORIES": "Categories",
-    "REGISTERS": "Registers",
-    "ENTRIES": "Entries",
+    "PRODUCTS": "Products",
+    "USERS": "Users",
+    "CUSTOMERS": "Customers",
     "LOGOUT": "Logout"
   },
   "LOGIN": {
@@ -25,11 +27,11 @@
     "PASSWORD": "Password",
     "SUBMIT": "Sign in"
   },
-  "REGISTER": {
-    "TITLE": "Register",
+  "PRODUCT": {
+    "TITLE": "Product",
     "USERNAME": "Username",
     "PASSWORD": "Password",
-    "NO_REGISTERS_YET": "No registers yet"
+    "NO_PRODUCTS_YET": "No products yet"
   },
   "CATEGORY": {
     "TITLE": "Category",
@@ -40,5 +42,13 @@
     "LIABILITY": "Liability",
     "TYPES": ["I:Income", "E:Expense", "A:Asset", "L:Liability"],
     "NO_CATEGORIES_YET": "No categories yet"
+  },
+  "USER": {
+    "TITLE": "User",
+    "USERNAME": "Username",
+    "FIRST_NAME": "First Name",
+    "LAST_NAME": "Last Name",
+    "ROLE": "Role",
+    "NO_USERS_YET": "No users yet"
   }
 }

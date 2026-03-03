@@ -6,3 +6,5 @@ export { suppliers } from './supplier.schema';
 export { addresses } from './address.schema';
 export { inventories } from './inventory.schema';
 export { settings } from './settings.schema';
+export { serialNumbers } from './serial-number.schema';
+export { stockInvoices } from './stock-invoice.schema';

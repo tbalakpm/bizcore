@@ -6,7 +6,6 @@ export const serialNumbers = sqliteTable('serial_numbers', {
   prefix: text('prefix', { length: 20 }),
   current: integer('current').notNull().default(1),
   length: integer('length').notNull().default(10),
-  serialNumber: text('serial_number', { length: 50 }).notNull(),
 });
 
 export type SerialNumber = typeof serialNumbers.$inferSelect;

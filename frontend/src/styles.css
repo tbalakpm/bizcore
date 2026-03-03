@@ -1,2 +1,67 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
+
+html,
+body {
+  min-height: 100%;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+label {
+  color: #0f172a;
+}
+
+.dark body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.dark label {
+  color: #e2e8f0;
+}
+
+.dark .bg-white {
+  background-color: #1e293b;
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-slate-200 {
+  background-color: #334155;
+}
+
+.dark .border-slate-200 {
+  border-color: #475569;
+}
+
+.dark .hover\:bg-slate-100:hover {
+  background-color: #475569;
+}
+
+.dark thead,
+.dark .bg-gray-50 {
+  background-color: #334155;
+}
+
+.dark th {
+  color: #f1f5f9;
+}
+
+.dark .text-blue-700 {
+  color: #93c5fd;
+}
+
+.dark .text-red-700 {
+  color: #fca5a5;
+}
+
+.dark .text-green-700,
+.dark .text-green-600 {
+  color: #86efac;
+}
+
+.dark .text-gray-400 {
+  color: #94a3b8;
+}
