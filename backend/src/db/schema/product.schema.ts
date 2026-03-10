@@ -14,6 +14,7 @@ export const products = sqliteTable(
     unitPrice: numeric('unit_price'),
     hsnSac: text('hsn_sac', { length: 20 }),
     taxRate: numeric('tax_rate'),
+    gtnGeneration: text('gtn_generation', { length: 20 }),
     // unitsInStock: integer('units_in_stock'),
     ...auditFields,
   },

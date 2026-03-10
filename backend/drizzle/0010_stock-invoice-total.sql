@@ -1,0 +1,1 @@
+ALTER TABLE `stock_invoice_items` RENAME COLUMN "total_amount" TO "line_total";

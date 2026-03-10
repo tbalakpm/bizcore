@@ -72,3 +72,8 @@ body {
 .dark .app-shell .text-slate-600 {
   color: #e2e8f0;
 }
+
+.dark .app-shell .focus\:ring-slate-700:focus,
+.dark .app-shell .hover\:ring-slate-700:hover {
+  --tw-ring-color: #94a3b8;
+}

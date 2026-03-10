@@ -8,7 +8,9 @@ export { inventories } from './inventory.schema';
 export { settings } from './settings.schema';
 export { serialNumbers } from './serial-number.schema';
 export { productSerialNumbers } from './product-serial-number.schema';
+
 export { stockInvoices } from './stock-invoice.schema';
 export { stockInvoiceItems } from './stock-invoice-items.schema';
+
 export { salesInvoices } from './sales-invoice.schema';
 export { salesInvoiceItems } from './sales-invoice-items.schema';

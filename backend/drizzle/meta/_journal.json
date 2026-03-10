@@ -64,6 +64,20 @@
       "when": 1772554327509,
       "tag": "0008_misty_living_mummy",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1772697749247,
+      "tag": "0009_gtn-generation",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1772776624926,
+      "tag": "0010_stock-invoice-total",
+      "breakpoints": true
     }
   ]
 }
