@@ -12,6 +12,9 @@ export interface Product {
   categoryId: number;
   qtyPerUnit?: string;
   unitPrice?: number;
+  hsnSac?: string;
+  taxRate?: number;
+  gtnGeneration?: string;
   unitsInStock?: number;
   categoryName?: string;
   isActive: boolean;

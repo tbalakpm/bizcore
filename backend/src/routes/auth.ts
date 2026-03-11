@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import { config } from '../config';
 import { db, users } from '../db';
 import { rateLimit } from '../middleware/rate-limit';
-import { isStrongPassword } from '../utils/list-query';
+import { isStrongPassword } from '../utils/password.util';
 
 export const authRouter = express.Router();
 

@@ -25,6 +25,8 @@ export class Products implements OnInit {
     categoryId: undefined,
     qtyPerUnit: undefined,
     unitPrice: undefined,
+    hsnSac: undefined,
+    taxRate: undefined,
     unitsInStock: undefined,
     isActive: true,
   };
@@ -91,6 +93,8 @@ export class Products implements OnInit {
       categoryId: undefined,
       qtyPerUnit: undefined,
       unitPrice: undefined,
+      hsnSac: undefined,
+      taxRate: undefined,
       unitsInStock: undefined,
       categoryName: undefined,
       isActive: true,
@@ -106,6 +110,8 @@ export class Products implements OnInit {
       this.editingProduct.categoryId = res.categoryId;
       this.editingProduct.qtyPerUnit = res.qtyPerUnit;
       this.editingProduct.unitPrice = res.unitPrice;
+      this.editingProduct.hsnSac = res.hsnSac;
+      this.editingProduct.taxRate = res.taxRate;
       this.editingProduct.unitsInStock = res.unitsInStock;
       this.editingProduct.categoryName = res.categoryName;
       this.editingProduct.isActive = res.isActive;

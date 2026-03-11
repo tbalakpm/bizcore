@@ -3,7 +3,8 @@ import { and, eq, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
 import { db, users } from '../db';
-import { isStrongPassword, parsePagination, resolveSortDirection, toPagination } from '../utils/list-query';
+import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
+import { isStrongPassword } from '../utils/password.util';
 
 export const usersRouter = express.Router();
 
@@ -20,12 +21,20 @@ const userPublicSelect = {
 
 usersRouter.get('/', async (req: Request, res: Response) => {
   try {
-    const { limit, offset, pageNum } = parsePagination({
-      limit: req.query.limit as string | undefined,
-      offset: req.query.offset as string | undefined,
-      page: req.query.page as string | undefined,
-      pageNum: req.query.pageNum as string | undefined,
-    });
+    const hasPaginationQuery =
+      req.query.limit !== undefined ||
+      req.query.offset !== undefined ||
+      req.query.page !== undefined ||
+      req.query.pageNum !== undefined;
+
+    const pagination = hasPaginationQuery
+      ? parsePagination({
+          limit: req.query.limit as string | undefined,
+          offset: req.query.offset as string | undefined,
+          page: req.query.page as string | undefined,
+          pageNum: req.query.pageNum as string | undefined,
+        })
+      : undefined;
 
     // Build filters dynamically
     const filters: SQL[] = [];
@@ -89,15 +98,22 @@ usersRouter.get('/', async (req: Request, res: Response) => {
       : countResult[0].count;
 
     // Get paginated results
-    const result = await query
-      .orderBy(...orderBy)
-      .limit(limit)
-      .offset(offset)
-      .all();
+    const orderedQuery = query.orderBy(...orderBy);
+    const result = pagination
+      ? await orderedQuery.limit(pagination.limit).offset(pagination.offset).all()
+      : await orderedQuery.all();
 
     res.json({
       data: result,
-      pagination: toPagination(limit, offset, filteredCount, pageNum),
+      pagination: pagination
+        ? toPagination(pagination.limit, pagination.offset, filteredCount, pagination.pageNum)
+        : {
+            limit: result.length,
+            offset: 0,
+            total: filteredCount,
+            page: 1,
+            totalPages: 1,
+          },
     });
   } catch (error) {
     console.error('Failed to fetch users');

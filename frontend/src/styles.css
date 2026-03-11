@@ -77,3 +77,42 @@ body {
 .dark .app-shell .hover\:ring-slate-700:hover {
   --tw-ring-color: #94a3b8;
 }
+
+.app-shell-main {
+  flex-direction: column;
+}
+
+.app-shell-sidebar {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.app-shell-content {
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .app-shell-sidebar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-shell-main {
+    flex-direction: row;
+  }
+
+  .app-shell-sidebar {
+    display: block;
+    width: 15rem;
+    flex-shrink: 0;
+  }
+}
+
+@media (min-width: 1280px) {
+  .app-shell-sidebar {
+    width: 16rem;
+  }
+}

@@ -1,0 +1,262 @@
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+  <h1 class="text-2xl font-bold">{{ isEditMode ? 'Edit' : 'Create' }} Stock Invoice</h1>
+  <a
+    routerLink="/stock-invoices"
+    class="py-1.5 px-4 border border-slate-700 rounded text-sm cursor-pointer"
+  >
+    Back to List
+  </a>
+</div>
+
+<div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700">
+  <form (ngSubmit)="onSubmit()" class="space-y-3">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
+      <div>
+        <label class="block text-sm font-medium">Invoice Number</label>
+        <input
+          type="text"
+          [(ngModel)]="editingInvoice.invoiceNumber"
+          name="invoiceNumber"
+          placeholder="Auto-generated if empty"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Invoice Date</label>
+        <input
+          type="date"
+          [(ngModel)]="editingInvoice.invoiceDate"
+          name="invoiceDate"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+        />
+      </div>
+      <!-- <div>
+        <label class="block text-sm font-medium">Product Search</label>
+        <input
+          type="text"
+          [(ngModel)]="productSearch"
+          name="productSearch"
+          placeholder="Search code or name"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+        />
+      </div> -->
+      <div class="flex items-end justify-end md:col-span-2 xl:col-span-2">
+        <button
+          type="button"
+          class="py-1.5 px-4 border border-slate-700 dark:border-slate-400 rounded text-sm cursor-pointer"
+          (click)="showNewProductForm = !showNewProductForm"
+        >
+          {{ showNewProductForm ? 'Close Product Form' : 'Create New Product' }}
+        </button>
+      </div>
+    </div>
+
+    @if (showNewProductForm) {
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 bg-slate-50 p-3 rounded border border-slate-200"
+      >
+        <div>
+          <label class="block text-sm font-medium">Code</label>
+          <input
+            type="text"
+            [(ngModel)]="newProduct.code"
+            name="newProductCode"
+            class="mt-1 w-full border border-slate-400 rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Name</label>
+          <input
+            type="text"
+            [(ngModel)]="newProduct.name"
+            name="newProductName"
+            class="mt-1 w-full border border-slate-400 rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Category</label>
+          <select
+            [(ngModel)]="newProduct.categoryId"
+            name="newProductCategoryId"
+            class="mt-1 w-full border border-slate-400 rounded px-2 py-1"
+          >
+            @for (category of categories(); track category.id) {
+              <option [ngValue]="category.id">{{ category.name }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Qty/Unit</label>
+          <input
+            type="text"
+            [(ngModel)]="newProduct.qtyPerUnit"
+            name="newProductQtyPerUnit"
+            class="mt-1 w-full border border-slate-400 rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Unit Price</label>
+          <input
+            type="number"
+            [(ngModel)]="newProduct.unitPrice"
+            name="newProductUnitPrice"
+            class="mt-1 w-full border border-slate-400 rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">HSN/SAC</label>
+          <input
+            type="text"
+            [(ngModel)]="newProduct.hsnSac"
+            name="newProductHsnSac"
+            class="mt-1 w-full border border-slate-400 rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Tax Rate</label>
+          <input
+            type="number"
+            step="0.01"
+            [(ngModel)]="newProduct.taxRate"
+            name="newProductTaxRate"
+            class="mt-1 w-full border border-slate-400 rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">GTN Generation</label>
+          <select
+            [(ngModel)]="newProduct.gtnGeneration"
+            name="newProductGtnGeneration"
+            class="mt-1 w-full border border-slate-400 rounded px-2 py-1"
+          >
+            <option value="auto">Auto</option>
+            <option value="manual">Manual</option>
+          </select>
+        </div>
+        <div class="md:col-span-2 xl:col-span-4 flex justify-end">
+          <button
+            type="button"
+            class="py-1.5 px-4 border bg-slate-700 text-white rounded text-sm cursor-pointer"
+            (click)="createProductFromInvoice()"
+          >
+            Create Product
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="overflow-auto border border-slate-200 rounded">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-50 border-b border-slate-300">
+          <tr>
+            <th class="text-left px-2 py-2">Product</th>
+            <th class="text-left px-2 py-2 w-40">GTN</th>
+            <th class="text-left px-2 py-2 w-32">HSN/SAC</th>
+            <th class="text-left px-2 py-2 w-28">Tax Rate</th>
+            <th class="text-left px-2 py-2 w-28">Qty</th>
+            <th class="text-left px-2 py-2 w-32">Unit Price</th>
+            <th class="text-left px-2 py-2 w-32">Line Total</th>
+            <th class="text-right px-2 py-2 w-28">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of editingInvoice.items; track $index; let i = $index) {
+            <tr class="border-b border-slate-200">
+              <td class="px-2 py-2">
+                <select
+                  [(ngModel)]="item.productId"
+                  (ngModelChange)="onProductSelect(item)"
+                  (focus)="selectedRowIndex = i"
+                  [name]="'itemProduct' + i"
+                  class="w-full border border-slate-400 rounded px-2 py-1"
+                >
+                  <option [ngValue]="undefined">-- Select Product --</option>
+                  @for (product of filteredProducts; track product.id) {
+                    <option [ngValue]="product.id">{{ product.code }} - {{ product.name }}</option>
+                  }
+                </select>
+              </td>
+              <td class="px-2 py-2">
+                <input
+                  type="text"
+                  [(ngModel)]="item.gtn"
+                  [name]="'itemGtn' + i"
+                  class="w-full border border-slate-400 rounded px-2 py-1"
+                />
+              </td>
+              <td class="px-2 py-2">
+                <input
+                  type="text"
+                  [(ngModel)]="item.hsnSac"
+                  [name]="'itemHsnSac' + i"
+                  class="w-full border border-slate-400 rounded px-2 py-1"
+                />
+              </td>
+              <td class="px-2 py-2">
+                <input
+                  type="number"
+                  step="0.01"
+                  [(ngModel)]="item.taxRate"
+                  [name]="'itemTaxRate' + i"
+                  class="w-full border border-slate-400 rounded px-2 py-1"
+                />
+              </td>
+              <td class="px-2 py-2">
+                <input
+                  type="number"
+                  min="1"
+                  [(ngModel)]="item.qty"
+                  (ngModelChange)="onItemChanged(item)"
+                  [name]="'itemQty' + i"
+                  class="w-full border border-slate-400 rounded px-2 py-1"
+                />
+              </td>
+              <td class="px-2 py-2">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  [(ngModel)]="item.unitPrice"
+                  (ngModelChange)="onItemChanged(item)"
+                  [name]="'itemPrice' + i"
+                  class="w-full border border-slate-400 rounded px-2 py-1"
+                />
+              </td>
+              <td class="px-2 py-2">{{ item.lineTotal }}</td>
+              <td class="px-2 py-2 text-right">
+                <button
+                  type="button"
+                  class="text-red-700 text-sm hover:underline cursor-pointer"
+                  (click)="removeItemRow(i)"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-2">
+      <button
+        type="button"
+        class="py-1.5 px-4 border border-slate-700 dark:border-slate-400 rounded text-sm cursor-pointer"
+        (click)="addItemRow()"
+      >
+        Add Item
+      </button>
+      <button
+        type="submit"
+        [disabled]="submitting"
+        class="py-1.5 px-4 border bg-slate-700 text-white rounded text-sm cursor-pointer disabled:bg-slate-500 sm:ml-auto"
+      >
+        {{ submitting ? 'Saving...' : 'Save Invoice' }}
+      </button>
+    </div>
+
+    @if (error) {
+      <p class="text-red-600 text-xs">{{ error }}</p>
+    }
+  </form>
+</div>

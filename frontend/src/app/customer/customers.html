@@ -1,4 +1,4 @@
-<div class="flex justify-between items-center mb-4">
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
   <h1 class="flex text-2xl font-bold items-center gap-2">
     <svg
       class="w-7 h-7 text-gray-800"
@@ -28,7 +28,7 @@
       {{ editingCustomer.id ? ('EDIT' | translate) : ('ADD' | translate) }}
       {{ 'MENU.CUSTOMERS' | translate }}
     </h2>
-    <form (ngSubmit)="onSubmit()" class="grid grid-cols-4 gap-2">
+    <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
       <div>
         <label class="block text-sm font-medium">{{ 'CODE' | translate }}</label>
         <input
@@ -70,7 +70,7 @@
         ></textarea>
       </div>
 
-      <div class="gap-4 col-start-4 flex items-end">
+      <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
         <button
           type="submit"
           class="py-1.5 w-full border bg-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-white text-sm cursor-pointer"
@@ -101,18 +101,19 @@
       <h2 class="text-lg font-semibold">{{ 'MENU.CUSTOMERS' | translate }}</h2>
     </div>
 
-    <table class="min-w-full text-sm">
-      <thead class="bg-gray-50">
-        <tr class="border-b border-slate-400">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-50">
+          <tr class="border-b border-slate-400">
           <th class="text-left py-2">{{ 'CODE' | translate }}</th>
           <th class="text-left py-2">{{ 'NAME' | translate }}</th>
           <th class="text-left py-2">{{ 'TYPE' | translate }}</th>
           <th class="text-left py-2">{{ 'DESCRIPTION' | translate }}</th>
           <th class="text-center w-16 py-2">{{ 'ACTIVE' | translate }}</th>
           <th class="py-2 text-right w-32">{{ 'ACTIONS' | translate }}</th>
-        </tr>
-      </thead>
-      <tbody>
+          </tr>
+        </thead>
+        <tbody>
         @for (c of customers(); track c.id) {
           <tr
             class="border-b border-slate-200 hover:bg-slate-100"
@@ -189,7 +190,8 @@
             </td>
           </tr>
         }
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

@@ -2,18 +2,26 @@ import { and, eq, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
 import { categories, db, products } from '../db';
-import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query';
+import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 
 export const productsRouter = express.Router();
 
 productsRouter.get('/', async (req: Request, res: Response) => {
   try {
-    const { limit, offset, pageNum } = parsePagination({
-      limit: req.query.limit as string | undefined,
-      offset: req.query.offset as string | undefined,
-      page: req.query.page as string | undefined,
-      pageNum: req.query.pageNum as string | undefined,
-    });
+    const hasPaginationQuery =
+      req.query.limit !== undefined ||
+      req.query.offset !== undefined ||
+      req.query.page !== undefined ||
+      req.query.pageNum !== undefined;
+
+    const pagination = hasPaginationQuery
+      ? parsePagination({
+          limit: req.query.limit as string | undefined,
+          offset: req.query.offset as string | undefined,
+          page: req.query.page as string | undefined,
+          pageNum: req.query.pageNum as string | undefined,
+        })
+      : undefined;
 
     // Build filters dynamically
     const filters: SQL[] = [];
@@ -126,6 +134,9 @@ productsRouter.get('/', async (req: Request, res: Response) => {
         categoryName: categories.name,
         qtyPerUnit: products.qtyPerUnit,
         unitPrice: products.unitPrice,
+        hsnSac: products.hsnSac,
+        taxRate: products.taxRate,
+        gtnGeneration: products.gtnGeneration,
         //unitsInStock: products.unitsInStock,
         isActive: products.isActive,
         createdAt: products.createdAt,
@@ -152,20 +163,25 @@ productsRouter.get('/', async (req: Request, res: Response) => {
       .leftJoin(categories, eq(categories.id, products.categoryId));
 
     const whereCondition = allFilters.length > 0 ? and(...allFilters) : undefined;
-    const filteredCount = whereCondition
-      ? (await countQuery.where(whereCondition))[0].count
-      : countResult[0].count;
+    const filteredCount = whereCondition ? (await countQuery.where(whereCondition))[0].count : countResult[0].count;
 
     // Get paginated results
-    const result = await query
-      .orderBy(...orderBy)
-      .limit(limit)
-      .offset(offset)
-      .all();
+    const orderedQuery = query.orderBy(...orderBy);
+    const result = pagination
+      ? await orderedQuery.limit(pagination.limit).offset(pagination.offset).all()
+      : await orderedQuery.all();
 
     res.json({
       data: result,
-      pagination: toPagination(limit, offset, filteredCount, pageNum),
+      pagination: pagination
+        ? toPagination(pagination.limit, pagination.offset, filteredCount, pagination.pageNum)
+        : {
+            limit: result.length,
+            offset: 0,
+            total: filteredCount,
+            page: 1,
+            totalPages: 1,
+          },
     });
   } catch (error) {
     console.error('Failed to fetch products');
@@ -186,7 +202,19 @@ productsRouter.get('/:id', async (req, res) => {
 });
 
 productsRouter.post('/', async (req, res) => {
-  const { code, name, description, categoryId, qtyPerUnit, unitPrice, unitsInStock, isActive } = req.body;
+  const {
+    code,
+    name,
+    description,
+    categoryId,
+    qtyPerUnit,
+    unitPrice,
+    hsnSac,
+    taxRate,
+    gtnGeneration,
+    unitsInStock,
+    isActive,
+  } = req.body;
 
   if (!code) return res.status(400).json({ error: 'Code is required' });
   if (!name) return res.status(400).json({ error: 'Name is required' });
@@ -202,6 +230,9 @@ productsRouter.post('/', async (req, res) => {
         categoryId,
         qtyPerUnit,
         unitPrice: unitPrice?.toString(),
+        hsnSac,
+        taxRate: taxRate?.toString(),
+        gtnGeneration,
         //unitsInStock,
         isActive: isActive !== false,
       })
@@ -219,7 +250,19 @@ productsRouter.post('/', async (req, res) => {
 
 productsRouter.put('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { code, name, description, categoryId, qtyPerUnit, unitPrice, unitsInStock, isActive } = req.body;
+  const {
+    code,
+    name,
+    description,
+    categoryId,
+    qtyPerUnit,
+    unitPrice,
+    hsnSac,
+    taxRate,
+    gtnGeneration,
+    unitsInStock,
+    isActive,
+  } = req.body;
 
   const product = await db.select().from(products).where(eq(products.id, id)).get();
   if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
@@ -230,6 +273,9 @@ productsRouter.put('/:id', async (req, res) => {
   if (categoryId) product.categoryId = categoryId;
   if (qtyPerUnit) product.qtyPerUnit = qtyPerUnit;
   if (unitPrice) product.unitPrice = unitPrice?.toString();
+  if (hsnSac !== undefined) product.hsnSac = hsnSac;
+  if (taxRate !== undefined) product.taxRate = taxRate?.toString();
+  if (gtnGeneration !== undefined) product.gtnGeneration = gtnGeneration;
   // if (unitsInStock !== undefined) product.unitsInStock = unitsInStock;
   if (typeof isActive === 'boolean') product.isActive = isActive;
 
@@ -242,6 +288,9 @@ productsRouter.put('/:id', async (req, res) => {
       categoryId: product.categoryId,
       qtyPerUnit: product.qtyPerUnit,
       unitPrice: product.unitPrice,
+      hsnSac: product.hsnSac,
+      taxRate: product.taxRate,
+      gtnGeneration: product.gtnGeneration,
       // unitsInStock: product.unitsInStock,
       isActive: product.isActive,
     })

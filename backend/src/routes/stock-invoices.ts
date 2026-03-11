@@ -1,0 +1,390 @@
+import { and, eq, inArray, like, sql, type SQL } from 'drizzle-orm';
+import express, { type Request, type Response } from 'express';
+
+import { db, inventories, products, stockInvoiceItems, stockInvoices } from '../db';
+import type { StockInvoiceItemModel, StockInvoiceModel } from '../models/stock-invoice.model';
+import { serialNumberService } from '../services/serial-number.service';
+import type { DbTransaction } from '../shared/serial-number.shared';
+import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
+import { normalizeDate } from '../utils/date.util';
+import { toNumericString, toPositiveNumber } from '../utils/number.util';
+import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
+
+type StockInvoiceItemInput = Partial<StockInvoiceItemModel>;
+
+type StockInvoiceInput = Partial<Omit<StockInvoiceModel, 'items'>> & { items?: StockInvoiceItemInput[] };
+
+export const stockInvoicesRouter = express.Router();
+
+const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, items: StockInvoiceItemInput[]) => {
+  let totalQty = 0;
+  let totalAmount = 0;
+
+  for (const item of items) {
+    const qty = toPositiveNumber(item.qty, 0);
+
+    if (qty <= 0) {
+      throw new Error('Item qty must be greater than zero');
+    }
+
+    const unitPriceRaw = item.unitPrice ?? 0;
+    const unitPrice = toPositiveNumber(unitPriceRaw, 0);
+    const lineTotal = toPositiveNumber(item.lineTotal, Number((qty * unitPrice).toFixed(2)));
+
+    let inventoryId = item.inventoryId;
+
+    if (!inventoryId) {
+      if (!item.productId) {
+        throw new Error('Each item requires either inventoryId or productId');
+      }
+
+      const product = await tx.select().from(products).where(eq(products.id, item.productId)).get();
+      if (!product) {
+        throw new Error(`Product not found for productId=${item.productId}`);
+      }
+
+      const gtn = item.gtn || (shouldGenerateGtn(product.gtnGeneration) ? generateGtn(product.code) : undefined);
+      const createdInventory = await tx
+        .insert(inventories)
+        .values({
+          productId: product.id,
+          gtn,
+          qtyPerUnit: product.qtyPerUnit,
+          hsnSac: item.hsnSac ?? product.hsnSac,
+          taxRate: toNumericString(item.taxRate) ?? product.taxRate,
+          buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
+          sellingPrice: product.unitPrice,
+          unitsInStock: 0,
+          location: item.location,
+        })
+        .returning({ id: inventories.id })
+        .get();
+
+      inventoryId = createdInventory.id;
+    }
+
+    const inventory = await tx.select().from(inventories).where(eq(inventories.id, inventoryId)).get();
+    if (!inventory) {
+      throw new Error(`Inventory not found for inventoryId=${inventoryId}`);
+    }
+
+    const updatedUnitsInStock = (inventory.unitsInStock ?? 0) + qty;
+    await tx
+      .update(inventories)
+      .set({ unitsInStock: updatedUnitsInStock })
+      .where(eq(inventories.id, inventory.id))
+      .run();
+
+    await tx
+      .insert(stockInvoiceItems)
+      .values({
+        stockInvoiceId,
+        inventoryId: inventory.id,
+        qty: toNumericString(qty),
+        unitPrice: toNumericString(unitPrice),
+        lineTotal: toNumericString(lineTotal),
+      })
+      .run();
+
+    totalQty += qty;
+    totalAmount += lineTotal;
+  }
+
+  return {
+    totalQty,
+    totalAmount,
+  };
+};
+
+stockInvoicesRouter.get('/', async (req: Request, res: Response) => {
+  try {
+    const { limit, offset, pageNum } = parsePagination({
+      limit: req.query.limit as string | undefined,
+      offset: req.query.offset as string | undefined,
+      page: req.query.page as string | undefined,
+      pageNum: req.query.pageNum as string | undefined,
+    });
+
+    const filters: SQL[] = [];
+    if (req.query.invoiceNumber) {
+      filters.push(like(stockInvoices.invoiceNumber, `%${req.query.invoiceNumber}%`));
+    }
+
+    if (req.query.invoiceDate) {
+      filters.push(eq(stockInvoices.invoiceDate, req.query.invoiceDate as string));
+    }
+
+    if (req.query.minAmount) {
+      const minAmount = Number(req.query.minAmount);
+      if (!Number.isNaN(minAmount)) {
+        filters.push(sql`CAST(${stockInvoices.totalAmount} AS REAL) >= ${minAmount}`);
+      }
+    }
+
+    if (req.query.maxAmount) {
+      const maxAmount = Number(req.query.maxAmount);
+      if (!Number.isNaN(maxAmount)) {
+        filters.push(sql`CAST(${stockInvoices.totalAmount} AS REAL) <= ${maxAmount}`);
+      }
+    }
+
+    const sortableFields = ['id', 'invoiceNumber', 'invoiceDate', 'totalQty', 'totalAmount'] as const;
+    type SortableField = (typeof sortableFields)[number];
+    const isSortableField = (value: string): value is SortableField =>
+      (sortableFields as readonly string[]).includes(value);
+
+    const orderBy: SQL[] = [];
+    if (req.query.sort) {
+      const sortParams = (req.query.sort as string).split(',');
+      for (const param of sortParams) {
+        const [field, direction] = param.split(':');
+        const dir = resolveSortDirection(direction);
+        if (!field || !isSortableField(field)) {
+          continue;
+        }
+
+        const column = stockInvoices[field];
+        if (column) {
+          orderBy.push(dir(column));
+        }
+      }
+    }
+
+    if (orderBy.length === 0) {
+      orderBy.push(resolveSortDirection('desc')(stockInvoices.id));
+    }
+
+    const baseQuery = db.select().from(stockInvoices);
+    const whereCondition = filters.length > 0 ? and(...filters) : undefined;
+    const query = whereCondition ? baseQuery.where(whereCondition) : baseQuery;
+
+    const totalResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(stockInvoices);
+    const filteredCount = whereCondition
+      ? (
+          await db
+            .select({ count: sql<number>`cast(count(*) as integer)` })
+            .from(stockInvoices)
+            .where(whereCondition)
+        )[0].count
+      : totalResult[0].count;
+
+    const data = await query
+      .orderBy(...orderBy)
+      .limit(limit)
+      .offset(offset)
+      .all();
+
+    res.json({
+      data,
+      pagination: toPagination(limit, offset, filteredCount, pageNum),
+    });
+  } catch (error) {
+    console.error('Failed to fetch stock invoices', error);
+    res.status(500).json({ error: 'Failed to fetch stock invoices' });
+  }
+});
+
+stockInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id as string, 10);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid stock invoice ID' });
+    }
+
+    const invoice = await db.select().from(stockInvoices).where(eq(stockInvoices.id, id)).get();
+    if (!invoice) {
+      return res.status(404).json({ error: 'Stock invoice not found' });
+    }
+
+    const items = await db
+      .select({
+        id: stockInvoiceItems.id,
+        stockInvoiceId: stockInvoiceItems.stockInvoiceId,
+        inventoryId: stockInvoiceItems.inventoryId,
+        qty: stockInvoiceItems.qty,
+        unitPrice: stockInvoiceItems.unitPrice,
+        lineTotal: stockInvoiceItems.lineTotal,
+        productId: inventories.productId,
+        gtn: inventories.gtn,
+        hsnSac: inventories.hsnSac,
+        taxRate: inventories.taxRate,
+        productCode: products.code,
+        productName: products.name,
+      })
+      .from(stockInvoiceItems)
+      .innerJoin(inventories, eq(inventories.id, stockInvoiceItems.inventoryId))
+      .innerJoin(products, eq(products.id, inventories.productId))
+      .where(eq(stockInvoiceItems.stockInvoiceId, id))
+      .all();
+
+    return res.json({ ...invoice, items });
+  } catch (error) {
+    console.error('Failed to fetch stock invoice', error);
+    return res.status(500).json({ error: 'Failed to fetch stock invoice' });
+  }
+});
+
+stockInvoicesRouter.post('/', async (req: Request, res: Response) => {
+  try {
+    const body = req.body as StockInvoiceInput;
+    const items = body.items ?? [];
+
+    if (items.length === 0) {
+      return res.status(400).json({ error: 'At least one item is required' });
+    }
+
+    const created = await db.transaction(async (tx) => {
+      const invoiceNumber = body.invoiceNumber || (await serialNumberService.generateInvoiceNumber('stockInvoice', tx));
+      const insertedInvoice = await tx
+        .insert(stockInvoices)
+        .values({
+          invoiceNumber,
+          invoiceDate: normalizeDate(body.invoiceDate),
+          totalQty: toNumericString(body.totalQty) ?? '0',
+          totalAmount: toNumericString(body.totalAmount) ?? '0',
+        })
+        .returning()
+        .get();
+
+      const totals = await processInvoiceItems(tx, insertedInvoice.id, items);
+
+      await tx
+        .update(stockInvoices)
+        .set({
+          totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
+          totalAmount: toNumericString(body.totalAmount) ?? toNumericString(totals.totalAmount),
+        })
+        .where(eq(stockInvoices.id, insertedInvoice.id))
+        .run();
+
+      return tx.select().from(stockInvoices).where(eq(stockInvoices.id, insertedInvoice.id)).get();
+    });
+
+    return res.status(201).json(created);
+  } catch (error) {
+    console.error('Failed to create stock invoice', error);
+    return res.status(400).json({ error: (error as Error).message || 'Failed to create stock invoice' });
+  }
+});
+
+stockInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id as string, 10);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid stock invoice ID' });
+    }
+
+    const body = req.body as StockInvoiceInput;
+    const items = body.items ?? [];
+    if (items.length === 0) {
+      return res.status(400).json({ error: 'At least one item is required' });
+    }
+
+    const updated = await db.transaction(async (tx) => {
+      const existing = await tx.select().from(stockInvoices).where(eq(stockInvoices.id, id)).get();
+      if (!existing) {
+        throw new Error('Stock invoice not found');
+      }
+
+      const existingItems = await tx
+        .select()
+        .from(stockInvoiceItems)
+        .where(eq(stockInvoiceItems.stockInvoiceId, id))
+        .all();
+      if (existingItems.length > 0) {
+        const inventoryIds = [...new Set(existingItems.map((item) => item.inventoryId))];
+        const inventoryRows = await tx.select().from(inventories).where(inArray(inventories.id, inventoryIds)).all();
+        const inventoryMap = new Map(inventoryRows.map((row) => [row.id, row]));
+
+        for (const item of existingItems) {
+          const inventory = inventoryMap.get(item.inventoryId);
+          if (!inventory) {
+            continue;
+          }
+
+          const qty = Number(item.qty ?? 0);
+          const nextUnitsInStock = Math.max((inventory.unitsInStock ?? 0) - qty, 0);
+          await tx
+            .update(inventories)
+            .set({ unitsInStock: nextUnitsInStock })
+            .where(eq(inventories.id, inventory.id))
+            .run();
+          inventoryMap.set(inventory.id, { ...inventory, unitsInStock: nextUnitsInStock });
+        }
+
+        await tx.delete(stockInvoiceItems).where(eq(stockInvoiceItems.stockInvoiceId, id)).run();
+      }
+
+      const totals = await processInvoiceItems(tx, id, items);
+
+      await tx
+        .update(stockInvoices)
+        .set({
+          invoiceNumber: body.invoiceNumber ?? existing.invoiceNumber,
+          invoiceDate: body.invoiceDate ?? existing.invoiceDate,
+          totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
+          totalAmount: toNumericString(body.totalAmount) ?? toNumericString(totals.totalAmount),
+        })
+        .where(eq(stockInvoices.id, id))
+        .run();
+
+      return tx.select().from(stockInvoices).where(eq(stockInvoices.id, id)).get();
+    });
+
+    return res.json(updated);
+  } catch (error) {
+    console.error('Failed to update stock invoice', error);
+    return res.status(400).json({ error: (error as Error).message || 'Failed to update stock invoice' });
+  }
+});
+
+stockInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id as string, 10);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid stock invoice ID' });
+    }
+
+    await db.transaction(async (tx) => {
+      const existing = await tx
+        .select({ id: stockInvoices.id })
+        .from(stockInvoices)
+        .where(eq(stockInvoices.id, id))
+        .get();
+      if (!existing) {
+        throw new Error('Stock invoice not found');
+      }
+
+      const items = await tx.select().from(stockInvoiceItems).where(eq(stockInvoiceItems.stockInvoiceId, id)).all();
+      if (items.length > 0) {
+        const inventoryIds = [...new Set(items.map((item) => item.inventoryId))];
+        const inventoryRows = await tx.select().from(inventories).where(inArray(inventories.id, inventoryIds)).all();
+        const inventoryMap = new Map(inventoryRows.map((row) => [row.id, row]));
+
+        for (const item of items) {
+          const inventory = inventoryMap.get(item.inventoryId);
+          if (!inventory) {
+            continue;
+          }
+
+          const qty = Number(item.qty ?? 0);
+          const nextUnitsInStock = Math.max((inventory.unitsInStock ?? 0) - qty, 0);
+          await tx
+            .update(inventories)
+            .set({ unitsInStock: nextUnitsInStock })
+            .where(eq(inventories.id, inventory.id))
+            .run();
+          inventoryMap.set(inventory.id, { ...inventory, unitsInStock: nextUnitsInStock });
+        }
+      }
+
+      await tx.delete(stockInvoiceItems).where(eq(stockInvoiceItems.stockInvoiceId, id)).run();
+      await tx.delete(stockInvoices).where(eq(stockInvoices.id, id)).run();
+    });
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error('Failed to delete stock invoice', error);
+    return res.status(404).json({ error: (error as Error).message || 'Failed to delete stock invoice' });
+  }
+});

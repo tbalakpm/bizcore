@@ -1,5 +1,5 @@
 @baseUrl=http://localhost:4000/api
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoidGJhbGEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Njk2OTI3NDMsImV4cCI6MTc3MDI5NzU0M30.aaqVFvywasfzvQy_yuLyIzAyQsBXo-wzYb5j-8X4X3s
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoidGJhbGEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzMxNTg5ODMsImV4cCI6MTc3Mzc2Mzc4M30.o0vSR_qKDw_6R09Pk3E670KFJowC4NHxb1pqaXbi7Sw
 
 ### Get all categories (basic)
 GET {{baseUrl}}/categories

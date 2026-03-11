@@ -1,13 +1,47 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import express from 'express';
 
 import { db, suppliers } from '../db';
+import { parsePagination, toPagination } from '../utils/list-query.util';
 
 export const suppliersRouter = express.Router();
 
-suppliersRouter.get('/', async (_req, res) => {
-  const data = await db.select().from(suppliers).orderBy(suppliers.id).all();
-  res.json({ data });
+suppliersRouter.get('/', async (req, res) => {
+  const hasPaginationQuery =
+    req.query.limit !== undefined ||
+    req.query.offset !== undefined ||
+    req.query.page !== undefined ||
+    req.query.pageNum !== undefined;
+
+  const pagination = hasPaginationQuery
+    ? parsePagination({
+        limit: req.query.limit as string | undefined,
+        offset: req.query.offset as string | undefined,
+        page: req.query.page as string | undefined,
+        pageNum: req.query.pageNum as string | undefined,
+      })
+    : undefined;
+
+  const baseQuery = db.select().from(suppliers).orderBy(suppliers.id);
+  const data = pagination
+    ? await baseQuery.limit(pagination.limit).offset(pagination.offset).all()
+    : await baseQuery.all();
+
+  const countResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(suppliers);
+  const total = countResult[0].count;
+
+  res.json({
+    data,
+    pagination: pagination
+      ? toPagination(pagination.limit, pagination.offset, total, pagination.pageNum)
+      : {
+          limit: data.length,
+          offset: 0,
+          total,
+          page: 1,
+          totalPages: 1,
+        },
+  });
 });
 
 suppliersRouter.get('/:id', async (req, res) => {

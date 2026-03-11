@@ -1,0 +1,151 @@
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+  <h1 class="text-2xl font-bold">Stock Invoices</h1>
+  <a
+    routerLink="/stock-invoices/new"
+    class="py-1.5 px-4 border bg-slate-700 text-white rounded text-sm cursor-pointer"
+  >
+    New Invoice
+  </a>
+</div>
+
+<div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700">
+  <div class="flex flex-col xl:flex-row xl:items-end gap-3 mb-3">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-2 xl:flex-1">
+      <input
+        type="text"
+        [(ngModel)]="filters.invoiceNumber"
+        name="filterInvoiceNumber"
+        placeholder="Invoice number"
+        class="border border-slate-400 rounded px-2 py-1"
+      />
+      <input
+        type="date"
+        [(ngModel)]="filters.invoiceDate"
+        name="filterInvoiceDate"
+        class="border border-slate-400 rounded px-2 py-1"
+      />
+      <input
+        type="number"
+        [(ngModel)]="filters.minAmount"
+        name="filterMinAmount"
+        placeholder="Min amount"
+        class="border border-slate-400 rounded px-2 py-1"
+      />
+      <input
+        type="number"
+        [(ngModel)]="filters.maxAmount"
+        name="filterMaxAmount"
+        placeholder="Max amount"
+        class="border border-slate-400 rounded px-2 py-1"
+      />
+      <div class="flex gap-2">
+        <button
+          type="button"
+          class="w-full py-1 border bg-slate-700 text-white rounded cursor-pointer"
+          (click)="applyFilters()"
+        >
+          Apply
+        </button>
+      </div>
+    </div>
+    <div
+      class="flex flex-col sm:flex-row sm:items-center gap-2 border-t border-slate-200 pt-2 xl:border-t-0 xl:pt-0 xl:border-l xl:border-slate-200 xl:pl-3"
+    >
+      <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Sort</span>
+      <select
+        [(ngModel)]="sortValue"
+        (change)="onSortChange()"
+        name="filterSort"
+        class="border border-slate-400 rounded px-2 py-1 min-w-[180px]"
+      >
+        <option value="id:desc">Newest</option>
+        <option value="id:asc">Oldest</option>
+        <option value="invoiceNumber:asc">Invoice Number A-Z</option>
+        <option value="invoiceNumber:desc">Invoice Number Z-A</option>
+        <option value="invoiceDate:asc">Date Asc</option>
+        <option value="invoiceDate:desc">Date Desc</option>
+        <option value="totalAmount:asc">Amount 0-9</option>
+        <option value="totalAmount:desc">Amount 9-0</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50">
+        <tr class="border-b border-slate-400">
+          <th class="text-left py-2">Invoice #</th>
+          <th class="text-left py-2">Date</th>
+          <th class="text-right py-2">Qty</th>
+          <th class="text-right py-2">Total Amount</th>
+          <th class="text-right py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (invoice of invoices(); track invoice.id) {
+          <tr class="border-b border-slate-200 hover:bg-slate-100">
+            <td class="py-2">{{ invoice.invoiceNumber }}</td>
+            <td class="py-2">{{ invoice.invoiceDate }}</td>
+            <td class="py-2 text-right">{{ invoice.totalQty }}</td>
+            <td class="py-2 text-right">{{ invoice.totalAmount }}</td>
+            <td class="py-2 text-right space-x-2">
+              <a
+                [routerLink]="['/stock-invoices', invoice.id, 'edit']"
+                class="text-blue-700 rounded text-sm hover:underline cursor-pointer"
+              >
+                Edit
+              </a>
+              <button
+                type="button"
+                class="text-red-700 rounded text-sm hover:underline cursor-pointer"
+                (click)="deleteInvoice(invoice.id)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        }
+        @if (!invoices().length && !loading) {
+          <tr>
+            <td colspan="5" class="py-3 text-center text-gray-400">No stock invoices found</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-3 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-sm">Rows</span>
+      <select
+        [(ngModel)]="filters.limit"
+        (change)="onLimitChange()"
+        name="pageLimit"
+        class="border border-slate-400 rounded px-2 py-1"
+      >
+        <option [ngValue]="10">10</option>
+        <option [ngValue]="25">25</option>
+        <option [ngValue]="50">50</option>
+      </select>
+    </div>
+    <div class="flex items-center gap-2 text-sm">
+      <button
+        type="button"
+        class="px-2 py-1 border border-slate-400 rounded cursor-pointer"
+        [disabled]="filters.page <= 1"
+        (click)="goToPreviousPage()"
+      >
+        Prev
+      </button>
+      <span>Page {{ pagination().page }} of {{ pagination().totalPages || 1 }}</span>
+      <button
+        type="button"
+        class="px-2 py-1 border border-slate-400 rounded cursor-pointer"
+        [disabled]="filters.page >= pagination().totalPages"
+        (click)="goToNextPage()"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>

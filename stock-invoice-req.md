@@ -1,6 +1,6 @@
 # Stock Invoice Route
 
-[Stock Invoice]
+### Stock Invoice
 
 ## 1. Goal
 
