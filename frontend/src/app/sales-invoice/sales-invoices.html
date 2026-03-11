@@ -1,0 +1,123 @@
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+  <h1 class="flex text-2xl font-bold items-center gap-2">
+    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11"/>
+    </svg>
+    Sales Invoices
+  </h1>
+  <a routerLink="/sales-invoices/new" class="py-1.5 px-4 border bg-blue-600 hover:bg-blue-700 transition font-semibold text-white rounded shadow-sm text-sm cursor-pointer">
+    New Sales Invoice
+  </a>
+</div>
+
+<div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 dark:bg-slate-900">
+  <!-- Filters Bar -->
+  <div class="flex flex-col md:flex-row gap-4 mb-4" [formGroup]="filterForm">
+    <div class="flex flex-wrap items-center grow gap-2">
+      <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Filter</span>
+
+      <input type="text" formControlName="invoiceNumber" placeholder="Invoice number"
+             class="border border-slate-300 dark:border-slate-600 dark:bg-slate-800 rounded px-3 py-1.5 text-sm" />
+             
+      <input type="date" formControlName="invoiceDate"
+             class="border border-slate-300 dark:border-slate-600 dark:bg-slate-800 rounded px-3 py-1.5 text-sm" />
+             
+      <input type="number" formControlName="minAmount" placeholder="Min amount"
+             class="border border-slate-300 dark:border-slate-600 dark:bg-slate-800 rounded px-3 py-1.5 text-sm w-32" />
+             
+      <input type="number" formControlName="maxAmount" placeholder="Max amount"
+             class="border border-slate-300 dark:border-slate-600 dark:bg-slate-800 rounded px-3 py-1.5 text-sm w-32" />
+             
+      <button type="button" class="py-1.5 px-3 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm rounded cursor-pointer transition"
+              (click)="onClearFilters()">
+        Clear
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-slate-700 rounded-lg">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+        <tr>
+          <th class="text-left font-semibold py-3 px-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition" (click)="onSort('invoiceNumber')">
+            Invoice #
+            @if (sortColumn() === 'invoiceNumber') { <span>{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span> }
+          </th>
+          <th class="text-left font-semibold py-3 px-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition" (click)="onSort('invoiceDate')">
+            Date
+            @if (sortColumn() === 'invoiceDate') { <span>{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span> }
+          </th>
+          <th class="text-left font-semibold py-3 px-4">Customer</th>
+          <th class="text-right font-semibold py-3 px-4">Total Qty</th>
+          <th class="text-right font-semibold py-3 px-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition" (click)="onSort('netAmount')">
+            Net Amount
+            @if (sortColumn() === 'netAmount') { <span>{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span> }
+          </th>
+          <th class="text-center font-semibold py-3 px-4">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (invoice of invoices(); track invoice.id) {
+        <tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+          <td class="py-3 px-4 font-medium flex items-center gap-2">
+            {{ invoice.invoiceNumber }}
+            @if (invoice.irn) {
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">IRN</span>
+            }
+          </td>
+          <td class="py-3 px-4 text-slate-500">{{ invoice.invoiceDate | date:'mediumDate' }}</td>
+          <td class="py-3 px-4">{{ invoice.customerName || '—' }}</td>
+          <td class="py-3 px-4 text-right">{{ invoice.totalQty }}</td>
+          <td class="py-3 px-4 text-right font-medium text-emerald-600 dark:text-emerald-400">Rs. {{ invoice.netAmount | number:'1.2-2' }}</td>
+          <td class="py-3 px-4 text-center space-x-3">
+            @if (!invoice.irn) {
+                <button type="button" class="text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 font-medium hover:underline cursor-pointer"
+                  (click)="generateIrn(invoice.id)">
+                  Gen IRN
+                </button>
+                <a [routerLink]="['/sales-invoices', invoice.id, 'edit']"
+                  class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline cursor-pointer">
+                  Edit
+                </a>
+                <button type="button" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium hover:underline cursor-pointer"
+                  (click)="deleteInvoice(invoice.id)">
+                  Delete
+                </button>
+            }
+            <button type="button" class="text-slate-600 hover:text-slate-800 dark:hover:text-slate-300 font-medium hover:underline cursor-pointer"
+              (click)="printInvoice(invoice.id)">
+              Print
+            </button>
+          </td>
+        </tr>
+        }
+        @if (!invoices().length) {
+        <tr>
+          <td colspan="6" class="py-8 text-center text-slate-400 italic">No sales invoices found based on the current filters.</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="mt-4 flex flex-col md:flex-row gap-4 md:items-center justify-between">
+    <div class="text-sm text-slate-500">
+      Showing page <span class="font-medium text-slate-900 dark:text-white">{{ pagination().page }}</span> 
+      of <span class="font-medium text-slate-900 dark:text-white">{{ pagination().totalPages || 1 }}</span>
+      ({{ pagination().total }} total records)
+    </div>
+    
+    <div class="flex items-center gap-2 text-sm">
+      <button type="button" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        [disabled]="pagination().page <= 1" (click)="onPageChange(pagination().page - 1)">
+        Previous
+      </button>
+      
+      <button type="button" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        [disabled]="pagination().page >= pagination().totalPages" (click)="onPageChange(pagination().page + 1)">
+        Next
+      </button>
+    </div>
+  </div>
+</div>

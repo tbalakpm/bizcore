@@ -8,6 +8,8 @@ import { Customers } from './customer/customers';
 import { Users } from './user/users';
 import { StockInvoices } from './stock-invoice/stock-invoices';
 import { StockInvoiceForm } from './stock-invoice/stock-invoice-form';
+import { SalesInvoices } from './sales-invoice/sales-invoices';
+import { SalesInvoiceForm } from './sales-invoice/sales-invoice-form';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -19,9 +21,22 @@ export const routes: Routes = [
       { path: 'categories', component: Categories },
       { path: 'products', component: Products },
       { path: 'customers', component: Customers },
-      { path: 'stock-invoices', component: StockInvoices },
-      { path: 'stock-invoices/new', component: StockInvoiceForm },
-      { path: 'stock-invoices/:id/edit', component: StockInvoiceForm },
+      {
+        path: 'stock-invoices',
+        children: [
+          { path: '', component: StockInvoices },
+          { path: 'new', component: StockInvoiceForm },
+          { path: ':id/edit', component: StockInvoiceForm },
+        ],
+      },
+      {
+        path: 'sales-invoices',
+        children: [
+          { path: '', component: SalesInvoices },
+          { path: 'new', component: SalesInvoiceForm },
+          { path: ':id/edit', component: SalesInvoiceForm },
+        ],
+      },
       { path: 'users', component: Users },
       // { path: 'customers', component: Entries },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

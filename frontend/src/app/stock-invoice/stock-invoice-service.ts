@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { pagination } from '../models/pagination';
+import { AuthService } from '../auth/auth-service';
 
 export interface StockInvoiceItem {
   id?: number;
@@ -33,6 +34,12 @@ export interface StockInvoiceList {
   pagination: pagination;
 }
 
+export interface PrintableBarcodeLabel {
+  title: string;
+  code: string;
+  subtitle: string;
+}
+
 export type StockInvoiceQuery = {
   page?: number;
   limit?: number;
@@ -46,6 +53,7 @@ export type StockInvoiceQuery = {
 @Injectable({ providedIn: 'root' })
 export class StockInvoiceService {
   private http = inject(HttpClient);
+  private auth = inject(AuthService);
 
   getAll(query: StockInvoiceQuery = {}): Observable<StockInvoiceList> {
     let params = new HttpParams();
@@ -73,5 +81,19 @@ export class StockInvoiceService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/stock-invoices/${id}`);
+  }
+
+  /** fetch pre-built barcode labels from backend */
+  getBarcodeLabels(id: number): Observable<{ labels: PrintableBarcodeLabel[] }> {
+    return this.http.get<{ labels: PrintableBarcodeLabel[] }>(
+      `${environment.apiUrl}/stock-invoices/${id}/barcodes`,
+    );
+  }
+
+  /** when you just want to open the PDF in a new window */
+  getBarcodePdfUrl(id: number): string {
+    const baseUrl = `${environment.apiUrl}/stock-invoices/${id}/barcodes/pdf`;
+    const token = this.auth.token;
+    return token ? `${baseUrl}?token=${token}` : baseUrl;
   }
 }

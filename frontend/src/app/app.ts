@@ -21,6 +21,7 @@ export class App implements OnDestroy {
   today = new Date();
   themeMode = signal<'system' | 'light' | 'dark'>('system');
   isDarkTheme = signal(false);
+  currentMenu = signal<'main' | 'reports'>('main');
 
   protected readonly title = signal('BizCore');
 
@@ -52,6 +53,10 @@ export class App implements OnDestroy {
   toggleTheme() {
     const nextTheme = this.isDarkTheme() ? 'light' : 'dark';
     this.setTheme(nextTheme);
+  }
+
+  switchMenu(menu: 'main' | 'reports') {
+    this.currentMenu.set(menu);
   }
 
   private initializeTheme() {

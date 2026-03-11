@@ -10,6 +10,17 @@ import { normalizeDate } from '../utils/date.util';
 import { toNumericString, toPositiveNumber } from '../utils/number.util';
 import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
 
+// barcode printing support
+import PDFDocument from 'pdfkit';
+import bwipjs from 'bwip-js';
+
+// model used for building labels
+interface PrintableBarcodeLabel {
+  title: string;
+  code: string;
+  subtitle: string;
+}
+
 type StockInvoiceItemInput = Partial<StockInvoiceItemModel>;
 
 type StockInvoiceInput = Partial<Omit<StockInvoiceModel, 'items'>> & { items?: StockInvoiceItemInput[] };
@@ -161,11 +172,11 @@ stockInvoicesRouter.get('/', async (req: Request, res: Response) => {
     const totalResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(stockInvoices);
     const filteredCount = whereCondition
       ? (
-          await db
-            .select({ count: sql<number>`cast(count(*) as integer)` })
-            .from(stockInvoices)
-            .where(whereCondition)
-        )[0].count
+        await db
+          .select({ count: sql<number>`cast(count(*) as integer)` })
+          .from(stockInvoices)
+          .where(whereCondition)
+      )[0].count
       : totalResult[0].count;
 
     const data = await query
@@ -183,6 +194,39 @@ stockInvoicesRouter.get('/', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch stock invoices' });
   }
 });
+
+// helper for barcode labels used by both json and pdf endpoints
+const buildBarcodeLabels = (invoice: {
+  items?: Array<Partial<Omit<StockInvoiceItemModel, 'qty' | 'unitPrice' | 'lineTotal' | 'gtn' | 'hsnSac' | 'taxRate'>> & { 
+    qty?: string | number | null;
+    unitPrice?: string | number | null;
+    lineTotal?: string | number | null;
+    gtn?: string | null;
+    hsnSac?: string | null;
+    taxRate?: string | null;
+    productCode?: string; 
+    productName?: string 
+  }>;
+}): PrintableBarcodeLabel[] => {
+  const labels: PrintableBarcodeLabel[] = [];
+
+  for (const item of invoice.items ?? []) {
+    const barcodeValue = String(item.gtn ?? item.productCode ?? '').trim();
+    if (!barcodeValue) {
+      continue;
+    }
+
+    const qty = Math.max(1, Math.round(Number(item.qty ?? 1)));
+    const title = String(item.productName ?? item.productCode ?? 'Product');
+    const subtitle = `Rs. ${Number(item.unitPrice ?? 0).toFixed(2)}`;
+
+    for (let i = 0; i < qty; i += 1) {
+      labels.push({ title, code: barcodeValue, subtitle });
+    }
+  }
+
+  return labels;
+};
 
 stockInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
   try {
@@ -221,6 +265,122 @@ stockInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Failed to fetch stock invoice', error);
     return res.status(500).json({ error: 'Failed to fetch stock invoice' });
+  }
+});
+
+// return barcode labels (title, code, subtitle) for a stock invoice
+stockInvoicesRouter.get('/:id/barcodes', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id as string, 10);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid stock invoice ID' });
+    }
+
+    const invoice = await db.select().from(stockInvoices).where(eq(stockInvoices.id, id)).get();
+    if (!invoice) {
+      return res.status(404).json({ error: 'Stock invoice not found' });
+    }
+
+    const items = await db
+      .select({
+        id: stockInvoiceItems.id,
+        stockInvoiceId: stockInvoiceItems.stockInvoiceId,
+        inventoryId: stockInvoiceItems.inventoryId,
+        qty: stockInvoiceItems.qty,
+        unitPrice: stockInvoiceItems.unitPrice,
+        lineTotal: stockInvoiceItems.lineTotal,
+        productId: inventories.productId,
+        gtn: inventories.gtn,
+        hsnSac: inventories.hsnSac,
+        taxRate: inventories.taxRate,
+        productCode: products.code,
+        productName: products.name,
+      })
+      .from(stockInvoiceItems)
+      .innerJoin(inventories, eq(inventories.id, stockInvoiceItems.inventoryId))
+      .innerJoin(products, eq(products.id, inventories.productId))
+      .where(eq(stockInvoiceItems.stockInvoiceId, id))
+      .all();
+
+    const labels = buildBarcodeLabels({ items });
+    return res.json({ labels });
+  } catch (error) {
+    console.error('Failed to fetch barcode labels', error);
+    return res.status(500).json({ error: 'Failed to fetch barcode labels' });
+  }
+});
+
+// generate a PDF of barcode labels
+stockInvoicesRouter.get('/:id/barcodes/pdf', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id as string, 10);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid stock invoice ID' });
+    }
+
+    const invoice = await db.select().from(stockInvoices).where(eq(stockInvoices.id, id)).get();
+    if (!invoice) {
+      return res.status(404).json({ error: 'Stock invoice not found' });
+    }
+
+    const items = await db
+      .select({
+        id: stockInvoiceItems.id,
+        stockInvoiceId: stockInvoiceItems.stockInvoiceId,
+        inventoryId: stockInvoiceItems.inventoryId,
+        qty: stockInvoiceItems.qty,
+        unitPrice: stockInvoiceItems.unitPrice,
+        lineTotal: stockInvoiceItems.lineTotal,
+        productId: inventories.productId,
+        gtn: inventories.gtn,
+        hsnSac: inventories.hsnSac,
+        taxRate: inventories.taxRate,
+        productCode: products.code,
+        productName: products.name,
+      })
+      .from(stockInvoiceItems)
+      .innerJoin(inventories, eq(inventories.id, stockInvoiceItems.inventoryId))
+      .innerJoin(products, eq(products.id, inventories.productId))
+      .where(eq(stockInvoiceItems.stockInvoiceId, id))
+      .all();
+
+    const labels = buildBarcodeLabels({ items });
+    if (labels.length === 0) {
+      return res.status(404).json({ error: 'No barcode data available for this invoice' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
+    doc.pipe(res);
+
+    for (let i = 0; i < labels.length; i++) {
+      const label = labels[i];
+      doc.fontSize(12).font('Helvetica-Bold').text(label.title, { align: 'center' });
+      // generate barcode image buffer
+      try {
+        const png: Buffer = await bwipjs.toBuffer({
+          bcid: 'code128',
+          text: label.code,
+          scale: 3,
+          includetext: false,
+        });
+        doc.image(png, { align: 'center', width: 200 });
+      } catch (err) {
+        console.error('barcode generation failed', err);
+        // fall back to text
+        doc.fontSize(10).text(label.code, { align: 'center' });
+      }
+      doc.fontSize(10).text(label.code, { align: 'center' });
+      doc.fontSize(9).text(label.subtitle, { align: 'center' });
+      if (i < labels.length - 1) {
+        doc.addPage();
+      }
+    }
+
+    doc.end();
+  } catch (error) {
+    console.error('Failed to generate barcode PDF', error);
+    return res.status(500).json({ error: 'Failed to generate barcode PDF' });
   }
 });
 
@@ -303,7 +463,8 @@ stockInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
           }
 
           const qty = Number(item.qty ?? 0);
-          const nextUnitsInStock = Math.max((inventory.unitsInStock ?? 0) - qty, 0);
+          // Add inventory units back to stock
+          const nextUnitsInStock = (inventory.unitsInStock ?? 0) - qty;
           await tx
             .update(inventories)
             .set({ unitsInStock: nextUnitsInStock })
@@ -368,7 +529,8 @@ stockInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
           }
 
           const qty = Number(item.qty ?? 0);
-          const nextUnitsInStock = Math.max((inventory.unitsInStock ?? 0) - qty, 0);
+          // Revert stock qty update
+          const nextUnitsInStock = (inventory.unitsInStock ?? 0) - qty;
           await tx
             .update(inventories)
             .set({ unitsInStock: nextUnitsInStock })

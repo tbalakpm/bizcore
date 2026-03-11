@@ -13,4 +13,7 @@ export { stockInvoices } from './stock-invoice.schema';
 export { stockInvoiceItems } from './stock-invoice-items.schema';
 
 export { salesInvoices } from './sales-invoice.schema';
+export type { SalesInvoice, NewSalesInvoice, SalesInvoiceWithItems, NewSalesInvoiceWithItems } from './sales-invoice.schema';
+
 export { salesInvoiceItems } from './sales-invoice-items.schema';
+export type { SalesInvoiceItem, NewSalesInvoiceItem } from './sales-invoice-items.schema';

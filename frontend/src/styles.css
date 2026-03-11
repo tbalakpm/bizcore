@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
+@import "@ng-select/ng-select/themes/default.theme.css";
 @custom-variant dark (&:where(.dark, .dark *));
 
 html,
@@ -115,4 +116,82 @@ body {
   .app-shell-sidebar {
     width: 16rem;
   }
+}
+
+/* ng-select custom styling to match standard inputs */
+.ng-select .ng-select-container {
+  min-height: 34px !important;
+  border-radius: 0.25rem !important;
+  border-color: #94a3b8 !important; /* border-slate-400 */
+  background-color: transparent !important;
+}
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 34px !important;
+}
+
+.ng-select .ng-select-container .ng-value-container {
+  padding-left: 0.5rem !important; /* px-2 */
+}
+
+.ng-select.ng-select-single .ng-select-container .ng-value-container .ng-input {
+  top: 4px !important;
+  padding-left: 0.5rem !important;
+}
+
+.ng-dropdown-panel {
+  border-color: #94a3b8 !important;
+  border-radius: 0.25rem !important;
+}
+
+/* Dark mode for ng-select */
+.dark .ng-select .ng-select-container,
+.dark .ng-select.ng-select-single .ng-select-container .ng-value-container .ng-value,
+.dark .ng-select.ng-select-single .ng-select-container .ng-value-container .ng-input>input {
+  color: #e2e8f0 !important;
+}
+
+.dark .ng-select .ng-select-container {
+  border-color: #94a3b8 !important;
+}
+
+.dark .ng-select .ng-select-container .ng-value-container .ng-placeholder {
+  color: #94a3b8 !important;
+}
+
+.dark .ng-dropdown-panel {
+  background-color: #1e293b !important; /* bg-slate-800 */
+  border-color: #475569 !important; /* border-slate-600 */
+  color: #e2e8f0 !important;
+}
+
+.dark .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  background-color: transparent !important;
+  color: #e2e8f0 !important;
+}
+
+.dark .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background-color: #334155 !important; /* bg-slate-700 */
+  color: #f8fafc !important;
+}
+
+.dark .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected {
+  background-color: #475569 !important; /* bg-slate-600 */
+  color: #ffffff !important;
+}
+
+.dark .ng-select .ng-arrow-wrapper .ng-arrow {
+  border-color: #94a3b8 transparent transparent !important;
+}
+
+.dark .ng-select.ng-select-opened>.ng-select-container .ng-arrow {
+  border-color: transparent transparent #94a3b8 !important;
+}
+
+.dark .ng-select .ng-clear-wrapper {
+  color: #94a3b8 !important;
+}
+
+.dark .ng-select .ng-clear-wrapper:hover .ng-clear {
+  color: #fca5a5 !important;
 }

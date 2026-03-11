@@ -1,26 +1,18 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
   <h1 class="flex text-2xl font-bold items-center gap-2">
-    <svg
-      class="w-7 h-7 text-gray-800"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2.5"
-        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-      />
+    <svg class="w-7 h-7 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+      fill="none" viewBox="0 0 24 24">
+      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
     </svg>
     {{ 'MENU.CUSTOMERS' | translate }}
   </h1>
 </div>
-
+@if (error) {
+<div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+  {{ error }}
+</div>
+}
 <div class="grid grid-cols-1 gap-4">
   <!-- Add form -->
   <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 max-h-max">
@@ -31,68 +23,49 @@
     <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
       <div>
         <label class="block text-sm font-medium">{{ 'CODE' | translate }}</label>
-        <input
-          type="text"
-          [(ngModel)]="editingCustomer.code"
-          name="newCustomerCode"
+        <input type="text" [(ngModel)]="editingCustomer.code" name="newCustomerCode"
           class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-          autofocus
-        />
+          autofocus />
       </div>
       <div>
         <label class="block text-sm font-medium">{{ 'NAME' | translate }}</label>
-        <input
-          type="text"
-          [(ngModel)]="editingCustomer.name"
-          name="newCustomerName"
+        <input type="text" [(ngModel)]="editingCustomer.name" name="newCustomerName"
           class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-          autofocus
-        />
+          autofocus />
       </div>
       <div>
         <label class="block text-sm font-medium">{{ 'TYPE' | translate }}</label>
-        <select
-          [(ngModel)]="editingCustomer.type"
-          name="newCustomerType"
-          class="block w-full px-2 py-1.5 mt-1 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer"
-        >
+        <select [(ngModel)]="editingCustomer.type" name="newCustomerType"
+          class="block w-full px-2 py-1.5 mt-1 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer">
           <option [ngValue]="'retail'">Retail</option>
           <option [ngValue]="'wholesale'">Wholesale</option>
         </select>
       </div>
       <div>
         <label class="block text-sm font-medium">{{ 'DESCRIPTION' | translate }}</label>
-        <textarea
-          rows="1"
-          [(ngModel)]="editingCustomer.notes"
-          name="newCustomerNotes"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-        ></textarea>
+        <textarea rows="1" [(ngModel)]="editingCustomer.notes" name="newCustomerNotes"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"></textarea>
       </div>
 
       <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
-        <button
-          type="submit"
-          class="py-1.5 w-full border bg-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-white text-sm cursor-pointer"
-        >
+        <button type="submit"
+          class="py-1.5 w-full border bg-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-white text-sm cursor-pointer">
           Save
         </button>
         @if (editingCustomer.id) {
-          <button
-            type="button"
-            class="py-1.5 w-full border border-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-sm cursor-pointer"
-            (click)="onCancel()"
-          >
-            Cancel
-          </button>
+        <button type="button"
+          class="py-1.5 w-full border border-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-sm cursor-pointer"
+          (click)="onCancel()">
+          Cancel
+        </button>
         }
       </div>
     </form>
-    @if (error) {
-      <p class="text-red-600 text-xs mt-2">
-        {{ error }}
-      </p>
-    }
+    <!-- @if (error) {
+    <p class="text-red-600 text-xs mt-2">
+      {{ error }}
+    </p>
+    } -->
   </div>
 
   <!-- List -->
@@ -105,91 +78,62 @@
       <table class="min-w-full text-sm">
         <thead class="bg-gray-50">
           <tr class="border-b border-slate-400">
-          <th class="text-left py-2">{{ 'CODE' | translate }}</th>
-          <th class="text-left py-2">{{ 'NAME' | translate }}</th>
-          <th class="text-left py-2">{{ 'TYPE' | translate }}</th>
-          <th class="text-left py-2">{{ 'DESCRIPTION' | translate }}</th>
-          <th class="text-center w-16 py-2">{{ 'ACTIVE' | translate }}</th>
-          <th class="py-2 text-right w-32">{{ 'ACTIONS' | translate }}</th>
+            <th class="text-left py-2">{{ 'CODE' | translate }}</th>
+            <th class="text-left py-2">{{ 'NAME' | translate }}</th>
+            <th class="text-left py-2">{{ 'TYPE' | translate }}</th>
+            <th class="text-left py-2">{{ 'DESCRIPTION' | translate }}</th>
+            <th class="text-center w-16 py-2">{{ 'ACTIVE' | translate }}</th>
+            <th class="py-2 text-right w-32">{{ 'ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
-        @for (c of customers(); track c.id) {
-          <tr
-            class="border-b border-slate-200 hover:bg-slate-100"
-            [ngClass]="{ 'bg-slate-200': editingCustomer.id == c.id }"
-          >
+          @for (c of customers(); track c.id) {
+          <tr class="border-b border-slate-200 hover:bg-slate-100"
+            [ngClass]="{ 'bg-slate-200': editingCustomer.id == c.id }">
             <td class="py-2">{{ c.code }}</td>
             <td class="py-2">{{ c.name }}</td>
             <td class="py-2">{{ c.type }}</td>
             <td class="py-2">{{ c.notes || '-' }}</td>
             <td class="text-center">
-              <button
-                type="button"
-                (click)="toggleActive(c)"
+              <button type="button" (click)="toggleActive(c)"
                 class="inline-flex items-center justify-center w-4.5 h-4.5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:ring-slate-700 hover:outline-none rounded hover:bg-gray-100 transition cursor-pointer"
                 [ngClass]="
                   c.isActive ? 'border-green-500 text-green-600' : 'border-gray-300 text-gray-400'
-                "
-              >
+                ">
                 @if (c.isActive) {
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
                 } @else {
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
                 }
               </button>
             </td>
             <td class="py-2 px-2 text-right space-x-2">
-              <button
-                (click)="editCustomer(c.id)"
-                class="text-blue-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer"
-              >
+              <button (click)="editCustomer(c.id)"
+                class="text-blue-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer">
                 {{ 'EDIT' | translate }}
               </button>
-              <button
-                (click)="deleteCustomer(c.id)"
-                class="text-red-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer"
-              >
+              <button (click)="deleteCustomer(c.id)"
+                class="text-red-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer">
                 {{ 'DELETE' | translate }}
               </button>
             </td>
           </tr>
-        }
-        @if (!customers().length) {
+          }
+          @if (!customers().length) {
           <tr>
             <td colspan="5" class="py-2 text-center text-gray-400">
               @if (error) {
-                <p class="text-red-600 text-xs mt-4">{{ error }}</p>
+              <p class="text-red-600 text-xs mt-4">{{ error }}</p>
               } @else {
-                No customers yet
+              No customers yet
               }
             </td>
           </tr>
-        }
+          }
         </tbody>
       </table>
     </div>

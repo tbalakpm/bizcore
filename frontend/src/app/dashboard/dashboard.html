@@ -1,30 +1,24 @@
 <div class="flex flex-col gap-4">
   <h1 class="flex text-2xl font-bold items-center gap-2">
-    <svg
-      class="w-7 h-7 text-gray-800"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      fill="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2.5"
-        fill-rule="evenodd"
+    <svg class="w-7 h-7 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+      fill="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" fill-rule="evenodd"
         d="M9 15a6 6 0 1 1 12 0 6 6 0 0 1-12 0Zm3.845-1.855a2.4 2.4 0 0 1 1.2-1.226 1 1 0 0 1 1.992-.026c.426.15.809.408 1.111.749a1 1 0 1 1-1.496 1.327.682.682 0 0 0-.36-.213.997.997 0 0 1-.113-.032.4.4 0 0 0-.394.074.93.93 0 0 0 .455.254 2.914 2.914 0 0 1 1.504.9c.373.433.669 1.092.464 1.823a.996.996 0 0 1-.046.129c-.226.519-.627.94-1.132 1.192a1 1 0 0 1-1.956.093 2.68 2.68 0 0 1-1.227-.798 1 1 0 1 1 1.506-1.315.682.682 0 0 0 .363.216c.038.009.075.02.111.032a.4.4 0 0 0 .395-.074.93.93 0 0 0-.455-.254 2.91 2.91 0 0 1-1.503-.9c-.375-.433-.666-1.089-.466-1.817a.994.994 0 0 1 .047-.134Zm1.884.573.003.008c-.003-.005-.003-.008-.003-.008Zm.55 2.613s-.002-.002-.003-.007a.032.032 0 0 1 .003.007ZM4 14a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1Zm3-2a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Zm6.5-8a1 1 0 0 1 1-1H18a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-.796l-2.341 2.049a1 1 0 0 1-1.24.06l-2.894-2.066L6.614 9.29a1 1 0 1 1-1.228-1.578l4.5-3.5a1 1 0 0 1 1.195-.025l2.856 2.04L15.34 5h-.84a1 1 0 0 1-1-1Z"
-        clip-rule="evenodd"
-      />
+        clip-rule="evenodd" />
     </svg>
     {{ 'MENU.DASHBOARD' | translate }}
   </h1>
+  @if (error) {
+  <div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+    {{ error }}
+  </div>
+  }
 
   <!-- Summary cards -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
     <!-- Today -->
-    <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+    <div
+      class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 flex justify-between items-center">
       <div>
         <p class="text-xs text-gray-500 uppercase">Income - Today</p>
         <p class="text-2xl font-bold mt-1">
@@ -32,24 +26,15 @@
         </p>
       </div>
       <div class="p-2 rounded-xl bg-slate-100">
-        <svg
-          class="w-6 h-6 text-slate-700"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 7H7v6h6V7zM3 3h18M5 21h14"
-          />
+        <svg class="w-6 h-6 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7H7v6h6V7zM3 3h18M5 21h14" />
         </svg>
       </div>
     </div>
 
-    <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+    <div
+      class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 flex justify-between items-center">
       <div>
         <p class="text-xs text-gray-500 uppercase">Expenses - Today</p>
         <p class="text-2xl font-bold mt-1">
@@ -57,25 +42,16 @@
         </p>
       </div>
       <div class="p-2 rounded-xl bg-slate-100">
-        <svg
-          class="w-6 h-6 text-slate-700"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 7H7v6h6V7zM3 3h18M5 21h14"
-          />
+        <svg class="w-6 h-6 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7H7v6h6V7zM3 3h18M5 21h14" />
         </svg>
       </div>
     </div>
 
     <!-- This month income -->
-    <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+    <div
+      class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 flex justify-between items-center">
       <div>
         <p class="text-xs text-gray-500 uppercase">Income - This Month</p>
         <p class="text-2xl font-bold mt-1">
@@ -83,25 +59,17 @@
         </p>
       </div>
       <div class="p-2 rounded-xl bg-slate-100">
-        <svg
-          class="w-6 h-6 text-slate-700"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 7V3m8 4V3M5 11h14M5 19h14M7 11v8m4-8v8m4-8v8"
-          />
+        <svg class="w-6 h-6 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7V3m8 4V3M5 11h14M5 19h14M7 11v8m4-8v8m4-8v8" />
         </svg>
       </div>
     </div>
 
     <!-- This month expenses -->
-    <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+    <div
+      class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 flex justify-between items-center">
       <div>
         <p class="text-xs text-gray-500 uppercase">Expenses - This Month</p>
         <p class="text-2xl font-bold mt-1">
@@ -109,19 +77,10 @@
         </p>
       </div>
       <div class="p-2 rounded-xl bg-slate-100">
-        <svg
-          class="w-6 h-6 text-slate-700"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 7V3m8 4V3M5 11h14M5 19h14M7 11v8m4-8v8m4-8v8"
-          />
+        <svg class="w-6 h-6 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7V3m8 4V3M5 11h14M5 19h14M7 11v8m4-8v8m4-8v8" />
         </svg>
       </div>
     </div>
@@ -130,13 +89,7 @@
   <!-- Charts row -->
   <div class="bg-white rounded-lg shadow border border-slate-200 dark:border-slate-700 p-4 h-72">
     <h2 class="text-sm font-semibold mb-2">Daily entries (this month)</h2>
-    <canvas
-      baseChart
-      [data]="dailyChartData"
-      [options]="dailyChartOptions"
-      [type]="'bar'"
-      class="mb-6"
-    >
+    <canvas baseChart [data]="dailyChartData" [options]="dailyChartOptions" [type]="'bar'" class="mb-6">
     </canvas>
   </div>
 
@@ -146,25 +99,15 @@
     <!-- Category pie chart -->
     <div class="bg-white rounded-lg shadow border border-slate-200 dark:border-slate-700 p-4 h-72">
       <h2 class="text-sm font-semibold mb-2">Income By Register (this month)</h2>
-      <canvas
-        baseChart
-        [data]="incomeCategoryChartData"
-        [options]="incomeCategoryChartOptions"
-        [type]="'pie'"
-        class="mb-6"
-      >
+      <canvas baseChart [data]="incomeCategoryChartData" [options]="incomeCategoryChartOptions" [type]="'pie'"
+        class="mb-6">
       </canvas>
     </div>
 
     <div class="bg-white rounded-lg shadow border border-slate-200 dark:border-slate-700 p-4 h-72">
       <h2 class="text-sm font-semibold mb-2">Expenses By Category (this month)</h2>
-      <canvas
-        baseChart
-        [data]="expenseCategoryChartData"
-        [options]="expenseCategoryChartOptions"
-        [type]="'pie'"
-        class="mb-6"
-      >
+      <canvas baseChart [data]="expenseCategoryChartData" [options]="expenseCategoryChartOptions" [type]="'pie'"
+        class="mb-6">
       </canvas>
     </div>
     <!-- </div> -->
@@ -180,9 +123,7 @@
   <div class="bg-white rounded-lg shadow border border-slate-200 dark:border-slate-700 p-4">
     <h2 class="text-lg font-semibold">
       Recent Entries
-      <span class="text-gray-700 text-sm font-normal"
-        >- Quick overview of your last 10 days entries.</span
-      >
+      <span class="text-gray-700 text-sm font-normal">- Quick overview of your last 10 days entries.</span>
     </h2>
 
     <div class="overflow-x-auto">
@@ -224,10 +165,10 @@
       </table>
     </div>
 
-    @if(error){
+    <!-- @if (error) {
     <p class="text-red-600 text-xs mt-2">
       {{ error }}
     </p>
-    }
+    } -->
   </div>
 </div>

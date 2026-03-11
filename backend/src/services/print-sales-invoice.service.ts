@@ -1,4 +1,3 @@
-// import { Injectable } from '@nestjs/common';
 import PDFDocument from 'pdfkit';
 import * as fs from 'fs';
 
@@ -6,6 +5,8 @@ interface LineItem {
   serialNo: number;
   productCode: string;
   productName: string;
+  gtn?: string;
+  hsnSac?: string;
   qty: number;
   rate: number;
   discount: number;

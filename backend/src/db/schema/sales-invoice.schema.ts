@@ -19,6 +19,12 @@ export const salesInvoices = sqliteTable('sales_invoices', {
   taxPct: numeric('tax_pct'),
   taxAmount: numeric('tax_amount'),
   netAmount: numeric('net_amount'),
+  
+  // E-Invoice Metadata
+  irn: text('irn', { length: 64 }), // 64-character hash
+  ackNo: text('ack_no', { length: 20 }), // 15-digit Ack No
+  ackDate: text('ack_date', { length: 50 }), // ISO Date String
+  signedQrCode: text('signed_qr_code'), // Large payload string
 });
 
 export type SalesInvoice = typeof salesInvoices.$inferSelect;

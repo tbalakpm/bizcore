@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { type Category, CategoryService } from '../category/category-service';
 import { type Product, ProductService } from '../product/product-service';
 import { type StockInvoiceItem, StockInvoiceService } from './stock-invoice-service';
@@ -27,7 +28,7 @@ type EditableStockInvoice = {
 
 @Component({
   selector: 'app-stock-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule],
   templateUrl: './stock-invoice-form.html',
 })
 export class StockInvoiceForm implements OnInit {
