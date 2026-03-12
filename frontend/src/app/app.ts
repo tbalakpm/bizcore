@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { Component, HostListener, inject, OnDestroy, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth/auth-service';
@@ -23,6 +23,13 @@ export class App implements OnDestroy {
   isDarkTheme = signal(false);
   currentMenu = signal<'main' | 'reports'>('main');
 
+  isSidebarCollapsed = signal(false);
+  sidebarWidth = signal(260);
+  isResizing = signal(false);
+  private readonly minSidebarWidth = 200;
+  private readonly maxSidebarWidth = 400;
+  private readonly sidebarStateKey = 'sidebar_state';
+
   protected readonly title = signal('BizCore');
 
   constructor() {
@@ -32,6 +39,17 @@ export class App implements OnDestroy {
     const storedLang = sessionStorage.getItem(this.langKey) || 'en';
     this.translate.use(storedLang);
     this.initializeTheme();
+
+    if (typeof window !== 'undefined') {
+      const storedSidebar = localStorage.getItem(this.sidebarStateKey);
+      if (storedSidebar) {
+        try {
+          const state = JSON.parse(storedSidebar);
+          this.isSidebarCollapsed.set(state.collapsed ?? false);
+          this.sidebarWidth.set(state.width ?? 260);
+        } catch (e) {}
+      }
+    }
   }
 
   ngOnDestroy() {
@@ -57,6 +75,49 @@ export class App implements OnDestroy {
 
   switchMenu(menu: 'main' | 'reports') {
     this.currentMenu.set(menu);
+  }
+
+  toggleSidebar() {
+    this.isSidebarCollapsed.update(v => !v);
+    this.saveSidebarState();
+  }
+
+  startResizing(event: MouseEvent) {
+    if (this.isSidebarCollapsed()) return;
+    this.isResizing.set(true);
+    event.preventDefault(); // allow drag
+    // Disable text selection during resize
+    document.body.style.userSelect = 'none';
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    if (!this.isResizing()) return;
+    
+    // Calculate new width based on mouse position
+    let newWidth = event.clientX;
+    if (newWidth < this.minSidebarWidth) newWidth = this.minSidebarWidth;
+    if (newWidth > this.maxSidebarWidth) newWidth = this.maxSidebarWidth;
+    
+    this.sidebarWidth.set(newWidth);
+  }
+
+  @HostListener('document:mouseup')
+  onMouseUp() {
+    if (this.isResizing()) {
+      this.isResizing.set(false);
+      this.saveSidebarState();
+      document.body.style.userSelect = ''; // Re-enable text selection
+    }
+  }
+
+  private saveSidebarState() {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.sidebarStateKey, JSON.stringify({
+        collapsed: this.isSidebarCollapsed(),
+        width: this.sidebarWidth()
+      }));
+    }
   }
 
   private initializeTheme() {
