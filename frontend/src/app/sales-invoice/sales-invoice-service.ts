@@ -8,6 +8,8 @@ import { AuthService } from '../auth/auth-service';
 export interface SalesInvoiceItem {
   id?: number;
   salesInvoiceId?: number;
+  inventoryId?: number;
+  gtn?: string;
   productId?: number;
   qty: number;
   unitPrice: number;

@@ -92,13 +92,26 @@
           class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
       </div>
       <div>
-        <label class="block text-sm font-medium">GTN Generation</label>
+        <label class="block text-sm font-medium">GTN Mode</label>
         <select [(ngModel)]="newProduct.gtnGeneration" name="newProductGtnGeneration"
           class="mt-1 w-full border border-slate-400 rounded px-2 py-1">
-          <option value="auto">Auto</option>
-          <option value="manual">Manual</option>
+          <option [ngValue]="undefined">Default (Product Code)</option>
+          <option value="BATCH">Batch Level</option>
+          <option value="TAG">Tag Level</option>
         </select>
       </div>
+      @if (newProduct.gtnGeneration === 'BATCH' || newProduct.gtnGeneration === 'TAG') {
+      <div>
+        <label class="block text-sm font-medium">GTN Prefix</label>
+        <input type="text" [(ngModel)]="newProduct.gtnPrefix" name="newProductGtnPrefix"
+          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Start Sequence</label>
+        <input type="number" step="1" [(ngModel)]="newProduct.gtnStartPos" name="newProductGtnStartPos"
+          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
+      </div>
+      }
       <div class="md:col-span-2 xl:col-span-4 flex justify-end">
         <button type="button" class="py-1.5 px-4 border bg-slate-700 text-white rounded text-sm cursor-pointer"
           (click)="createProductFromInvoice()">
@@ -140,7 +153,8 @@
             </td>
             <td class="px-2 py-2">
               <input type="text" [(ngModel)]="item.gtn" [name]="'itemGtn' + i"
-                class="w-full border border-slate-400 rounded px-2 py-1" />
+                placeholder="Auto-generate"
+                class="w-full border border-slate-400 rounded px-2 py-1 placeholder-slate-400 text-sm" />
             </td>
             <td class="px-2 py-2">
               <input type="text" [(ngModel)]="item.hsnSac" [name]="'itemHsnSac' + i"

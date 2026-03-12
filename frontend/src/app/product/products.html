@@ -77,6 +77,34 @@
         <input type="number" step="0.01" [(ngModel)]="editingProduct.taxRate" name="newProductTaxRate"
           class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
       </div>
+
+      <div class="col-span-full border-t border-slate-200 mt-2 mb-1 pt-2">
+        <h3 class="font-medium text-slate-700">Goods Tracking Number (GTN) Setup</h3>
+      </div>
+      <div>
+        <label class="block text-sm font-medium">GTN Mode</label>
+        <select [(ngModel)]="editingProduct.gtnGeneration" name="newProductGtnGeneration"
+          class="block w-full px-2 py-1.5 mt-1 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer">
+          <option [ngValue]="undefined">Default (Product Code)</option>
+          <option value="BATCH">Batch Level (Same GTN per lot)</option>
+          <option value="TAG">Tag Level (Unique GTN per item)</option>
+        </select>
+      </div>
+
+      @if (editingProduct.gtnGeneration === 'BATCH' || editingProduct.gtnGeneration === 'TAG') {
+      <div>
+        <label class="block text-sm font-medium">Batch/Tag Prefix</label>
+        <input type="text" [(ngModel)]="editingProduct.gtnPrefix" name="newProductGtnPrefix"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+          placeholder="e.g. BATCH- or TAG-" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Start Sequence</label>
+        <input type="number" step="1" [(ngModel)]="editingProduct.gtnStartPos" name="newProductGtnStartPos"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
+          placeholder="1" />
+      </div>
+      }
       <!-- <div>
         <label class="block text-sm font-medium">Balance as on (for asset/liability)</label>
         <input
@@ -142,6 +170,7 @@
             <th class="text-left py-2">{{ 'CATEGORY.TITLE' | translate }}</th>
             <th class="text-left py-2">HSN/SAC</th>
             <th class="text-left py-2">Tax Rate</th>
+            <th class="text-left py-2">GTN Mode</th>
             <th class="text-center w-16 py-2">{{ 'ACTIVE' | translate }}</th>
             <th class="py-2 text-right w-32">{{ 'ACTIONS' | translate }}</th>
           </tr>
@@ -156,6 +185,11 @@
             <td class="py-2">{{ p.categoryName || '-' }}</td>
             <td class="py-2">{{ p.hsnSac || '-' }}</td>
             <td class="py-2">{{ p.taxRate ?? '-' }}</td>
+            <td class="py-2">
+               @if (p.gtnGeneration === 'BATCH') { <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded border border-blue-200">Batch</span> }
+               @else if (p.gtnGeneration === 'TAG') { <span class="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded border border-purple-200">Tag</span> }
+               @else { <span class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded border border-slate-200">Default</span> }
+            </td>
             <td class="text-center">
               <button type="button" (click)="toggleActive(p)"
                 class="inline-flex items-center justify-center w-4.5 h-4.5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:ring-slate-700 hover:outline-none rounded hover:bg-gray-100 transition cursor-pointer"

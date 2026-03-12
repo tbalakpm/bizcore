@@ -15,6 +15,8 @@ export interface Product {
   hsnSac?: string;
   taxRate?: number;
   gtnGeneration?: string;
+  gtnPrefix?: string;
+  gtnStartPos?: string;
   unitsInStock?: number;
   categoryName?: string;
   isActive: boolean;

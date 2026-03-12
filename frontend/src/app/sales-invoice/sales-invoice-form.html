@@ -135,7 +135,7 @@
       <table class="min-w-full text-sm">
         <thead class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
           <tr>
-            <th class="text-left font-semibold px-4 py-3 min-w-[250px]">Product</th>
+            <th class="text-left font-semibold px-4 py-3 min-w-[300px]">Item (GTN / Product)</th>
             <th class="text-right font-semibold px-4 py-3 w-32">Qty</th>
             <th class="text-right font-semibold px-4 py-3 w-32">Unit Price</th>
             <th class="text-right font-semibold px-4 py-3 w-32">Tax %</th>
@@ -148,16 +148,16 @@
           @for (item of editingInvoice.items; track $index; let i = $index) {
           <tr class="border-b border-slate-100 dark:border-slate-800">
             <td class="px-2 py-2">
-              <ng-select [items]="products()" bindLabel="name" bindValue="id" [(ngModel)]="item.productId"
-                appendTo="body" (change)="onProductSelect(item)" [disabled]="!!editingInvoice.irn"
-                [name]="'itemProduct' + i" [searchable]="true" [clearable]="true" placeholder="-- Select Product --"
+              <ng-select [items]="inventories()" bindLabel="gtn" bindValue="id" [(ngModel)]="item.inventoryId"
+                appendTo="body" (change)="onInventorySelect(item)" [disabled]="!!editingInvoice.irn"
+                [name]="'itemInventory' + i" [searchable]="true" [clearable]="true" placeholder="-- Select Item (GTN) --"
                 class="w-full text-sm">
                 <ng-template ng-label-tmp let-p="item">
-                  <span class="font-medium">{{ p.code }}</span> - {{ p.name }}
+                  <span class="font-medium">{{ p.gtn || p.code }}</span> - {{ p.name }}
                 </ng-template>
                 <ng-template ng-option-tmp let-p="item" let-search="searchTerm">
                   <div class="font-medium">{{ p.name }}</div>
-                  <div class="text-xs text-slate-500">Code: {{ p.code }} &middot; Stock: {{ p.stock || 0 }}</div>
+                  <div class="text-xs text-slate-500">GTN: {{ p.gtn || p.code }} &middot; Stock: {{ p.unitsInStock || 0 }}</div>
                 </ng-template>
               </ng-select>
             </td>

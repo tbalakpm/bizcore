@@ -54,7 +54,9 @@ export class StockInvoiceForm implements OnInit {
     unitPrice: undefined,
     hsnSac: undefined,
     taxRate: undefined,
-    gtnGeneration: 'auto',
+    gtnGeneration: undefined,
+    gtnPrefix: undefined,
+    gtnStartPos: undefined,
     isActive: true,
   };
 
@@ -84,7 +86,7 @@ export class StockInvoiceForm implements OnInit {
       id: undefined,
       invoiceNumber: '',
       invoiceDate: new Date().toISOString().slice(0, 10),
-      items: [{ qty: 1, unitPrice: 0, lineTotal: 0 }],
+      items: [{ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '' }],
     };
   }
 
@@ -126,7 +128,7 @@ export class StockInvoiceForm implements OnInit {
         }));
 
         if (this.editingInvoice.items.length === 0) {
-          this.editingInvoice.items = [{ qty: 1, unitPrice: 0, lineTotal: 0 }];
+          this.editingInvoice.items = [{ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '' }];
         }
 
         this.loading = false;
@@ -150,7 +152,7 @@ export class StockInvoiceForm implements OnInit {
   }
 
   addItemRow() {
-    this.editingInvoice.items.push({ qty: 1, unitPrice: 0, lineTotal: 0 });
+    this.editingInvoice.items.push({ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '' });
   }
 
   removeItemRow(index: number) {
@@ -268,7 +270,9 @@ export class StockInvoiceForm implements OnInit {
           unitPrice: undefined,
           hsnSac: undefined,
           taxRate: undefined,
-          gtnGeneration: 'auto',
+          gtnGeneration: undefined,
+          gtnPrefix: undefined,
+          gtnStartPos: undefined,
           isActive: true,
         };
       },

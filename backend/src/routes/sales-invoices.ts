@@ -28,30 +28,24 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
     const unitPrice = toPositiveNumber(item.unitPrice, 0);
     const lineTotal = toPositiveNumber(item.lineTotal, Number((qty * unitPrice).toFixed(2)));
 
-    const productId = item.productId;
-    if (!productId) {
-      throw new Error('Each item requires a productId');
+    const inventoryId = item.inventoryId;
+    if (!inventoryId) {
+      throw new Error('Each item requires an inventoryId');
     }
 
-    // Try to find inventory to deduct from
-    // In a real system with complex inventory logic (FIFO, specific batches), 
-    // you would iterate through accessible batches. For simplicity, we just
-    // deduct from the first available inventory row for this product or a specific one if passed.
-    
-    // Default to a specific product's inventory that has stock
-    const inventoriesRows = await tx
+    const inventory = await tx
       .select()
       .from(inventories)
-      .where(and(eq(inventories.productId, productId), sql`${inventories.unitsInStock} >= ${qty}`))
-      .all();
+      .where(eq(inventories.id, inventoryId))
+      .get();
       
-    if (inventoriesRows.length === 0) {
-      const product = await tx.select({ name: products.name }).from(products).where(eq(products.id, productId)).get();
-      throw new Error(`Insufficient stock for product ${product?.name || productId}`);
+    if (!inventory) {
+      throw new Error(`Inventory stock not found for inventoryId=${inventoryId}`);
     }
     
-    // Just take the first valid inventory batch
-    const inventory = inventoriesRows[0];
+    if ((inventory.unitsInStock ?? 0) < qty) {
+      throw new Error(`Insufficient stock for inventoryId=${inventoryId}`);
+    }
 
     const updatedUnitsInStock = (inventory.unitsInStock ?? 0) - qty;
     await tx
@@ -64,7 +58,7 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
       .insert(salesInvoiceItems)
       .values({
         salesInvoiceId,
-        productId,
+        inventoryId,
         qty: toNumericString(qty),
         unitPrice: toNumericString(unitPrice),
         discountBy: item.discountBy,
@@ -207,7 +201,7 @@ salesInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
       .select({
         id: salesInvoiceItems.id,
         salesInvoiceId: salesInvoiceItems.salesInvoiceId,
-        productId: salesInvoiceItems.productId,
+        inventoryId: salesInvoiceItems.inventoryId,
         qty: salesInvoiceItems.qty,
         unitPrice: salesInvoiceItems.unitPrice,
         discountBy: salesInvoiceItems.discountBy,
@@ -216,11 +210,13 @@ salesInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
         taxPct: salesInvoiceItems.taxPct,
         taxAmount: salesInvoiceItems.taxAmount,
         lineTotal: salesInvoiceItems.lineTotal,
+        productId: inventories.productId,
         productCode: products.code,
         productName: products.name,
       })
       .from(salesInvoiceItems)
-      .innerJoin(products, eq(products.id, salesInvoiceItems.productId))
+      .innerJoin(inventories, eq(inventories.id, salesInvoiceItems.inventoryId))
+      .innerJoin(products, eq(products.id, inventories.productId))
       .where(eq(salesInvoiceItems.salesInvoiceId, id))
       .all();
 
@@ -320,12 +316,11 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
         
       if (existingItems.length > 0) {
         // Find corresponding inventory to refund the stock to. 
-        // This is a simplified rollback mechanism. 
         for (const item of existingItems) {
            const inventory = await tx
               .select()
               .from(inventories)
-              .where(eq(inventories.productId, item.productId))
+              .where(eq(inventories.id, item.inventoryId))
               .get();
               
            if (inventory) {
@@ -400,7 +395,7 @@ salesInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
            const inventory = await tx
               .select()
               .from(inventories)
-              .where(eq(inventories.productId, item.productId))
+              .where(eq(inventories.id, item.inventoryId))
               .get();
               
            if (inventory) {
@@ -517,7 +512,8 @@ salesInvoicesRouter.get('/:id/pdf', async (req: Request, res: Response) => {
         productName: products.name,
       })
       .from(salesInvoiceItems)
-      .innerJoin(products, eq(products.id, salesInvoiceItems.productId))
+      .innerJoin(inventories, eq(inventories.id, salesInvoiceItems.inventoryId))
+      .innerJoin(products, eq(products.id, inventories.productId))
       .where(eq(salesInvoiceItems.salesInvoiceId, id))
       .all();
 

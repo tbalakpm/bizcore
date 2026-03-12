@@ -4,6 +4,7 @@ import express, { type Request, type Response } from 'express';
 import { db, inventories, products, stockInvoiceItems, stockInvoices } from '../db';
 import type { StockInvoiceItemModel, StockInvoiceModel } from '../models/stock-invoice.model';
 import { serialNumberService } from '../services/serial-number.service';
+import { productSerialNumberService } from '../services/product-serial-number.service';
 import type { DbTransaction } from '../shared/serial-number.shared';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 import { normalizeDate } from '../utils/date.util';
@@ -54,48 +55,133 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
         throw new Error(`Product not found for productId=${item.productId}`);
       }
 
-      const gtn = item.gtn || (shouldGenerateGtn(product.gtnGeneration) ? generateGtn(product.code) : undefined);
-      const createdInventory = await tx
-        .insert(inventories)
-        .values({
-          productId: product.id,
-          gtn,
-          qtyPerUnit: product.qtyPerUnit,
-          hsnSac: item.hsnSac ?? product.hsnSac,
-          taxRate: toNumericString(item.taxRate) ?? product.taxRate,
-          buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
-          sellingPrice: product.unitPrice,
-          unitsInStock: 0,
-          location: item.location,
-        })
-        .returning({ id: inventories.id })
-        .get();
-
-      inventoryId = createdInventory.id;
+      if (item.gtn) {
+          // Manual GTN provided
+          const createdInventory = await tx
+            .insert(inventories)
+            .values({
+              productId: product.id,
+              gtn: item.gtn,
+              qtyPerUnit: product.qtyPerUnit,
+              hsnSac: item.hsnSac ?? product.hsnSac,
+              taxRate: toNumericString(item.taxRate) ?? product.taxRate,
+              buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
+              sellingPrice: product.unitPrice,
+              unitsInStock: qty,
+              location: item.location,
+            })
+            .returning({ id: inventories.id })
+            .get();
+          
+          await tx
+            .insert(stockInvoiceItems)
+            .values({
+              stockInvoiceId,
+              inventoryId: createdInventory.id,
+              qty: toNumericString(qty),
+              unitPrice: toNumericString(unitPrice),
+              lineTotal: toNumericString(lineTotal),
+            })
+            .run();
+      } else {
+          // Auto GTN Generation logic
+          const genType = product.gtnGeneration || 'CODE';
+          
+          if (genType === 'TAG') {
+              // TAG: Each quantity gets a distinct inventory row with qty 1
+              for (let i = 0; i < qty; i++) {
+                 const generatedGtn = await productSerialNumberService.generateTagNumber(product.id, 'product_code_as_tag_batch', tx);
+                 const createdInventory = await tx
+                    .insert(inventories)
+                    .values({
+                      productId: product.id,
+                      gtn: generatedGtn,
+                      qtyPerUnit: product.qtyPerUnit,
+                      hsnSac: item.hsnSac ?? product.hsnSac,
+                      taxRate: toNumericString(item.taxRate) ?? product.taxRate,
+                      buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
+                      sellingPrice: product.unitPrice,
+                      unitsInStock: 1,
+                      location: item.location,
+                    })
+                    .returning({ id: inventories.id })
+                    .get();
+                    
+                 await tx
+                    .insert(stockInvoiceItems)
+                    .values({
+                      stockInvoiceId,
+                      inventoryId: createdInventory.id,
+                      qty: '1',
+                      unitPrice: toNumericString(unitPrice),
+                      lineTotal: toNumericString(unitPrice), // Line total for 1 qty is unit price
+                    })
+                    .run();
+              }
+          } else {
+             // CODE or BATCH or anything else: 1 row for the full quantity
+             let generatedGtn: string | undefined = undefined;
+             if (genType === 'BATCH') {
+                 generatedGtn = await productSerialNumberService.generateBatchNumber(product.id, 'product_code_as_tag_batch', tx);
+             } else if (genType === 'CODE') {
+                 generatedGtn = product.code;
+             } else if (shouldGenerateGtn(product.gtnGeneration)) {
+                 generatedGtn = generateGtn(product.code);
+             }
+             
+             const createdInventory = await tx
+                .insert(inventories)
+                .values({
+                  productId: product.id,
+                  gtn: generatedGtn,
+                  qtyPerUnit: product.qtyPerUnit,
+                  hsnSac: item.hsnSac ?? product.hsnSac,
+                  taxRate: toNumericString(item.taxRate) ?? product.taxRate,
+                  buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
+                  sellingPrice: product.unitPrice,
+                  unitsInStock: qty,
+                  location: item.location,
+                })
+                .returning({ id: inventories.id })
+                .get();
+                
+             await tx
+                .insert(stockInvoiceItems)
+                .values({
+                  stockInvoiceId,
+                  inventoryId: createdInventory.id,
+                  qty: toNumericString(qty),
+                  unitPrice: toNumericString(unitPrice),
+                  lineTotal: toNumericString(lineTotal),
+                })
+                .run();
+          }
+      }
+    } else {
+        // Appending to an existing inventoryId
+        const inventory = await tx.select().from(inventories).where(eq(inventories.id, inventoryId)).get();
+        if (!inventory) {
+          throw new Error(`Inventory not found for inventoryId=${inventoryId}`);
+        }
+    
+        const updatedUnitsInStock = (inventory.unitsInStock ?? 0) + qty;
+        await tx
+          .update(inventories)
+          .set({ unitsInStock: updatedUnitsInStock })
+          .where(eq(inventories.id, inventory.id))
+          .run();
+    
+        await tx
+          .insert(stockInvoiceItems)
+          .values({
+            stockInvoiceId,
+            inventoryId: inventory.id,
+            qty: toNumericString(qty),
+            unitPrice: toNumericString(unitPrice),
+            lineTotal: toNumericString(lineTotal),
+          })
+          .run();
     }
-
-    const inventory = await tx.select().from(inventories).where(eq(inventories.id, inventoryId)).get();
-    if (!inventory) {
-      throw new Error(`Inventory not found for inventoryId=${inventoryId}`);
-    }
-
-    const updatedUnitsInStock = (inventory.unitsInStock ?? 0) + qty;
-    await tx
-      .update(inventories)
-      .set({ unitsInStock: updatedUnitsInStock })
-      .where(eq(inventories.id, inventory.id))
-      .run();
-
-    await tx
-      .insert(stockInvoiceItems)
-      .values({
-        stockInvoiceId,
-        inventoryId: inventory.id,
-        qty: toNumericString(qty),
-        unitPrice: toNumericString(unitPrice),
-        lineTotal: toNumericString(lineTotal),
-      })
-      .run();
 
     totalQty += qty;
     totalAmount += lineTotal;

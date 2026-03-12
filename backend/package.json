@@ -12,6 +12,7 @@
     "postbuild": "cp -R src/i18n dist/i18n && cp -R src/public dist/public && cp package.json dist/package.json",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
     "db:check": "drizzle-kit check"
   },
   "dependencies": {

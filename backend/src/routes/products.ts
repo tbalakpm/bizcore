@@ -1,7 +1,8 @@
 import { and, eq, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
-import { categories, db, products } from '../db';
+import { categories, db, products, productSerialNumbers } from '../db';
+import { productSerialNumberService } from '../services/product-serial-number.service';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 
 export const productsRouter = express.Router();
@@ -212,6 +213,8 @@ productsRouter.post('/', async (req, res) => {
     hsnSac,
     taxRate,
     gtnGeneration,
+    gtnPrefix,
+    gtnStartPos,
     unitsInStock,
     isActive,
   } = req.body;
@@ -239,6 +242,24 @@ productsRouter.post('/', async (req, res) => {
       .returning()
       .get();
 
+    if (gtnGeneration === 'BATCH' || gtnGeneration === 'TAG') {
+        const serialType = gtnGeneration === 'BATCH' ? productSerialNumberService.serialTypes.batchNumber : productSerialNumberService.serialTypes.tagNumber;
+        
+        // Ensure starting pos is valid
+        const nextPos = parseInt(gtnStartPos, 10);
+        const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
+        
+        await db.insert(productSerialNumbers).values({
+           key: `${serialType}:product_code:${product.id}`,
+           serialType,
+           mode: productSerialNumberService.modes.productCodeAsTagBatch, // Use the proper mode
+           productId: product.id,
+           prefix: gtnPrefix || '',
+           current: startPos,
+           length: 6,
+        }).run();
+    }
+
     res.status(201).json(product);
   } catch (err) {
     console.error(err);
@@ -260,6 +281,8 @@ productsRouter.put('/:id', async (req, res) => {
     hsnSac,
     taxRate,
     gtnGeneration,
+    gtnPrefix,
+    gtnStartPos,
     unitsInStock,
     isActive,
   } = req.body;
@@ -296,6 +319,32 @@ productsRouter.put('/:id', async (req, res) => {
     })
     .where(eq(products.id, id))
     .run();
+
+    if (gtnGeneration === 'BATCH' || gtnGeneration === 'TAG') {
+        const serialType = gtnGeneration === 'BATCH' ? productSerialNumberService.serialTypes.batchNumber : productSerialNumberService.serialTypes.tagNumber;
+        
+        // Ensure starting pos is valid
+        const nextPos = parseInt(gtnStartPos, 10);
+        const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
+        
+        const existingSerial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.key, `${serialType}:product_code:${product.id}`)).get();
+        if (existingSerial) {
+             await db.update(productSerialNumbers).set({
+                 prefix: gtnPrefix || '',
+                 current: startPos,
+             }).where(eq(productSerialNumbers.id, existingSerial.id)).run();
+        } else {
+             await db.insert(productSerialNumbers).values({
+                 key: `${serialType}:product_code:${product.id}`,
+                 serialType,
+                 mode: productSerialNumberService.modes.productCodeAsTagBatch, // Use the proper mode
+                 productId: product.id,
+                 prefix: gtnPrefix || '',
+                 current: startPos,
+                 length: 6,
+             }).run();
+        }
+    }
 
   res.json(product);
 });

@@ -7,10 +7,13 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { type Product, ProductService } from '../product/product-service';
 import { type Customer, CustomerService } from '../customer/customer-service';
 import { type SalesInvoiceItem, SalesInvoiceService, SalesInvoice } from './sales-invoice-service';
+import { type Inventory, InventoryService } from '../inventory/inventory-service';
 
 type EditableSalesInvoiceItem = {
   id?: number;
+  inventoryId?: number;
   productId?: number;
+  gtn?: string;
   qty: number;
   unitPrice: number;
   discountBy?: string;
@@ -44,11 +47,13 @@ export class SalesInvoiceForm implements OnInit {
   private salesInvoiceService = inject(SalesInvoiceService);
   private productService = inject(ProductService);
   private customerService = inject(CustomerService);
+  private inventoryService = inject(InventoryService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   products = signal<Product[]>([]);
   customers = signal<Customer[]>([]);
+  inventories = signal<Inventory[]>([]);
 
   editingInvoice: EditableSalesInvoice = this.defaultInvoice();
   
@@ -95,6 +100,7 @@ export class SalesInvoiceForm implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadCustomers();
+    this.loadInventories();
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -128,6 +134,13 @@ export class SalesInvoiceForm implements OnInit {
     });
   }
 
+  loadInventories() {
+    this.inventoryService.getAvailableStock().subscribe({
+      next: (res) => this.inventories.set(res.data),
+      error: () => this.error = 'Failed to load inventories',
+    });
+  }
+
   loadInvoice(id: number) {
     this.loading = true;
     this.salesInvoiceService.getById(id).subscribe({
@@ -145,7 +158,9 @@ export class SalesInvoiceForm implements OnInit {
           signedQrCode: invoice.signedQrCode,
           items: (invoice.items || []).map((item) => ({
             id: item.id,
+            inventoryId: item.inventoryId,
             productId: item.productId,
+            gtn: item.gtn,
             qty: Number(item.qty || 0),
             unitPrice: Number(item.unitPrice || 0),
             discountBy: item.discountBy,
@@ -165,18 +180,26 @@ export class SalesInvoiceForm implements OnInit {
     });
   }
   
-  onProductSelect(item: EditableSalesInvoiceItem) {
-    if (!item.productId) {
+  onInventorySelect(item: EditableSalesInvoiceItem) {
+    if (!item.inventoryId) {
+      item.productId = undefined;
+      item.gtn = undefined;
       item.unitPrice = 0;
       item.taxPct = 0;
       this.calculateLineTotal(item);
       return;
     }
 
-    const product = this.products().find((p) => p.id === item.productId);
-    if (product) {
-      item.unitPrice = Number(product.unitPrice || 0);
-      item.taxPct = Number(product.taxRate || 0);
+    const inventory = this.inventories().find((inv) => inv.id === item.inventoryId);
+    if (inventory) {
+      item.productId = inventory.productId;
+      item.gtn = inventory.gtn;
+      
+      const product = this.products().find((p) => p.id === inventory.productId);
+      if (product) {
+        item.unitPrice = Number(product.unitPrice || 0);
+        item.taxPct = Number(product.taxRate || 0);
+      }
       this.calculateLineTotal(item);
     }
   }
@@ -276,8 +299,8 @@ export class SalesInvoiceForm implements OnInit {
     }
 
     for (const item of this.editingInvoice.items) {
-      if (!item.productId || typeof item.productId !== 'number') {
-        this.error = 'All items must have a valid product selected.';
+      if (!item.inventoryId || typeof item.inventoryId !== 'number') {
+        this.error = 'All items must have a valid inventory item (GTN) selected.';
         window.scrollTo(0, 0);
         return;
       }
@@ -285,6 +308,13 @@ export class SalesInvoiceForm implements OnInit {
         this.error = 'All items must have a quantity greater than zero.';
         window.scrollTo(0, 0);
         return;
+      }
+      
+      const inv = this.inventories().find(i => i.id === item.inventoryId);
+      if (inv && Number(item.qty) > inv.unitsInStock) {
+          this.error = `Insufficient stock for item: ${inv.name} (GTN: ${inv.gtn || 'N/A'}). Available: ${inv.unitsInStock}`;
+          window.scrollTo(0, 0);
+          return;
       }
     }
 
