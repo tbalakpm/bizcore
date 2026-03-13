@@ -16,7 +16,7 @@ type EditableSalesInvoiceItem = {
   gtn?: string;
   qty: number;
   unitPrice: number;
-  discountBy?: string;
+  discountType?: string;
   discountPct?: number;
   discountAmount?: number;
   taxPct?: number;
@@ -163,7 +163,7 @@ export class SalesInvoiceForm implements OnInit {
             gtn: item.gtn,
             qty: Number(item.qty || 0),
             unitPrice: Number(item.unitPrice || 0),
-            discountBy: item.discountBy,
+            discountType: item.discountType,
             discountPct: Number(item.discountPct || 0),
             discountAmount: Number(item.discountAmount || 0),
             taxPct: Number(item.taxPct || 0),
@@ -211,9 +211,9 @@ export class SalesInvoiceForm implements OnInit {
     
     // Apply discount
     let discountAmt = 0;
-    if (item.discountBy === 'pct' && item.discountPct) {
+    if (item.discountType === 'percent' && item.discountPct) {
         discountAmt = grossTotal * (Number(item.discountPct) / 100);
-    } else if (item.discountBy === 'amt' && item.discountAmount) {
+    } else if (item.discountType === 'amount' && item.discountAmount) {
         discountAmt = Number(item.discountAmount);
     }
     item.discountAmount = discountAmt;

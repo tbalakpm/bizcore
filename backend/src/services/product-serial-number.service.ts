@@ -30,8 +30,8 @@ type GenerateProductSerialParams = {
 };
 
 const defaultConfigBySerialType: Record<ProductSerialType, SerialSequenceConfig> = {
-  [SERIAL_TYPES.tagNumber]: { prefix: 'TAG-', length: 6, start: 1 },
-  [SERIAL_TYPES.batchNumber]: { prefix: 'BAT-', length: 6, start: 1 },
+  [SERIAL_TYPES.tagNumber]: { prefix: 'TAG-', length: 10, start: 1 },
+  [SERIAL_TYPES.batchNumber]: { prefix: 'BAT-', length: 10, start: 1 },
 };
 
 const resolveCounterKey = (mode: ProductSerialMode, serialType: ProductSerialType, productId: number): string => {
@@ -127,15 +127,12 @@ export const productSerialNumberService = {
     let [currentRecord] = await tx
       .select()
       .from(productSerialNumbers)
-      .where(eq(productSerialNumbers.key, key))
+      .where(eq(productSerialNumbers.productId, productId))
       .orderBy(asc(productSerialNumbers.id))
       .limit(1);
 
     if (!currentRecord) {
       await tx.insert(productSerialNumbers).values({
-        key,
-        serialType,
-        mode,
         productId: mode === MODES.eachProduct ? productId : null,
         prefix: config.prefix,
         current: config.start,
@@ -145,7 +142,7 @@ export const productSerialNumberService = {
       [currentRecord] = await tx
         .select()
         .from(productSerialNumbers)
-        .where(eq(productSerialNumbers.key, key))
+        .where(eq(productSerialNumbers.productId, productId))
         .orderBy(asc(productSerialNumbers.id))
         .limit(1);
     }

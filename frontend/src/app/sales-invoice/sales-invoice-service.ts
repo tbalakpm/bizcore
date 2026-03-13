@@ -13,7 +13,7 @@ export interface SalesInvoiceItem {
   productId?: number;
   qty: number;
   unitPrice: number;
-  discountBy?: string;
+  discountType?: string;
   discountPct?: number | string;
   discountAmount?: number | string;
   taxPct?: number | string;
@@ -34,7 +34,7 @@ export interface SalesInvoice {
   refDate?: string;
   totalQty: number;
   subtotal: number;
-  discountBy?: string;
+  discountType?: string;
   discountPct?: number | string;
   discountAmount?: number | string;
   taxPct?: number | string;

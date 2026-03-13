@@ -17,11 +17,11 @@ productsRouter.get('/', async (req: Request, res: Response) => {
 
     const pagination = hasPaginationQuery
       ? parsePagination({
-          limit: req.query.limit as string | undefined,
-          offset: req.query.offset as string | undefined,
-          page: req.query.page as string | undefined,
-          pageNum: req.query.pageNum as string | undefined,
-        })
+        limit: req.query.limit as string | undefined,
+        offset: req.query.offset as string | undefined,
+        page: req.query.page as string | undefined,
+        pageNum: req.query.pageNum as string | undefined,
+      })
       : undefined;
 
     // Build filters dynamically
@@ -177,12 +177,12 @@ productsRouter.get('/', async (req: Request, res: Response) => {
       pagination: pagination
         ? toPagination(pagination.limit, pagination.offset, filteredCount, pagination.pageNum)
         : {
-            limit: result.length,
-            offset: 0,
-            total: filteredCount,
-            page: 1,
-            totalPages: 1,
-          },
+          limit: result.length,
+          offset: 0,
+          total: filteredCount,
+          page: 1,
+          totalPages: 1,
+        },
     });
   } catch (error) {
     console.error('Failed to fetch products');
@@ -243,21 +243,18 @@ productsRouter.post('/', async (req, res) => {
       .get();
 
     if (gtnGeneration === 'BATCH' || gtnGeneration === 'TAG') {
-        const serialType = gtnGeneration === 'BATCH' ? productSerialNumberService.serialTypes.batchNumber : productSerialNumberService.serialTypes.tagNumber;
-        
-        // Ensure starting pos is valid
-        const nextPos = parseInt(gtnStartPos, 10);
-        const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
-        
-        await db.insert(productSerialNumbers).values({
-           key: `${serialType}:product_code:${product.id}`,
-           serialType,
-           mode: productSerialNumberService.modes.productCodeAsTagBatch, // Use the proper mode
-           productId: product.id,
-           prefix: gtnPrefix || '',
-           current: startPos,
-           length: 6,
-        }).run();
+      const serialType = gtnGeneration === 'BATCH' ? productSerialNumberService.serialTypes.batchNumber : productSerialNumberService.serialTypes.tagNumber;
+
+      // Ensure starting pos is valid
+      const nextPos = parseInt(gtnStartPos, 10);
+      const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
+
+      await db.insert(productSerialNumbers).values({
+        productId: product.id,
+        prefix: gtnPrefix || '',
+        current: startPos,
+        length: 10,
+      }).run();
     }
 
     res.status(201).json(product);
@@ -320,31 +317,28 @@ productsRouter.put('/:id', async (req, res) => {
     .where(eq(products.id, id))
     .run();
 
-    if (gtnGeneration === 'BATCH' || gtnGeneration === 'TAG') {
-        const serialType = gtnGeneration === 'BATCH' ? productSerialNumberService.serialTypes.batchNumber : productSerialNumberService.serialTypes.tagNumber;
-        
-        // Ensure starting pos is valid
-        const nextPos = parseInt(gtnStartPos, 10);
-        const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
-        
-        const existingSerial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.key, `${serialType}:product_code:${product.id}`)).get();
-        if (existingSerial) {
-             await db.update(productSerialNumbers).set({
-                 prefix: gtnPrefix || '',
-                 current: startPos,
-             }).where(eq(productSerialNumbers.id, existingSerial.id)).run();
-        } else {
-             await db.insert(productSerialNumbers).values({
-                 key: `${serialType}:product_code:${product.id}`,
-                 serialType,
-                 mode: productSerialNumberService.modes.productCodeAsTagBatch, // Use the proper mode
-                 productId: product.id,
-                 prefix: gtnPrefix || '',
-                 current: startPos,
-                 length: 6,
-             }).run();
-        }
+  if (gtnGeneration === 'BATCH' || gtnGeneration === 'TAG') {
+    const serialType = gtnGeneration === 'BATCH' ? productSerialNumberService.serialTypes.batchNumber : productSerialNumberService.serialTypes.tagNumber;
+
+    // Ensure starting pos is valid
+    const nextPos = parseInt(gtnStartPos, 10);
+    const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
+
+    const existingSerial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, product.id)).get();
+    if (existingSerial) {
+      await db.update(productSerialNumbers).set({
+        prefix: gtnPrefix || '',
+        current: startPos,
+      }).where(eq(productSerialNumbers.id, existingSerial.id)).run();
+    } else {
+      await db.insert(productSerialNumbers).values({
+        productId: product.id,
+        prefix: gtnPrefix || '',
+        current: startPos,
+        length: 10,
+      }).run();
     }
+  }
 
   res.json(product);
 });

@@ -1,3 +1,4 @@
+import { SQL, sql } from 'drizzle-orm';
 import { integer, numeric, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { salesInvoices } from './sales-invoice.schema';
 import { inventories } from './inventory.schema';
@@ -10,15 +11,27 @@ export const salesInvoiceItems = sqliteTable('sales_invoice_items', {
   inventoryId: integer('inventory_id')
     .references(() => inventories.id)
     .notNull(),
-  qty: numeric('qty'),
-  unitPrice: numeric('unit_price'),
-  discountBy: text('discount_by', { length: 20 }), // pct or amt
-  discountPct: numeric('discount_pct'),
-  discountAmount: numeric('discount_amount'),
-  taxPct: numeric('tax_pct'),
-  taxAmount: numeric('tax_amount'),
-  lineTotal: numeric('line_total'),
+  qty: numeric('qty').notNull().default('0.000'),
+  unitPrice: numeric('unit_price').notNull().default('0.00'),
+  discountType: text('discount_type', { length: 10 }).notNull().default('none'), // none, percent, amount
+  discountPct: numeric('discount_pct').notNull().default('0.00'),
+  discountAmount: numeric('discount_amount').notNull().default('0.00'),
+  taxPct: numeric('tax_pct').notNull().default('0.00'),
+  taxAmount: numeric('tax_amount').generatedAlwaysAs(
+    (): SQL => sql`(ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))`
+  ),
+  lineTotal: numeric('line_total').generatedAlwaysAs(
+    (): SQL => sql`(ROUND((qty * unit_price - discount_amount) + tax_amount, 2))`
+  )
 });
 
 export type SalesInvoiceItem = typeof salesInvoiceItems.$inferSelect;
 export type NewSalesInvoiceItem = typeof salesInvoiceItems.$inferInsert;
+
+/*
+  Allow user to scan the barcode (gtn column) and fetch the inventories and show it as product, hsn/sac, tax, etc.
+  After selection of the product from the dropdown, 'inventories' table should be updated as below:
+    create: it should be deduct the qty in the 'inventories' table
+    update: reverse the qty to its original state and deduct the qty
+    delete: reverse the qty to its original state
+*/

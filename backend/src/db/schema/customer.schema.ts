@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { check, integer, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
+import { check, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { auditFields, keyFields } from './base';
 import { addresses } from './address.schema';
 
@@ -7,18 +7,18 @@ export const customers = sqliteTable(
   'customers',
   {
     ...keyFields,
-    type: text('type', { length: 20 }).notNull().default('retail'),
-    notes: text('notes', { length: 255 }),
-    gstin: text('gstin', { length: 20 }),
+    type: text('type', { length: 25 }).notNull().default('retail'),
+    gstin: text('gstin', { length: 25 }),
     billingAddressId: integer('billing_address_id').references(() => addresses.id),
     shippingAddressId: integer('shipping_address_id').references(() => addresses.id),
-    ...auditFields,
+    notes: text('notes', { length: 255 }),
+    ...auditFields
   },
   (t) => [
     check('type_must_be_in_list', sql`${t.type} IN ('retail','wholesale')`),
-    unique('customers_code_unique').on(t.code),
-    unique('customers_name_unique').on(t.name),
-  ],
+    uniqueIndex('customers_code_unique').on(t.code),
+    uniqueIndex('customers_name_unique').on(t.name)
+  ]
 );
 
 export type Customer = typeof customers.$inferSelect;

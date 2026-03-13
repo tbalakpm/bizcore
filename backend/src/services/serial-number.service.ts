@@ -16,9 +16,9 @@ const SERIAL_KEYS = {
 type InvoiceSerialType = keyof typeof SERIAL_KEYS;
 
 const defaultSerialConfig: Record<string, SerialSequenceConfig> = {
-  [SERIAL_KEYS.stockInvoice]: { prefix: 'STK-', length: 6, start: 1 },
-  [SERIAL_KEYS.salesInvoice]: { prefix: 'INV-', length: 6, start: 1 },
-  [SERIAL_KEYS.purchaseInvoice]: { prefix: 'PUR-', length: 6, start: 1 },
+  [SERIAL_KEYS.stockInvoice]: { prefix: 'STK-', length: 10, start: 1 },
+  [SERIAL_KEYS.salesInvoice]: { prefix: 'INV-', length: 10, start: 1 },
+  [SERIAL_KEYS.purchaseInvoice]: { prefix: 'PUR-', length: 10, start: 1 },
 };
 
 export const serialNumberService = {
@@ -46,7 +46,7 @@ export const serialNumberService = {
   generateNextNumberInTransaction: async (key: string, tx: DbTransaction, date: Date = new Date()): Promise<string> => {
     const config = defaultSerialConfig[key] ?? {
       prefix: `${key.toUpperCase()}-`,
-      length: 6,
+      length: 10,
       start: 1,
     };
 

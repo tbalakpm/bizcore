@@ -1,4 +1,4 @@
-import { sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { auditFields, keyFields } from './base';
 
 export const categories = sqliteTable(
@@ -6,9 +6,12 @@ export const categories = sqliteTable(
   {
     ...keyFields,
     description: text('description', { length: 255 }),
-    ...auditFields,
+    ...auditFields
   },
-  (t) => [unique('categories_code_unique').on(t.code), unique('categories_name_unique').on(t.name)],
+  (t) => [
+    uniqueIndex('categories_code_unique').on(t.code),
+    uniqueIndex('categories_name_unique').on(t.name)
+  ]
 );
 
 export type Category = typeof categories.$inferSelect;

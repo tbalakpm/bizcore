@@ -8,16 +8,18 @@ export const inventories = sqliteTable(
     productId: integer('product_id')
       .references(() => products.id)
       .notNull(),
-    gtn: text('gtn', { length: 20 }),
-    qtyPerUnit: text('qty_per_unit', { length: 20 }),
-    hsnSac: text('hsn_sac', { length: 20 }),
+    gtn: text('gtn', { length: 25 }),
+    qtyPerUnit: text('qty_per_unit', { length: 25 }),
+    hsnSac: text('hsn_sac', { length: 25 }),
     taxRate: numeric('tax_rate'),
     buyingPrice: numeric('buying_price'),
     sellingPrice: numeric('selling_price'),
     unitsInStock: integer('units_in_stock'),
-    location: text('location', { length: 255 }),
+    location: text('location', { length: 255 })
   },
-  (t) => [index('inventories_product_id').on(t.productId)],
+  (t) => [
+    index('inventories_product_id').on(t.productId)
+  ]
 );
 
 export type Inventory = typeof inventories.$inferSelect;

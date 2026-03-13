@@ -61,12 +61,10 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
         inventoryId,
         qty: toNumericString(qty),
         unitPrice: toNumericString(unitPrice),
-        discountBy: item.discountBy,
+        discountType: item.discountType,
         discountPct: toNumericString(item.discountPct),
         discountAmount: toNumericString(item.discountAmount),
         taxPct: toNumericString(item.taxPct),
-        taxAmount: toNumericString(item.taxAmount),
-        lineTotal: toNumericString(lineTotal),
       })
       .run();
 
@@ -204,7 +202,7 @@ salesInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
         inventoryId: salesInvoiceItems.inventoryId,
         qty: salesInvoiceItems.qty,
         unitPrice: salesInvoiceItems.unitPrice,
-        discountBy: salesInvoiceItems.discountBy,
+        discountType: salesInvoiceItems.discountType,
         discountPct: salesInvoiceItems.discountPct,
         discountAmount: salesInvoiceItems.discountAmount,
         taxPct: salesInvoiceItems.taxPct,
@@ -254,12 +252,10 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
           refDate: body.refDate ? normalizeDate(body.refDate) : null,
           totalQty: toNumericString(body.totalQty) ?? '0',
           subtotal: toNumericString(body.subtotal) ?? '0',
-          discountBy: body.discountBy,
+          discountType: body.discountType,
           discountPct: toNumericString(body.discountPct),
           discountAmount: toNumericString(body.discountAmount),
           taxPct: toNumericString(body.taxPct),
-          taxAmount: toNumericString(body.taxAmount),
-          netAmount: toNumericString(body.netAmount) ?? '0',
         })
         .returning()
         .get();
@@ -272,9 +268,7 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
         .set({
           totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
           subtotal: toNumericString(body.subtotal) ?? toNumericString(totals.subtotal),
-          taxAmount: toNumericString(body.taxAmount) ?? toNumericString(totals.totalTax),
           discountAmount: toNumericString(body.discountAmount) ?? toNumericString(totals.totalDiscount),
-          netAmount: toNumericString(body.netAmount) ?? toNumericString(totals.netAmount),
         })
         .where(eq(salesInvoices.id, insertedInvoice.id))
         .run();
@@ -350,12 +344,10 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
           refDate: body.refDate ? normalizeDate(body.refDate) : existing.refDate,
           totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
           subtotal: toNumericString(body.subtotal) ?? toNumericString(totals.subtotal),
-          discountBy: body.discountBy ?? existing.discountBy,
+          discountType: body.discountType ?? existing.discountType,
           discountPct: toNumericString(body.discountPct) ?? existing.discountPct,
           discountAmount: toNumericString(body.discountAmount) ?? toNumericString(totals.totalDiscount),
           taxPct: toNumericString(body.taxPct) ?? existing.taxPct,
-          taxAmount: toNumericString(body.taxAmount) ?? toNumericString(totals.totalTax),
-          netAmount: toNumericString(body.netAmount) ?? toNumericString(totals.netAmount),
         })
         .where(eq(salesInvoices.id, id))
         .run();

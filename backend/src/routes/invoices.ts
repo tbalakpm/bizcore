@@ -42,12 +42,10 @@ invoicesRouter.post('/sales', async (req, res) => {
     refDate,
     totalQty,
     subtotal,
-    discountBy,
+    discountType,
     discountPct,
     discountAmount,
     taxPct,
-    taxAmount,
-    netAmount,
   } = req.body;
 
   if (!customerId) {
@@ -65,12 +63,10 @@ invoicesRouter.post('/sales', async (req, res) => {
       refDate,
       totalQty: totalQty?.toString(),
       subtotal: subtotal?.toString(),
-      discountBy,
+      discountType,
       discountPct: discountPct?.toString(),
       discountAmount: discountAmount?.toString(),
       taxPct: taxPct?.toString(),
-      taxAmount: taxAmount?.toString(),
-      netAmount: netAmount?.toString(),
     })
     .returning()
     .get();
