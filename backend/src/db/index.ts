@@ -15,8 +15,8 @@ export const db = drizzle(client, { logger: false /*config.isDevelopment*/, casi
 export const initializeDatabase = async () => {
   console.log('Initializing database');
   await db.run(`
-    PRAGMA journal_mode = WAL;
-    PRAGMA synchronous = NORMAL;
+    PRAGMA journal_mode=WAL;
+    PRAGMA synchronous=NORMAL;
     PRAGMA foreign_keys=ON;`);
 };
 
