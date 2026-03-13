@@ -1,1 +1,0 @@
-ALTER TABLE `serial_numbers` DROP COLUMN `serial_number`;
