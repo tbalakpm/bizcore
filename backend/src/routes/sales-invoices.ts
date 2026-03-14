@@ -101,6 +101,13 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
       filters.push(eq(salesInvoices.invoiceDate, req.query.invoiceDate as string));
     }
 
+    if (req.query.customerId) {
+      const customerId = Number(req.query.customerId);
+      if (!Number.isNaN(customerId)) {
+        filters.push(eq(salesInvoices.customerId, customerId));
+      }
+    }
+
     if (req.query.minAmount) {
       const minAmount = Number(req.query.minAmount);
       if (!Number.isNaN(minAmount)) {

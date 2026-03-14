@@ -150,6 +150,7 @@
             <td class="px-2 py-2">
               <ng-select [items]="inventories()" bindLabel="gtn" bindValue="id" [(ngModel)]="item.inventoryId"
                 appendTo="body" (change)="onInventorySelect(item)" [disabled]="!!editingInvoice.irn"
+                [typeahead]="inventoryInput$" (scrollToEnd)="onInventoryScrollToEnd()" [loading]="inventoryLoading"
                 [name]="'itemInventory' + i" [searchable]="true" [clearable]="true" placeholder="-- Select Item (GTN) --"
                 class="w-full text-sm">
                 <ng-template ng-label-tmp let-p="item">

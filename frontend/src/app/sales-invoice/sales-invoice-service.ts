@@ -65,6 +65,7 @@ export type SalesInvoiceQuery = {
   invoiceDate?: string;
   minAmount?: number;
   maxAmount?: number;
+  customerId?: number;
   sort?: string;
 };
 

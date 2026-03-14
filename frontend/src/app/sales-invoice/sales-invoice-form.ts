@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -55,6 +56,15 @@ export class SalesInvoiceForm implements OnInit {
   customers = signal<Customer[]>([]);
   inventories = signal<Inventory[]>([]);
 
+  // Inventory Search & Lazy Loading
+  inventoryInput$ = new Subject<string>();
+  private destroy$ = new Subject<void>();
+  inventoryLoading = false;
+  inventorySearchQuery = '';
+  inventoryOffset = 0;
+  inventoryLimit = 50;
+  inventoryTotal = 0;
+
   editingInvoice: EditableSalesInvoice = this.defaultInvoice();
   
   // Inline Customer Creation
@@ -101,6 +111,7 @@ export class SalesInvoiceForm implements OnInit {
     this.loadProducts();
     this.loadCustomers();
     this.loadInventories();
+    this.setupInventorySearch();
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -109,6 +120,11 @@ export class SalesInvoiceForm implements OnInit {
         this.loadInvoice(id);
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   defaultInvoice(): EditableSalesInvoice {
@@ -134,11 +150,43 @@ export class SalesInvoiceForm implements OnInit {
     });
   }
 
-  loadInventories() {
-    this.inventoryService.getAvailableStock().subscribe({
-      next: (res) => this.inventories.set(res.data),
-      error: () => this.error = 'Failed to load inventories',
+  loadInventories(append = false) {
+    this.inventoryLoading = true;
+    this.inventoryService.getAvailableStock(this.inventorySearchQuery, this.inventoryLimit, this.inventoryOffset).subscribe({
+      next: (res) => {
+        if (append) {
+          this.inventories.update(prev => [...prev, ...res.data]);
+        } else {
+          this.inventories.set(res.data);
+        }
+        this.inventoryTotal = res.pagination.total;
+        this.inventoryLoading = false;
+      },
+      error: () => {
+        this.error = 'Failed to load inventories';
+        this.inventoryLoading = false;
+      },
     });
+  }
+
+  setupInventorySearch() {
+    this.inventoryInput$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(term => {
+      this.inventorySearchQuery = term || '';
+      this.inventoryOffset = 0;
+      this.loadInventories(false);
+    });
+  }
+
+  onInventoryScrollToEnd() {
+    if (this.inventoryLoading || this.inventories().length >= this.inventoryTotal) {
+      return;
+    }
+    this.inventoryOffset += this.inventoryLimit;
+    this.loadInventories(true);
   }
 
   loadInvoice(id: number) {

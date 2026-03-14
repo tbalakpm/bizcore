@@ -24,8 +24,16 @@ export interface InventoryList {
 export class InventoryService {
   private http = inject(HttpClient);
 
-  // Fetch only available stock items
-  getAvailableStock(): Observable<InventoryList> {
-    return this.http.get<InventoryList>(`${environment.apiUrl}/inventories`);
+  // Fetch only available stock items with search and pagination
+  getAvailableStock(q?: string, limit: number = 50, offset: number = 0): Observable<InventoryList> {
+    let params = new HttpParams()
+      .set('limit', limit.toString())
+      .set('offset', offset.toString());
+    
+    if (q) {
+      params = params.set('q', q);
+    }
+
+    return this.http.get<InventoryList>(`${environment.apiUrl}/inventories`, { params });
   }
 }

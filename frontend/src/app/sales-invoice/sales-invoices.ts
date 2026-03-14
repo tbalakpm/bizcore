@@ -5,18 +5,22 @@ import { Router, RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { SalesInvoice, SalesInvoiceService } from './sales-invoice-service';
 import { pagination } from '../models/pagination';
+import { Customer, CustomerService } from '../customer/customer-service';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-sales-invoices',
-  imports: [ReactiveFormsModule, DatePipe, DecimalPipe, RouterLink],
+  imports: [ReactiveFormsModule, DatePipe, DecimalPipe, RouterLink, NgSelectModule],
   templateUrl: './sales-invoices.html',
 })
 export class SalesInvoices implements OnInit {
   private service = inject(SalesInvoiceService);
+  private customerService = inject(CustomerService);
   private router: Router = inject(Router);
   private fb: FormBuilder = inject(FormBuilder);
 
   invoices = signal<SalesInvoice[]>([]);
+  customers = signal<Customer[]>([]);
   pagination = signal<pagination>({ limit: 10, offset: 0, total: 0, page: 1, totalPages: 1 });
   
   filterForm: FormGroup;
@@ -29,11 +33,12 @@ export class SalesInvoices implements OnInit {
     this.filterForm = this.fb.group({
       invoiceNumber: [''],
       invoiceDate: [''],
+      customerId: [null],
       minAmount: [''],
       maxAmount: [''],
     });
 
-    this.filterSubject.pipe(debounceTime(400), distinctUntilChanged()).subscribe(() => {
+    this.filterSubject.pipe(debounceTime(400)).subscribe(() => {
       this.loadInvoices(1);
     });
 
@@ -44,6 +49,14 @@ export class SalesInvoices implements OnInit {
 
   ngOnInit() {
     this.loadInvoices();
+    this.loadCustomers();
+  }
+
+  loadCustomers() {
+    this.customerService.getAll().subscribe({
+      next: (res) => this.customers.set(res.data),
+      error: (err) => console.error('Failed to load customers', err),
+    });
   }
 
   loadInvoices(page: number = 1) {

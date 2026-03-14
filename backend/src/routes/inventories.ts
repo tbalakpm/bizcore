@@ -6,7 +6,17 @@ export const inventoriesRouter = express.Router();
 
 inventoriesRouter.get('/', async (req: Request, res: Response) => {
   try {
-    const data = await db
+    const q = req.query.q as string | undefined;
+    const limit = Number(req.query.limit) || 50;
+    const offset = Number(req.query.offset) || 0;
+
+    let totalCountQuery = db
+      .select({ count: sql<number>`count(*)` })
+      .from(inventories)
+      .innerJoin(products, eq(products.id, inventories.productId))
+      .$dynamic();
+
+    let dataQuery = db
       .select({
         id: inventories.id,
         productId: inventories.productId,
@@ -18,10 +28,36 @@ inventoriesRouter.get('/', async (req: Request, res: Response) => {
       })
       .from(inventories)
       .innerJoin(products, eq(products.id, inventories.productId))
-      // .where(gt(inventories.unitsInStock, 0)) // Only fetch available inventory
-      .all();
+      .$dynamic();
 
-    res.json({ data, pagination: { total: data.length, limit: data.length, offset: 0, page: 1, totalPages: 1 } });
+    if (q) {
+      const searchPattern = `%${q}%`;
+      totalCountQuery = totalCountQuery.where(
+        sql`${inventories.gtn} LIKE ${searchPattern} OR ${products.name} LIKE ${searchPattern}`
+      );
+      dataQuery = dataQuery.where(
+        sql`${inventories.gtn} LIKE ${searchPattern} OR ${products.name} LIKE ${searchPattern}`
+      );
+    }
+
+    const [totalRes] = await totalCountQuery.execute();
+    const data = await dataQuery
+      .limit(limit)
+      .offset(offset)
+      .execute();
+
+    const total = Number(totalRes?.count || 0);
+
+    res.json({
+      data,
+      pagination: {
+        total,
+        limit,
+        offset,
+        page: Math.floor(offset / limit) + 1,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error('Failed to fetch inventories', error);
     res.status(500).json({ error: 'Failed to fetch available stock' });
