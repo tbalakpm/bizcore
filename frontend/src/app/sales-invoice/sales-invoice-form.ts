@@ -4,6 +4,7 @@ import { Subject, takeUntil, debounceTime, distinctUntilChanged, switchMap } fro
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { AddressForm } from '../shared/components/address-form';
 
 import { type Product, ProductService } from '../product/product-service';
 import { type Customer, CustomerService } from '../customer/customer-service';
@@ -41,7 +42,7 @@ type EditableSalesInvoice = {
 
 @Component({
   selector: 'app-sales-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm],
   templateUrl: './sales-invoice-form.html',
 })
 export class SalesInvoiceForm implements OnInit {
@@ -73,8 +74,13 @@ export class SalesInvoiceForm implements OnInit {
     code: '',
     name: '',
     type: 'retail',
+    gstin: '',
+    billingAddress: {},
+    shippingAddress: {},
     isActive: true,
   };
+
+  sameAsBilling = false;
 
   loading = false;
   submitting = false;
@@ -315,12 +321,16 @@ export class SalesInvoiceForm implements OnInit {
         this.customerService.getAll().subscribe(res => {
           this.customers.set(res.data);
           
+          if (this.sameAsBilling) {
+            this.newCustomer.shippingAddress = { ...this.newCustomer.billingAddress };
+          }
           // Auto-select the newly created customer
           this.editingInvoice.customerId = createdCustomer.id;
           
           this.showNewCustomerForm = false;
           this.customerSubmitting = false;
-          this.newCustomer = { code: '', name: '', type: 'retail', isActive: true };
+          this.newCustomer = { code: '', name: '', type: 'retail', gstin: '', billingAddress: {}, shippingAddress: {}, isActive: true };
+          this.sameAsBilling = false;
         });
       },
       error: (err) => {

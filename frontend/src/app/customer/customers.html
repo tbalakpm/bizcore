@@ -42,9 +42,39 @@
         </select>
       </div>
       <div>
+        <label class="block text-sm font-medium">{{ 'GSTIN' | translate }}</label>
+        <input type="text" [(ngModel)]="editingCustomer.gstin" name="newCustomerGstin"
+          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
+      </div>
+      <div class="md:col-span-2 xl:col-span-4">
         <label class="block text-sm font-medium">{{ 'DESCRIPTION' | translate }}</label>
-        <textarea rows="1" [(ngModel)]="editingCustomer.notes" name="newCustomerNotes"
+        <textarea rows="2" [(ngModel)]="editingCustomer.notes" name="newCustomerNotes"
           class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"></textarea>
+      </div>
+
+      <!-- Addresses -->
+      <div class="md:col-span-2 xl:col-span-2">
+        <app-address-form 
+          [address]="editingCustomer.billingAddress!" 
+          [title]="'BILLING_ADDRESS'" 
+          [isExpandable]="true"
+          [isOpen]="false"
+        ></app-address-form>
+      </div>
+      <div class="md:col-span-2 xl:col-span-2">
+        <div class="flex items-center gap-2 mb-2">
+          <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="sameAsBilling"
+            class="w-4 h-4 text-slate-700 border-slate-300 rounded focus:ring-slate-500" />
+          <label for="sameAsBilling" class="text-sm font-medium text-slate-700">{{ 'SAME_AS_BILLING' | translate }}</label>
+        </div>
+        @if (!sameAsBilling) {
+          <app-address-form 
+            [address]="editingCustomer.shippingAddress!" 
+            [title]="'SHIPPING_ADDRESS'" 
+            [isExpandable]="true"
+            [isOpen]="false"
+          ></app-address-form>
+        }
       </div>
 
       <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">

@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { type Customer, CustomerList, CustomerService } from './customer-service';
+import { type Customer, type Address, CustomerList, CustomerService } from './customer-service';
+import { AddressForm } from '../shared/components/address-form';
 
 @Component({
   selector: 'app-customers',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm],
   templateUrl: './customers.html',
 })
 export class Customers implements OnInit {
@@ -19,9 +20,14 @@ export class Customers implements OnInit {
     code: '',
     name: '',
     type: 'retail',
+    gstin: '',
+    billingAddress: {},
+    shippingAddress: {},
     notes: '',
     isActive: true,
   };
+
+  sameAsBilling = false;
 
   loading = false;
   error: string | null = null;
@@ -51,6 +57,10 @@ export class Customers implements OnInit {
   }
 
   onSubmit() {
+    if (this.sameAsBilling) {
+      this.editingCustomer.shippingAddress = { ...this.editingCustomer.billingAddress };
+    }
+
     const request$ = this.editingCustomer.id
       ? this.customerService.update(this.editingCustomer.id, this.editingCustomer)
       : this.customerService.create(this.editingCustomer);
@@ -72,9 +82,13 @@ export class Customers implements OnInit {
       code: '',
       name: '',
       type: 'retail',
+      gstin: '',
+      billingAddress: {},
+      shippingAddress: {},
       notes: '',
       isActive: true,
     };
+    this.sameAsBilling = false;
   }
 
   editCustomer(id: number) {
@@ -83,8 +97,12 @@ export class Customers implements OnInit {
       this.editingCustomer.code = res.code;
       this.editingCustomer.name = res.name;
       this.editingCustomer.type = res.type;
+      this.editingCustomer.gstin = res.gstin;
+      this.editingCustomer.billingAddress = res.billingAddress || {};
+      this.editingCustomer.shippingAddress = res.shippingAddress || {};
       this.editingCustomer.notes = res.notes;
       this.editingCustomer.isActive = res.isActive;
+      this.sameAsBilling = false;
     });
   }
 

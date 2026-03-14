@@ -1,10 +1,14 @@
-import { and, eq, like, sql, type SQL } from 'drizzle-orm';
+import { and, eq, like, sql, type SQL, getTableColumns } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/sqlite-core';
 import express, { type Request, type Response } from 'express';
 
-import { customers, db } from '../db';
+import { customers, db, addresses } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 
 export const customersRouter = express.Router();
+
+const billingAddress = alias(addresses, 'billing_address');
+const shippingAddress = alias(addresses, 'shipping_address');
 
 customersRouter.get('/', async (req: Request, res: Response) => {
   try {
@@ -25,7 +29,7 @@ customersRouter.get('/', async (req: Request, res: Response) => {
 
     // Build filters dynamically
     const filters: SQL[] = [];
-    const filterableFields = ['code', 'name', 'type', 'notes'] as const;
+    const filterableFields = ['code', 'name', 'type', 'notes', 'gstin'] as const;
     const sortableFields = ['id', ...filterableFields, 'isActive', 'createdAt', 'updatedAt'] as const;
     type SortableField = (typeof sortableFields)[number];
     const isSortableField = (value: string): value is SortableField =>
@@ -68,22 +72,27 @@ customersRouter.get('/', async (req: Request, res: Response) => {
       orderBy.push(resolveSortDirection('desc')(customers.id));
     }
 
-    // Build the query
-    const baseQuery = db.select().from(customers);
+    // Build the query with joins
+    const baseQuery = db
+      .select({
+        ...getTableColumns(customers),
+        billingAddress: billingAddress,
+        shippingAddress: shippingAddress,
+      })
+      .from(customers)
+      .leftJoin(billingAddress, eq(customers.billingAddressId, billingAddress.id))
+      .leftJoin(shippingAddress, eq(customers.shippingAddressId, shippingAddress.id));
+
     const query = filters.length > 0 ? baseQuery.where(and(...filters)) : baseQuery;
 
     // Get total count
-    const countResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(customers);
-
     const whereCondition = filters.length > 0 ? and(...filters) : undefined;
-    const filteredCount = whereCondition
-      ? (
-          await db
-            .select({ count: sql<number>`cast(count(*) as integer)` })
-            .from(customers)
-            .where(whereCondition)
-        )[0].count
-      : countResult[0].count;
+    const filteredCountResult = await db
+      .select({ count: sql<number>`cast(count(*) as integer)` })
+      .from(customers)
+      .where(whereCondition || sql`1=1`);
+    
+    const filteredCount = filteredCountResult[0].count;
 
     // Get paginated results
     const orderedQuery = query.orderBy(...orderBy);
@@ -104,7 +113,7 @@ customersRouter.get('/', async (req: Request, res: Response) => {
           },
     });
   } catch (error) {
-    console.error('Failed to fetch customers');
+    console.error('Failed to fetch customers', error);
     res.status(500).json({ error: 'Failed to fetch customers' });
   }
 });
@@ -115,7 +124,18 @@ customersRouter.get('/:id', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Invalid customer ID' });
   }
 
-  const customer = await db.select().from(customers).where(eq(customers.id, id)).get();
+  const customer = await db
+    .select({
+      ...getTableColumns(customers),
+      billingAddress: billingAddress,
+      shippingAddress: shippingAddress,
+    })
+    .from(customers)
+    .leftJoin(billingAddress, eq(customers.billingAddressId, billingAddress.id))
+    .leftJoin(shippingAddress, eq(customers.shippingAddressId, shippingAddress.id))
+    .where(eq(customers.id, id))
+    .get();
+
   if (!customer) {
     return res.status(404).json({
       error: req.i18n?.t('customer.notFound') || 'Customer not found',
@@ -126,29 +146,47 @@ customersRouter.get('/:id', async (req: Request, res: Response) => {
 });
 
 customersRouter.post('/', async (req, res) => {
-  const { code, name, type, notes, isActive } = req.body;
+  const { code, name, type, notes, isActive, gstin, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
 
   if (!name) return res.status(400).json({ error: 'Name is required' });
   if (!code) return res.status(400).json({ error: 'Code is required' });
 
   try {
-    const customer = await db
-      .insert(customers)
-      .values({
-        code,
-        name,
-        type: type || 'retail',
-        notes,
-        isActive: isActive !== false,
-      })
-      .returning()
-      .get();
+    const result = await db.transaction(async (tx) => {
+      let billingAddressId: number | undefined;
+      let shippingAddressId: number | undefined;
 
-    res.status(201).json(customer);
+      if (bAddr && Object.keys(bAddr).length > 0) {
+        const addr = await tx.insert(addresses).values(bAddr).returning({ id: addresses.id }).get();
+        billingAddressId = addr.id;
+      }
+
+      if (sAddr && Object.keys(sAddr).length > 0) {
+        const addr = await tx.insert(addresses).values(sAddr).returning({ id: addresses.id }).get();
+        shippingAddressId = addr.id;
+      }
+
+      return await tx
+        .insert(customers)
+        .values({
+          code,
+          name,
+          type: type || 'retail',
+          gstin,
+          billingAddressId,
+          shippingAddressId,
+          notes,
+          isActive: isActive !== false,
+        })
+        .returning()
+        .get();
+    });
+
+    res.status(201).json(result);
   } catch (err) {
     console.error(err);
     res.status(400).json({
-      error: req.i18n?.t('customer.exists') || 'Customer already exists',
+      error: req.i18n?.t('customer.exists') || 'Customer already exists or invalid data',
     });
   }
 });
@@ -156,32 +194,60 @@ customersRouter.post('/', async (req, res) => {
 customersRouter.put('/:id', async (req, res) => {
   const id = parseInt(req.params.id as string, 10);
 
-  const customer = await db.select().from(customers).where(eq(customers.id, id)).get();
-  if (!customer)
+  const existingCustomer = await db.select().from(customers).where(eq(customers.id, id)).get();
+  if (!existingCustomer)
     return res.status(404).json({
       error: req.i18n?.t('customer.notFound') || 'Customer not found',
     });
 
-  const { code, name, type, notes, isActive } = req.body;
-  if (code !== undefined) customer.code = code;
-  if (name !== undefined) customer.name = name;
-  if (type !== undefined) customer.type = type;
-  if (notes !== undefined) customer.notes = notes;
-  if (typeof isActive === 'boolean') customer.isActive = isActive;
+  const { code, name, type, notes, isActive, gstin, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
 
-  await db
-    .update(customers)
-    .set({
-      code: customer.code,
-      name: customer.name,
-      type: customer.type,
-      notes: customer.notes,
-      isActive: customer.isActive,
-    })
-    .where(eq(customers.id, id))
-    .run();
+  try {
+    const updatedCustomer = await db.transaction(async (tx) => {
+      let bAddrId = existingCustomer.billingAddressId;
+      let sAddrId = existingCustomer.shippingAddressId;
 
-  res.json(customer);
+      if (bAddr) {
+        if (bAddrId) {
+          await tx.update(addresses).set(bAddr).where(eq(addresses.id, bAddrId)).run();
+        } else if (Object.keys(bAddr).length > 0) {
+          const addr = await tx.insert(addresses).values(bAddr).returning({ id: addresses.id }).get();
+          bAddrId = addr.id;
+        }
+      }
+
+      if (sAddr) {
+        if (sAddrId) {
+          await tx.update(addresses).set(sAddr).where(eq(addresses.id, sAddrId)).run();
+        } else if (Object.keys(sAddr).length > 0) {
+          const addr = await tx.insert(addresses).values(sAddr).returning({ id: addresses.id }).get();
+          sAddrId = addr.id;
+        }
+      }
+
+      await tx
+        .update(customers)
+        .set({
+          code: code ?? existingCustomer.code,
+          name: name ?? existingCustomer.name,
+          type: type ?? existingCustomer.type,
+          gstin: gstin ?? existingCustomer.gstin,
+          billingAddressId: bAddrId,
+          shippingAddressId: sAddrId,
+          notes: notes ?? existingCustomer.notes,
+          isActive: typeof isActive === 'boolean' ? isActive : existingCustomer.isActive,
+        })
+        .where(eq(customers.id, id))
+        .run();
+
+      return { ...existingCustomer, code, name, type, gstin, notes, isActive, billingAddressId: bAddrId, shippingAddressId: sAddrId };
+    });
+
+    res.json(updatedCustomer);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: 'Failed to update customer' });
+  }
 });
 
 customersRouter.delete('/:id', async (req, res) => {

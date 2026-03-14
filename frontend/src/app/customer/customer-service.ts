@@ -4,11 +4,35 @@ import type { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { pagination } from '../models/pagination';
 
+export interface Address {
+  id?: number;
+  addressLine1?: string;
+  addressLine2?: string;
+  area?: string;
+  city?: string;
+  taluk?: string;
+  district?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  phone?: string;
+  mobile?: string;
+  email?: string;
+  website?: string;
+  latitude?: string;
+  longitude?: string;
+}
+
 export interface Customer {
   id: number;
   code: string;
   name: string;
   type?: string;
+  gstin?: string;
+  billingAddressId?: number;
+  shippingAddressId?: number;
+  billingAddress?: Address;
+  shippingAddress?: Address;
   notes?: string;
   isActive: boolean;
 }

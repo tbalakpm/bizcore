@@ -82,6 +82,34 @@
                   <option value="wholesale">Wholesale</option>
                 </select>
              </div>
+             <div class="flex-1">
+               <input type="text" [(ngModel)]="newCustomer.gstin" name="newCustGstin" placeholder="GSTIN" class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-500 dark:bg-slate-900" />
+             </div>
+           </div>
+           
+           <!-- Addresses Inlined -->
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+             <app-address-form 
+               [address]="newCustomer.billingAddress!" 
+               [title]="'BILLING_ADDRESS'" 
+               [isExpandable]="true"
+               [isOpen]="false"
+             ></app-address-form>
+             <div>
+               <div class="flex items-center gap-2 mb-1">
+                 <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="invoiceSameAsBilling"
+                   class="w-3.5 h-3.5 text-blue-600 border-slate-300 rounded focus:ring-blue-500" />
+                 <label for="invoiceSameAsBilling" class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ 'SAME_AS_BILLING' | translate }}</label>
+               </div>
+               @if (!sameAsBilling) {
+                 <app-address-form 
+                   [address]="newCustomer.shippingAddress!" 
+                   [title]="'SHIPPING_ADDRESS'" 
+                   [isExpandable]="true"
+                   [isOpen]="false"
+                 ></app-address-form>
+               }
+             </div>
            </div>
            <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-xs py-1.5 px-3 rounded shadow-sm disabled:opacity-50" (click)="createCustomerInline()" [disabled]="customerSubmitting">
              {{ customerSubmitting ? 'Saving...' : 'Save & Select Customer' }}
