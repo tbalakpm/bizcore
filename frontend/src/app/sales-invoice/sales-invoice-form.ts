@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AddressForm } from '../shared/components/address-form';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { type Product, ProductService } from '../product/product-service';
 import { type Customer, CustomerService } from '../customer/customer-service';
@@ -42,7 +43,7 @@ type EditableSalesInvoice = {
 
 @Component({
   selector: 'app-sales-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, TranslatePipe],
   templateUrl: './sales-invoice-form.html',
 })
 export class SalesInvoiceForm implements OnInit {
@@ -67,7 +68,7 @@ export class SalesInvoiceForm implements OnInit {
   inventoryTotal = 0;
 
   editingInvoice: EditableSalesInvoice = this.defaultInvoice();
-  
+
   // Inline Customer Creation
   showNewCustomerForm = false;
   newCustomer: Partial<Customer> = {
@@ -91,26 +92,26 @@ export class SalesInvoiceForm implements OnInit {
   get isEditMode() {
     return !!this.editingInvoice.id;
   }
-  
+
   // Computed values
   get totalQty() {
     return this.editingInvoice.items.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
   }
-  
+
   get subtotal() {
     return this.editingInvoice.items.reduce((sum, item) => sum + ((Number(item.qty) || 0) * (Number(item.unitPrice) || 0)), 0);
   }
-  
+
   get totalDiscount() {
     return this.editingInvoice.items.reduce((sum, item) => sum + (Number(item.discountAmount) || 0), 0);
   }
-  
+
   get totalTax() {
     return this.editingInvoice.items.reduce((sum, item) => sum + (Number(item.taxAmount) || 0), 0);
   }
-  
+
   get netAmount() {
-     return this.editingInvoice.items.reduce((sum, item) => sum + (Number(item.lineTotal) || 0), 0);
+    return this.editingInvoice.items.reduce((sum, item) => sum + (Number(item.lineTotal) || 0), 0);
   }
 
   ngOnInit(): void {
@@ -233,7 +234,7 @@ export class SalesInvoiceForm implements OnInit {
       },
     });
   }
-  
+
   onInventorySelect(item: EditableSalesInvoiceItem) {
     if (!item.inventoryId) {
       item.productId = undefined;
@@ -248,7 +249,7 @@ export class SalesInvoiceForm implements OnInit {
     if (inventory) {
       item.productId = inventory.productId;
       item.gtn = inventory.gtn;
-      
+
       const product = this.products().find((p) => p.id === inventory.productId);
       if (product) {
         item.unitPrice = Number(product.unitPrice || 0);
@@ -262,25 +263,25 @@ export class SalesInvoiceForm implements OnInit {
     const qty = Number(item.qty || 0);
     let price = Number(item.unitPrice || 0);
     const grossTotal = qty * price;
-    
+
     // Apply discount
     let discountAmt = 0;
     if (item.discountType === 'percent' && item.discountPct) {
-        discountAmt = grossTotal * (Number(item.discountPct) / 100);
+      discountAmt = grossTotal * (Number(item.discountPct) / 100);
     } else if (item.discountType === 'amount' && item.discountAmount) {
-        discountAmt = Number(item.discountAmount);
+      discountAmt = Number(item.discountAmount);
     }
     item.discountAmount = discountAmt;
-    
+
     const afterDiscount = grossTotal - discountAmt;
-    
+
     // Apply tax
     let taxAmt = 0;
     if (item.taxPct) {
-        taxAmt = afterDiscount * (Number(item.taxPct) / 100);
+      taxAmt = afterDiscount * (Number(item.taxPct) / 100);
     }
     item.taxAmount = taxAmt;
-    
+
     item.lineTotal = Number((afterDiscount + taxAmt).toFixed(2));
   }
 
@@ -293,9 +294,9 @@ export class SalesInvoiceForm implements OnInit {
       this.editingInvoice.items.splice(index, 1);
     }
   }
-  
+
   // --- Inline Customer Form Handlers ---
-  
+
   toggleNewCustomerForm() {
     this.showNewCustomerForm = !this.showNewCustomerForm;
     this.customerError = null;
@@ -305,28 +306,28 @@ export class SalesInvoiceForm implements OnInit {
       this.newCustomer.code = `CUST-${(currentCount + 1).toString().padStart(4, '0')}`;
     }
   }
-  
+
   createCustomerInline() {
     if (!this.newCustomer.code || !this.newCustomer.name) {
       this.customerError = 'Code and Name are required.';
       return;
     }
-    
+
     this.customerSubmitting = true;
     this.customerError = null;
-    
+
     this.customerService.create(this.newCustomer).subscribe({
       next: (createdCustomer) => {
         // Refresh customer list
         this.customerService.getAll().subscribe(res => {
           this.customers.set(res.data);
-          
+
           if (this.sameAsBilling) {
             this.newCustomer.shippingAddress = { ...this.newCustomer.billingAddress };
           }
           // Auto-select the newly created customer
           this.editingInvoice.customerId = createdCustomer.id;
-          
+
           this.showNewCustomerForm = false;
           this.customerSubmitting = false;
           this.newCustomer = { code: '', name: '', type: 'retail', gstin: '', billingAddress: {}, shippingAddress: {}, isActive: true };
@@ -342,12 +343,12 @@ export class SalesInvoiceForm implements OnInit {
   }
 
   // --- Main Form Submission ---
-  
+
   onSubmit() {
     if (!this.editingInvoice.customerId) {
-        this.error = "Customer is required";
-        window.scrollTo(0, 0);
-        return;
+      this.error = "Customer is required";
+      window.scrollTo(0, 0);
+      return;
     }
 
     if (this.editingInvoice.items.length === 0) {
@@ -367,12 +368,12 @@ export class SalesInvoiceForm implements OnInit {
         window.scrollTo(0, 0);
         return;
       }
-      
+
       const inv = this.inventories().find(i => i.id === item.inventoryId);
       if (inv && Number(item.qty) > inv.unitsInStock) {
-          this.error = `Insufficient stock for item: ${inv.name} (GTN: ${inv.gtn || 'N/A'}). Available: ${inv.unitsInStock}`;
-          window.scrollTo(0, 0);
-          return;
+        this.error = `Insufficient stock for item: ${inv.name} (GTN: ${inv.gtn || 'N/A'}). Available: ${inv.unitsInStock}`;
+        window.scrollTo(0, 0);
+        return;
       }
     }
 

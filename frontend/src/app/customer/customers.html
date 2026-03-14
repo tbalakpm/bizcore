@@ -54,26 +54,19 @@
 
       <!-- Addresses -->
       <div class="md:col-span-2 xl:col-span-2">
-        <app-address-form 
-          [address]="editingCustomer.billingAddress!" 
-          [title]="'BILLING_ADDRESS'" 
-          [isExpandable]="true"
-          [isOpen]="false"
-        ></app-address-form>
+        <app-address-form [address]="editingCustomer.billingAddress!" [title]="'ADDRESS.BILLING'" [isExpandable]="true"
+          [isOpen]="false"></app-address-form>
       </div>
       <div class="md:col-span-2 xl:col-span-2">
         <div class="flex items-center gap-2 mb-2">
           <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="sameAsBilling"
             class="w-4 h-4 text-slate-700 border-slate-300 rounded focus:ring-slate-500" />
-          <label for="sameAsBilling" class="text-sm font-medium text-slate-700">{{ 'SAME_AS_BILLING' | translate }}</label>
+          <label for="sameAsBilling" class="text-sm font-medium text-slate-700">{{ 'ADDRESS.SAME_AS_BILLING' | translate
+            }}</label>
         </div>
         @if (!sameAsBilling) {
-          <app-address-form 
-            [address]="editingCustomer.shippingAddress!" 
-            [title]="'SHIPPING_ADDRESS'" 
-            [isExpandable]="true"
-            [isOpen]="false"
-          ></app-address-form>
+        <app-address-form [address]="editingCustomer.shippingAddress!" [title]="'ADDRESS.SHIPPING'"
+          [isExpandable]="true" [isOpen]="false || !sameAsBilling"></app-address-form>
         }
       </div>
 

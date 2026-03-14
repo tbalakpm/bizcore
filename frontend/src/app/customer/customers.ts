@@ -27,7 +27,7 @@ export class Customers implements OnInit {
     isActive: true,
   };
 
-  sameAsBilling = false;
+  sameAsBilling = true;
 
   loading = false;
   error: string | null = null;
