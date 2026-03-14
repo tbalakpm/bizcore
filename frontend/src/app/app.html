@@ -3,23 +3,23 @@
   <!-- Top bar -->
   <header
     class="flex flex-wrap justify-between items-center gap-2 px-3 md:px-4 py-2 bg-slate-800 text-white shadow border border-slate-900 dark:bg-slate-950 dark:border-slate-800">
-        <div class="flex items-center justify-center align-middle gap-3">
-      <button (click)="toggleSidebar()" 
-              class="p-1.5 rounded hover:bg-slate-700 text-slate-300 transition-colors focus:outline-none"
-              [title]="isSidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+    <div class="flex items-center justify-center align-middle gap-3">
+      <button (click)="toggleSidebar()"
+        class="p-1.5 rounded hover:bg-slate-700 text-slate-300 transition-colors focus:outline-none"
+        [title]="isSidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
       </button>
       <a routerLink="/" class="flex items-center justify-center align-middle gap-2 shrink-0">
-      <!-- Simple Flowbite-esque logo/icon -->
-      <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700">
-        <!-- icon (heroicon-style) -->
-        <img src="bizcore.png" alt="Application logo" />
-      </span>
-            <span class="font-bold text-lg items-center whitespace-nowrap pr-2">
-        {{ 'APP_TITLE' | translate }}
-      </span>
+        <!-- Simple Flowbite-esque logo/icon -->
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700">
+          <!-- icon (heroicon-style) -->
+          <img src="bizcore.png" alt="Application logo" />
+        </span>
+        <span class="font-bold text-lg items-center whitespace-nowrap pr-2">
+          {{ 'APP_TITLE' | translate }}
+        </span>
       </a>
     </div>
 
@@ -85,110 +85,124 @@
   <!-- Sidebar -->
   <div class="app-shell-main flex grow min-h-0">
     @if (this.auth.isLoggedIn) {
-        <aside class="app-shell-sidebar bg-slate-800 text-white py-4 flex flex-col relative transition-all duration-300 ease-in-out dark:bg-slate-950 border-r border-slate-700 space-y-1 overflow-x-hidden"
-           [style.width.px]="isSidebarCollapsed() ? 64 : sidebarWidth()"
-           [class.transition-none]="isResizing()">
-      
+    <aside
+      class="app-shell-sidebar bg-slate-800 text-white py-4 flex flex-col relative transition-all duration-300 ease-in-out dark:bg-slate-950 border-r border-slate-700 space-y-1 overflow-x-hidden"
+      [style.width.px]="isSidebarCollapsed() ? 64 : sidebarWidth()" [class.transition-none]="isResizing()">
+
       @if (!isSidebarCollapsed()) {
-      <div class="absolute right-0 top-0 bottom-0 w-1 hover:w-1.5 bg-transparent hover:bg-indigo-500 cursor-col-resize z-10 transition-all opacity-0 hover:opacity-100"
-           (mousedown)="startResizing($event)"></div>
+      <div
+        class="absolute right-0 top-0 bottom-0 w-1 hover:w-1.5 bg-transparent hover:bg-indigo-500 cursor-col-resize z-10 transition-all opacity-0 hover:opacity-100"
+        (mousedown)="startResizing($event)"></div>
       }
 
       @if (currentMenu() === 'main') {
-      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-2 mb-2" [class.opacity-0]="isSidebarCollapsed()">Home</div>
+      <div
+        class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-2 mb-2"
+        [class.opacity-0]="isSidebarCollapsed()">Home</div>
       <!-- Dashboard -->
       <a routerLink="/dashboard" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2">
         <!-- <span class="flex justify-center items-center overflow-hidden text-center gap-2"> -->
-        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-          fill="currentColor" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="currentColor" viewBox="0 0 24 24">
           <path fill-rule="evenodd"
             d="M9 15a6 6 0 1 1 12 0 6 6 0 0 1-12 0Zm3.845-1.855a2.4 2.4 0 0 1 1.2-1.226 1 1 0 0 1 1.992-.026c.426.15.809.408 1.111.749a1 1 0 1 1-1.496 1.327.682.682 0 0 0-.36-.213.997.997 0 0 1-.113-.032.4.4 0 0 0-.394.074.93.93 0 0 0 .455.254 2.914 2.914 0 0 1 1.504.9c.373.433.669 1.092.464 1.823a.996.996 0 0 1-.046.129c-.226.519-.627.94-1.132 1.192a1 1 0 0 1-1.956.093 2.68 2.68 0 0 1-1.227-.798 1 1 0 1 1 1.506-1.315.682.682 0 0 0 .363.216c.038.009.075.02.111.032a.4.4 0 0 0 .395-.074.93.93 0 0 0-.455-.254 2.91 2.91 0 0 1-1.503-.9c-.375-.433-.666-1.089-.466-1.817a.994.994 0 0 1 .047-.134Zm1.884.573.003.008c-.003-.005-.003-.008-.003-.008Zm.55 2.613s-.002-.002-.003-.007a.032.032 0 0 1 .003.007ZM4 14a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1Zm3-2a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Zm6.5-8a1 1 0 0 1 1-1H18a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-.796l-2.341 2.049a1 1 0 0 1-1.24.06l-2.894-2.066L6.614 9.29a1 1 0 1 1-1.228-1.578l4.5-3.5a1 1 0 0 1 1.195-.025l2.856 2.04L15.34 5h-.84a1 1 0 0 1-1-1Z"
             clip-rule="evenodd" />
         </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
-        {{ 'MENU.DASHBOARD' | translate }}
-        <!-- </span> -->
-      </span></a>
+        <span class="truncate whitespace-nowrap transition-opacity duration-300"
+          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+          {{ 'MENU.DASHBOARD' | translate }}
+          <!-- </span> -->
+        </span></a>
 
       <hr class="border-slate-700 dark:border-slate-800 my-2" />
-      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2" [class.opacity-0]="isSidebarCollapsed()">Transactions</div>
+      <div
+        class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2"
+        [class.opacity-0]="isSidebarCollapsed()">Transactions</div>
 
       <!-- Sales -->
       <a routerLink="/sales-invoices" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2">
-        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-          fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11" />
         </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
-        Sales
-      </span></a>
+        <span class="truncate whitespace-nowrap transition-opacity duration-300"
+          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+          Sales
+        </span></a>
 
       <!-- Opening Stock -->
       <a routerLink="/stock-invoices" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2">
-        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-          fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M8 20V10m8 10V4M4 20h16" />
         </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
-        Opening Stock
-      </span></a>
+        <span class="truncate whitespace-nowrap transition-opacity duration-300"
+          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+          Opening Stock
+        </span></a>
 
       <hr class="border-slate-700 dark:border-slate-800 my-2" />
-      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2" [class.opacity-0]="isSidebarCollapsed()">Masters</div>
+      <div
+        class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2"
+        [class.opacity-0]="isSidebarCollapsed()">Masters</div>
       <!-- Products -->
       <a routerLink="/products" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2">
-        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-          fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
           <path stroke="currentColor" stroke-linejoin="round" stroke-width="2"
             d="M4 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5Zm16 14a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2ZM4 13a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6Zm16-2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v6Z" />
         </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
-        {{ 'MENU.PRODUCTS' | translate }}
-      </span></a>
+        <span class="truncate whitespace-nowrap transition-opacity duration-300"
+          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+          {{ 'MENU.PRODUCTS' | translate }}
+        </span></a>
 
       <!-- Customers -->
       <a routerLink="/customers" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2">
-        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-          fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
         </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+        <span class="truncate whitespace-nowrap transition-opacity duration-300"
+          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
 
-        {{ 'MENU.CUSTOMERS' | translate }}
-      </span></a>
+          {{ 'MENU.CUSTOMERS' | translate }}
+        </span></a>
 
       <!-- Categories -->
       <a routerLink="/categories" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2">
-        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-          fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M5 19V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13H7a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M9 3v14m7 0v4" />
         </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+        <span class="truncate whitespace-nowrap transition-opacity duration-300"
+          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
 
-        {{ 'MENU.CATEGORIES' | translate }}
-      </span></a>
+          {{ 'MENU.CATEGORIES' | translate }}
+        </span></a>
 
       <!-- Users -->
       <a routerLink="/users" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2">
-        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-          fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
           <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
             d="M16 19h4a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-2m-2.236-4a3 3 0 1 0 0-4M3 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+        <span class="truncate whitespace-nowrap transition-opacity duration-300"
+          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
 
-        <!-- <svg
+          <!-- <svg
             class="w-6 h-6 text-white"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
@@ -206,8 +220,8 @@
             />
           </svg> -->
 
-        {{ 'MENU.USERS' | translate }}
-      </span></a>
+          {{ 'MENU.USERS' | translate }}
+        </span></a>
 
       <hr class="border-slate-700 dark:border-slate-800 my-2" />
       <!-- Reports -->
@@ -215,46 +229,50 @@
         class="w-full flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden justify-between gap-2 text-left transition-colors">
         <span class="flex items-center overflow-hidden gap-2">
           <!-- Document Report Icon -->
-          <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-            fill="none" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+            height="24" fill="none" viewBox="0 0 24 24">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10" />
           </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
-          Reports
+          <span class="truncate whitespace-nowrap transition-opacity duration-300"
+            [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+            Reports
+          </span>
+          <!-- Right Arrow Icon -->
+          <svg class="w-4 h-4 text-slate-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
         </span>
-        <!-- Right Arrow Icon -->
-        <svg class="w-4 h-4 text-slate-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-          viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-        </svg>
-      </span></button>
+      </button>
 
       <hr class="border-slate-700 dark:border-slate-800 my-2" />
       <!-- Settings -->
       <a routerLink="/settings" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2">
-        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-          fill="none" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535 1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.707.536.535a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H20a1 1 0 0 0 1-1Z" />
           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
         </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
-        Settings
-      </span></a>
+        <span class="truncate whitespace-nowrap transition-opacity duration-300"
+          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+          Settings
+        </span></a>
       }
 
       @if (currentMenu() === 'reports') {
       <div class="mt-2 mb-4">
         <button (click)="switchMenu('main')"
           class="flex items-center gap-2 overflow-hidden px-4 text-sm text-slate-400 hover:text-white transition-colors cursor-pointer px-2 py-1 rounded hover:bg-slate-700">
-          <svg class="w-4 h-4 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-            stroke-width="2.5" stroke="currentColor">
+          <svg class="w-4 h-4 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
           </svg>
-          <span class="truncate whitespace-nowrap transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
+          <span class="truncate whitespace-nowrap transition-opacity duration-300"
+            [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
             Back to Menu
           </span>
         </button>
@@ -266,16 +284,31 @@
 
       <a routerLink="/reports/sales" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-slate-400 transition-colors">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10" />
+        </svg>
         Sales Report
       </a>
 
       <a routerLink="/reports/stock" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-slate-400 transition-colors">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10" />
+        </svg>
         Stock Report
       </a>
 
       <a routerLink="/reports/tax" routerLinkActive="bg-slate-700 font-semibold"
         class="flex px-4 py-2 rounded hover:bg-slate-600 items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-slate-400 transition-colors">
+        <svg class="w-6 h-6 shrink-0 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10" />
+        </svg>
         Tax Output
       </a>
       }

@@ -18,7 +18,7 @@ inventoriesRouter.get('/', async (req: Request, res: Response) => {
       })
       .from(inventories)
       .innerJoin(products, eq(products.id, inventories.productId))
-      .where(gt(inventories.unitsInStock, 0)) // Only fetch available inventory
+      // .where(gt(inventories.unitsInStock, 0)) // Only fetch available inventory
       .all();
 
     res.json({ data, pagination: { total: data.length, limit: data.length, offset: 0, page: 1, totalPages: 1 } });

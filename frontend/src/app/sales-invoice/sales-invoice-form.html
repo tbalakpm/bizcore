@@ -154,10 +154,20 @@
                 class="w-full text-sm">
                 <ng-template ng-label-tmp let-p="item">
                   <span class="font-medium">{{ p.gtn || p.code }}</span> - {{ p.name }}
+                  <span *ngIf="(p.unitsInStock || 0) <= 0" class="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">No Stock</span>
                 </ng-template>
                 <ng-template ng-option-tmp let-p="item" let-search="searchTerm">
-                  <div class="font-medium">{{ p.name }}</div>
-                  <div class="text-xs text-slate-500">GTN: {{ p.gtn || p.code }} &middot; Stock: {{ p.unitsInStock || 0 }}</div>
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <div class="font-medium text-slate-900 dark:text-white">{{ p.name }}</div>
+                      <div class="text-xs text-slate-500">GTN: {{ p.gtn || p.code }}</div>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-xs font-semibold" [class.text-red-500]="(p.unitsInStock || 0) <= 0" [class.text-emerald-600]="(p.unitsInStock || 0) > 0">
+                        Stock: {{ p.unitsInStock || 0 }}
+                      </div>
+                    </div>
+                  </div>
                 </ng-template>
               </ng-select>
             </td>
