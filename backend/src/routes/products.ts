@@ -2,7 +2,6 @@ import { and, eq, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
 import { categories, db, products, productSerialNumbers } from '../db';
-import { productSerialNumberService } from '../services/product-serial-number.service';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 
 export const productsRouter = express.Router();
@@ -34,8 +33,8 @@ productsRouter.get('/', async (req: Request, res: Response) => {
       'unitPrice',
       // 'unitsInStock',
       'isActive',
-      'createdAt',
-      'updatedAt',
+      // 'createdAt',
+      // 'updatedAt',
     ] as const;
     type SortableField = (typeof sortableFields)[number];
     const isSortableField = (value: string): value is SortableField =>
@@ -137,6 +136,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
         unitPrice: products.unitPrice,
         hsnSac: products.hsnSac,
         taxRate: products.taxRate,
+        gtnMode: products.gtnMode,
         gtnGeneration: products.gtnGeneration,
         //unitsInStock: products.unitsInStock,
         isActive: products.isActive,
@@ -197,9 +197,19 @@ productsRouter.get('/:id', async (req, res) => {
   }
 
   const product = await db.select().from(products).where(eq(products.id, id)).get();
-  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
+  if (!product) {
+    return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
+  }
 
-  res.json(product);
+  // Also fetch serial number config so the frontend can pre-populate gtnPrefix/gtnStartPos/gtnLength
+  const serial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).get();
+
+  res.json({
+    ...product,
+    gtnPrefix: serial?.prefix ?? '',
+    gtnStartPos: serial?.current ?? 1,
+    gtnLength: serial?.length ?? 10,
+  });
 });
 
 productsRouter.post('/', async (req, res) => {
@@ -212,10 +222,11 @@ productsRouter.post('/', async (req, res) => {
     unitPrice,
     hsnSac,
     taxRate,
+    gtnMode,
     gtnGeneration,
     gtnPrefix,
     gtnStartPos,
-    unitsInStock,
+    gtnLength,
     isActive,
   } = req.body;
 
@@ -235,16 +246,14 @@ productsRouter.post('/', async (req, res) => {
         unitPrice: unitPrice?.toString(),
         hsnSac,
         taxRate: taxRate?.toString(),
+        gtnMode,
         gtnGeneration,
-        //unitsInStock,
         isActive: isActive !== false,
       })
       .returning()
       .get();
 
-    if (gtnGeneration === 'BATCH' || gtnGeneration === 'TAG') {
-      const serialType = gtnGeneration === 'BATCH' ? productSerialNumberService.serialTypes.batchNumber : productSerialNumberService.serialTypes.tagNumber;
-
+    if (gtnMode !== 'manual' && (gtnGeneration === 'batch' || gtnGeneration === 'tag')) {
       // Ensure starting pos is valid
       const nextPos = parseInt(gtnStartPos, 10);
       const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
@@ -253,7 +262,7 @@ productsRouter.post('/', async (req, res) => {
         productId: product.id,
         prefix: gtnPrefix || '',
         current: startPos,
-        length: 10,
+        length: parseInt(gtnLength, 10) || 10,
       }).run();
     }
 
@@ -277,10 +286,11 @@ productsRouter.put('/:id', async (req, res) => {
     unitPrice,
     hsnSac,
     taxRate,
+    gtnMode,
     gtnGeneration,
     gtnPrefix,
     gtnStartPos,
-    unitsInStock,
+    gtnLength,
     isActive,
   } = req.body;
 
@@ -295,8 +305,8 @@ productsRouter.put('/:id', async (req, res) => {
   if (unitPrice) product.unitPrice = unitPrice?.toString();
   if (hsnSac !== undefined) product.hsnSac = hsnSac;
   if (taxRate !== undefined) product.taxRate = taxRate?.toString();
+  if (gtnMode !== undefined) product.gtnMode = gtnMode;
   if (gtnGeneration !== undefined) product.gtnGeneration = gtnGeneration;
-  // if (unitsInStock !== undefined) product.unitsInStock = unitsInStock;
   if (typeof isActive === 'boolean') product.isActive = isActive;
 
   await db
@@ -310,16 +320,14 @@ productsRouter.put('/:id', async (req, res) => {
       unitPrice: product.unitPrice,
       hsnSac: product.hsnSac,
       taxRate: product.taxRate,
+      gtnMode: product.gtnMode,
       gtnGeneration: product.gtnGeneration,
-      // unitsInStock: product.unitsInStock,
       isActive: product.isActive,
     })
     .where(eq(products.id, id))
     .run();
 
-  if (gtnGeneration === 'BATCH' || gtnGeneration === 'TAG') {
-    const serialType = gtnGeneration === 'BATCH' ? productSerialNumberService.serialTypes.batchNumber : productSerialNumberService.serialTypes.tagNumber;
-
+  if (product.gtnMode !== 'manual' && (product.gtnGeneration === 'batch' || product.gtnGeneration === 'tag')) {
     // Ensure starting pos is valid
     const nextPos = parseInt(gtnStartPos, 10);
     const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
@@ -329,15 +337,19 @@ productsRouter.put('/:id', async (req, res) => {
       await db.update(productSerialNumbers).set({
         prefix: gtnPrefix || '',
         current: startPos,
+        length: parseInt(gtnLength, 10) || 10,
       }).where(eq(productSerialNumbers.id, existingSerial.id)).run();
     } else {
       await db.insert(productSerialNumbers).values({
         productId: product.id,
         prefix: gtnPrefix || '',
         current: startPos,
-        length: 10,
+        length: parseInt(gtnLength, 10) || 10,
       }).run();
     }
+  } else {
+    // Clean up serial number row if switching away from batch/tag
+    await db.delete(productSerialNumbers).where(eq(productSerialNumbers.productId, product.id)).run();
   }
 
   res.json(product);

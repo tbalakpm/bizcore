@@ -21,3 +21,13 @@ export const users = sqliteTable(
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+
+// Runtime column selection object for use with db.select()
+export const userPublicSelect = {
+  id: users.id,
+  username: users.username,
+  firstName: users.firstName,
+  lastName: users.lastName,
+  role: users.role,
+};
+export type UserPublicSelect = typeof userPublicSelect;

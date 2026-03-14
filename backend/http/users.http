@@ -61,11 +61,11 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "username": "john.doe",
-  "password": "SecurePass123",
-  "firstName": "John",
-  "lastName": "Doe",
-  "role": "user",
+  "username": "tbala",
+  "password": "1234",
+  "firstName": "Bala",
+  "lastName": "T",
+  "role": "admin",
   "isActive": true
 }
 

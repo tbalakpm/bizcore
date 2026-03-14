@@ -31,93 +31,22 @@
         <input type="date" [(ngModel)]="editingInvoice.invoiceDate" name="invoiceDate"
           class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
       </div>
-      <!-- <div>
-        <label class="block text-sm font-medium">Product Search</label>
-        <input
-          type="text"
-          [(ngModel)]="productSearch"
-          name="productSearch"
-          placeholder="Search code or name"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-        />
-      </div> -->
       <div class="flex items-end justify-end md:col-span-2 xl:col-span-2">
         <button type="button"
           class="py-1.5 px-4 border border-slate-700 dark:border-slate-400 rounded text-sm cursor-pointer"
           (click)="showNewProductForm = !showNewProductForm">
-          {{ showNewProductForm ? 'Close Product Form' : 'Create New Product' }}
+          {{ showNewProductForm ? 'Hide Product Form' : 'Create New Product' }}
         </button>
       </div>
     </div>
 
     @if (showNewProductForm) {
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 bg-slate-50 p-3 rounded border border-slate-200">
-      <div>
-        <label class="block text-sm font-medium">Code</label>
-        <input type="text" [(ngModel)]="newProduct.code" name="newProductCode"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Name</label>
-        <input type="text" [(ngModel)]="newProduct.name" name="newProductName"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Category</label>
-        <select [(ngModel)]="newProduct.categoryId" name="newProductCategoryId"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1">
-          @for (category of categories(); track category.id) {
-          <option [ngValue]="category.id">{{ category.name }}</option>
-          }
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Qty/Unit</label>
-        <input type="text" [(ngModel)]="newProduct.qtyPerUnit" name="newProductQtyPerUnit"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Unit Price</label>
-        <input type="number" [(ngModel)]="newProduct.unitPrice" name="newProductUnitPrice"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">HSN/SAC</label>
-        <input type="text" [(ngModel)]="newProduct.hsnSac" name="newProductHsnSac"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Tax Rate</label>
-        <input type="number" step="0.01" [(ngModel)]="newProduct.taxRate" name="newProductTaxRate"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">GTN Mode</label>
-        <select [(ngModel)]="newProduct.gtnGeneration" name="newProductGtnGeneration"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1">
-          <option [ngValue]="undefined">Default (Product Code)</option>
-          <option value="BATCH">Batch Level</option>
-          <option value="TAG">Tag Level</option>
-        </select>
-      </div>
-      @if (newProduct.gtnGeneration === 'BATCH' || newProduct.gtnGeneration === 'TAG') {
-      <div>
-        <label class="block text-sm font-medium">GTN Prefix</label>
-        <input type="text" [(ngModel)]="newProduct.gtnPrefix" name="newProductGtnPrefix"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Start Sequence</label>
-        <input type="number" step="1" [(ngModel)]="newProduct.gtnStartPos" name="newProductGtnStartPos"
-          class="mt-1 w-full border border-slate-400 rounded px-2 py-1" />
-      </div>
-      }
-      <div class="md:col-span-2 xl:col-span-4 flex justify-end">
-        <button type="button" class="py-1.5 px-4 border bg-slate-700 text-white rounded text-sm cursor-pointer"
-          (click)="createProductFromInvoice()">
-          Create Product
-        </button>
-      </div>
+    <div class="bg-slate-50 p-3 rounded border border-slate-200">
+      <p class="text-sm font-medium text-slate-600 mb-2">New Product — will be auto-selected in the active row</p>
+      <app-product-form
+        (saved)="onNewProductSaved($event)"
+        (cancelled)="showNewProductForm = false"
+      />
     </div>
     }
 

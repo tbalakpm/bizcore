@@ -30,6 +30,39 @@ export const resolvePrefixTemplate = (template: string, date: Date): string => {
   return template.replace(/YYYYMMDD|YYMMDD|YYYY|YY|MM|DD|JJJ/g, (token) => replacements[token]);
 };
 
+export const incrementPrefixTemplate = (prefix: string): string => {
+  const chars = prefix.split('');
+  let carry = true;
+  for (let i = chars.length - 1; i >= 0; i--) {
+    const code = chars[i].charCodeAt(0);
+    if (code >= 65 && code <= 90) { // A-Z
+      if (carry) {
+        if (code === 90) {
+          chars[i] = 'A';
+        } else {
+          chars[i] = String.fromCharCode(code + 1);
+          carry = false;
+          break;
+        }
+      }
+    } else if (code >= 97 && code <= 122) { // a-z
+      if (carry) {
+        if (code === 122) {
+          chars[i] = 'a';
+        } else {
+          chars[i] = String.fromCharCode(code + 1);
+          carry = false;
+          break;
+        }
+      }
+    }
+  }
+  return chars.join('');
+};
+
 export const formatSerialNumber = (prefix: string, value: number, length: number): string => {
-  return `${prefix}${value.toString().padStart(length, '0')}`;
+  // Don't format numbers longer than their allowed length, unless they naturally exceed it (which we handle upstream)
+  const valueStr = value.toString();
+  const allowedLength = Math.max(length, valueStr.length);
+  return `${prefix}${valueStr.padStart(allowedLength, '0')}`;
 };

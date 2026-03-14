@@ -6,7 +6,7 @@ export const productSerialNumbers = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
     productId: integer('product_id').references(() => products.id),
-    prefix: text('prefix', { length: 10 }).notNull().default(''),
+    prefix: text('prefix', { length: 50 }).notNull().default(''),
     current: integer('current').notNull().default(1),
     length: integer('length').notNull().default(10)
   },

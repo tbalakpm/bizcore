@@ -85,12 +85,12 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
             .run();
       } else {
           // Auto GTN Generation logic
-          const genType = product.gtnGeneration || 'CODE';
+          const genType = (product.gtnGeneration || 'CODE').toUpperCase();
           
           if (genType === 'TAG') {
               // TAG: Each quantity gets a distinct inventory row with qty 1
               for (let i = 0; i < qty; i++) {
-                 const generatedGtn = await productSerialNumberService.generateTagNumber(product.id, 'product_code_as_tag_batch', tx);
+                 const generatedGtn = await productSerialNumberService.generateTagNumber(product.id, 'each_product', tx);
                  const createdInventory = await tx
                     .insert(inventories)
                     .values({
@@ -122,7 +122,7 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
              // CODE or BATCH or anything else: 1 row for the full quantity
              let generatedGtn: string | undefined = undefined;
              if (genType === 'BATCH') {
-                 generatedGtn = await productSerialNumberService.generateBatchNumber(product.id, 'product_code_as_tag_batch', tx);
+                 generatedGtn = await productSerialNumberService.generateBatchNumber(product.id, 'each_product', tx);
              } else if (genType === 'CODE') {
                  generatedGtn = product.code;
              } else if (shouldGenerateGtn(product.gtnGeneration)) {

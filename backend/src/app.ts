@@ -1,10 +1,11 @@
 import path from 'node:path';
 import cors from 'cors';
 import express, { type Request, type Response } from 'express';
+import { i18nMiddleware } from './middleware/i18n';
 
 import { config } from './config';
 import { initializeDatabase, migrateDatabase } from './db';
-import { i18nMiddleware } from './middleware/i18n';
+import { createAdminUser } from './db/seed/admin-user.seed';
 
 import { authRouter } from './routes/auth';
 import { categoriesRouter } from './routes/categories';
@@ -24,6 +25,7 @@ import { salesInvoicesRouter } from './routes/sales-invoices';
 export async function app() {
   console.log(`Environment: ${config.environment}`);
   await initializeDatabase();
+  await createAdminUser();
   if (config.autoMigrateOnStartup) {
     await migrateDatabase();
   }

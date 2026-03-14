@@ -19,7 +19,7 @@ export function logger(req: Request, res: Response, next: NextFunction) {
     // Hook into response to capture size and timing
     const originalSend = res.send;
     res.send = function (data) {
-      const responseSize = JSON.stringify(data).length || 0;
+      const responseSize = JSON.stringify(data || {}).length || 0;
       const timeTaken = Date.now() - startTime;
       const statusCode = res.statusCode;
 

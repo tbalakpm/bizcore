@@ -3,8 +3,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { type Category, CategoryService } from '../category/category-service';
 import { type Product, ProductService } from '../product/product-service';
+import { ProductFormComponent } from '../product/product-form.component';
 import { type StockInvoiceItem, StockInvoiceService } from './stock-invoice-service';
 
 type EditableStockInvoiceItem = {
@@ -28,37 +28,21 @@ type EditableStockInvoice = {
 
 @Component({
   selector: 'app-stock-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, ProductFormComponent],
   templateUrl: './stock-invoice-form.html',
 })
 export class StockInvoiceForm implements OnInit {
   private stockInvoiceService = inject(StockInvoiceService);
   private productService = inject(ProductService);
-  private categoryService = inject(CategoryService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   products = signal<Product[]>([]);
-  categories = signal<Category[]>([]);
 
   editingInvoice: EditableStockInvoice = this.defaultInvoice();
-  productSearch = '';
   selectedRowIndex = 0;
 
   showNewProductForm = false;
-  newProduct: Partial<Product> = {
-    code: '',
-    name: '',
-    categoryId: undefined,
-    qtyPerUnit: '',
-    unitPrice: undefined,
-    hsnSac: undefined,
-    taxRate: undefined,
-    gtnGeneration: undefined,
-    gtnPrefix: undefined,
-    gtnStartPos: undefined,
-    isActive: true,
-  };
 
   loading = false;
   submitting = false;
@@ -70,7 +54,6 @@ export class StockInvoiceForm implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
-    this.loadCategories();
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -99,13 +82,22 @@ export class StockInvoiceForm implements OnInit {
     });
   }
 
-  loadCategories() {
-    this.categoryService.getAll().subscribe({
-      next: (res) => this.categories.set(res.data),
-      error: () => {
-        this.error = 'Failed to load categories';
-      },
-    });
+  /** Called when the user saves a new product from the inline form */
+  onNewProductSaved(product: Product) {
+    // Add to local product list so ng-select shows it immediately
+    this.products.set([product, ...this.products()]);
+
+    // Auto-select in the active row
+    const item = this.editingInvoice.items[this.selectedRowIndex];
+    if (item) {
+      item.productId = product.id;
+      item.unitPrice = Number(product.unitPrice ?? 0);
+      item.hsnSac = product.hsnSac;
+      item.taxRate = product.taxRate !== undefined ? Number(product.taxRate) : undefined;
+      this.onItemChanged(item);
+    }
+
+    this.showNewProductForm = false;
   }
 
   loadInvoice(invoiceId: number) {
@@ -138,17 +130,6 @@ export class StockInvoiceForm implements OnInit {
         this.loading = false;
       },
     });
-  }
-
-  get filteredProducts() {
-    const search = this.productSearch.trim().toLowerCase();
-    if (!search) {
-      return this.products();
-    }
-
-    return this.products().filter(
-      (p) => p.code.toLowerCase().includes(search) || p.name.toLowerCase().includes(search),
-    );
   }
 
   addItemRow() {
@@ -244,41 +225,4 @@ export class StockInvoiceForm implements OnInit {
     });
   }
 
-  createProductFromInvoice() {
-    if (!this.newProduct.code || !this.newProduct.name || !this.newProduct.categoryId) {
-      this.error = 'Code, name and category are required to create product';
-      return;
-    }
-
-    this.productService.create(this.newProduct).subscribe({
-      next: (product) => {
-        this.products.set([product, ...this.products()]);
-
-        const item = this.editingInvoice.items[this.selectedRowIndex];
-        if (item) {
-          item.productId = product.id;
-          item.unitPrice = Number(product.unitPrice ?? 0);
-          this.onItemChanged(item);
-        }
-
-        this.showNewProductForm = false;
-        this.newProduct = {
-          code: '',
-          name: '',
-          categoryId: undefined,
-          qtyPerUnit: '',
-          unitPrice: undefined,
-          hsnSac: undefined,
-          taxRate: undefined,
-          gtnGeneration: undefined,
-          gtnPrefix: undefined,
-          gtnStartPos: undefined,
-          isActive: true,
-        };
-      },
-      error: (err) => {
-        this.error = err.error?.error || 'Failed to create product';
-      },
-    });
-  }
 }

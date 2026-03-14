@@ -14,10 +14,12 @@ export interface Product {
   unitPrice?: number;
   hsnSac?: string;
   taxRate?: number;
+  gtnMode?: string;
   gtnGeneration?: string;
   gtnPrefix?: string;
-  gtnStartPos?: string;
-  unitsInStock?: number;
+  gtnStartPos?: number;
+  gtnLength?: number;
+  // unitsInStock?: number;
   categoryName?: string;
   isActive: boolean;
 }

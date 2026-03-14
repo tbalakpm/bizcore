@@ -8,149 +8,21 @@
     {{ 'MENU.PRODUCTS' | translate }}
   </h1>
 </div>
+
 @if (error) {
-<div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+<div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
   {{ error }}
 </div>
 }
 
 <div class="grid grid-cols-1 gap-4">
-  <!-- Add form -->
+  <!-- Add / Edit form via reusable component -->
   <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 max-h-max">
     <h2 class="text-lg font-semibold mb-3">
-      {{ editingProduct.id ? ('EDIT' | translate) : ('ADD' | translate) }}
+      {{ editingProductId ? ('EDIT' | translate) : ('ADD' | translate) }}
       {{ 'PRODUCT.TITLE' | translate }}
     </h2>
-    <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
-      <div>
-        <label class="block text-sm font-medium">{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</label>
-        <input type="text" [(ngModel)]="editingProduct.code" name="newProductCode"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-          autofocus />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">{{ 'PRODUCT.TITLE' | translate }} {{ 'NAME' | translate }}</label>
-        <input type="text" [(ngModel)]="editingProduct.name" name="newProductName"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-          autofocus />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">{{ 'DESCRIPTION' | translate }}</label>
-        <textarea rows="1" [(ngModel)]="editingProduct.description" name="newProductDescription"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"></textarea>
-      </div>
-      <div>
-        <label class="block text-sm font-medium">{{ 'CATEGORY.TITLE' | translate }}</label>
-        <select [(ngModel)]="editingProduct.categoryId" name="newProductCategory"
-          class="block w-full px-2 py-1.5 mt-1 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer focus:ring-brand focus:border-brand placeholder:text-body">
-          <!-- <option [ngValue]="null">-- Select --</option> -->
-          @for (c of categories(); track c.id) {
-          <option [ngValue]="c.id" selected="{{ editingProduct.categoryId === c.id }}">
-            {{ c.name }}
-          </option>
-          }
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Qty Per Unit</label>
-        <input type="text" [(ngModel)]="editingProduct.qtyPerUnit" name="newProductQtyPerUnit"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-          autofocus />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Unit Price</label>
-        <input type="number" step="1.00" [(ngModel)]="editingProduct.unitPrice" name="newProductUnitPrice"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 disabled:bg-gray-100 disabled:border-gray-400" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Unit In Stock</label>
-        <input type="number" step="1.00" [(ngModel)]="editingProduct.unitsInStock" name="newProductUnitsInStock"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 disabled:bg-gray-100 disabled:border-gray-400" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">HSN/SAC</label>
-        <input type="text" [(ngModel)]="editingProduct.hsnSac" name="newProductHsnSac"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Tax Rate</label>
-        <input type="number" step="0.01" [(ngModel)]="editingProduct.taxRate" name="newProductTaxRate"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
-      </div>
-
-      <div class="col-span-full border-t border-slate-200 mt-2 mb-1 pt-2">
-        <h3 class="font-medium text-slate-700">Goods Tracking Number (GTN) Setup</h3>
-      </div>
-      <div>
-        <label class="block text-sm font-medium">GTN Mode</label>
-        <select [(ngModel)]="editingProduct.gtnGeneration" name="newProductGtnGeneration"
-          class="block w-full px-2 py-1.5 mt-1 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer">
-          <option [ngValue]="undefined">Default (Product Code)</option>
-          <option value="BATCH">Batch Level (Same GTN per lot)</option>
-          <option value="TAG">Tag Level (Unique GTN per item)</option>
-        </select>
-      </div>
-
-      @if (editingProduct.gtnGeneration === 'BATCH' || editingProduct.gtnGeneration === 'TAG') {
-      <div>
-        <label class="block text-sm font-medium">Batch/Tag Prefix</label>
-        <input type="text" [(ngModel)]="editingProduct.gtnPrefix" name="newProductGtnPrefix"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-          placeholder="e.g. BATCH- or TAG-" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Start Sequence</label>
-        <input type="number" step="1" [(ngModel)]="editingProduct.gtnStartPos" name="newProductGtnStartPos"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-          placeholder="1" />
-      </div>
-      }
-      <!-- <div>
-        <label class="block text-sm font-medium">Balance as on (for asset/liability)</label>
-        <input
-          type="date"
-          [(ngModel)]="editingProduct.date"
-          name="newRegisterDate"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 cursor-pointer disabled:bg-gray-100 disabled:border-gray-400 disabled:cursor-default"
-          [disabled]="
-            !(editingProduct.categoryType && ['A', 'L'].includes(editingProduct.categoryType))
-          "
-        />
-      </div> -->
-      <!-- <div class="flex items-center">
-        <input
-          id="newCategoryActive"
-          type="checkbox"
-          value=""
-          [(ngModel)]="editingProduct.isActive"
-          name="newCategoryActive"
-          class="w-4 h-4 border bg-slate-500 accent-slate-700 rounded-md focus:ring focus:ring-slate-700 focus:outline-none cursor-pointer"
-        />
-        <label
-          for="newCategoryActive"
-          class="select-none ms-2 text-sm font-medium text-heading cursor-pointer"
-          >Active</label
-        >
-      </div> -->
-      <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
-        <button type="submit"
-          class="py-1.5 w-full border bg-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-white text-sm cursor-pointer">
-          Save
-        </button>
-        @if (editingProduct.id) {
-        <button type="button"
-          class="py-1.5 w-full border border-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-sm cursor-pointer"
-          (click)="onCancel()">
-          Cancel
-        </button>
-        }
-      </div>
-    </form>
-    <!-- @if (error) {
-    <p class="text-red-600 text-xs mt-2">
-      {{ error }}
-    </p>
-    } -->
+    <app-product-form [productId]="editingProductId" (saved)="onFormSaved()" (cancelled)="onFormCancelled()" />
   </div>
 
   <!-- List -->
@@ -159,7 +31,6 @@
       <h2 class="text-lg font-semibold">{{ 'MENU.PRODUCTS' | translate }}</h2>
     </div>
 
-    <!-- <div class="h-210 overflow-auto"> -->
     <div class="overflow-x-auto">
       <table class="min-w-full text-sm">
         <thead class="bg-gray-50">
@@ -170,7 +41,7 @@
             <th class="text-left py-2">{{ 'CATEGORY.TITLE' | translate }}</th>
             <th class="text-left py-2">HSN/SAC</th>
             <th class="text-left py-2">Tax Rate</th>
-            <th class="text-left py-2">GTN Mode</th>
+            <th class="text-left py-2">GTN</th>
             <th class="text-center w-16 py-2">{{ 'ACTIVE' | translate }}</th>
             <th class="py-2 text-right w-32">{{ 'ACTIONS' | translate }}</th>
           </tr>
@@ -178,7 +49,7 @@
         <tbody>
           @for (p of products(); track p.id) {
           <tr class="border-b border-slate-200 hover:bg-slate-100"
-            [ngClass]="{ 'bg-slate-200': editingProduct.id == p.id }">
+            [ngClass]="{ 'bg-slate-200': editingProductId === p.id }">
             <td class="py-2">{{ p.code }}</td>
             <td class="py-2">{{ p.name }}</td>
             <td class="py-2">{{ p.description }}</td>
@@ -186,13 +57,33 @@
             <td class="py-2">{{ p.hsnSac || '-' }}</td>
             <td class="py-2">{{ p.taxRate ?? '-' }}</td>
             <td class="py-2">
-               @if (p.gtnGeneration === 'BATCH') { <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded border border-blue-200">Batch</span> }
-               @else if (p.gtnGeneration === 'TAG') { <span class="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded border border-purple-200">Tag</span> }
-               @else { <span class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded border border-slate-200">Default</span> }
+              <div class="flex flex-row gap-0.5">
+                <!-- gtnMode badge -->
+                @if (p.gtnMode === 'manual') {
+                <span
+                  class="bg-orange-100 text-orange-800 text-xs px-2 py-0.5 rounded border border-orange-200 w-fit">Manual</span>
+                } @else {
+                <span
+                  class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded border border-green-200 w-fit">Auto</span>
+                }
+                <!-- gtnGeneration badge -->
+                @if (p.gtnMode !== 'manual') {
+                @if (p.gtnGeneration === 'batch') {
+                <span
+                  class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded border border-blue-200 w-fit">Batch</span>
+                } @else if (p.gtnGeneration === 'tag') {
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded border border-purple-200 w-fit">Tag</span>
+                } @else {
+                <span
+                  class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded border border-green-200 w-fit">Code</span>
+                }
+                }
+              </div>
             </td>
             <td class="text-center">
               <button type="button" (click)="toggleActive(p)"
-                class="inline-flex items-center justify-center w-4.5 h-4.5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:ring-slate-700 hover:outline-none rounded hover:bg-gray-100 transition cursor-pointer"
+                class="inline-flex items-center justify-center w-4.5 h-4.5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:outline-none rounded transition cursor-pointer"
                 [ngClass]="
                   p.isActive ? 'border-green-500 text-green-600' : 'border-gray-300 text-gray-400'
                 ">
@@ -222,25 +113,13 @@
           <!---->
           @if (!products().length) {
           <tr>
-            <td colspan="8" class="py-2 text-center text-gray-400">
-              @if (error) {
-              <p class="text-red-600 text-xs mt-4">
-                {{ error }}
-              </p>
-              } @else {
+            <td colspan="9" class="py-2 text-center text-gray-400">
               {{ 'PRODUCT.NO_PRODUCTS_YET' | translate }}
-              }
             </td>
           </tr>
           }
         </tbody>
       </table>
     </div>
-    <!-- </div> -->
-    <!-- @if (error) {
-      <p class="text-red-600 text-xs mt-4">
-        {{ error }}
-      </p>
-    } -->
   </div>
 </div>

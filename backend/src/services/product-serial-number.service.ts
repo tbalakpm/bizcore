@@ -4,6 +4,7 @@ import {
   type DbTransaction,
   formatSerialNumber,
   resolvePrefixTemplate,
+  incrementPrefixTemplate,
   type SerialSequenceConfig,
 } from '../shared/serial-number.shared';
 
@@ -32,18 +33,6 @@ type GenerateProductSerialParams = {
 const defaultConfigBySerialType: Record<ProductSerialType, SerialSequenceConfig> = {
   [SERIAL_TYPES.tagNumber]: { prefix: 'TAG-', length: 10, start: 1 },
   [SERIAL_TYPES.batchNumber]: { prefix: 'BAT-', length: 10, start: 1 },
-};
-
-const resolveCounterKey = (mode: ProductSerialMode, serialType: ProductSerialType, productId: number): string => {
-  if (mode === MODES.globalProductSerial) {
-    return `${serialType}:global`;
-  }
-
-  if (mode === MODES.eachProduct) {
-    return `${serialType}:product:${productId}`;
-  }
-
-  return `${serialType}:product_code:${productId}`;
 };
 
 const requiresCounter = (mode: ProductSerialMode): boolean => mode !== MODES.productCodeAsTagBatch;
@@ -121,7 +110,6 @@ export const productSerialNumberService = {
       return product.code;
     }
 
-    const key = resolveCounterKey(mode, serialType, productId);
     const config = defaultConfigBySerialType[serialType];
 
     let [currentRecord] = await tx
@@ -132,10 +120,12 @@ export const productSerialNumberService = {
       .limit(1);
 
     if (!currentRecord) {
+      // Create a default one if not exists (though the product route should have created it)
+      // Use the product's configured prefix and start position if available
       await tx.insert(productSerialNumbers).values({
-        productId: mode === MODES.eachProduct ? productId : null,
-        prefix: config.prefix,
-        current: config.start,
+        productId,
+        prefix: product.gtnPrefix || config.prefix,
+        current: product.gtnStartPos || config.start,
         length: config.length,
       });
 
@@ -148,22 +138,36 @@ export const productSerialNumberService = {
     }
 
     if (!currentRecord) {
-      throw new Error(`Unable to initialize product serial number for key: ${key}`);
+      throw new Error(`Unable to initialize product serial number for productId: ${productId}`);
     }
 
-    const [updatedRecord] = await tx
-      .update(productSerialNumbers)
-      .set({ current: sql`${productSerialNumbers.current} + 1` })
-      .where(eq(productSerialNumbers.id, currentRecord.id))
-      .returning({ current: productSerialNumbers.current });
-
-    if (!updatedRecord) {
-      throw new Error(`Unable to increment product serial number for key: ${key}`);
+    let finalPrefix = currentRecord.prefix;
+    let finalValue = currentRecord.current;
+    
+    // Check for overflow (numeric sequence exhaustion)
+    const maxValue = Math.pow(10, currentRecord.length) - 1;
+    if (finalValue > maxValue) {
+      // Roll over prefix and reset current to 1
+      finalPrefix = incrementPrefixTemplate(finalPrefix);
+      finalValue = 1;
+      
+      await tx
+        .update(productSerialNumbers)
+        .set({ 
+          prefix: finalPrefix,
+          current: 2 // We are issuing 1 now, so next is 2
+        })
+        .where(eq(productSerialNumbers.id, currentRecord.id))
+        .run();
+    } else {
+      await tx
+        .update(productSerialNumbers)
+        .set({ current: sql`${productSerialNumbers.current} + 1` })
+        .where(eq(productSerialNumbers.id, currentRecord.id))
+        .run();
     }
 
-    const serialValue = updatedRecord.current - 1;
-    const prefix = resolvePrefixTemplate(currentRecord.prefix, date);
-
-    return formatSerialNumber(prefix, serialValue, currentRecord.length);
+    const resolvedPrefix = resolvePrefixTemplate(finalPrefix, date);
+    return formatSerialNumber(resolvedPrefix, finalValue, currentRecord.length);
   },
 };
