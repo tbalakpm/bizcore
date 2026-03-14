@@ -71,7 +71,7 @@
         @for (invoice of invoices(); track invoice.id) {
         <tr class="border-b border-slate-200 hover:bg-slate-100">
           <td class="py-2">{{ invoice.invoiceNumber }}</td>
-          <td class="py-2">{{ invoice.invoiceDate }}</td>
+          <td class="py-2">{{ invoice.invoiceDate | date:'mediumDate' }}</td>
           <td class="py-2 text-right">{{ invoice.totalQty }}</td>
           <td class="py-2 text-right">{{ invoice.totalAmount }}</td>
           <td class="py-2 text-right space-x-2">
