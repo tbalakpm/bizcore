@@ -9,7 +9,7 @@
   </h1>
 </div>
 @if (error) {
-<div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+<div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
   {{ error }}
 </div>
 }
@@ -66,7 +66,7 @@
         </div>
         @if (!sameAsBilling) {
         <app-address-form [address]="editingCustomer.shippingAddress!" [title]="'ADDRESS.SHIPPING'"
-          [isExpandable]="true" [isOpen]="false || !sameAsBilling"></app-address-form>
+          [isExpandable]="true" [isOpen]="false"></app-address-form>
         }
       </div>
 
@@ -148,12 +148,12 @@
           }
           @if (!customers().length) {
           <tr>
-            <td colspan="5" class="py-2 text-center text-gray-400">
-              @if (error) {
+            <td colspan="6" class="py-2 text-center text-gray-400">
+              <!-- @if (error) {
               <p class="text-red-600 text-xs mt-4">{{ error }}</p>
-              } @else {
+              } @else { -->
               No customers yet
-              }
+              <!-- } -->
             </td>
           </tr>
           }

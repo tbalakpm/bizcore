@@ -68,6 +68,6 @@
     "PINCODE": "Pincode",
     "MOBILE": "Mobile",
     "EMAIL": "Email",
-    "SAME_AS_BILLING": "Same as Billing"
+    "SAME_AS_BILLING": "Shipping address is same as Billing Address"
   }
 }

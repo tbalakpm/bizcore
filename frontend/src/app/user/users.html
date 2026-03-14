@@ -10,7 +10,7 @@
 </div>
 
 @if (error) {
-<div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+<div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
   {{ error }}
 </div>
 }
@@ -127,13 +127,13 @@
           @if (!users().length) {
           <tr>
             <td colspan="6" class="py-2 text-center text-gray-400">
-              @if (error) {
+              <!-- @if (error) {
               <p class="text-red-600 text-xs mt-4">
                 {{ error }}
               </p>
-              } @else {
+              } @else { -->
               {{ 'USER.NO_USERS_YET' | translate }}
-              }
+              <!-- } -->
             </td>
           </tr>
           }
