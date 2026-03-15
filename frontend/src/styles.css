@@ -495,6 +495,7 @@ body {
   border-radius: var(--radius-md) !important;
   background-color: var(--color-surface) !important;
   color: var(--color-text) !important;
+  z-index: 1050 !important;
 }
 
 .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {

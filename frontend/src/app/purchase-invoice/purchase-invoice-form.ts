@@ -50,7 +50,7 @@ type EditablePurchaseInvoice = {
 
 @Component({
   selector: 'app-purchase-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, ProductFormComponent, TooltipDirective, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, NgSelectComponent, AddressForm, ProductFormComponent, TooltipDirective, LucideAngularModule],
   templateUrl: './purchase-invoice-form.html',
 })
 export class PurchaseInvoiceForm implements OnInit {
