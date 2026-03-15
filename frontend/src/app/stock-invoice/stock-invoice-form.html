@@ -1,15 +1,32 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
   <h1 class="page-title">
-    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-      viewBox="0 0 24 24">
-      <path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-        d="M8 20V10m8 10V4M4 20h16" />
+    <svg
+      class="w-7 h-7"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M8 20V10m8 10V4M4 20h16"
+      />
     </svg>
     {{ isEditMode ? 'Edit' : 'Create' }} Opening Stock
   </h1>
   <div class="flex gap-2 items-center">
     <a routerLink="/stock-invoices" class="btn-outline">Back to List</a>
-    <button type="submit" (click)="onSubmit()" [disabled]="submitting" class="btn-primary sm:ml-auto">
+    <button
+      type="submit"
+      (click)="onSubmit()"
+      [disabled]="submitting"
+      class="btn-primary sm:ml-auto"
+    >
       {{ submitting ? 'Saving...' : 'Save Invoice' }}
     </button>
   </div>
@@ -17,35 +34,50 @@
 
 <div class="card">
   @if (error) {
-  <div class="error-banner">{{ error }}</div>
+    <div class="error-banner">{{ error }}</div>
   }
   <form (ngSubmit)="onSubmit()" class="space-y-3">
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
       <div>
         <label class="label-base">Invoice Number</label>
-        <input type="text" [(ngModel)]="editingInvoice.invoiceNumber" name="invoiceNumber"
-          placeholder="Auto-generated if empty" class="input-base" />
+        <input
+          type="text"
+          [(ngModel)]="editingInvoice.invoiceNumber"
+          name="invoiceNumber"
+          placeholder="Auto-generated if empty"
+          class="input-base"
+        />
       </div>
       <div>
         <label class="label-base">Invoice Date</label>
-        <input type="date" [(ngModel)]="editingInvoice.invoiceDate" name="invoiceDate" class="input-base" />
+        <input
+          type="date"
+          [(ngModel)]="editingInvoice.invoiceDate"
+          name="invoiceDate"
+          class="input-base"
+        />
       </div>
       <div class="flex items-end justify-end md:col-span-2 xl:col-span-2">
-        <button type="button" class="btn-outline"
-          (click)="showNewProductForm = !showNewProductForm">
+        <button
+          type="button"
+          class="btn-outline"
+          (click)="showNewProductForm = !showNewProductForm"
+        >
           {{ showNewProductForm ? 'Hide Product Form' : 'Create New Product' }}
         </button>
       </div>
     </div>
 
     @if (showNewProductForm) {
-    <div class="bg-surface-muted p-3 rounded-lg border border-border">
-      <p class="text-sm font-medium text-text-muted mb-2">New Product — will be auto-selected in the active row</p>
-      <app-product-form
-        (saved)="onNewProductSaved($event)"
-        (cancelled)="showNewProductForm = false"
-      />
-    </div>
+      <div class="bg-surface-muted p-3 rounded-lg border border-border">
+        <p class="text-sm font-medium text-text-muted mb-2">
+          New Product — will be auto-selected in the active row
+        </p>
+        <app-product-form
+          (saved)="onNewProductSaved($event)"
+          (cancelled)="showNewProductForm = false"
+        />
+      </div>
     }
 
     <div class="overflow-auto border border-border rounded-lg">
@@ -64,54 +96,107 @@
         </thead>
         <tbody>
           @for (item of editingInvoice.items; track $index; let i = $index) {
-          <tr class="table-row">
-            <td class="td-cell">
-              <ng-select [items]="products()" bindLabel="name" bindValue="id" [(ngModel)]="item.productId"
-                appendTo="body" (change)="onProductSelect(item)" (focus)="selectedRowIndex = i"
-                [name]="'itemProduct' + i" [searchable]="true" [clearable]="true" placeholder="-- Select Product --"
-                class="w-full text-sm">
-                <ng-template ng-label-tmp let-item="item">
-                  {{ item.code }} - {{ item.name }}
-                </ng-template>
-                <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-                  {{ item.code }} - {{ item.name }}
-                </ng-template>
-              </ng-select>
-            </td>
-            <td class="td-cell">
-              <input type="text" [(ngModel)]="item.gtn" [name]="'itemGtn' + i"
-                placeholder="Auto-generate" class="input-base" />
-            </td>
-            <td class="td-cell">
-              <input type="text" [(ngModel)]="item.hsnSac" [name]="'itemHsnSac' + i" class="input-base" />
-            </td>
-            <td class="td-cell">
-              <input type="number" step="0.01" [(ngModel)]="item.taxRate" [name]="'itemTaxRate' + i" class="input-base" />
-            </td>
-            <td class="td-cell">
-              <input type="number" min="1" [(ngModel)]="item.qty" (ngModelChange)="onItemChanged(item)"
-                [name]="'itemQty' + i" class="input-base" />
-            </td>
-            <td class="td-cell">
-              <input type="number" min="0" step="0.01" [(ngModel)]="item.unitPrice"
-                (ngModelChange)="onItemChanged(item)" [name]="'itemPrice' + i" class="input-base" />
-            </td>
-            <td class="td-cell">{{ item.lineTotal }}</td>
-            <td class="td-cell text-right">
-              <button type="button" class="btn-link-danger" appTooltip="Remove item" (click)="removeItemRow(i)">Remove</button>
-            </td>
-          </tr>
+            <tr class="table-row">
+              <td class="td-cell">
+                <ng-select
+                  #itemRowSelect
+                  [items]="products()"
+                  bindLabel="name"
+                  bindValue="id"
+                  [(ngModel)]="item.productId"
+                  appendTo="body"
+                  (change)="onProductSelect(item)"
+                  (focus)="selectedRowIndex = i"
+                  [name]="'itemProduct' + i"
+                  [searchable]="true"
+                  [clearable]="true"
+                  placeholder="-- Select Product --"
+                  class="w-full text-sm"
+                >
+                  <ng-template ng-label-tmp let-item="item">
+                    {{ item.code }} - {{ item.name }}
+                  </ng-template>
+                  <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
+                    {{ item.code }} - {{ item.name }}
+                  </ng-template>
+                </ng-select>
+              </td>
+              <td class="td-cell">
+                <input
+                  type="text"
+                  [(ngModel)]="item.gtn"
+                  [name]="'itemGtn' + i"
+                  placeholder="Auto-generate"
+                  class="input-base"
+                />
+              </td>
+              <td class="td-cell">
+                <input
+                  type="text"
+                  [(ngModel)]="item.hsnSac"
+                  [name]="'itemHsnSac' + i"
+                  class="input-base"
+                />
+              </td>
+              <td class="td-cell">
+                <input
+                  type="number"
+                  step="0.01"
+                  [(ngModel)]="item.taxRate"
+                  [name]="'itemTaxRate' + i"
+                  class="input-base"
+                />
+              </td>
+              <td class="td-cell">
+                <input
+                  type="number"
+                  min="1"
+                  [(ngModel)]="item.qty"
+                  (ngModelChange)="onItemChanged(item)"
+                  [name]="'itemQty' + i"
+                  class="input-base"
+                />
+              </td>
+              <td class="td-cell">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  [(ngModel)]="item.unitPrice"
+                  (ngModelChange)="onItemChanged(item)"
+                  [name]="'itemPrice' + i"
+                  class="input-base"
+                />
+              </td>
+              <td class="td-cell">{{ item.lineTotal }}</td>
+              <td class="td-cell text-right">
+                <button
+                  type="button"
+                  class="btn-link-danger"
+                  appTooltip="Remove item"
+                  (click)="removeItemRow(i)"
+                >
+                  <i-lucide name="trash-2" [size]="18"></i-lucide>
+                </button>
+              </td>
+            </tr>
           }
         </tbody>
       </table>
-    </div>
-
-    <div class="flex flex-col sm:flex-row gap-2">
-      <button type="button" class="btn-outline" (click)="addItemRow()">Add Item</button>
+      <div class="bg-surface-muted px-4 py-3 border-t border-border">
+        <button
+          type="button"
+          class="text-accent hover:text-accent-hover font-medium text-sm flex items-center gap-1 transition"
+          (click)="addItemRow()"
+        >
+          <i-lucide name="plus" [size]="16"></i-lucide>
+          Add Line Item
+        </button>
+      </div>
     </div>
 
     @if (error) {
-    <p class="text-danger text-xs">{{ error }}</p>
+      <p class="text-danger text-xs">{{ error }}</p>
     }
   </form>
 </div>

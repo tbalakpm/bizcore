@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, HostListener, inject, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -11,6 +11,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { ProductFormComponent } from '../product/product-form.component';
 import { TooltipDirective } from '../shared/directives/tooltip.directive';
 import { LucideAngularModule } from 'lucide-angular';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 type EditablePurchaseInvoiceItem = {
   id?: number;
@@ -58,6 +59,7 @@ export class PurchaseInvoiceForm implements OnInit {
   private supplierService = inject(SupplierService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NgSelectComponent>;
 
   products = signal<Product[]>([]);
   suppliers = signal<Supplier[]>([]);
@@ -190,8 +192,23 @@ export class PurchaseInvoiceForm implements OnInit {
     });
   }
 
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.altKey && event.code === 'KeyN') {
+      event.preventDefault();
+      this.addItemRow();
+    }
+  }
+
   addItemRow() {
     this.editingInvoice.items.push({ qty: 1, unitPrice: 0, lineTotal: 0, taxPct: 0, taxAmount: 0, discountType: 'none', discountPct: 0, discountAmount: 0 });
+    setTimeout(() => {
+      const lastSelect = this.itemRowSelects.last;
+      if (lastSelect) {
+        lastSelect.focus();
+        lastSelect.open();
+      }
+    });
   }
 
   removeItemRow(index: number) {

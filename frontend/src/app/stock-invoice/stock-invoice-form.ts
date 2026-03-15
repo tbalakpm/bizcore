@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, HostListener, inject, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -7,6 +7,8 @@ import { type Product, ProductService } from '../product/product-service';
 import { ProductFormComponent } from '../product/product-form.component';
 import { type StockInvoiceItem, StockInvoiceService } from './stock-invoice-service';
 import { TooltipDirective } from '../shared/directives/tooltip.directive';
+import { LucideAngularModule } from 'lucide-angular';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 type EditableStockInvoiceItem = {
   id?: number;
@@ -29,7 +31,7 @@ type EditableStockInvoice = {
 
 @Component({
   selector: 'app-stock-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, ProductFormComponent, TooltipDirective],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, ProductFormComponent, TooltipDirective, LucideAngularModule],
   templateUrl: './stock-invoice-form.html',
 })
 export class StockInvoiceForm implements OnInit {
@@ -37,6 +39,7 @@ export class StockInvoiceForm implements OnInit {
   private productService = inject(ProductService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NgSelectComponent>;
 
   products = signal<Product[]>([]);
 
@@ -133,8 +136,23 @@ export class StockInvoiceForm implements OnInit {
     });
   }
 
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.altKey && event.code === 'KeyN') {
+      event.preventDefault();
+      this.addItemRow();
+    }
+  }
+
   addItemRow() {
     this.editingInvoice.items.push({ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '' });
+    setTimeout(() => {
+      const lastSelect = this.itemRowSelects.last;
+      if (lastSelect) {
+        lastSelect.focus();
+        lastSelect.open();
+      }
+    });
   }
 
   removeItemRow(index: number) {

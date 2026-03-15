@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, HostListener, inject, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { type Customer, CustomerService } from '../customer/customer-service';
 import { type SalesInvoiceItem, SalesInvoiceService, SalesInvoice } from './sales-invoice-service';
 import { type Inventory, InventoryService } from '../inventory/inventory-service';
 import { LucideAngularModule } from 'lucide-angular';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 type EditableSalesInvoiceItem = {
   id?: number;
@@ -55,6 +56,7 @@ export class SalesInvoiceForm implements OnInit {
   private inventoryService = inject(InventoryService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NgSelectComponent>;
 
   products = signal<Product[]>([]);
   customers = signal<Customer[]>([]);
@@ -287,8 +289,23 @@ export class SalesInvoiceForm implements OnInit {
     item.lineTotal = Number((afterDiscount + taxAmt).toFixed(2));
   }
 
-  addItem() {
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.altKey && event.code === 'KeyN') {
+      event.preventDefault();
+      this.addItemRow();
+    }
+  }
+
+  addItemRow() {
     this.editingInvoice.items.push({ qty: 1, unitPrice: 0, taxPct: 0, taxAmount: 0, discountAmount: 0, lineTotal: 0 });
+    setTimeout(() => {
+      const lastSelect = this.itemRowSelects.last;
+      if (lastSelect) {
+        lastSelect.focus();
+        lastSelect.open();
+      }
+    });
   }
 
   removeItem(index: number) {
