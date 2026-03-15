@@ -34,6 +34,10 @@ export class PdfDocument {
     this.y += height;
   }
 
+  syncY(): void {
+    this.y = this.doc.y;
+  }
+
   end(): void {
     this.doc.end();
   }

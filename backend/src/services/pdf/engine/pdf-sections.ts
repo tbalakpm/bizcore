@@ -267,85 +267,97 @@ export function renderTotals(
   company: CompanyInfo,
 ): void {
   const doc = pdf.raw;
-  const totalsX = pdf.pageWidth - pdf.marginRight - 150;
-  const valueX = pdf.pageWidth - pdf.marginRight - 60;
-  const colWidth = 60;
+  const RIGHT_LABEL_X = 340;
+  const RIGHT_VALUE_X = pdf.marginLeft + pdf.usableWidth;
+  const LINE_H = 15;
+
+  // Check if totals + footer fit on current page; if not, start new page
+  const estimatedHeight = 120; // approx height of totals + footer block
+  if (pdf.y + estimatedHeight > pdf.pageHeight - pdf.marginBottom) {
+    doc.addPage();
+    pdf.y = pdf.marginTop;
+  }
+
+  pdf.y += 8; // gap after table
 
   const fmt = (v: number) => v.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  doc.fontSize(9).font('Helvetica');
+  // Helper row drawer
+  const drawRow = (label: string, value: string, bold = false) => {
+    const size = bold ? 10 : 9;
+    const font = bold ? 'Helvetica-Bold' : 'Helvetica';
+    doc.fontSize(size).font(font).fillColor('#000000');
+    doc.text(label, RIGHT_LABEL_X, pdf.y, { width: 120, align: 'right' });
+    doc.text(value, RIGHT_VALUE_X - 80, pdf.y, { width: 80, align: 'right' });
+    pdf.y += LINE_H;
+  };
 
-  doc.text('Subtotal:', totalsX, pdf.y);
-  doc.text(fmt(totals.subtotal), valueX, pdf.y, { align: 'right', width: colWidth });
-  pdf.y += 15;
+  drawRow('Subtotal:', fmt(totals.subtotal));
 
   if (totals.discountAmount > 0) {
-    doc.text('Discount:', totalsX, pdf.y);
-    doc.text(`- ${fmt(totals.discountAmount)}`, valueX, pdf.y, { align: 'right', width: colWidth });
-    pdf.y += 15;
+    drawRow('Discount:', `- ${fmt(totals.discountAmount)}`);
   }
 
   const taxableAmount = totals.subtotal - totals.discountAmount;
-  doc.text('Taxable Amount:', totalsX, pdf.y);
-  doc.text(fmt(taxableAmount), valueX, pdf.y, { align: 'right', width: colWidth });
-  pdf.y += 15;
+  drawRow('Taxable Amount:', fmt(taxableAmount));
 
   // CGST / SGST split
   const isIgst = company.igstSharingRate === 100;
   if (isIgst) {
-    doc.text(`IGST (${totals.taxPct}%):`, totalsX, pdf.y);
-    doc.text(fmt(totals.taxAmount), valueX, pdf.y, { align: 'right', width: colWidth });
-    pdf.y += 15;
+    drawRow(`IGST (${totals.taxPct}%):`, fmt(totals.taxAmount));
   } else {
     const halfTax = totals.taxPct / 2;
     const halfAmt = totals.taxAmount / 2;
-    doc.text(`CGST (${halfTax}%):`, totalsX, pdf.y);
-    doc.text(fmt(halfAmt), valueX, pdf.y, { align: 'right', width: colWidth });
-    pdf.y += 15;
-    doc.text(`SGST (${halfTax}%):`, totalsX, pdf.y);
-    doc.text(fmt(halfAmt), valueX, pdf.y, { align: 'right', width: colWidth });
-    pdf.y += 15;
+    drawRow(`CGST (${halfTax}%):`, fmt(halfAmt));
+    drawRow(`SGST (${halfTax}%):`, fmt(halfAmt));
   }
 
   if (Math.abs(totals.roundOff) > 0.001) {
-    doc.text('Round Off:', totalsX, pdf.y);
-    doc.text(fmt(totals.roundOff), valueX, pdf.y, { align: 'right', width: colWidth });
-    pdf.y += 15;
+    drawRow('Round Off:', fmt(totals.roundOff));
   }
 
-  doc.moveTo(totalsX, pdf.y).lineTo(pdf.pageWidth - pdf.marginRight, pdf.y).stroke('#CCCCCC');
+  doc.moveTo(RIGHT_LABEL_X, pdf.y).lineTo(RIGHT_VALUE_X, pdf.y).lineWidth(0.5).stroke('#CCCCCC');
   pdf.y += 5;
 
-  doc.font('Helvetica-Bold').fontSize(11);
-  doc.text('NET AMOUNT:', totalsX, pdf.y);
-  doc.text(fmt(totals.netAmount), valueX, pdf.y, { align: 'right', width: colWidth });
-  pdf.y += 20;
+  drawRow('NET AMOUNT:', fmt(totals.netAmount), true);
 }
 
 // --- Section 7: Footer ---
 export function renderFooter(pdf: PdfDocument, company: CompanyInfo): void {
   const doc = pdf.raw;
-  pdf.y = pdf.pageHeight - pdf.marginBottom - 40;
+  const FOOTER_HEIGHT = 80;
 
-  doc.moveTo(pdf.marginLeft, pdf.y).lineTo(pdf.pageWidth - pdf.marginRight, pdf.y).stroke('#CCCCCC');
+  // Push footer to a fixed position near bottom if possible
+  const footerY = Math.max(
+    pdf.y + 20,
+    pdf.pageHeight - pdf.marginBottom - FOOTER_HEIGHT,
+  );
+
+  pdf.y = footerY;
+
+  doc.moveTo(pdf.marginLeft, pdf.y).lineTo(pdf.marginLeft + pdf.usableWidth, pdf.y).lineWidth(0.5).stroke('#CCCCCC');
   pdf.y += 10;
 
-  // Bank Info
-  doc.fontSize(8).font('Helvetica-Bold').text('Bank Details:', pdf.marginLeft, pdf.y);
-  doc.font('Helvetica');
-  doc.text(`Bank: ${company.bankName || ''}`, pdf.marginLeft, pdf.y + 10);
-  doc.text(`A/c: ${company.bankAccount || ''}`, pdf.marginLeft, pdf.y + 20);
-  doc.text(`IFSC: ${company.bankIfsc || ''}`, pdf.marginLeft, pdf.y + 30);
+  const startY = pdf.y;
+  const colWidth = pdf.usableWidth / 3;
 
-  // Terms
+  // Column 1: Bank Info
+  doc.fontSize(8).font('Helvetica-Bold').text('Bank Details:', pdf.marginLeft, startY);
+  doc.font('Helvetica');
+  doc.text(`Bank: ${company.bankName || ''}`, pdf.marginLeft, startY + 12);
+  doc.text(`A/c: ${company.bankAccount || ''}`, pdf.marginLeft, startY + 24);
+  doc.text(`IFSC: ${company.bankIfsc || ''}`, pdf.marginLeft, startY + 36);
+
+  // Column 2: Terms
   if (company.invoiceTerms) {
-    doc.font('Helvetica-Bold').text('Terms & Conditions:', pdf.marginLeft + 160, pdf.y);
-    doc.font('Helvetica').text(company.invoiceTerms, pdf.marginLeft + 160, pdf.y + 10, { width: 150 });
+    doc.fontSize(8).font('Helvetica-Bold').text('Terms & Conditions:', pdf.marginLeft + colWidth, startY);
+    doc.font('Helvetica').text(company.invoiceTerms, pdf.marginLeft + colWidth, startY + 12, { width: colWidth - 10 });
   }
 
-  // Signatory
-  doc.font('Helvetica-Bold').text(`For ${company.name}`, pdf.pageWidth - pdf.marginRight - 150, pdf.y, { align: 'right', width: 150 });
-  doc.text('Authorised Signatory', pdf.pageWidth - pdf.marginRight - 150, pdf.y + 50, { align: 'right', width: 150 });
+  // Column 3: Signatory
+  const signatoryX = pdf.pageWidth - pdf.marginRight - colWidth;
+  doc.fontSize(8).font('Helvetica-Bold').text(`For ${company.name}`, signatoryX, startY, { align: 'right', width: colWidth });
+  doc.text('Authorised Signatory', signatoryX, startY + 50, { align: 'right', width: colWidth });
 }
 
 // --- Section 8: Rule ---
