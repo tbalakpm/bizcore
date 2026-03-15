@@ -19,6 +19,7 @@
     "PRODUCTS": "Products",
     "USERS": "Users",
     "CUSTOMERS": "Customers",
+    "SUPPLIERS": "Suppliers",
     "LOGOUT": "Logout"
   },
   "LOGIN": {
@@ -40,7 +41,12 @@
     "EXPENSE": "Expense",
     "ASSET": "Asset",
     "LIABILITY": "Liability",
-    "TYPES": ["I:Income", "E:Expense", "A:Asset", "L:Liability"],
+    "TYPES": [
+      "I:Income",
+      "E:Expense",
+      "A:Asset",
+      "L:Liability"
+    ],
     "NO_CATEGORIES_YET": "No categories yet"
   },
   "USER": {
@@ -50,5 +56,19 @@
     "LAST_NAME": "Last Name",
     "ROLE": "Role",
     "NO_USERS_YET": "No users yet"
+  },
+  "ADDRESS": {
+    "BILLING": "Billing Address",
+    "SHIPPING": "Shipping Address",
+    "LINE1": "Address Line 1",
+    "LINE2": "Address Line 2",
+    "AREA": "Area",
+    "CITY": "City",
+    "STATE": "State",
+    "COUNTRY": "Country",
+    "PINCODE": "Pincode",
+    "MOBILE": "Mobile",
+    "EMAIL": "Email",
+    "SAME_AS_BILLING": "Shipping address is same as Billing Address"
   }
 }

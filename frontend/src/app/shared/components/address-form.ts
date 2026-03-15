@@ -4,10 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Address } from '../../customer/customer-service';
 
+import { LucideAngularModule } from 'lucide-angular';
+
 @Component({
   selector: 'app-address-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, LucideAngularModule],
   templateUrl: './address-form.html',
 })
 export class AddressForm {

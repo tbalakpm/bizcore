@@ -7,9 +7,7 @@
       <button (click)="toggleSidebar()"
         class="p-1.5 rounded hover:bg-chrome-hover text-chrome-text transition-colors focus:outline-none"
         [title]="isSidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
+        <i-lucide name="menu" class="w-5 h-5"></i-lucide>
       </button>
       <a routerLink="/" class="flex items-center justify-center align-middle gap-2 shrink-0">
         <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-chrome-hover">
@@ -26,32 +24,13 @@
         class="p-[0.35rem] border rounded text-xs bg-chrome-hover text-chrome-text border-chrome-active cursor-pointer hover:bg-chrome-active hover:text-chrome-text-bright transition-colors"
         [title]="isDarkTheme() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
         @if (isDarkTheme()) {
-        <svg class="w-[1.15rem] h-[1.15rem]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="currentColor" viewBox="0 0 24 24">
-          <path fill-rule="evenodd"
-            d="M13 3a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0V3ZM5.293 5.293a1 1 0 0 1 1.414 0l1.414 1.414a1 1 0 0 1-1.414 1.414L5.293 6.707a1 1 0 0 1 0-1.414ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm-4.95 2.05a7 7 0 1 1 9.9 9.9 7 7 0 0 1-9.9-9.9ZM19 12a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2h2Zm-1.293 4.293a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 0 1-1.414-1.414l1.414-1.414a1 1 0 0 1 1.414 0ZM12 19a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2Zm-5.293-1.293a1 1 0 0 1-1.414 0l-1.414-1.414a1 1 0 1 1 1.414-1.414l1.414 1.414a1 1 0 0 1 0 1.414ZM5 12a1 1 0 1 0 0-2H3a1 1 0 1 0 0 2h2Zm1.293-4.293a1 1 0 0 1 0-1.414l1.414-1.414a1 1 0 1 1 1.414 1.414L6.293 7.707a1 1 0 0 1-1.414 0Z"
-            clip-rule="evenodd" />
-        </svg>
+        <i-lucide name="sun" class="w-[1.15rem] h-[1.15rem]"></i-lucide>
         } @else {
-        <svg class="w-[1.15rem] h-[1.15rem]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="currentColor" viewBox="0 0 24 24">
-          <path fill-rule="evenodd"
-            d="M11.675 2.015a.998.998 0 0 0-.403.011C6.09 2.4 2 6.722 2 12c0 5.523 4.477 10 10 10 4.356 0 8.058-2.784 9.43-6.667a1 1 0 0 0-1.02-1.33c-.08.006-.105.005-.127.005h-.001l-.028-.002A5.227 5.227 0 0 0 20 14a8 8 0 0 1-8-8c0-.952.121-1.752.404-2.558a.996.996 0 0 0-.729-1.427Z"
-            clip-rule="evenodd" />
-        </svg>
+        <i-lucide name="moon" class="w-[1.15rem] h-[1.15rem]"></i-lucide>
         }
       </button>
       @if (this.auth.isLoggedIn) {
-      <svg class="w-6 h-6 text-chrome-text-bright" width="24" height="24" viewBox="0 0 256 256" fill="currentColor" id="Flat"
-        xmlns="http://www.w3.org/2000/svg">
-        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-        <g id="SVGRepo_iconCarrier">
-          <path stroke="currentColor" stroke-linejoin="round" stroke-width="2"
-            d="M224.48633,136.48438l-41.98926,42a12.0001,12.0001,0,0,1-16.97266-16.96876L187.03467,140H104a12,12,0,0,1,0-24h83.03467L165.52441,94.48438a12.0001,12.0001,0,0,1,16.97266-16.96876l41.98926,42A12.00094,12.00094,0,0,1,224.48633,136.48438ZM104,204H52V52h52a12,12,0,0,0,0-24H48A20.02229,20.02229,0,0,0,28,48V208a20.02229,20.02229,0,0,0,20,20h56a12,12,0,0,0,0-24Z">
-          </path>
-        </g>
-      </svg>
+      <i-lucide name="log-out" class="w-6 h-6 text-chrome-text-bright"></i-lucide>
       <button (click)="logout()" class="underline text-lg cursor-pointer text-chrome-text-bright hover:text-white transition-colors">
         {{ 'MENU.LOGOUT' | translate }}
       </button>
@@ -79,12 +58,7 @@
       <!-- Dashboard -->
       <a routerLink="/dashboard" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="currentColor" viewBox="0 0 24 24">
-          <path fill-rule="evenodd"
-            d="M9 15a6 6 0 1 1 12 0 6 6 0 0 1-12 0Zm3.845-1.855a2.4 2.4 0 0 1 1.2-1.226 1 1 0 0 1 1.992-.026c.426.15.809.408 1.111.749a1 1 0 1 1-1.496 1.327.682.682 0 0 0-.36-.213.997.997 0 0 1-.113-.032.4.4 0 0 0-.394.074.93.93 0 0 0 .455.254 2.914 2.914 0 0 1 1.504.9c.373.433.669 1.092.464 1.823a.996.996 0 0 1-.046.129c-.226.519-.627.94-1.132 1.192a1 1 0 0 1-1.956.093 2.68 2.68 0 0 1-1.227-.798 1 1 0 1 1 1.506-1.315.682.682 0 0 0 .363.216c.038.009.075.02.111.032a.4.4 0 0 0 .395-.074.93.93 0 0 0-.455-.254 2.91 2.91 0 0 1-1.503-.9c-.375-.433-.666-1.089-.466-1.817a.994.994 0 0 1 .047-.134Zm1.884.573.003.008c-.003-.005-.003-.008-.003-.008Zm.55 2.613s-.002-.002-.003-.007a.032.032 0 0 1 .003.007ZM4 14a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1Zm3-2a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Zm6.5-8a1 1 0 0 1 1-1H18a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-.796l-2.341 2.049a1 1 0 0 1-1.24.06l-2.894-2.066L6.614 9.29a1 1 0 1 1-1.228-1.578l4.5-3.5a1 1 0 0 1 1.195-.025l2.856 2.04L15.34 5h-.84a1 1 0 0 1-1-1Z"
-            clip-rule="evenodd" />
-        </svg>
+        <i-lucide name="layout-dashboard" class="w-6 h-6 shrink-0"></i-lucide>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
           {{ 'MENU.DASHBOARD' | translate }}
@@ -112,11 +86,7 @@
       @if (permissions.canRead('stock-invoices')) {
       <a routerLink="/stock-invoices" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M8 20V10m8 10V4M4 20h16" />
-        </svg>
+        <i-lucide name="package" class="w-6 h-6 shrink-0"></i-lucide>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Opening Stock</span></a>
       }
@@ -143,11 +113,7 @@
       @if (permissions.canRead('products')) {
       <a routerLink="/products" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linejoin="round" stroke-width="2"
-            d="M4 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5Zm16 14a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2ZM4 13a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6Zm16-2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v6Z" />
-        </svg>
+        <i-lucide name="layers" class="w-6 h-6 shrink-0"></i-lucide>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.PRODUCTS' | translate }}</span></a>
       }
@@ -182,11 +148,7 @@
       @if (permissions.canRead('categories')) {
       <a routerLink="/categories" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M5 19V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13H7a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M9 3v14m7 0v4" />
-        </svg>
+        <i-lucide name="tag" class="w-6 h-6 shrink-0"></i-lucide>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.CATEGORIES' | translate }}</span></a>
       }
@@ -195,11 +157,7 @@
       @if (permissions.canRead('users')) {
       <a routerLink="/users" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
-            d="M16 19h4a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-2m-2.236-4a3 3 0 1 0 0-4M3 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-        </svg>
+        <i-lucide name="user-round" class="w-6 h-6 shrink-0"></i-lucide>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.USERS' | translate }}</span></a>
       }
@@ -209,17 +167,10 @@
       <button (click)="switchMenu('reports')"
         class="w-full flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden justify-between gap-2 text-left transition-colors">
         <span class="flex items-center overflow-hidden gap-2">
-          <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-            height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10" />
-          </svg>
+          <i-lucide name="file-bar-chart" class="w-6 h-6 shrink-0"></i-lucide>
           <span class="truncate whitespace-nowrap transition-opacity duration-300"
             [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Reports</span>
-          <svg class="w-4 h-4 text-chrome-muted" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-          </svg>
+          <i-lucide name="chevron-right" class="w-4 h-4 text-chrome-muted"></i-lucide>
         </span>
       </button>
 
@@ -242,10 +193,7 @@
       <div class="mt-2 mb-4">
         <button (click)="switchMenu('main')"
           class="flex items-center gap-2 overflow-hidden px-4 text-sm text-chrome-muted hover:text-chrome-text-bright transition-colors cursor-pointer px-2 py-1 rounded hover:bg-chrome-hover">
-          <svg class="w-4 h-4 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-            viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-          </svg>
+          <i-lucide name="arrow-left" class="w-4 h-4 shrink-0"></i-lucide>
           <span class="truncate whitespace-nowrap transition-opacity duration-300"
             [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Back to Menu</span>
         </button>

@@ -1,10 +1,6 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
   <h1 class="page-title">
-    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-      fill="none" viewBox="0 0 24 24">
-      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
-    </svg>
+    <i-lucide name="notebook-pen" class="w-7 h-7"></i-lucide>
     {{ 'MENU.REGISTERS' | translate }}
   </h1>
 </div>
@@ -39,13 +35,9 @@
               [appTooltip]="r.isActive ? 'Deactivate' : 'Activate'"
               [ngClass]="r.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
               @if (r.isActive) {
-              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
+              <i-lucide name="check" class="w-4 h-4"></i-lucide>
               } @else {
-              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <i-lucide name="x" class="w-4 h-4"></i-lucide>
               }
             </button>
           </td>

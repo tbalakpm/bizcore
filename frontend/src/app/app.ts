@@ -4,10 +4,11 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth/auth-service';
 import { PermissionService } from './auth/permission.service';
 import { DatePipe } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, DatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, DatePipe, LucideAngularModule],
   templateUrl: './app.html',
 })
 export class App implements OnDestroy {

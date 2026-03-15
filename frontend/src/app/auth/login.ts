@@ -4,9 +4,11 @@ import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from './auth-service';
 
+import { LucideAngularModule } from 'lucide-angular';
+
 @Component({
   selector: 'app-login',
-  imports: [TranslatePipe, FormsModule, ReactiveFormsModule],
+  imports: [TranslatePipe, FormsModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './login.html',
 })
 export class Login {

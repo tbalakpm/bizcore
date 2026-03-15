@@ -7,9 +7,11 @@ import { BaseChartDirective } from 'ng2-charts';
 import { type Entry, EntryService } from '../entry/entry-service';
 import { getLocalYYYYMMDD } from '../utils/datefns';
 
+import { LucideAngularModule } from 'lucide-angular';
+
 @Component({
   selector: 'app-dashboard',
-  imports: [TranslatePipe, DecimalPipe, BaseChartDirective, DatePipe],
+  imports: [TranslatePipe, DecimalPipe, BaseChartDirective, DatePipe, LucideAngularModule],
   templateUrl: './dashboard.html',
 })
 export class Dashboard implements OnInit {

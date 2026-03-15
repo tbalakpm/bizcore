@@ -17,11 +17,17 @@ import {
   LucideIconProvider,
   Pencil, Trash2, Printer, FileCheck, FilterX, Plus, ArrowLeft,
   Check, X, Save, ScanBarcode, Eye, Copy, ToggleLeft, ToggleRight,
+  Menu, Sun, Moon, LogOut, LayoutDashboard, ReceiptText, Package,
+  Users, Truck, Layers, UserRound, FileBarChart, ChevronRight, Settings,
+  User, Wallet, Calendar, Search, Building2, Tag,
 } from 'lucide-angular';
 
 const icons = {
   Pencil, Trash2, Printer, FileCheck, FilterX, Plus, ArrowLeft,
   Check, X, Save, ScanBarcode, Eye, Copy, ToggleLeft, ToggleRight,
+  Menu, Sun, Moon, LogOut, LayoutDashboard, ReceiptText, Package,
+  Users, Truck, Layers, UserRound, FileBarChart, ChevronRight, Settings,
+  User, Wallet, Calendar, Search, Building2, Tag,
 };
 
 export const appConfig: ApplicationConfig = {
