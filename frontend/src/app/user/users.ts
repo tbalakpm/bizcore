@@ -4,24 +4,36 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type User, UserList, UserService } from './user-service';
 import { LucideAngularModule } from 'lucide-angular';
+import { AuthService } from '../auth/auth-service';
+import { PermissionService } from '../auth/permission.service';
+import { ALL_MODULES, MODULE_LABELS, type UserPermissions } from '../models/permission.model';
+import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-users',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, LucideAngularModule],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, LucideAngularModule, HasPermissionDirective],
   templateUrl: './users.html',
 })
 export class Users implements OnInit {
   private userService = inject(UserService);
+  private auth = inject(AuthService);
+  permissionService = inject(PermissionService);
 
   users = signal<User[]>([]);
 
-  editingUser: Partial<User> = {
+  allModules = ALL_MODULES;
+  moduleLabels = MODULE_LABELS;
+
+  isAdmin = this.auth.currentUserRole === 'admin';
+
+  editingUser: Partial<User> & { permissions: Record<string, string> } = {
     id: undefined,
     username: '',
     firstName: '',
     lastName: '',
     role: 'user',
     isActive: true,
+    permissions: this.defaultPermissions(),
   };
 
   loading = false;
@@ -29,6 +41,10 @@ export class Users implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+  }
+
+  defaultPermissions(): Record<string, string> {
+    return Object.fromEntries(ALL_MODULES.map((m) => [m, 'none']));
   }
 
   loadUsers() {
@@ -52,9 +68,12 @@ export class Users implements OnInit {
   }
 
   onSubmit() {
+    const payload: any = { ...this.editingUser };
+    payload.permissions = this.editingUser.permissions;
+
     const request$ = this.editingUser.id
-      ? this.userService.update(this.editingUser.id, this.editingUser)
-      : this.userService.create(this.editingUser);
+      ? this.userService.update(this.editingUser.id, payload)
+      : this.userService.create(payload);
 
     request$.subscribe({
       next: () => {
@@ -75,6 +94,7 @@ export class Users implements OnInit {
       lastName: '',
       role: 'user',
       isActive: true,
+      permissions: this.defaultPermissions(),
     };
   }
 
@@ -86,6 +106,9 @@ export class Users implements OnInit {
       this.editingUser.lastName = res.lastName;
       this.editingUser.role = res.role;
       this.editingUser.isActive = res.isActive;
+
+      const perms = typeof res.permissions === 'string' ? JSON.parse(res.permissions || '{}') : (res.permissions || {});
+      this.editingUser.permissions = { ...this.defaultPermissions(), ...perms };
     });
   }
 

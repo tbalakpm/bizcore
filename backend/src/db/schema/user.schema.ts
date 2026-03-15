@@ -11,6 +11,7 @@ export const users = sqliteTable(
     firstName: text('first_name', { length: 50 }),
     lastName: text('last_name', { length: 50 }),
     role: text('role', { length: 20 }).notNull().default('user'),
+    permissions: text('permissions').default('{}'),
     ...auditFields
   },
   (t) => [
@@ -29,5 +30,6 @@ export const userPublicSelect = {
   firstName: users.firstName,
   lastName: users.lastName,
   role: users.role,
+  permissions: users.permissions,
 };
 export type UserPublicSelect = typeof userPublicSelect;

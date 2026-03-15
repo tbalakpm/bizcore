@@ -12,7 +12,7 @@
       {{ editingInvoice.irn ? 'Back' : 'Cancel' }}
     </a>
     @if (!editingInvoice.irn) {
-    <button type="button" class="btn-accent" (click)="onSubmit()" [disabled]="submitting">
+    <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="submitting">
       {{ submitting ? 'Saving...' : 'Save Invoice' }}
     </button>
     }
@@ -112,7 +112,7 @@
             }
           </div>
         </div>
-        <button type="button" class="btn-accent text-xs"
+        <button type="button" class="btn-primary text-xs"
           (click)="createCustomerInline()" [disabled]="customerSubmitting">
           {{ customerSubmitting ? 'Saving...' : 'Save & Select Customer' }}
         </button>

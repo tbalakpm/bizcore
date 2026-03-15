@@ -19,14 +19,16 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       { path: 'dashboard', component: Dashboard },
-      { path: 'categories', component: Categories },
-      { path: 'products', component: Products },
-      { path: 'customers', component: Customers },
-      { path: 'suppliers', component: Suppliers },
+      { path: 'categories', component: Categories, data: { module: 'categories' } },
+      { path: 'products', component: Products, data: { module: 'products' } },
+      { path: 'customers', component: Customers, data: { module: 'customers' } },
+      { path: 'suppliers', component: Suppliers, data: { module: 'suppliers' } },
       {
         path: 'stock-invoices',
+        data: { module: 'stock-invoices' },
         children: [
           { path: '', component: StockInvoices },
           { path: 'new', component: StockInvoiceForm },
@@ -35,6 +37,7 @@ export const routes: Routes = [
       },
       {
         path: 'sales-invoices',
+        data: { module: 'sales-invoices' },
         children: [
           { path: '', component: SalesInvoices },
           { path: 'new', component: SalesInvoiceForm },
@@ -43,13 +46,14 @@ export const routes: Routes = [
       },
       {
         path: 'purchase-invoices',
+        data: { module: 'purchase-invoices' },
         children: [
           { path: '', component: PurchaseInvoices },
           { path: 'new', component: PurchaseInvoiceForm },
           { path: ':id/edit', component: PurchaseInvoiceForm },
         ],
       },
-      { path: 'users', component: Users },
+      { path: 'users', component: Users, data: { module: 'users' } },
       // { path: 'customers', component: Entries },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

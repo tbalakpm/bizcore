@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type Customer, type Address, CustomerList, CustomerService } from './customer-service';
 import { AddressForm } from '../shared/components/address-form';
 import { LucideAngularModule } from 'lucide-angular';
+import { PermissionService } from '../auth/permission.service';
 
 @Component({
   selector: 'app-customers',
@@ -13,6 +14,7 @@ import { LucideAngularModule } from 'lucide-angular';
 })
 export class Customers implements OnInit {
   private customerService = inject(CustomerService);
+  permissionService = inject(PermissionService);
 
   customers = signal<Customer[]>([]);
 

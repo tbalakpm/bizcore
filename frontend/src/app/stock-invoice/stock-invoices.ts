@@ -9,6 +9,7 @@ import {
   type StockInvoiceList,
   StockInvoiceService,
 } from './stock-invoice-service';
+import { PermissionService } from '../auth/permission.service';
 
 type PrintableBarcodeLabel = {
   title: string;
@@ -24,6 +25,7 @@ type PrintableBarcodeLabel = {
 export class StockInvoices implements OnInit {
   private router: Router = inject(Router);
   private stockInvoiceService = inject(StockInvoiceService);
+  permissionService = inject(PermissionService);
 
   invoices = signal<StockInvoice[]>([]);
 

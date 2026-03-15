@@ -1,7 +1,7 @@
 <div class="border border-border rounded-lg overflow-hidden mb-3">
   <!-- Header / Toggle -->
   <div
-    class="flex items-center justify-between px-3 py-2 bg-surface-muted cursor-pointer hover:bg-surface-alt transition"
+    class="flex items-center justify-between px-3 py-2 bg-surface-raised cursor-pointer hover:bg-surface-alt transition"
     (click)="isExpandable ? toggleOpen() : null">
     <h3 class="text-sm font-semibold text-text-heading">{{ title | translate }}</h3>
     @if (isExpandable) {

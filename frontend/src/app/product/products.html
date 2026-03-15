@@ -14,14 +14,16 @@
 }
 
 <div class="grid grid-cols-1 gap-4">
-  <!-- Add / Edit form via reusable component -->
-  <div class="card">
-    <h2 class="section-title">
-      {{ editingProductId ? ('EDIT' | translate) : ('ADD' | translate) }}
-      {{ 'PRODUCT.TITLE' | translate }}
-    </h2>
-    <app-product-form [productId]="editingProductId" (saved)="onFormSaved()" (cancelled)="onFormCancelled()" />
-  </div>
+  @if (permissionService.canWrite('products')) {
+    <!-- Add / Edit form via reusable component -->
+    <div class="card">
+      <h2 class="section-title">
+        {{ editingProductId ? ('EDIT' | translate) : ('ADD' | translate) }}
+        {{ 'PRODUCT.TITLE' | translate }}
+      </h2>
+      <app-product-form [productId]="editingProductId" (saved)="onFormSaved()" (cancelled)="onFormCancelled()" />
+    </div>
+  }
 
   <!-- List -->
   <div class="card">
@@ -41,7 +43,9 @@
             <th class="th-cell">Tax Rate</th>
             <th class="th-cell">GTN</th>
             <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
-            <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+            @if (permissionService.canWrite('products')) {
+              <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+            }
           </tr>
         </thead>
         <tbody>
@@ -87,16 +91,18 @@
                 }
               </button>
             </td>
-            <td class="td-cell text-center">
-              <div class="flex items-center justify-center gap-2">
-                <button (click)="editProduct(p.id)" class="btn-link-edit flex items-center gap-1" title="Edit product">
-                  <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
-                </button>
-                <button (click)="deleteProduct(p.id)" class="btn-link-danger flex items-center gap-1" title="Delete product">
-                  <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
-                </button>
-              </div>
-            </td>
+            @if (permissionService.canWrite('products')) {
+              <td class="td-cell text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button (click)="editProduct(p.id)" class="btn-link-edit flex items-center gap-1" title="Edit product">
+                    <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
+                  </button>
+                  <button (click)="deleteProduct(p.id)" class="btn-link-danger flex items-center gap-1" title="Delete product">
+                    <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
+                  </button>
+                </div>
+              </td>
+            }
           </tr>
           }
           @if (!products().length) {

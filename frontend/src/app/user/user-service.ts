@@ -4,12 +4,15 @@ import type { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { pagination } from '../models/pagination';
 
+import type { UserPermissions } from '../models/permission.model';
+
 export interface User {
   id: number;
   username: string;
   firstName?: string;
   lastName?: string;
   role: string;
+  permissions?: string | Partial<UserPermissions>;
   isActive: boolean;
 }
 

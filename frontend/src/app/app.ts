@@ -2,6 +2,7 @@ import { Component, HostListener, inject, OnDestroy, signal } from '@angular/cor
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth/auth-service';
+import { PermissionService } from './auth/permission.service';
 import { DatePipe } from '@angular/common';
 
 @Component({
@@ -11,6 +12,7 @@ import { DatePipe } from '@angular/common';
 })
 export class App implements OnDestroy {
   public auth = inject(AuthService);
+  public permissions = inject(PermissionService);
   private translate = inject(TranslateService);
   private router = inject(Router);
   private langKey = 'current_lang';

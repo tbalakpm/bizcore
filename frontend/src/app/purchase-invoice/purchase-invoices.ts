@@ -8,6 +8,7 @@ import {
   type PurchaseInvoiceList,
   PurchaseInvoiceService,
 } from './purchase-invoice-service';
+import { PermissionService } from '../auth/permission.service';
 
 @Component({
   selector: 'app-purchase-invoices',
@@ -16,6 +17,7 @@ import {
 })
 export class PurchaseInvoices implements OnInit {
   private purchaseInvoiceService = inject(PurchaseInvoiceService);
+  permissionService = inject(PermissionService);
 
   invoices = signal<PurchaseInvoice[]>([]);
   pagination = signal({ limit: 10, offset: 0, total: 0, page: 1, totalPages: 0 });

@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { PermissionService } from '../auth/permission.service';
 
 @Component({
   selector: 'app-categories',
@@ -12,6 +13,7 @@ import { LucideAngularModule } from 'lucide-angular';
 })
 export class Categories implements OnInit {
   categoryService = inject(CategoryService);
+  permissionService = inject(PermissionService);
 
   categories = signal<Category[]>([]);
   newCategory: Partial<Category> = { code: '', name: '', description: '', isActive: true };

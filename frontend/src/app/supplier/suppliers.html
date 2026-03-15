@@ -1,71 +1,117 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
   <h1 class="page-title">
-    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-      fill="none" viewBox="0 0 24 24">
-      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
+    <svg
+      class="w-7 h-7"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2.5"
+        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+      />
     </svg>
     {{ 'MENU.SUPPLIERS' | translate }}
   </h1>
 </div>
 @if (error) {
-<div class="error-banner">{{ error }}</div>
+  <div class="error-banner">{{ error }}</div>
 }
 <div class="grid grid-cols-1 gap-4">
-  <!-- Add form -->
-  <div class="card">
-    <h2 class="section-title">
-      {{ editingSupplier.id ? ('EDIT' | translate) : ('ADD' | translate) }}
-      {{ 'MENU.SUPPLIERS' | translate }}
-    </h2>
-    <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
-      <div>
-        <label class="label-base">{{ 'CODE' | translate }}</label>
-        <input type="text" [(ngModel)]="editingSupplier.code" name="newSupplierCode"
-          class="input-base" autofocus />
-      </div>
-      <div>
-        <label class="label-base">{{ 'NAME' | translate }}</label>
-        <input type="text" [(ngModel)]="editingSupplier.name" name="newSupplierName"
-          class="input-base" autofocus />
-      </div>
-      <div>
-        <label class="label-base">{{ 'GSTIN' | translate }}</label>
-        <input type="text" [(ngModel)]="editingSupplier.gstin" name="newSupplierGstin"
-          class="input-base" />
-      </div>
-      <div class="md:col-span-2 xl:col-span-4">
-        <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
-        <textarea rows="2" [(ngModel)]="editingSupplier.notes" name="newSupplierNotes"
-          class="input-base"></textarea>
-      </div>
-
-      <!-- Addresses -->
-      <div class="md:col-span-2 xl:col-span-2">
-        <app-address-form [address]="editingSupplier.billingAddress!" [title]="'ADDRESS.BILLING'" [isExpandable]="true"
-          [isOpen]="false"></app-address-form>
-      </div>
-      <div class="md:col-span-2 xl:col-span-2">
-        <div class="flex items-center gap-2 mb-2">
-          <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="sameAsBilling"
-            class="w-4 h-4 accent-primary rounded" />
-          <label for="sameAsBilling" class="text-sm font-medium text-text-muted">{{ 'ADDRESS.SAME_AS_BILLING' | translate
-            }}</label>
+  @if (permissionService.canWrite('suppliers')) {
+    <!-- Add form -->
+    <div class="card">
+      <h2 class="section-title">
+        {{ editingSupplier.id ? ('EDIT' | translate) : ('ADD' | translate) }}
+        {{ 'MENU.SUPPLIERS' | translate }}
+      </h2>
+      <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
+        <div>
+          <label class="label-base">{{ 'CODE' | translate }}</label>
+          <input
+            type="text"
+            [(ngModel)]="editingSupplier.code"
+            name="newSupplierCode"
+            class="input-base"
+            autofocus
+          />
         </div>
-        @if (!sameAsBilling) {
-        <app-address-form [address]="editingSupplier.shippingAddress!" [title]="'ADDRESS.SHIPPING'"
-          [isExpandable]="true" [isOpen]="false"></app-address-form>
-        }
-      </div>
+        <div>
+          <label class="label-base">{{ 'NAME' | translate }}</label>
+          <input
+            type="text"
+            [(ngModel)]="editingSupplier.name"
+            name="newSupplierName"
+            class="input-base"
+            autofocus
+          />
+        </div>
+        <div>
+          <label class="label-base">{{ 'GSTIN' | translate }}</label>
+          <input
+            type="text"
+            [(ngModel)]="editingSupplier.gstin"
+            name="newSupplierGstin"
+            class="input-base"
+          />
+        </div>
+        <div class="md:col-span-2 xl:col-span-4">
+          <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
+          <textarea
+            rows="2"
+            [(ngModel)]="editingSupplier.notes"
+            name="newSupplierNotes"
+            class="input-base"
+          ></textarea>
+        </div>
 
-      <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
-        <button type="submit" class="btn-primary w-full">Save</button>
-        @if (editingSupplier.id) {
-        <button type="button" class="btn-outline w-full" (click)="onCancel()">Cancel</button>
-        }
-      </div>
-    </form>
-  </div>
+        <!-- Addresses -->
+        <div class="flex items-center gap-2 mb-2 col-span-full">
+          <input
+            type="checkbox"
+            [(ngModel)]="sameAsBilling"
+            name="sameAsBilling"
+            id="sameAsBilling"
+            class="w-4 h-4 accent-primary rounded"
+          />
+          <label for="sameAsBilling" class="text-sm font-medium text-text-muted">{{
+            'ADDRESS.SAME_AS_BILLING' | translate
+          }}</label>
+        </div>
+        <div class="md:col-span-2 xl:col-span-2">
+          <app-address-form
+            [address]="editingSupplier.billingAddress!"
+            [title]="'ADDRESS.BILLING'"
+            [isExpandable]="true"
+            [isOpen]="false"
+          ></app-address-form>
+        </div>
+        <div class="md:col-span-2 xl:col-span-2">
+          @if (!sameAsBilling) {
+            <app-address-form
+              [address]="editingSupplier.shippingAddress!"
+              [title]="'ADDRESS.SHIPPING'"
+              [isExpandable]="true"
+              [isOpen]="false"
+            ></app-address-form>
+          }
+        </div>
+
+        <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
+          <button type="submit" class="btn-primary w-full">Save</button>
+          @if (editingSupplier.id) {
+            <button type="button" class="btn-outline w-full" (click)="onCancel()">Cancel</button>
+          }
+        </div>
+      </form>
+    </div>
+  }
 
   <!-- List -->
   <div class="card">
@@ -81,47 +127,86 @@
             <th class="th-cell">{{ 'NAME' | translate }}</th>
             <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
             <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
-            <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+            @if (permissionService.canWrite('suppliers')) {
+              <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+            }
           </tr>
         </thead>
         <tbody>
           @for (s of suppliers(); track s.id) {
-          <tr class="table-row" [class.table-row-selected]="editingSupplier.id == s.id">
-            <td class="td-cell">{{ s.code }}</td>
-            <td class="td-cell">{{ s.name }}</td>
-            <td class="td-cell">{{ s.notes || '-' }}</td>
-            <td class="td-cell text-center">
-              <button type="button" (click)="toggleActive(s)"
-                class="toggle-btn"
-                [title]="s.isActive ? 'Deactivate' : 'Activate'"
-                [ngClass]="s.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
-                @if (s.isActive) {
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                } @else {
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                }
-              </button>
-            </td>
-            <td class="td-cell text-center">
-              <div class="flex items-center justify-center gap-2">
-                <button (click)="editSupplier(s.id)" class="btn-link-edit flex items-center gap-1" title="Edit supplier">
-                  <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
+            <tr class="table-row" [class.table-row-selected]="editingSupplier.id == s.id">
+              <td class="td-cell">{{ s.code }}</td>
+              <td class="td-cell">{{ s.name }}</td>
+              <td class="td-cell">{{ s.notes || '-' }}</td>
+              <td class="td-cell text-center">
+                <button
+                  type="button"
+                  (click)="toggleActive(s)"
+                  class="toggle-btn"
+                  [title]="s.isActive ? 'Deactivate' : 'Activate'"
+                  [ngClass]="
+                    s.isActive
+                      ? 'border-success text-success'
+                      : 'border-border-strong text-text-muted'
+                  "
+                >
+                  @if (s.isActive) {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  } @else {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  }
                 </button>
-                <button (click)="deleteSupplier(s.id)" class="btn-link-danger flex items-center gap-1" title="Delete supplier">
-                  <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
-                </button>
-              </div>
-            </td>
-          </tr>
+              </td>
+              @if (permissionService.canWrite('suppliers')) {
+                <td class="td-cell text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <button
+                      (click)="editSupplier(s.id)"
+                      class="btn-link-edit flex items-center gap-1"
+                      title="Edit supplier"
+                    >
+                      <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
+                    </button>
+                    <button
+                      (click)="deleteSupplier(s.id)"
+                      class="btn-link-danger flex items-center gap-1"
+                      title="Delete supplier"
+                    >
+                      <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
+                    </button>
+                  </div>
+                </td>
+              }
+            </tr>
           }
           @if (!suppliers().length) {
-          <tr>
-            <td colspan="5" class="td-cell text-center text-text-muted">No suppliers yet</td>
-          </tr>
+            <tr>
+              <td colspan="5" class="td-cell text-center text-text-muted">No suppliers yet</td>
+            </tr>
           }
         </tbody>
       </table>

@@ -24,6 +24,7 @@
   <div class="error-banner">{{ error }}</div>
 }
 <div class="grid grid-cols-1 gap-4">
+  @if (permissionService.canWrite('customers')) {
   <!-- Add form -->
   <div class="card">
     <h2 class="section-title">
@@ -117,6 +118,7 @@
       </div>
     </form>
   </div>
+  }
 
   <!-- List -->
   <div class="card">
@@ -133,7 +135,9 @@
             <th class="th-cell">{{ 'TYPE' | translate }}</th>
             <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
             <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
-            <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+            @if (permissionService.canWrite('customers')) {
+              <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+            }
           </tr>
         </thead>
         <tbody>
@@ -186,24 +190,26 @@
                   }
                 </button>
               </td>
-              <td class="td-cell text-center">
-                <div class="flex items-center justify-center gap-2">
-                  <button
-                    (click)="editCustomer(c.id)"
-                    class="btn-link-edit flex items-center gap-1"
-                    title="Edit customer"
-                  >
-                    <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
-                  </button>
-                  <button
-                    (click)="deleteCustomer(c.id)"
-                    class="btn-link-danger flex items-center gap-1"
-                    title="Delete customer"
-                  >
-                    <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
-                  </button>
-                </div>
-              </td>
+              @if (permissionService.canWrite('customers')) {
+                <td class="td-cell text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <button
+                      (click)="editCustomer(c.id)"
+                      class="btn-link-edit flex items-center gap-1"
+                      title="Edit customer"
+                    >
+                      <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
+                    </button>
+                    <button
+                      (click)="deleteCustomer(c.id)"
+                      class="btn-link-danger flex items-center gap-1"
+                      title="Delete customer"
+                    >
+                      <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
+                    </button>
+                  </div>
+                </td>
+              }
             </tr>
           }
           @if (!customers().length) {

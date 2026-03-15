@@ -96,6 +96,7 @@
         [class.opacity-0]="isSidebarCollapsed()">Transactions</div>
 
       <!-- Sales -->
+      @if (permissions.canRead('sales-invoices')) {
       <a routerLink="/sales-invoices" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
         <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -105,8 +106,10 @@
         </svg>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Sales</span></a>
+      }
 
       <!-- Opening Stock -->
+      @if (permissions.canRead('stock-invoices')) {
       <a routerLink="/stock-invoices" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
         <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -116,8 +119,10 @@
         </svg>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Opening Stock</span></a>
+      }
 
       <!-- Purchase Invoices -->
+      @if (permissions.canRead('purchase-invoices')) {
       <a routerLink="/purchase-invoices" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
         <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -127,6 +132,7 @@
         </svg>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Purchase</span></a>
+      }
 
       <hr class="border-chrome-border my-2" />
       <div
@@ -134,6 +140,7 @@
         [class.opacity-0]="isSidebarCollapsed()">Masters</div>
 
       <!-- Products -->
+      @if (permissions.canRead('products')) {
       <a routerLink="/products" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
         <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -143,8 +150,10 @@
         </svg>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.PRODUCTS' | translate }}</span></a>
+      }
 
       <!-- Customers -->
+      @if (permissions.canRead('customers')) {
       <a routerLink="/customers" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
         <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -154,8 +163,10 @@
         </svg>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.CUSTOMERS' | translate }}</span></a>
+      }
 
       <!-- Suppliers -->
+      @if (permissions.canRead('suppliers')) {
       <a routerLink="/suppliers" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
         <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -165,8 +176,10 @@
         </svg>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.SUPPLIERS' | translate }}</span></a>
+      }
 
       <!-- Categories -->
+      @if (permissions.canRead('categories')) {
       <a routerLink="/categories" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
         <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -176,8 +189,10 @@
         </svg>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.CATEGORIES' | translate }}</span></a>
+      }
 
       <!-- Users -->
+      @if (permissions.canRead('users')) {
       <a routerLink="/users" routerLinkActive="bg-chrome-hover font-semibold"
         class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
         <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -187,6 +202,7 @@
         </svg>
         <span class="truncate whitespace-nowrap transition-opacity duration-300"
           [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.USERS' | translate }}</span></a>
+      }
 
       <hr class="border-chrome-border my-2" />
       <!-- Reports -->

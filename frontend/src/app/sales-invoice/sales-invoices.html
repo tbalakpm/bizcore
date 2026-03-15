@@ -19,7 +19,9 @@
     </svg>
     Sales Invoices
   </h1>
-  <a routerLink="/sales-invoices/new" class="btn-accent">New Sales Invoice</a>
+  @if (permissionService.canWrite('sales-invoices')) {
+    <a routerLink="/sales-invoices/new" class="btn-primary">New Sales Invoice</a>
+  }
 </div>
 
 <div class="card">
@@ -65,7 +67,12 @@
         class="input-base w-32"
       />
 
-      <button type="button" class="btn-outline flex items-center gap-1" title="Clear all filters" (click)="onClearFilters()">
+      <button
+        type="button"
+        class="btn-outline flex items-center gap-1"
+        title="Clear all filters"
+        (click)="onClearFilters()"
+      >
         <i-lucide name="filter-x" [size]="14"></i-lucide> Clear
       </button>
     </div>
@@ -124,18 +131,37 @@
             </td>
             <td class="td-cell text-center">
               <div class="flex items-center justify-center gap-2">
-                @if (!invoice.irn) {
-                <button type="button" class="btn-link-warning flex items-center gap-1" title="Generate IRN" (click)="generateIrn(invoice.id)">
-                  <i-lucide name="file-check" [size]="14"></i-lucide> Gen IRN
-                </button>
-                <a [routerLink]="['/sales-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1" title="Edit invoice">
-                  <i-lucide name="pencil" [size]="14"></i-lucide> Edit
-                </a>
-                <button type="button" class="btn-link-danger flex items-center gap-1" title="Delete invoice" (click)="deleteInvoice(invoice.id)">
-                  <i-lucide name="trash-2" [size]="14"></i-lucide> Delete
-                </button>
+                @if (!invoice.irn && permissionService.canWrite('sales-invoices')) {
+                  <button
+                    type="button"
+                    class="btn-link-warning flex items-center gap-1"
+                    title="Generate IRN"
+                    (click)="generateIrn(invoice.id)"
+                  >
+                    <i-lucide name="file-check" [size]="14"></i-lucide> Gen IRN
+                  </button>
+                  <a
+                    [routerLink]="['/sales-invoices', invoice.id, 'edit']"
+                    class="btn-link-edit flex items-center gap-1"
+                    title="Edit invoice"
+                  >
+                    <i-lucide name="pencil" [size]="14"></i-lucide> Edit
+                  </a>
+                  <button
+                    type="button"
+                    class="btn-link-danger flex items-center gap-1"
+                    title="Delete invoice"
+                    (click)="deleteInvoice(invoice.id)"
+                  >
+                    <i-lucide name="trash-2" [size]="14"></i-lucide> Delete
+                  </button>
                 }
-                <button type="button" class="btn-link-edit flex items-center gap-1" title="Print invoice" (click)="printInvoice(invoice.id)">
+                <button
+                  type="button"
+                  class="btn-link-edit flex items-center gap-1"
+                  title="Print invoice"
+                  (click)="printInvoice(invoice.id)"
+                >
                   <i-lucide name="printer" [size]="14"></i-lucide> Print
                 </button>
               </div>
@@ -157,16 +183,37 @@
   <div class="mt-3 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
     <div class="flex items-center gap-2">
       <span class="text-sm text-text-muted">Rows</span>
-      <select [(ngModel)]="pageLimit" (change)="onPageLimitChange()" name="pageLimit" class="select-base w-auto">
+      <select
+        [(ngModel)]="pageLimit"
+        (change)="onPageLimitChange()"
+        name="pageLimit"
+        class="select-base w-auto"
+      >
         <option [ngValue]="10">10</option>
         <option [ngValue]="25">25</option>
         <option [ngValue]="50">50</option>
       </select>
     </div>
     <div class="flex items-center gap-2 text-sm">
-      <button type="button" class="pagination-btn" [disabled]="pagination().page <= 1" (click)="onPageChange(pagination().page - 1)">Prev</button>
-      <span class="text-text-muted">Page {{ pagination().page }} of {{ pagination().totalPages || 1 }}</span>
-      <button type="button" class="pagination-btn" [disabled]="pagination().page >= pagination().totalPages" (click)="onPageChange(pagination().page + 1)">Next</button>
+      <button
+        type="button"
+        class="pagination-btn"
+        [disabled]="pagination().page <= 1"
+        (click)="onPageChange(pagination().page - 1)"
+      >
+        Prev
+      </button>
+      <span class="text-text-muted"
+        >Page {{ pagination().page }} of {{ pagination().totalPages || 1 }}</span
+      >
+      <button
+        type="button"
+        class="pagination-btn"
+        [disabled]="pagination().page >= pagination().totalPages"
+        (click)="onPageChange(pagination().page + 1)"
+      >
+        Next
+      </button>
     </div>
   </div>
 </div>

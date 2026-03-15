@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type Product, ProductList, ProductService } from './product-service';
 import { ProductFormComponent } from './product-form.component';
 import { LucideAngularModule } from 'lucide-angular';
+import { PermissionService } from '../auth/permission.service';
 
 @Component({
   selector: 'app-products',
@@ -12,6 +13,7 @@ import { LucideAngularModule } from 'lucide-angular';
 })
 export class Products implements OnInit {
   private productService = inject(ProductService);
+  permissionService = inject(PermissionService);
 
   products = signal<Product[]>([]);
 

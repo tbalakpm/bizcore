@@ -8,6 +8,7 @@ import { pagination } from '../models/pagination';
 import { Customer, CustomerService } from '../customer/customer-service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { LucideAngularModule } from 'lucide-angular';
+import { PermissionService } from '../auth/permission.service';
 
 @Component({
   selector: 'app-sales-invoices',
@@ -19,6 +20,7 @@ export class SalesInvoices implements OnInit {
   private customerService = inject(CustomerService);
   private router: Router = inject(Router);
   private fb: FormBuilder = inject(FormBuilder);
+  permissionService = inject(PermissionService);
 
   invoices = signal<SalesInvoice[]>([]);
   customers = signal<Customer[]>([]);

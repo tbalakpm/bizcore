@@ -15,6 +15,13 @@
       "when": 1773551468270,
       "tag": "0001_purchase",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1773557351304,
+      "tag": "0002_elite_scorpion",
+      "breakpoints": true
     }
   ]
 }

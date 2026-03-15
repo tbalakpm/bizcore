@@ -298,16 +298,20 @@ export class PurchaseInvoiceForm implements OnInit {
   }
 
   // --- Inline Product Logic ---
-  toggleNewProductForm(index: number) {
-    this.selectedRowIndex = index;
+  toggleNewProductForm() {
     this.showNewProductForm = !this.showNewProductForm;
+    this.productError = null;
   }
 
   onProductSaved(product: Product) {
-    this.loadProducts();
+    // Add to local product list so ng-select shows it immediately
+    this.products.set([product, ...this.products()]);
+
     const item = this.editingInvoice.items[this.selectedRowIndex];
-    item.productId = product.id;
-    this.onProductSelect(item);
+    if (item) {
+      item.productId = product.id;
+      this.onProductSelect(item);
+    }
     this.showNewProductForm = false;
   }
 

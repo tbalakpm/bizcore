@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type Supplier, type Address, SupplierList, SupplierService } from './supplier-service';
 import { AddressForm } from '../shared/components/address-form';
 import { LucideAngularModule } from 'lucide-angular';
+import { PermissionService } from '../auth/permission.service';
 
 @Component({
   selector: 'app-suppliers',
@@ -13,6 +14,7 @@ import { LucideAngularModule } from 'lucide-angular';
 })
 export class Suppliers implements OnInit {
   private supplierService = inject(SupplierService);
+  permissionService = inject(PermissionService);
 
   suppliers = signal<Supplier[]>([]);
 

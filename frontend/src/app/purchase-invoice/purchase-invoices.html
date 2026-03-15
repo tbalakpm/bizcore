@@ -7,7 +7,9 @@
     </svg>
     Purchase Invoices
   </h1>
-  <a routerLink="/purchase-invoices/new" class="btn-accent">New Purchase Invoice</a>
+  @if (permissionService.canWrite('purchase-invoices')) {
+    <a routerLink="/purchase-invoices/new" class="btn-primary">New Purchase Invoice</a>
+  }
 </div>
 
 <div class="card">
@@ -59,12 +61,14 @@
           <td class="td-cell text-right font-medium text-success">{{ invoice.netAmount | currency:'INR'}}</td>
           <td class="td-cell text-center">
             <div class="flex items-center justify-center gap-2">
-              <a [routerLink]="['/purchase-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1" title="Edit purchase invoice">
-                <i-lucide name="pencil" [size]="14"></i-lucide> Edit
-              </a>
-              <button type="button" class="btn-link-danger flex items-center gap-1" title="Delete purchase invoice" (click)="deleteInvoice(invoice.id)">
-                <i-lucide name="trash-2" [size]="14"></i-lucide> Delete
-              </button>
+              @if (permissionService.canWrite('purchase-invoices')) {
+                <a [routerLink]="['/purchase-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1" title="Edit purchase invoice">
+                  <i-lucide name="pencil" [size]="14"></i-lucide> Edit
+                </a>
+                <button type="button" class="btn-link-danger flex items-center gap-1" title="Delete purchase invoice" (click)="deleteInvoice(invoice.id)">
+                  <i-lucide name="trash-2" [size]="14"></i-lucide> Delete
+                </button>
+              }
             </div>
           </td>
         </tr>

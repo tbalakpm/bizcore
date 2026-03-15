@@ -40,6 +40,7 @@ authRouter.post('/login', rateLimit({ windowMs: 60 * 1000, max: 10 }), async (re
       username: users.username,
       passwordHash: users.passwordHash,
       role: users.role,
+      permissions: users.permissions,
     })
     .from(users)
     .where(eq(users.username, username))
@@ -50,9 +51,16 @@ authRouter.post('/login', rateLimit({ windowMs: 60 * 1000, max: 10 }), async (re
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) return res.status(401).json({ error: req.i18n?.t('auth.invalid') });
 
-  const token = jwt.sign({ sub: user.id, username: user.username, role: user.role }, config.jwtSecret, {
-    expiresIn: '7d',
-  });
+  const token = jwt.sign(
+    {
+      sub: user.id,
+      username: user.username,
+      role: user.role,
+      permissions: JSON.parse(user.permissions || '{}'),
+    },
+    config.jwtSecret,
+    { expiresIn: '7d' },
+  );
 
   return res.json({ token });
 });

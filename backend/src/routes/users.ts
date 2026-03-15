@@ -14,6 +14,7 @@ const userPublicSelect = {
   firstName: users.firstName,
   lastName: users.lastName,
   role: users.role,
+  permissions: users.permissions,
   isActive: users.isActive,
   createdAt: users.createdAt,
   updatedAt: users.updatedAt,
@@ -134,7 +135,7 @@ usersRouter.get('/:id', async (req, res) => {
 });
 
 usersRouter.post('/', async (req, res) => {
-  const { username, password, firstName, lastName, role, isActive } = req.body;
+  const { username, password, firstName, lastName, role, isActive, permissions } = req.body;
   const pwd: string = password;
 
   if (!username) return res.status(400).json({ error: 'Name is required' });
@@ -153,6 +154,7 @@ usersRouter.post('/', async (req, res) => {
         lastName,
         role: role || 'user',
         isActive: isActive !== false,
+        permissions: permissions ? JSON.stringify(permissions) : '{}',
       })
       .returning(userPublicSelect)
       .get();
@@ -165,7 +167,7 @@ usersRouter.post('/', async (req, res) => {
 
 usersRouter.put('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { username, firstName, lastName, role, isActive } = req.body;
+  const { username, firstName, lastName, role, isActive, permissions } = req.body;
 
   const user = await db.select(userPublicSelect).from(users).where(eq(users.id, id)).get();
   if (!user) return res.status(404).json({ error: req.i18n?.t('user.notFound') });
@@ -175,6 +177,7 @@ usersRouter.put('/:id', async (req, res) => {
   if (lastName) user.lastName = lastName;
   if (role) user.role = role;
   if (typeof isActive === 'boolean') user.isActive = isActive;
+  if (permissions) user.permissions = JSON.stringify(permissions);
 
   await db
     .update(users)
@@ -184,6 +187,7 @@ usersRouter.put('/:id', async (req, res) => {
       lastName: user.lastName,
       role: user.role,
       isActive: user.isActive,
+      permissions: user.permissions,
     })
     .where(eq(users.id, id))
     .run();

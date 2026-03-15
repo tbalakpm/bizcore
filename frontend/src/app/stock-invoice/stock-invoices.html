@@ -7,7 +7,9 @@
     </svg>
     Opening Stock
   </h1>
-  <a routerLink="/stock-invoices/new" class="btn-accent">New Opening Stock</a>
+  @if (permissionService.canWrite('stock-invoices')) {
+    <a routerLink="/stock-invoices/new" class="btn-primary">New Opening Stock</a>
+  }
 </div>
 
 <div class="card">
@@ -63,17 +65,21 @@
           <td class="td-cell text-right font-medium text-success">{{ invoice.totalAmount | currency:'INR'}}</td>
           <td class="td-cell text-center">
             <div class="flex items-center justify-center gap-2">
-              <a [routerLink]="['/stock-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1" title="Edit stock invoice">
-                <i-lucide name="pencil" [size]="14"></i-lucide> Edit
-              </a>
+              @if (permissionService.canWrite('stock-invoices')) {
+                <a [routerLink]="['/stock-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1" title="Edit stock invoice">
+                  <i-lucide name="pencil" [size]="14"></i-lucide> Edit
+                </a>
+              }
               <button type="button" class="btn-link-edit flex items-center gap-1" title="Print barcodes"
                 [disabled]="printingInvoiceId === invoice.id" (click)="printBarcodes(invoice.id)">
                 <i-lucide name="scan-barcode" [size]="14"></i-lucide>
                 {{ printingInvoiceId === invoice.id ? 'Printing...' : 'Print Barcode' }}
               </button>
-              <button type="button" class="btn-link-danger flex items-center gap-1" title="Delete stock invoice" (click)="deleteInvoice(invoice.id)">
-                <i-lucide name="trash-2" [size]="14"></i-lucide> Delete
-              </button>
+              @if (permissionService.canWrite('stock-invoices')) {
+                <button type="button" class="btn-link-danger flex items-center gap-1" title="Delete stock invoice" (click)="deleteInvoice(invoice.id)">
+                  <i-lucide name="trash-2" [size]="14"></i-lucide> Delete
+                </button>
+              }
             </div>
           </td>
         </tr>
