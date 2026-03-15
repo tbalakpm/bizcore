@@ -194,7 +194,7 @@ export class PurchaseInvoiceForm implements OnInit {
 
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {
-    if (event.altKey && event.code === 'KeyN') {
+    if (event.ctrlKey && event.code === 'KeyN') {
       event.preventDefault();
       this.addItemRow();
     }

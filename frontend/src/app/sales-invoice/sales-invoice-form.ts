@@ -28,7 +28,7 @@ type EditableSalesInvoiceItem = {
   taxPct?: number;
   taxAmount?: number;
   lineTotal: number;
-  
+
   // Track original state for stock validation
   originalQty?: number;
   originalInventoryId?: number;
@@ -300,7 +300,7 @@ export class SalesInvoiceForm implements OnInit {
 
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {
-    if (event.altKey && event.code === 'KeyN') {
+    if (event.ctrlKey && event.code === 'KeyN') {
       event.preventDefault();
       this.addItemRow();
     }
@@ -401,7 +401,7 @@ export class SalesInvoiceForm implements OnInit {
       const unitsInStock = item.unitsInStock ?? inv?.unitsInStock ?? 0;
       const originalQty = item.originalQty || 0;
       const isSameItem = item.inventoryId === item.originalInventoryId;
-      
+
       const effectiveAvailableStock = unitsInStock + (isSameItem ? originalQty : 0);
 
       if (Number(item.qty) > effectiveAvailableStock) {
