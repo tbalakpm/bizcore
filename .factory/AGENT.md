@@ -1,6 +1,6 @@
-# WARP.md
+# Agent.md
 
-This file provides guidance to WARP (warp.dev) when working with code in this repository.
+This file provides guidance to Agent (Agent.dev) when working with code in this repository.
 
 ## Project Overview
 
