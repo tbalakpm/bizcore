@@ -165,34 +165,32 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+            <div class="flex items-center col-span-2 gap-2 mb-1">
+              <input
+                type="checkbox"
+                [(ngModel)]="sameAsBilling"
+                name="sameAsBilling"
+                id="invoiceSameAsBilling"
+                class="w-3.5 h-3.5 accent-accent rounded"
+              />
+              <label for="invoiceSameAsBilling" class="text-xs font-medium text-text-muted">{{
+                'ADDRESS.SAME_AS_BILLING' | translate
+              }}</label>
+            </div>
             <app-address-form
               [address]="newCustomer.billingAddress!"
               [title]="'ADDRESS.BILLING'"
               [isExpandable]="true"
               [isOpen]="false"
             ></app-address-form>
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="sameAsBilling"
-                  name="sameAsBilling"
-                  id="invoiceSameAsBilling"
-                  class="w-3.5 h-3.5 accent-accent rounded"
-                />
-                <label for="invoiceSameAsBilling" class="text-xs font-medium text-text-muted">{{
-                  'ADDRESS.SAME_AS_BILLING' | translate
-                }}</label>
-              </div>
-              @if (!sameAsBilling) {
-                <app-address-form
-                  [address]="newCustomer.shippingAddress!"
-                  [title]="'ADDRESS.SHIPPING'"
-                  [isExpandable]="true"
-                  [isOpen]="false"
-                ></app-address-form>
-              }
-            </div>
+            @if (!sameAsBilling) {
+              <app-address-form
+                [address]="newCustomer.shippingAddress!"
+                [title]="'ADDRESS.SHIPPING'"
+                [isExpandable]="true"
+                [isOpen]="false"
+              ></app-address-form>
+            }
           </div>
           <button
             type="button"
@@ -310,7 +308,7 @@
                   [typeahead]="inventoryInput$"
                   (scrollToEnd)="onInventoryScrollToEnd()"
                   [loading]="inventoryLoading"
-                  [attr.name]="'itemInventory' + i"
+                  [name]="'itemInventory' + i"
                   bindDisabled="disabled"
                   [searchable]="true"
                   [clearable]="true"

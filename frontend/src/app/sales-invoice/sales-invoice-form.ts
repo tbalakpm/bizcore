@@ -51,7 +51,7 @@ type EditableSalesInvoice = {
 
 @Component({
   selector: 'app-sales-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, NgSelectComponent, AddressForm, TranslatePipe, TooltipDirective, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, TranslatePipe, TooltipDirective, LucideAngularModule],
   templateUrl: './sales-invoice-form.html',
 })
 export class SalesInvoiceForm implements OnInit {

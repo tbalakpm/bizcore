@@ -461,6 +461,7 @@ body {
    NG-SELECT — Themed to match design system
    ============================================================ */
 .ng-select .ng-select-container {
+  min-height: 34px !important;
   border-radius: var(--radius-md) !important;
   border-color: var(--color-border-strong) !important;
   background-color: var(--color-surface) !important;
@@ -481,7 +482,7 @@ body {
   border-radius: var(--radius-md) !important;
   background-color: var(--color-surface) !important;
   color: var(--color-text) !important;
-  z-index: 1050 !important;
+  z-index: 9999 !important;
 }
 
 .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {

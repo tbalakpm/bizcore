@@ -30,23 +30,18 @@ inventoriesRouter.get('/', async (req: Request, res: Response) => {
       .innerJoin(products, eq(products.id, inventories.productId))
       .$dynamic();
 
+    const filters: any[] = [];
+    if (req.query.inStock === 'true') {
+      filters.push(gt(inventories.unitsInStock, 0));
+    }
     if (q) {
       const searchPattern = `%${q}%`;
-      totalCountQuery = totalCountQuery.where(
-        and(
-          gt(inventories.unitsInStock, 0),
-          sql`${inventories.gtn} LIKE ${searchPattern} OR ${products.name} LIKE ${searchPattern}`
-        )
-      );
-      dataQuery = dataQuery.where(
-        and(
-          gt(inventories.unitsInStock, 0),
-          sql`${inventories.gtn} LIKE ${searchPattern} OR ${products.name} LIKE ${searchPattern}`
-        )
-      );
-    } else {
-      totalCountQuery = totalCountQuery.where(gt(inventories.unitsInStock, 0));
-      dataQuery = dataQuery.where(gt(inventories.unitsInStock, 0));
+      filters.push(sql`(${inventories.gtn} LIKE ${searchPattern} OR ${products.name} LIKE ${searchPattern})`);
+    }
+
+    if (filters.length > 0) {
+      totalCountQuery = totalCountQuery.where(and(...filters));
+      dataQuery = dataQuery.where(and(...filters));
     }
 
     const [totalRes] = await totalCountQuery.execute();

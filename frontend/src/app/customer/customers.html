@@ -5,68 +5,101 @@
   </h1>
 </div>
 @if (error) {
-<div class="error-banner">{{ error }}</div>
+  <div class="error-banner">{{ error }}</div>
 }
 <div class="grid grid-cols-1 gap-4">
   @if (permissionService.canWrite('customers')) {
-  <!-- Add form -->
-  <div class="card">
-    <h2 class="section-title">
-      {{ editingCustomer.id ? ('EDIT' | translate) : ('ADD' | translate) }}
-      {{ 'MENU.CUSTOMERS' | translate }}
-    </h2>
-    <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
-      <div>
-        <label class="label-base">{{ 'CODE' | translate }}</label>
-        <input type="text" [(ngModel)]="editingCustomer.code" name="newCustomerCode" class="input-base" autofocus />
-      </div>
-      <div>
-        <label class="label-base">{{ 'NAME' | translate }}</label>
-        <input type="text" [(ngModel)]="editingCustomer.name" name="newCustomerName" class="input-base" autofocus />
-      </div>
-      <div>
-        <label class="label-base">{{ 'TYPE' | translate }}</label>
-        <select [(ngModel)]="editingCustomer.type" name="newCustomerType" class="select-base">
-          <option [ngValue]="'retail'">Retail</option>
-          <option [ngValue]="'wholesale'">Wholesale</option>
-        </select>
-      </div>
-      <div>
-        <label class="label-base">{{ 'GSTIN' | translate }}</label>
-        <input type="text" [(ngModel)]="editingCustomer.gstin" name="newCustomerGstin" class="input-base" />
-      </div>
-      <div class="md:col-span-2 xl:col-span-4">
-        <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
-        <textarea rows="2" [(ngModel)]="editingCustomer.notes" name="newCustomerNotes" class="input-base"></textarea>
-      </div>
-
-      <!-- Addresses -->
-      <div class="md:col-span-2 xl:col-span-2">
-        <app-address-form [address]="editingCustomer.billingAddress!" [title]="'ADDRESS.BILLING'" [isExpandable]="true"
-          [isOpen]="false"></app-address-form>
-      </div>
-      <div class="md:col-span-2 xl:col-span-2">
-        <div class="flex items-center gap-2 mb-2">
-          <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="sameAsBilling"
-            class="w-4 h-4 accent-primary rounded" />
-          <label for="sameAsBilling" class="text-sm font-medium text-text-muted">{{
-            'ADDRESS.SAME_AS_BILLING' | translate
-            }}</label>
+    <!-- Add form -->
+    <div class="card">
+      <h2 class="section-title">
+        {{ editingCustomer.id ? ('EDIT' | translate) : ('ADD' | translate) }}
+        {{ 'MENU.CUSTOMERS' | translate }}
+      </h2>
+      <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
+        <div>
+          <label class="label-base">{{ 'CODE' | translate }}</label>
+          <input
+            type="text"
+            [(ngModel)]="editingCustomer.code"
+            name="newCustomerCode"
+            class="input-base"
+            autofocus
+          />
         </div>
-        @if (!sameAsBilling) {
-        <app-address-form [address]="editingCustomer.shippingAddress!" [title]="'ADDRESS.SHIPPING'"
-          [isExpandable]="true" [isOpen]="false"></app-address-form>
-        }
-      </div>
+        <div>
+          <label class="label-base">{{ 'NAME' | translate }}</label>
+          <input
+            type="text"
+            [(ngModel)]="editingCustomer.name"
+            name="newCustomerName"
+            class="input-base"
+            autofocus
+          />
+        </div>
+        <div>
+          <label class="label-base">{{ 'TYPE' | translate }}</label>
+          <select [(ngModel)]="editingCustomer.type" name="newCustomerType" class="select-base">
+            <option [ngValue]="'retail'">Retail</option>
+            <option [ngValue]="'wholesale'">Wholesale</option>
+          </select>
+        </div>
+        <div>
+          <label class="label-base">{{ 'GSTIN' | translate }}</label>
+          <input
+            type="text"
+            [(ngModel)]="editingCustomer.gstin"
+            name="newCustomerGstin"
+            class="input-base"
+          />
+        </div>
+        <div class="md:col-span-2 xl:col-span-4">
+          <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
+          <textarea
+            rows="2"
+            [(ngModel)]="editingCustomer.notes"
+            name="newCustomerNotes"
+            class="input-base"
+          ></textarea>
+        </div>
 
-      <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
-        <button type="submit" class="btn-primary w-full">Save</button>
-        @if (editingCustomer.id) {
-        <button type="button" class="btn-outline w-full" (click)="onCancel()">Cancel</button>
-        }
-      </div>
-    </form>
-  </div>
+        <!-- Addresses -->
+        <div class="col-span-full grid grid-cols-2">
+          <div class="flex items-center col-span-2 gap-2 mb-4">
+            <input
+              type="checkbox"
+              [(ngModel)]="sameAsBilling"
+              name="sameAsBilling"
+              id="sameAsBilling"
+              class="w-4 h-4 accent-primary rounded"
+            />
+            <label for="sameAsBilling" class="text-sm font-medium text-text-muted">{{
+              'ADDRESS.SAME_AS_BILLING' | translate
+            }}</label>
+          </div>
+          <app-address-form
+            [address]="editingCustomer.billingAddress!"
+            [title]="'ADDRESS.BILLING'"
+            [isExpandable]="true"
+            [isOpen]="false"
+          ></app-address-form>
+          @if (!sameAsBilling) {
+            <app-address-form
+              [address]="editingCustomer.shippingAddress!"
+              [title]="'ADDRESS.SHIPPING'"
+              [isExpandable]="true"
+              [isOpen]="false"
+            ></app-address-form>
+          }
+        </div>
+
+        <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
+          <button type="submit" class="btn-primary w-full">Save</button>
+          @if (editingCustomer.id) {
+            <button type="button" class="btn-outline w-full" (click)="onCancel()">Cancel</button>
+          }
+        </div>
+      </form>
+    </div>
   }
 
   <!-- List -->
@@ -85,52 +118,62 @@
             <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
             <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
             @if (permissionService.canWrite('customers')) {
-            <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+              <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
             }
           </tr>
         </thead>
         <tbody>
           @for (c of customers(); track c.id) {
-          <tr class="table-row" [class.table-row-selected]="editingCustomer.id == c.id">
-            <td class="td-cell">{{ c.code }}</td>
-            <td class="td-cell">{{ c.name }}</td>
-            <td class="td-cell">{{ c.type }}</td>
-            <td class="td-cell">{{ c.notes || '-' }}</td>
-            <td class="td-cell text-center">
-              <button type="button" (click)="toggleActive(c)"
-                class="w-6 h-6 rounded-full border flex items-center justify-center"
-                [appTooltip]="c.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
+            <tr class="table-row" [class.table-row-selected]="editingCustomer.id == c.id">
+              <td class="td-cell">{{ c.code }}</td>
+              <td class="td-cell">{{ c.name }}</td>
+              <td class="td-cell">{{ c.type }}</td>
+              <td class="td-cell">{{ c.notes || '-' }}</td>
+              <td class="td-cell text-center">
+                <button
+                  type="button"
+                  (click)="toggleActive(c)"
+                  class="w-6 h-6 rounded-full border flex items-center justify-center"
+                  [appTooltip]="c.isActive ? 'Deactivate' : 'Activate'"
+                  [ngClass]="
                     c.isActive
                       ? 'border-success text-success'
                       : 'border-border-strong text-text-muted'
-                  ">
-                @if (c.isActive) {
-                <i-lucide name="check" [size]="14"></i-lucide>
-                } @else {
-                <i-lucide name="x" [size]="14"></i-lucide>
-                }
-              </button>
-            </td>
-            @if (permissionService.canWrite('customers')) {
-            <td class="td-cell text-center">
-              <div class="flex items-center justify-center gap-2">
-                <button (click)="editCustomer(c.id)" class="btn-link-edit flex items-center gap-1"
-                  appTooltip="Edit customer">
-                  <i-lucide name="pencil" [size]="18"></i-lucide>
+                  "
+                >
+                  @if (c.isActive) {
+                    <i-lucide name="check" [size]="14"></i-lucide>
+                  } @else {
+                    <i-lucide name="x" [size]="14"></i-lucide>
+                  }
                 </button>
-                <button (click)="deleteCustomer(c.id)" class="btn-link-danger flex items-center gap-1"
-                  appTooltip="Delete customer">
-                  <i-lucide name="trash-2" [size]="18"></i-lucide>
-                </button>
-              </div>
-            </td>
-            }
-          </tr>
+              </td>
+              @if (permissionService.canWrite('customers')) {
+                <td class="td-cell text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <button
+                      (click)="editCustomer(c.id)"
+                      class="btn-link-edit flex items-center gap-1"
+                      appTooltip="Edit customer"
+                    >
+                      <i-lucide name="pencil" [size]="18"></i-lucide>
+                    </button>
+                    <button
+                      (click)="deleteCustomer(c.id)"
+                      class="btn-link-danger flex items-center gap-1"
+                      appTooltip="Delete customer"
+                    >
+                      <i-lucide name="trash-2" [size]="18"></i-lucide>
+                    </button>
+                  </div>
+                </td>
+              }
+            </tr>
           }
           @if (!customers().length) {
-          <tr>
-            <td colspan="6" class="td-cell text-center text-text-muted">No customers yet</td>
-          </tr>
+            <tr>
+              <td colspan="6" class="td-cell text-center text-text-muted">No customers yet</td>
+            </tr>
           }
         </tbody>
       </table>

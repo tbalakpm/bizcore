@@ -31,7 +31,7 @@ type EditableStockInvoice = {
 
 @Component({
   selector: 'app-stock-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, NgSelectComponent, ProductFormComponent, TooltipDirective, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, ProductFormComponent, TooltipDirective, LucideAngularModule],
   templateUrl: './stock-invoice-form.html',
 })
 export class StockInvoiceForm implements OnInit {

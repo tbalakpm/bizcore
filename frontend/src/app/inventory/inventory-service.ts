@@ -33,6 +33,8 @@ export class InventoryService {
     if (q) {
       params = params.set('q', q);
     }
+    
+    params = params.set('inStock', 'true');
 
     return this.http.get<InventoryList>(`${environment.apiUrl}/inventories`, { params });
   }
