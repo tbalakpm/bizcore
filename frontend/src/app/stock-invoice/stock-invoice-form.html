@@ -104,6 +104,7 @@
                   bindLabel="name"
                   bindValue="id"
                   [(ngModel)]="item.productId"
+                  appendTo="body"
                   (change)="onProductSelect(item)"
                   (focus)="selectedRowIndex = i"
                   [attr.name]="'itemProduct' + i"
