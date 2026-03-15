@@ -217,6 +217,7 @@ salesInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
         productId: inventories.productId,
         productCode: products.code,
         productName: products.name,
+        unitsInStock: inventories.unitsInStock,
       })
       .from(salesInvoiceItems)
       .innerJoin(inventories, eq(inventories.id, salesInvoiceItems.inventoryId))

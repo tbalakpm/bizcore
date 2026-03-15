@@ -28,6 +28,11 @@ type EditableSalesInvoiceItem = {
   taxPct?: number;
   taxAmount?: number;
   lineTotal: number;
+  
+  // Track original state for stock validation
+  originalQty?: number;
+  originalInventoryId?: number;
+  unitsInStock?: number;
 };
 
 type EditableSalesInvoice = {
@@ -228,6 +233,9 @@ export class SalesInvoiceForm implements OnInit {
             taxPct: Number(item.taxPct || 0),
             taxAmount: Number(item.taxAmount || 0),
             lineTotal: Number(item.lineTotal || 0),
+            originalQty: Number(item.qty || 0),
+            originalInventoryId: item.inventoryId,
+            unitsInStock: Number(item.unitsInStock || 0),
           })),
         };
         this.loading = false;
@@ -259,6 +267,7 @@ export class SalesInvoiceForm implements OnInit {
         item.unitPrice = Number(product.unitPrice || 0);
         item.taxPct = Number(product.taxRate || 0);
       }
+      item.unitsInStock = inventory.unitsInStock;
       this.calculateLineTotal(item);
     }
   }
@@ -389,8 +398,15 @@ export class SalesInvoiceForm implements OnInit {
       }
 
       const inv = this.inventories().find(i => i.id === item.inventoryId);
-      if (inv && Number(item.qty) > inv.unitsInStock) {
-        this.error = `Insufficient stock for item: ${inv.name} (GTN: ${inv.gtn || 'N/A'}). Available: ${inv.unitsInStock}`;
+      const unitsInStock = item.unitsInStock ?? inv?.unitsInStock ?? 0;
+      const originalQty = item.originalQty || 0;
+      const isSameItem = item.inventoryId === item.originalInventoryId;
+      
+      const effectiveAvailableStock = unitsInStock + (isSameItem ? originalQty : 0);
+
+      if (Number(item.qty) > effectiveAvailableStock) {
+        const itemName = inv?.name || item.gtn || 'Selected product';
+        this.error = `Insufficient stock for item: ${itemName}. Available: ${effectiveAvailableStock}`;
         window.scrollTo(0, 0);
         return;
       }

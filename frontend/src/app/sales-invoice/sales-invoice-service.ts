@@ -23,6 +23,7 @@ export interface SalesInvoiceItem {
   // Joined fields from db
   productCode?: string;
   productName?: string;
+  unitsInStock?: number;
 }
 
 export interface SalesInvoice {
