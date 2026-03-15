@@ -300,7 +300,7 @@
               <td class="px-2 py-2">
                 <ng-select
                   #itemRowSelect
-                  [items]="inventories()"
+                  [items]="getFilteredInventories(item)"
                   bindLabel="gtn"
                   bindValue="id"
                   [(ngModel)]="item.inventoryId"
@@ -311,6 +311,7 @@
                   (scrollToEnd)="onInventoryScrollToEnd()"
                   [loading]="inventoryLoading"
                   [name]="'itemInventory' + i"
+                  bindDisabled="disabled"
                   [searchable]="true"
                   [clearable]="true"
                   placeholder="-- Select Item (GTN) --"
@@ -333,10 +334,10 @@
                       <div class="text-right">
                         <div
                           class="text-xs font-semibold"
-                          [class.text-danger]="(p.unitsInStock || 0) <= 0"
-                          [class.text-success]="(p.unitsInStock || 0) > 0"
+                          [class.text-danger]="getInventoryEffectiveStock(p) <= 0"
+                          [class.text-success]="getInventoryEffectiveStock(p) > 0"
                         >
-                          Stock: {{ p.unitsInStock || 0 }}
+                          Available: {{ getInventoryEffectiveStock(p) }}
                         </div>
                       </div>
                     </div>

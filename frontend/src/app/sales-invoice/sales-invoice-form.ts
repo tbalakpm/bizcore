@@ -66,6 +66,7 @@ export class SalesInvoiceForm implements OnInit {
   products = signal<Product[]>([]);
   customers = signal<Customer[]>([]);
   inventories = signal<Inventory[]>([]);
+  originalInventories = signal<Inventory[]>([]);
 
   // Inventory Search & Lazy Loading
   inventoryInput$ = new Subject<string>();
@@ -238,6 +239,18 @@ export class SalesInvoiceForm implements OnInit {
             unitsInStock: Number(item.unitsInStock || 0),
           })),
         };
+
+        // Track original inventories to keep them in dropdown even if 0 stock
+        const loadedOriginalInvs: Inventory[] = (invoice.items || []).map(item => ({
+          id: item.inventoryId!,
+          productId: item.productId!,
+          gtn: item.gtn,
+          unitsInStock: Number(item.unitsInStock || 0),
+          code: item.productCode,
+          name: item.productName
+        }));
+        this.originalInventories.set(loadedOriginalInvs);
+
         this.loading = false;
       },
       error: () => {
@@ -321,6 +334,51 @@ export class SalesInvoiceForm implements OnInit {
     if (this.editingInvoice.items.length > 1) {
       this.editingInvoice.items.splice(index, 1);
     }
+  }
+
+  getFilteredInventories(currentItem: EditableSalesInvoiceItem): (Inventory & { disabled?: boolean })[] {
+    const available = this.inventories();
+    const original = this.originalInventories();
+    
+    // Merge available with original items (avoiding duplicates)
+    const mergedMap = new Map<number, Inventory>();
+    original.forEach(inv => mergedMap.set(inv.id, inv));
+    available.forEach(inv => mergedMap.set(inv.id, inv));
+    
+    return Array.from(mergedMap.values()).map(inv => {
+      const warehouseLeft = this.getInventoryEffectiveStock(inv);
+      return {
+        ...inv,
+        disabled: warehouseLeft <= 0 && currentItem.inventoryId !== inv.id
+      };
+    });
+  }
+
+  // Global Warehouse Left: Pool (DB + Original) - Total Current Usage
+  getInventoryEffectiveStock(inv: Inventory): number {
+    let pool = Number(inv.unitsInStock || 0);
+
+    // Add back everything this invoice originally took
+    this.editingInvoice.items.forEach(item => {
+      if (item.originalInventoryId === inv.id) {
+        pool += (item.originalQty || 0);
+      }
+    });
+
+    // Subtract what's currently in all rows
+    const totalCurrentUsage = this.editingInvoice.items
+      .filter(item => item.inventoryId === inv.id)
+      .reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+
+    return pool - totalCurrentUsage;
+  }
+
+  isInventoryDisabledFor(currentItem: EditableSalesInvoiceItem) {
+    return (inv: Inventory) => {
+      const warehouseLeft = this.getInventoryEffectiveStock(inv);
+      // Disable if warehouse is empty AND it's not the one already picked in this row
+      return warehouseLeft <= 0 && currentItem.inventoryId !== inv.id;
+    };
   }
 
   // --- Inline Customer Form Handlers ---

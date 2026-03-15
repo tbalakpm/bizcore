@@ -1,4 +1,4 @@
-import { eq, sql, gt } from 'drizzle-orm';
+import { eq, sql, gt, and } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 import { db, inventories, products } from '../db';
 
@@ -33,11 +33,20 @@ inventoriesRouter.get('/', async (req: Request, res: Response) => {
     if (q) {
       const searchPattern = `%${q}%`;
       totalCountQuery = totalCountQuery.where(
-        sql`${inventories.gtn} LIKE ${searchPattern} OR ${products.name} LIKE ${searchPattern}`
+        and(
+          gt(inventories.unitsInStock, 0),
+          sql`${inventories.gtn} LIKE ${searchPattern} OR ${products.name} LIKE ${searchPattern}`
+        )
       );
       dataQuery = dataQuery.where(
-        sql`${inventories.gtn} LIKE ${searchPattern} OR ${products.name} LIKE ${searchPattern}`
+        and(
+          gt(inventories.unitsInStock, 0),
+          sql`${inventories.gtn} LIKE ${searchPattern} OR ${products.name} LIKE ${searchPattern}`
+        )
       );
+    } else {
+      totalCountQuery = totalCountQuery.where(gt(inventories.unitsInStock, 0));
+      dataQuery = dataQuery.where(gt(inventories.unitsInStock, 0));
     }
 
     const [totalRes] = await totalCountQuery.execute();
