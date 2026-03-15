@@ -1,8 +1,8 @@
 <div class="space-y-4">
   <div class="flex justify-between items-center">
     <h1 class="page-title">
-      <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-        fill="none" viewBox="0 0 24 24">
+      <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+        viewBox="0 0 24 24">
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
           d="M5 19V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13H7a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M9 3v14m7 0v4" />
       </svg>
@@ -13,7 +13,8 @@
   <div class="error-banner">{{ error }}</div>
   }
 
-  <div class="grid gap-4" [ngClass]="{ 'grid-cols-1!': !permissionService.canWrite('categories'), 'grid-cols-1 lg:grid-cols-3' : permissionService.canWrite('categories') }">
+  <div class="grid gap-4"
+    [ngClass]="{ 'grid-cols-1!': !permissionService.canWrite('categories'), 'grid-cols-1 lg:grid-cols-3' : permissionService.canWrite('categories') }">
     <!-- List -->
     <div class="lg:col-span-2 card">
       <div class="flex justify-between items-center mb-2">
@@ -29,7 +30,7 @@
               <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
               <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
               @if (permissionService.canWrite('categories')) {
-                <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+              <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
               }
             </tr>
           </thead>
@@ -60,40 +61,42 @@
               </td>
               <td class="td-cell text-center">
                 <button type="button" (click)="toggleActive(c)"
-                  class="toggle-btn"
-                  [title]="c.isActive ? 'Deactivate' : 'Activate'"
-                  [ngClass]="c.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
+                  class="w-6 h-6 rounded-full border flex items-center justify-center"
+                  [title]="c.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
+                    c.isActive
+                      ? 'border-success text-success'
+                      : 'border-border-strong text-text-muted'
+                  ">
                   @if (c.isActive) {
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <i-lucide name="check" [size]="14"></i-lucide>
                   } @else {
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <i-lucide name="x" [size]="14"></i-lucide>
                   }
                 </button>
               </td>
               @if (permissionService.canWrite('categories')) {
-                <td class="td-cell text-center">
-                  <div class="flex items-center justify-center gap-2">
-                    @if (editing?.id == c.id) {
-                    <button class="btn-link-edit text-success flex items-center gap-1" title="Save changes" (click)="saveEdit()">
-                      <i-lucide name="check" [size]="14"></i-lucide> {{ 'SAVE' | translate }}
-                    </button>
-                    <button class="btn-link-edit text-text-muted flex items-center gap-1" title="Cancel editing" (click)="cancelEdit()">
-                      <i-lucide name="x" [size]="14"></i-lucide> {{ 'CANCEL' | translate }}
-                    </button>
-                    } @else {
-                    <button class="btn-link-edit flex items-center gap-1" title="Edit category" (click)="startEdit(c)">
-                      <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
-                    </button>
-                    <button class="btn-link-danger flex items-center gap-1" title="Delete category" (click)="deleteCategory(c)">
-                      <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
-                    </button>
-                    }
-                  </div>
-                </td>
+              <td class="td-cell text-center">
+                <div class="flex items-center justify-center gap-2">
+                  @if (editing?.id == c.id) {
+                  <button class="btn-link-edit text-success flex items-center gap-1" title="Save changes"
+                    (click)="saveEdit()">
+                    <i-lucide name="check" [size]="18"></i-lucide>
+                  </button>
+                  <button class="btn-link-edit text-text-muted flex items-center gap-1" title="Cancel editing"
+                    (click)="cancelEdit()">
+                    <i-lucide name="x" [size]="18"></i-lucide>
+                  </button>
+                  } @else {
+                  <button class="btn-link-edit flex items-center gap-1" title="Edit category" (click)="startEdit(c)">
+                    <i-lucide name="pencil" [size]="18"></i-lucide>
+                  </button>
+                  <button class="btn-link-danger flex items-center gap-1" title="Delete category"
+                    (click)="deleteCategory(c)">
+                    <i-lucide name="trash-2" [size]="18"></i-lucide>
+                  </button>
+                  }
+                </div>
+              </td>
               }
             </tr>
             }
@@ -110,25 +113,25 @@
     </div>
 
     @if (permissionService.canWrite('categories')) {
-      <!-- Add form -->
-      <div class="card max-h-max">
-        <h2 class="section-title">{{ 'CATEGORY.ADD' | translate }}</h2>
-        <form (ngSubmit)="addCategory()" class="space-y-3">
-          <div>
-            <label class="label-base">{{ 'CODE' | translate }}</label>
-            <input [(ngModel)]="newCategory.code" name="newCategoryCode" class="input-base" autofocus />
-          </div>
-          <div>
-            <label class="label-base">{{ 'NAME' | translate }}</label>
-            <input [(ngModel)]="newCategory.name" name="newCategoryName" class="input-base" />
-          </div>
-          <div>
-            <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
-            <textarea [(ngModel)]="newCategory.description" name="newCategoryDesc" class="input-base"></textarea>
-          </div>
-          <button type="submit" class="btn-primary w-full">{{ 'SAVE' | translate }}</button>
-        </form>
-      </div>
+    <!-- Add form -->
+    <div class="card max-h-max">
+      <h2 class="section-title">{{ 'CATEGORY.ADD' | translate }}</h2>
+      <form (ngSubmit)="addCategory()" class="space-y-3">
+        <div>
+          <label class="label-base">{{ 'CODE' | translate }}</label>
+          <input [(ngModel)]="newCategory.code" name="newCategoryCode" class="input-base" autofocus />
+        </div>
+        <div>
+          <label class="label-base">{{ 'NAME' | translate }}</label>
+          <input [(ngModel)]="newCategory.name" name="newCategoryName" class="input-base" />
+        </div>
+        <div>
+          <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
+          <textarea [(ngModel)]="newCategory.description" name="newCategoryDesc" class="input-base"></textarea>
+        </div>
+        <button type="submit" class="btn-primary w-full">{{ 'SAVE' | translate }}</button>
+      </form>
+    </div>
     }
   </div>
 </div>

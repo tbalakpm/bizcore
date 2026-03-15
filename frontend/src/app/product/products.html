@@ -15,14 +15,14 @@
 
 <div class="grid grid-cols-1 gap-4">
   @if (permissionService.canWrite('products')) {
-    <!-- Add / Edit form via reusable component -->
-    <div class="card">
-      <h2 class="section-title">
-        {{ editingProductId ? ('EDIT' | translate) : ('ADD' | translate) }}
-        {{ 'PRODUCT.TITLE' | translate }}
-      </h2>
-      <app-product-form [productId]="editingProductId" (saved)="onFormSaved()" (cancelled)="onFormCancelled()" />
-    </div>
+  <!-- Add / Edit form via reusable component -->
+  <div class="card">
+    <h2 class="section-title">
+      {{ editingProductId ? ('EDIT' | translate) : ('ADD' | translate) }}
+      {{ 'PRODUCT.TITLE' | translate }}
+    </h2>
+    <app-product-form [productId]="editingProductId" (saved)="onFormSaved()" (cancelled)="onFormCancelled()" />
+  </div>
   }
 
   <!-- List -->
@@ -44,7 +44,7 @@
             <th class="th-cell">GTN</th>
             <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
             @if (permissionService.canWrite('products')) {
-              <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+            <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
             }
           </tr>
         </thead>
@@ -77,31 +77,28 @@
             </td>
             <td class="td-cell text-center">
               <button type="button" (click)="toggleActive(p)"
-                class="toggle-btn"
+                class="w-6 h-6 rounded-full border flex items-center justify-center"
                 [title]="p.isActive ? 'Deactivate' : 'Activate'"
                 [ngClass]="p.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
                 @if (p.isActive) {
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <i-lucide name="check" [size]="14"></i-lucide>
                 } @else {
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <i-lucide name="x" [size]="14"></i-lucide>
                 }
               </button>
             </td>
             @if (permissionService.canWrite('products')) {
-              <td class="td-cell text-center">
-                <div class="flex items-center justify-center gap-2">
-                  <button (click)="editProduct(p.id)" class="btn-link-edit flex items-center gap-1" title="Edit product">
-                    <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
-                  </button>
-                  <button (click)="deleteProduct(p.id)" class="btn-link-danger flex items-center gap-1" title="Delete product">
-                    <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
-                  </button>
-                </div>
-              </td>
+            <td class="td-cell text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button (click)="editProduct(p.id)" class="btn-link-edit flex items-center gap-1" title="Edit product">
+                  <i-lucide name="pencil" [size]="18"></i-lucide>
+                </button>
+                <button (click)="deleteProduct(p.id)" class="btn-link-danger flex items-center gap-1"
+                  title="Delete product">
+                  <i-lucide name="trash-2" [size]="18"></i-lucide>
+                </button>
+              </div>
+            </td>
             }
           </tr>
           }
