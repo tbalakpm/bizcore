@@ -8,6 +8,7 @@ import { toNumericString, toPositiveNumber } from '../utils/number.util';
 import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
 import { productSerialNumberService } from '../services/product-serial-number.service';
 import type { DbTransaction } from '../shared/serial-number.shared';
+import { renderPurchaseInvoice } from '../services/pdf/reports/purchase-invoice.report';
 
 export const purchaseInvoicesRouter = express.Router();
 
@@ -408,5 +409,20 @@ purchaseInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
     res.status(204).send();
   } catch (err) {
     res.status(400).json({ error: 'Failed' });
+  }
+});
+
+// PDF Generation Route 
+purchaseInvoicesRouter.get('/:id/pdf', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id as string, 10);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid purchase invoice ID' });
+    }
+
+    await renderPurchaseInvoice(id, db, res);
+  } catch (error) {
+    console.error('Failed to generate purchase invoice PDF', error);
+    res.status(500).json({ error: 'Failed to generate PDF' });
   }
 });

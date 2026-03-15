@@ -12,6 +12,7 @@ import { type Product, ProductService } from '../product/product-service';
 import { type Customer, CustomerService } from '../customer/customer-service';
 import { type SalesInvoiceItem, SalesInvoiceService, SalesInvoice } from './sales-invoice-service';
 import { type Inventory, InventoryService } from '../inventory/inventory-service';
+import { LucideAngularModule } from 'lucide-angular';
 
 type EditableSalesInvoiceItem = {
   id?: number;
@@ -44,7 +45,7 @@ type EditableSalesInvoice = {
 
 @Component({
   selector: 'app-sales-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, TranslatePipe, TooltipDirective],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, TranslatePipe, TooltipDirective, LucideAngularModule],
   templateUrl: './sales-invoice-form.html',
 })
 export class SalesInvoiceForm implements OnInit {

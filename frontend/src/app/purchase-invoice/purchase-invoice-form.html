@@ -1,14 +1,36 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
   <h1 class="page-title">
-    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-      viewBox="0 0 24 24">
-      <path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-        d="M8 20V10m8 10V4M4 20h16" />
+    <svg
+      class="w-7 h-7"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M8 20V10m8 10V4M4 20h16"
+      />
     </svg>
     {{ isEditMode ? 'Edit' : 'Create' }} Purchase Invoice
   </h1>
   <div class="flex gap-2">
     <a routerLink="/purchase-invoices" class="btn-outline">Back to List</a>
+    @if (isEditMode) {
+      <button
+        type="button"
+        class="btn-outline text-accent flex items-center gap-1"
+        (click)="printInvoice()"
+      >
+        <i-lucide name="printer" [size]="18"></i-lucide>
+        Print
+      </button>
+    }
     <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="submitting">
       {{ submitting ? 'Saving...' : 'Save Invoice' }}
     </button>
@@ -17,16 +39,25 @@
 
 <div class="card">
   @if (error) {
-  <div class="error-banner flex items-start">
-    <svg class="h-5 w-5 mr-3 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-    <div>
-      <h3 class="font-medium">Error saving invoice</h3>
-      <div class="mt-1">{{ error }}</div>
+    <div class="error-banner flex items-start">
+      <svg
+        class="h-5 w-5 mr-3 mt-0.5 shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <div>
+        <h3 class="font-medium">Error saving invoice</h3>
+        <div class="mt-1">{{ error }}</div>
+      </div>
     </div>
-  </div>
   }
 
   <form (ngSubmit)="onSubmit()">
@@ -36,76 +67,137 @@
       <div class="lg:col-span-2 space-y-1">
         <div class="flex justify-between items-center mb-1">
           <label class="label-base">Supplier <span class="text-danger">*</span></label>
-          <button type="button" class="text-xs text-accent hover:text-accent-hover font-medium"
-            (click)="toggleNewSupplierForm()">
+          <button
+            type="button"
+            class="text-xs text-accent hover:text-accent-hover font-medium"
+            (click)="toggleNewSupplierForm()"
+          >
             {{ showNewSupplierForm ? 'Cancel Supplier' : '+ Add Supplier' }}
           </button>
         </div>
 
         @if (showNewSupplierForm) {
-        <div class="bg-surface-muted border border-border p-3 rounded-lg mb-2">
-          <h4 class="text-xs font-semibold uppercase text-text-muted mb-2">Quick Add Supplier</h4>
-          @if (supplierError) {
-          <div class="text-xs text-danger mb-2">{{ supplierError }}</div>
-          }
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <input type="text" [(ngModel)]="newSupplier.code" name="newSuppCode" placeholder="Code *"
-              class="input-base" />
-            <input type="text" [(ngModel)]="newSupplier.name" name="newSuppName" placeholder="Supplier Name *"
-              class="input-base" />
-          </div>
-          <input type="text" [(ngModel)]="newSupplier.gstin" name="newSuppGstin" placeholder="GSTIN (Optional)"
-            class="input-base mb-2" />
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
-            <div class="flex items-center gap-2 mb-1 col-span-full ml-2">
-              <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="suppSameAsBilling"
-                class="w-3.5 h-3.5 accent-accent rounded" />
-              <label for="suppSameAsBilling" class="text-xs font-medium">Shipping Address same as Billing
-                Address</label>
-            </div>
-            <app-address-form [address]="newSupplier.billingAddress!" [title]="'ADDRESS.BILLING'" [isExpandable]="true"
-              [isOpen]="false"></app-address-form>
-            @if (!sameAsBilling) {
-            <app-address-form [address]="newSupplier.shippingAddress!" [title]="'ADDRESS.SHIPPING'"
-              [isExpandable]="true" [isOpen]="false"></app-address-form>
+          <div class="bg-surface-muted border border-border p-3 rounded-lg mb-2">
+            <h4 class="text-xs font-semibold uppercase text-text-muted mb-2">Quick Add Supplier</h4>
+            @if (supplierError) {
+              <div class="text-xs text-danger mb-2">{{ supplierError }}</div>
             }
-          </div>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <input
+                type="text"
+                [(ngModel)]="newSupplier.code"
+                name="newSuppCode"
+                placeholder="Code *"
+                class="input-base"
+              />
+              <input
+                type="text"
+                [(ngModel)]="newSupplier.name"
+                name="newSuppName"
+                placeholder="Supplier Name *"
+                class="input-base"
+              />
+            </div>
+            <input
+              type="text"
+              [(ngModel)]="newSupplier.gstin"
+              name="newSuppGstin"
+              placeholder="GSTIN (Optional)"
+              class="input-base mb-2"
+            />
 
-          <div class="flex justify-end">
-            <button type="button" class="btn-accent text-xs" (click)="createSupplierInline()"
-              [disabled]="supplierSubmitting">
-              {{ supplierSubmitting ? 'Saving...' : 'Save & Select Supplier' }}
-            </button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+              <div class="flex items-center gap-2 mb-1 col-span-full ml-2">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="sameAsBilling"
+                  name="sameAsBilling"
+                  id="suppSameAsBilling"
+                  class="w-3.5 h-3.5 accent-accent rounded"
+                />
+                <label for="suppSameAsBilling" class="text-xs font-medium"
+                  >Shipping Address same as Billing Address</label
+                >
+              </div>
+              <app-address-form
+                [address]="newSupplier.billingAddress!"
+                [title]="'ADDRESS.BILLING'"
+                [isExpandable]="true"
+                [isOpen]="false"
+              ></app-address-form>
+              @if (!sameAsBilling) {
+                <app-address-form
+                  [address]="newSupplier.shippingAddress!"
+                  [title]="'ADDRESS.SHIPPING'"
+                  [isExpandable]="true"
+                  [isOpen]="false"
+                ></app-address-form>
+              }
+            </div>
+
+            <div class="flex justify-end">
+              <button
+                type="button"
+                class="btn-accent text-xs"
+                (click)="createSupplierInline()"
+                [disabled]="supplierSubmitting"
+              >
+                {{ supplierSubmitting ? 'Saving...' : 'Save & Select Supplier' }}
+              </button>
+            </div>
           </div>
-        </div>
         } @else {
-        <ng-select [items]="suppliers()" bindLabel="name" bindValue="id" [(ngModel)]="editingInvoice.supplierId"
-          name="supplierId" [searchable]="true" [clearable]="true" placeholder="-- Select Supplier --"
-          class="w-full text-sm">
-          <ng-template ng-option-tmp let-item="item">
-            <span class="font-medium text-text-heading">{{ item.code }}</span> -
-            <span class="text-text-muted">{{ item.name }}</span>
-          </ng-template>
-        </ng-select>
+          <ng-select
+            [items]="suppliers()"
+            bindLabel="name"
+            bindValue="id"
+            [(ngModel)]="editingInvoice.supplierId"
+            name="supplierId"
+            [searchable]="true"
+            [clearable]="true"
+            placeholder="-- Select Supplier --"
+            class="w-full text-sm"
+          >
+            <ng-template ng-option-tmp let-item="item">
+              <span class="font-medium text-text-heading">{{ item.code }}</span> -
+              <span class="text-text-muted">{{ item.name }}</span>
+            </ng-template>
+          </ng-select>
         }
       </div>
 
       <div>
         <label class="label-base">Invoice # <span class="text-danger">*</span></label>
-        <input type="text" [(ngModel)]="editingInvoice.invoiceNumber" name="invoiceNumber" placeholder="Required"
-          required class="input-base" />
+        <input
+          type="text"
+          [(ngModel)]="editingInvoice.invoiceNumber"
+          name="invoiceNumber"
+          placeholder="Required"
+          required
+          class="input-base"
+        />
       </div>
 
       <div>
         <label class="label-base">Invoice Date <span class="text-danger">*</span></label>
-        <input type="date" [(ngModel)]="editingInvoice.invoiceDate" name="invoiceDate" required class="input-base" />
+        <input
+          type="date"
+          [(ngModel)]="editingInvoice.invoiceDate"
+          name="invoiceDate"
+          required
+          class="input-base"
+        />
       </div>
 
       <div>
         <label class="label-base">Reference #</label>
-        <input type="text" [(ngModel)]="editingInvoice.refNumber" name="refNumber" placeholder="e.g. PO-567"
-          class="input-base" />
+        <input
+          type="text"
+          [(ngModel)]="editingInvoice.refNumber"
+          name="refNumber"
+          placeholder="e.g. PO-567"
+          class="input-base"
+        />
       </div>
 
       <div>
@@ -121,11 +213,15 @@
     </div>
 
     @if (showNewProductForm) {
-    <div class="bg-surface-muted p-3 rounded-lg border border-border mb-6">
-      <p class="text-xs font-semibold uppercase text-text-muted mb-3">Quick Add Product — will be auto-selected in the
-        active row</p>
-      <app-product-form (saved)="onProductSaved($event)" (cancelled)="showNewProductForm = false"></app-product-form>
-    </div>
+      <div class="bg-surface-muted p-3 rounded-lg border border-border mb-6">
+        <p class="text-xs font-semibold uppercase text-text-muted mb-3">
+          Quick Add Product — will be auto-selected in the active row
+        </p>
+        <app-product-form
+          (saved)="onProductSaved($event)"
+          (cancelled)="showNewProductForm = false"
+        ></app-product-form>
+      </div>
     }
 
     <!-- Items Section -->
@@ -146,88 +242,170 @@
           </thead>
           <tbody>
             @for (item of editingInvoice.items; track $index; let i = $index) {
-            <tr class="table-row">
-              <td class="px-2 py-2">
-                <ng-select [items]="products()" bindLabel="name" bindValue="id" [(ngModel)]="item.productId"
-                  appendTo="body" (change)="onProductSelect(item)" (focus)="selectedRowIndex = i"
-                  [name]="'itemProduct' + i" [searchable]="true" [clearable]="true" placeholder="-- Select Product --"
-                  class="text-sm">
-                  <ng-template ng-label-tmp let-p="item">
-                    <span class="font-medium text-text-heading">{{ p.code || p.name }}</span>
-                    <span *ngIf="p.code && p.name && p.code !== p.name" class="ml-1 text-text-muted">- {{ p.name
-                      }}</span>
-                  </ng-template>
-                  <ng-template ng-option-tmp let-p="item">
-                    <div class="font-medium text-text-heading">{{ p.name }}</div>
-                    <div class="text-xs text-text-muted">{{ p.code }}</div>
-                  </ng-template>
-                </ng-select>
-              </td>
-              <td class="px-2 py-2 align-bottom">
-                <input type="text" [(ngModel)]="item.gtn" [name]="'itemGtn' + i" placeholder="Auto generated"
-                  class="input-base" />
-              </td>
-              <td class="px-2 py-2 text-right align-bottom">
-                <input type="number" step="1" min="1" [(ngModel)]="item.qty" (ngModelChange)="onItemChanged(item)"
-                  [name]="'itemQty' + i" class="input-base text-right" />
-              </td>
-              <td class="px-2 py-2 text-right align-bottom">
-                <input type="number" step="1" min="0.01" [(ngModel)]="item.unitPrice"
-                  (ngModelChange)="onItemChanged(item)" [name]="'itemPrice' + i" class="input-base text-right" />
-              </td>
-              <td class="px-2 py-2 align-bottom">
-                <div class="flex border border-border-strong rounded-md overflow-hidden">
-                  <select [(ngModel)]="item.discountType" [name]="'itemDiscType' + i" (change)="onItemChanged(item)"
-                    class="text-xs border-r border-border-strong bg-surface-muted px-1 py-2 text-text outline-none">
-                    <option value="none">None</option>
-                    <option value="percent">%</option>
-                    <option value="amount">Amt</option>
-                  </select>
-                  @if (item.discountType === 'percent') {
-                  <input type="number" step="0.01" [(ngModel)]="item.discountPct" (ngModelChange)="onItemChanged(item)"
-                    [name]="'itemDiscVal' + i"
-                    class="w-full border-none px-2 py-1 text-right text-xs bg-surface text-text outline-none"
-                    placeholder="0" />
-                  } @else if (item.discountType === 'amount') {
-                  <input type="number" step="1" min="0" [(ngModel)]="item.discountAmount"
-                    (ngModelChange)="onItemChanged(item)" [name]="'itemDiscVal' + i"
-                    class="w-full border-none px-2 py-1 text-right text-xs bg-surface text-text outline-none"
-                    placeholder="0" />
-                  }
-                </div>
-              </td>
-              <td class="px-2 py-2 text-right align-bottom">
-                <input type="number" [ngModel]="item.taxPct" name="itemTaxPct{{ i }}" readonly tabindex="-1"
-                  class="input-base text-right bg-surface-muted text-text-muted cursor-not-allowed" />
-              </td>
-              <td class="td-cell text-right font-medium">
-                {{ item.lineTotal | number: '1.2-2' }}
-              </td>
-              <td class="px-2 py-2 text-center">
-                <button type="button"
-                  class="text-danger hover:text-danger p-1.5 rounded hover:bg-surface-muted transition"
-                  appTooltip="Remove item" (click)="removeItemRow(i)">
-                  <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                    fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                  </svg>
-                </button>
-              </td>
-            </tr>
+              <tr class="table-row">
+                <td class="px-2 py-2">
+                  <ng-select
+                    [items]="products()"
+                    bindLabel="name"
+                    bindValue="id"
+                    [(ngModel)]="item.productId"
+                    appendTo="body"
+                    (change)="onProductSelect(item)"
+                    (focus)="selectedRowIndex = i"
+                    [name]="'itemProduct' + i"
+                    [searchable]="true"
+                    [clearable]="true"
+                    placeholder="-- Select Product --"
+                    class="text-sm"
+                  >
+                    <ng-template ng-label-tmp let-p="item">
+                      <span class="font-medium text-text-heading">{{ p.code || p.name }}</span>
+                      <span
+                        *ngIf="p.code && p.name && p.code !== p.name"
+                        class="ml-1 text-text-muted"
+                        >- {{ p.name }}</span
+                      >
+                    </ng-template>
+                    <ng-template ng-option-tmp let-p="item">
+                      <div class="font-medium text-text-heading">{{ p.name }}</div>
+                      <div class="text-xs text-text-muted">{{ p.code }}</div>
+                    </ng-template>
+                  </ng-select>
+                </td>
+                <td class="px-2 py-2 align-bottom">
+                  <input
+                    type="text"
+                    [(ngModel)]="item.gtn"
+                    [name]="'itemGtn' + i"
+                    placeholder="Auto generated"
+                    class="input-base"
+                  />
+                </td>
+                <td class="px-2 py-2 text-right align-bottom">
+                  <input
+                    type="number"
+                    step="1"
+                    min="1"
+                    [(ngModel)]="item.qty"
+                    (ngModelChange)="onItemChanged(item)"
+                    [name]="'itemQty' + i"
+                    class="input-base text-right"
+                  />
+                </td>
+                <td class="px-2 py-2 text-right align-bottom">
+                  <input
+                    type="number"
+                    step="1"
+                    min="0.01"
+                    [(ngModel)]="item.unitPrice"
+                    (ngModelChange)="onItemChanged(item)"
+                    [name]="'itemPrice' + i"
+                    class="input-base text-right"
+                  />
+                </td>
+                <td class="px-2 py-2 align-bottom">
+                  <div class="flex border border-border-strong rounded-md overflow-hidden">
+                    <select
+                      [(ngModel)]="item.discountType"
+                      [name]="'itemDiscType' + i"
+                      (change)="onItemChanged(item)"
+                      class="text-xs border-r border-border-strong bg-surface-muted px-1 py-2 text-text outline-none"
+                    >
+                      <option value="none">None</option>
+                      <option value="percent">%</option>
+                      <option value="amount">Amt</option>
+                    </select>
+                    @if (item.discountType === 'percent') {
+                      <input
+                        type="number"
+                        step="0.01"
+                        [(ngModel)]="item.discountPct"
+                        (ngModelChange)="onItemChanged(item)"
+                        [name]="'itemDiscVal' + i"
+                        class="w-full border-none px-2 py-1 text-right text-xs bg-surface text-text outline-none"
+                        placeholder="0"
+                      />
+                    } @else if (item.discountType === 'amount') {
+                      <input
+                        type="number"
+                        step="1"
+                        min="0"
+                        [(ngModel)]="item.discountAmount"
+                        (ngModelChange)="onItemChanged(item)"
+                        [name]="'itemDiscVal' + i"
+                        class="w-full border-none px-2 py-1 text-right text-xs bg-surface text-text outline-none"
+                        placeholder="0"
+                      />
+                    }
+                  </div>
+                </td>
+                <td class="px-2 py-2 text-right align-bottom">
+                  <input
+                    type="number"
+                    [ngModel]="item.taxPct"
+                    name="itemTaxPct{{ i }}"
+                    readonly
+                    tabindex="-1"
+                    class="input-base text-right bg-surface-muted text-text-muted cursor-not-allowed"
+                  />
+                </td>
+                <td class="td-cell text-right font-medium">
+                  {{ item.lineTotal | number: '1.2-2' }}
+                </td>
+                <td class="px-2 py-2 text-center">
+                  <button
+                    type="button"
+                    class="text-danger hover:text-danger p-1.5 rounded hover:bg-surface-muted transition"
+                    appTooltip="Remove item"
+                    (click)="removeItemRow(i)"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+                      />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
             }
           </tbody>
         </table>
       </div>
 
       <div class="bg-surface-muted px-4 py-3 border-t border-border">
-        <button type="button"
+        <button
+          type="button"
           class="text-accent hover:text-accent-hover font-medium text-sm flex items-center gap-1 transition"
-          (click)="addItemRow()">
-          <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-            viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          (click)="addItemRow()"
+        >
+          <svg
+            class="w-4 h-4"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Add Item Row
         </button>
@@ -244,36 +422,62 @@
           <div class="flex items-center justify-between gap-4">
             <span class="text-sm font-medium text-text-muted">Invoice Discount</span>
             <div class="flex border border-border-strong rounded-md overflow-hidden w-48">
-              <select [(ngModel)]="editingInvoice.discountType" name="headerDiscountType" (change)="recalculateAll()"
-                class="text-xs border-r border-border-strong bg-surface px-2 py-1.5 text-text outline-none cursor-pointer">
+              <select
+                [(ngModel)]="editingInvoice.discountType"
+                name="headerDiscountType"
+                (change)="recalculateAll()"
+                class="text-xs border-r border-border-strong bg-surface px-2 py-1.5 text-text outline-none cursor-pointer"
+              >
                 <option value="none">None</option>
                 <option value="percent">Percent (%)</option>
                 <option value="amount">Value (INR)</option>
               </select>
               @if (editingInvoice.discountType === 'percent') {
-              <input type="number" step="0.01" [(ngModel)]="editingInvoice.discountPct"
-                (ngModelChange)="recalculateAll()" name="headerDiscVal"
-                class="w-full border-none px-3 py-1.5 text-right text-sm bg-surface text-text outline-none"
-                placeholder="0" />
+                <input
+                  type="number"
+                  step="0.01"
+                  [(ngModel)]="editingInvoice.discountPct"
+                  (ngModelChange)="recalculateAll()"
+                  name="headerDiscVal"
+                  class="w-full border-none px-3 py-1.5 text-right text-sm bg-surface text-text outline-none"
+                  placeholder="0"
+                />
               } @else if (editingInvoice.discountType === 'amount') {
-              <input type="number" step="0.01" [(ngModel)]="editingInvoice.discountAmount"
-                (ngModelChange)="recalculateAll()" name="headerDiscVal"
-                class="w-full border-none px-3 py-1.5 text-right text-sm bg-surface text-text outline-none"
-                placeholder="0" />
+                <input
+                  type="number"
+                  step="0.01"
+                  [(ngModel)]="editingInvoice.discountAmount"
+                  (ngModelChange)="recalculateAll()"
+                  name="headerDiscVal"
+                  class="w-full border-none px-3 py-1.5 text-right text-sm bg-surface text-text outline-none"
+                  placeholder="0"
+                />
               }
             </div>
           </div>
 
           <div class="flex items-center justify-between gap-4">
             <span class="text-sm font-medium text-text-muted">Tax Override (%)</span>
-            <input type="number" step="0.01" [(ngModel)]="editingInvoice.taxPct" name="hTaxPct"
-              (ngModelChange)="recalculateAll()" class="input-base w-24 text-right" />
+            <input
+              type="number"
+              step="0.01"
+              [(ngModel)]="editingInvoice.taxPct"
+              name="hTaxPct"
+              (ngModelChange)="recalculateAll()"
+              class="input-base w-24 text-right"
+            />
           </div>
 
           <div class="flex items-center justify-between gap-4">
             <span class="text-sm font-medium text-text-muted">Round Off</span>
-            <input type="number" step="0.01" [(ngModel)]="editingInvoice.roundOff" name="roundOff"
-              (ngModelChange)="recalculateAll()" class="input-base w-32 text-right font-semibold" />
+            <input
+              type="number"
+              step="0.01"
+              [(ngModel)]="editingInvoice.roundOff"
+              name="roundOff"
+              (ngModelChange)="recalculateAll()"
+              class="input-base w-32 text-right font-semibold"
+            />
           </div>
         </div>
       </div>
@@ -284,26 +488,32 @@
           <span class="text-text-muted font-medium">Subtotal</span>
           <span class="font-medium text-text-heading">{{
             editingInvoice.subtotal | number: '1.2-2'
-            }}</span>
+          }}</span>
         </div>
 
         <div class="flex justify-between items-center text-sm">
           <span class="text-text-muted font-medium">Total Discount</span>
-          <span class="font-medium text-danger">- {{ editingInvoice.discountAmount | number: '1.2-2' }}</span>
+          <span class="font-medium text-danger"
+            >- {{ editingInvoice.discountAmount | number: '1.2-2' }}</span
+          >
         </div>
 
         <div class="flex justify-between items-center text-sm">
           <span class="text-text-muted font-medium">Total Tax</span>
           <span class="font-medium text-text-heading">{{
             editingInvoice.taxAmount | number: '1.2-2'
-            }}</span>
+          }}</span>
         </div>
 
         <div class="border-t border-border my-1"></div>
 
         <div class="flex justify-between items-center">
-          <span class="text-base font-bold text-text-heading uppercase tracking-wider">Net Amount</span>
-          <span class="text-xl font-bold text-success">Rs. {{ editingInvoice.netAmount | number: '1.2-2' }}</span>
+          <span class="text-base font-bold text-text-heading uppercase tracking-wider"
+            >Net Amount</span
+          >
+          <span class="text-xl font-bold text-success"
+            >Rs. {{ editingInvoice.netAmount | number: '1.2-2' }}</span
+          >
         </div>
       </div>
     </div>

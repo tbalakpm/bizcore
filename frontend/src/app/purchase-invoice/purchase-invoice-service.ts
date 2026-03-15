@@ -1,6 +1,7 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import type { Observable } from 'rxjs';
+import { AuthService } from '../auth/auth-service';
 import { environment } from '../../environments/environment';
 import { pagination } from '../models/pagination';
 
@@ -61,6 +62,7 @@ export type PurchaseInvoiceQuery = {
 @Injectable({ providedIn: 'root' })
 export class PurchaseInvoiceService {
   private http = inject(HttpClient);
+  private auth = inject(AuthService);
 
   getAll(query: PurchaseInvoiceQuery = {}): Observable<PurchaseInvoiceList> {
     let params = new HttpParams();
@@ -88,5 +90,12 @@ export class PurchaseInvoiceService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/purchase-invoices/${id}`);
+  }
+
+  /** when you just want to open the PDF in a new window */
+  getPdfUrl(id: number): string {
+    const baseUrl = `${environment.apiUrl}/purchase-invoices/${id}/pdf`;
+    const token = this.auth.token;
+    return token ? `${baseUrl}?token=${token}` : baseUrl;
   }
 }

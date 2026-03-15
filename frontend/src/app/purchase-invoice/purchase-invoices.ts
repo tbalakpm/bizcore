@@ -108,4 +108,9 @@ export class PurchaseInvoices implements OnInit {
       error: (err) => this.error = err.error?.error || 'Failed to delete purchase invoice'
     });
   }
+
+  printInvoice(id: number) {
+    const url = this.purchaseInvoiceService.getPdfUrl(id);
+    window.open(url, '_blank');
+  }
 }

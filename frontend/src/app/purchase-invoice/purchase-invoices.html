@@ -1,35 +1,61 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
   <h1 class="page-title">
-    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-      viewBox="0 0 24 24">
-      <path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-        d="M8 20V10m8 10V4M4 20h16" />
+    <svg
+      class="w-7 h-7"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M8 20V10m8 10V4M4 20h16"
+      />
     </svg>
     Purchase Invoices
   </h1>
   @if (permissionService.canWrite('purchase-invoices')) {
-  <a routerLink="/purchase-invoices/new" class="btn-primary">New Purchase Invoice</a>
+    <a routerLink="/purchase-invoices/new" class="btn-primary">New Purchase Invoice</a>
   }
 </div>
 
 <div class="card">
   @if (error) {
-  <div class="error-banner">{{ error }}</div>
+    <div class="error-banner">{{ error }}</div>
   }
 
   <div class="flex gap-3 mb-3">
     <div class="flex flex-wrap items-center grow gap-2">
       <span class="text-xs font-semibold uppercase tracking-wide text-text-muted">Filter</span>
 
-      <input type="text" [(ngModel)]="filters.invoiceNumber" name="filterInvoiceNumber" placeholder="Invoice number"
-        class="input-base w-auto" />
-      <input type="date" [(ngModel)]="filters.invoiceDate" name="filterInvoiceDate" class="input-base w-auto" />
+      <input
+        type="text"
+        [(ngModel)]="filters.invoiceNumber"
+        name="filterInvoiceNumber"
+        placeholder="Invoice number"
+        class="input-base w-auto"
+      />
+      <input
+        type="date"
+        [(ngModel)]="filters.invoiceDate"
+        name="filterInvoiceDate"
+        class="input-base w-auto"
+      />
       <button type="button" class="btn-primary" (click)="applyFilters()">Apply</button>
     </div>
     <div class="flex flex-col sm:flex-row sm:items-center gap-2 border-l border-border pl-2">
       <span class="text-xs font-semibold uppercase tracking-wide text-text-muted">Sort</span>
-      <select [(ngModel)]="sortValue" (change)="onSortChange()" name="filterSort"
-        class="select-base w-auto min-w-[180px]">
+      <select
+        [(ngModel)]="sortValue"
+        (change)="onSortChange()"
+        name="filterSort"
+        class="select-base w-auto min-w-[180px]"
+      >
         <option value="id:desc">Newest</option>
         <option value="id:asc">Oldest</option>
         <option value="invoiceNumber:asc">Invoice Number A-Z</option>
@@ -54,32 +80,51 @@
       </thead>
       <tbody>
         @for (invoice of invoices(); track invoice.id) {
-        <tr class="table-row">
-          <td class="td-cell">{{ invoice.invoiceNumber }}</td>
-          <td class="td-cell">{{ invoice.invoiceDate | date:'mediumDate' }}</td>
-          <td class="td-cell">{{ invoice.supplierName }}</td>
-          <td class="td-cell text-right">{{ invoice.totalQty }}</td>
-          <td class="td-cell text-right font-medium text-success">{{ invoice.netAmount | currency:'INR'}}</td>
-          <td class="td-cell text-center">
-            <div class="flex items-center justify-center gap-2">
-              @if (permissionService.canWrite('purchase-invoices')) {
-              <a [routerLink]="['/purchase-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1"
-                appTooltip="Edit purchase invoice">
-                <i-lucide name="pencil" [size]="18"></i-lucide>
-              </a>
-              <button type="button" class="btn-link-danger flex items-center gap-1" appTooltip="Delete purchase invoice"
-                (click)="deleteInvoice(invoice.id)">
-                <i-lucide name="trash-2" [size]="18"></i-lucide>
-              </button>
-              }
-            </div>
-          </td>
-        </tr>
+          <tr class="table-row">
+            <td class="td-cell">{{ invoice.invoiceNumber }}</td>
+            <td class="td-cell">{{ invoice.invoiceDate | date: 'mediumDate' }}</td>
+            <td class="td-cell">{{ invoice.supplierName }}</td>
+            <td class="td-cell text-right">{{ invoice.totalQty }}</td>
+            <td class="td-cell text-right font-medium text-success">
+              {{ invoice.netAmount | currency: 'INR' }}
+            </td>
+            <td class="td-cell text-center">
+              <div class="flex items-center justify-center gap-2">
+                @if (permissionService.canWrite('purchase-invoices')) {
+                  <a
+                    [routerLink]="['/purchase-invoices', invoice.id, 'edit']"
+                    class="btn-link-edit flex items-center gap-1"
+                    appTooltip="Edit purchase invoice"
+                  >
+                    <i-lucide name="pencil" [size]="18"></i-lucide>
+                  </a>
+                  <button
+                    type="button"
+                    class="btn-link-danger flex items-center gap-1"
+                    appTooltip="Delete purchase invoice"
+                    (click)="deleteInvoice(invoice.id)"
+                  >
+                    <i-lucide name="trash-2" [size]="18"></i-lucide>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-link-edit flex items-center gap-1 text-accent"
+                    appTooltip="Print purchase invoice"
+                    (click)="printInvoice(invoice.id)"
+                  >
+                    <i-lucide name="printer" [size]="18"></i-lucide>
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
         }
         @if (!invoices().length && !loading) {
-        <tr>
-          <td colspan="6" class="td-cell text-center text-text-muted py-6">No purchase invoices found</td>
-        </tr>
+          <tr>
+            <td colspan="6" class="td-cell text-center text-text-muted py-6">
+              No purchase invoices found
+            </td>
+          </tr>
         }
       </tbody>
     </table>
@@ -88,18 +133,37 @@
   <div class="mt-3 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
     <div class="flex items-center gap-2">
       <span class="text-sm text-text-muted">Rows</span>
-      <select [(ngModel)]="filters.limit" (change)="onLimitChange()" name="pageLimit" class="select-base w-auto">
+      <select
+        [(ngModel)]="filters.limit"
+        (change)="onLimitChange()"
+        name="pageLimit"
+        class="select-base w-auto"
+      >
         <option [ngValue]="10">10</option>
         <option [ngValue]="25">25</option>
         <option [ngValue]="50">50</option>
       </select>
     </div>
     <div class="flex items-center gap-2 text-sm">
-      <button type="button" class="pagination-btn" [disabled]="filters.page <= 1"
-        (click)="goToPreviousPage()">Prev</button>
-      <span class="text-text-muted">Page {{ pagination().page }} of {{ pagination().totalPages || 1 }}</span>
-      <button type="button" class="pagination-btn" [disabled]="filters.page >= pagination().totalPages"
-        (click)="goToNextPage()">Next</button>
+      <button
+        type="button"
+        class="pagination-btn"
+        [disabled]="filters.page <= 1"
+        (click)="goToPreviousPage()"
+      >
+        Prev
+      </button>
+      <span class="text-text-muted"
+        >Page {{ pagination().page }} of {{ pagination().totalPages || 1 }}</span
+      >
+      <button
+        type="button"
+        class="pagination-btn"
+        [disabled]="filters.page >= pagination().totalPages"
+        (click)="goToNextPage()"
+      >
+        Next
+      </button>
     </div>
   </div>
 </div>

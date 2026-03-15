@@ -10,6 +10,7 @@ import { AddressForm } from '../shared/components/address-form';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ProductFormComponent } from '../product/product-form.component';
 import { TooltipDirective } from '../shared/directives/tooltip.directive';
+import { LucideAngularModule } from 'lucide-angular';
 
 type EditablePurchaseInvoiceItem = {
   id?: number;
@@ -48,7 +49,7 @@ type EditablePurchaseInvoice = {
 
 @Component({
   selector: 'app-purchase-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, ProductFormComponent, TooltipDirective],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, ProductFormComponent, TooltipDirective, LucideAngularModule],
   templateUrl: './purchase-invoice-form.html',
 })
 export class PurchaseInvoiceForm implements OnInit {
@@ -369,5 +370,12 @@ export class PurchaseInvoiceForm implements OnInit {
         this.error = err.error?.error || 'Failed to save purchase invoice';
       },
     });
+  }
+
+  printInvoice() {
+    if (this.editingInvoice.id) {
+      const url = this.purchaseInvoiceService.getPdfUrl(this.editingInvoice.id);
+      window.open(url, '_blank');
+    }
   }
 }

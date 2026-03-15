@@ -1,9 +1,21 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
   <h1 class="page-title">
-    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-      viewBox="0 0 24 24">
-      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-        d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11" />
+    <svg
+      class="w-7 h-7"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2.5"
+        d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11"
+      />
     </svg>
     {{ isEditMode ? 'Edit Sales Invoice' : 'New Sales Invoice' }}
   </h1>
@@ -12,53 +24,85 @@
       {{ editingInvoice.irn ? 'Back' : 'Cancel' }}
     </a>
     @if (editingInvoice.id) {
-    <button type="button" class="btn-secondary" (click)="previewPdf()">
-      Preview PDF
-    </button>
+      <button
+        type="button"
+        class="btn-outline text-accent flex items-center gap-1"
+        (click)="previewPdf()"
+      >
+        <i-lucide name="printer" [size]="18"></i-lucide>
+        Print
+      </button>
     }
     @if (!editingInvoice.irn) {
-    <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="submitting">
-      {{ submitting ? 'Saving...' : 'Save Invoice' }}
-    </button>
+      <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="submitting">
+        {{ submitting ? 'Saving...' : 'Save Invoice' }}
+      </button>
     }
   </div>
 </div>
 
 <div class="card">
   @if (error) {
-  <div class="error-banner flex items-start">
-    <svg class="h-5 w-5 mr-3 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-    <div>
-      <h3 class="font-medium">Error saving invoice</h3>
-      <div class="mt-1">{{ error }}</div>
+    <div class="error-banner flex items-start">
+      <svg
+        class="h-5 w-5 mr-3 mt-0.5 shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <div>
+        <h3 class="font-medium">Error saving invoice</h3>
+        <div class="mt-1">{{ error }}</div>
+      </div>
     </div>
-  </div>
   }
 
   @if (editingInvoice.irn) {
-  <div class="mb-6 rounded-lg border border-success/30 bg-success-light p-4">
-    <div class="flex items-start">
-      <svg class="h-6 w-6 text-success mt-0.5 mr-3 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-        width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-        <path fill-rule="evenodd"
-          d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
-          clip-rule="evenodd" />
-      </svg>
-      <div>
-        <h3 class="text-sm font-bold text-success uppercase tracking-wider mb-2">Indian E-Invoice Generated</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-success">
-          <div><span class="font-medium">IRN:</span> <span class="font-mono text-xs break-all">{{ editingInvoice.irn
-              }}</span></div>
-          <div><span class="font-medium">Ack No:</span> {{ editingInvoice.ackNo }}</div>
-          <div><span class="font-medium">Ack Date:</span> {{ editingInvoice.ackDate | date:'medium' }}</div>
+    <div class="mb-6 rounded-lg border border-success/30 bg-success-light p-4">
+      <div class="flex items-start">
+        <svg
+          class="h-6 w-6 text-success mt-0.5 mr-3 shrink-0"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <div>
+          <h3 class="text-sm font-bold text-success uppercase tracking-wider mb-2">
+            Indian E-Invoice Generated
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-success">
+            <div>
+              <span class="font-medium">IRN:</span>
+              <span class="font-mono text-xs break-all">{{ editingInvoice.irn }}</span>
+            </div>
+            <div><span class="font-medium">Ack No:</span> {{ editingInvoice.ackNo }}</div>
+            <div>
+              <span class="font-medium">Ack Date:</span>
+              {{ editingInvoice.ackDate | date: 'medium' }}
+            </div>
+          </div>
+          <p class="mt-2 text-xs italic opacity-80 text-success">
+            This invoice has been locked from future edits.
+          </p>
         </div>
-        <p class="mt-2 text-xs italic opacity-80 text-success">This invoice has been locked from future edits.</p>
       </div>
     </div>
-  </div>
   }
 
   <!-- Master Details Form -->
@@ -68,100 +112,170 @@
       <div class="flex justify-between items-center mb-1">
         <label class="label-base">Customer <span class="text-danger">*</span></label>
         @if (!editingInvoice.irn) {
-        <button type="button" class="text-xs text-accent hover:text-accent-hover font-medium"
-          (click)="toggleNewCustomerForm()">
-          {{ showNewCustomerForm ? 'Cancel Customer' : '+ Add Customer' }}
-        </button>
+          <button
+            type="button"
+            class="text-xs text-accent hover:text-accent-hover font-medium"
+            (click)="toggleNewCustomerForm()"
+          >
+            {{ showNewCustomerForm ? 'Cancel Customer' : '+ Add Customer' }}
+          </button>
         }
       </div>
 
       @if (showNewCustomerForm) {
-      <div class="bg-surface-muted border border-border p-3 rounded-lg mb-2">
-        <h4 class="text-xs font-semibold uppercase text-text-muted mb-2">Quick Add Customer</h4>
-        @if (customerError) {
-        <div class="text-xs text-danger mb-2">{{ customerError }}</div>
-        }
-        <div class="flex gap-2 mb-2">
-          <div class="flex-1">
-            <input type="text" [(ngModel)]="newCustomer.code" name="newCustCode" placeholder="Code (e.g. CUST-01)"
-              class="input-base" />
-          </div>
-          <div class="flex-2">
-            <input type="text" [(ngModel)]="newCustomer.name" name="newCustName" placeholder="Customer Name *"
-              class="input-base" />
-          </div>
-          <div class="flex-1">
-            <select [(ngModel)]="newCustomer.type" name="newCustType" class="select-base">
-              <option value="retail">Retail</option>
-              <option value="wholesale">Wholesale</option>
-            </select>
-          </div>
-          <div class="flex-1">
-            <input type="text" [(ngModel)]="newCustomer.gstin" name="newCustGstin" placeholder="GSTIN"
-              class="input-base" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
-          <app-address-form [address]="newCustomer.billingAddress!" [title]="'ADDRESS.BILLING'" [isExpandable]="true"
-            [isOpen]="false"></app-address-form>
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="invoiceSameAsBilling"
-                class="w-3.5 h-3.5 accent-accent rounded" />
-              <label for="invoiceSameAsBilling" class="text-xs font-medium text-text-muted">{{
-                'ADDRESS.SAME_AS_BILLING' | translate }}</label>
+        <div class="bg-surface-muted border border-border p-3 rounded-lg mb-2">
+          <h4 class="text-xs font-semibold uppercase text-text-muted mb-2">Quick Add Customer</h4>
+          @if (customerError) {
+            <div class="text-xs text-danger mb-2">{{ customerError }}</div>
+          }
+          <div class="flex gap-2 mb-2">
+            <div class="flex-1">
+              <input
+                type="text"
+                [(ngModel)]="newCustomer.code"
+                name="newCustCode"
+                placeholder="Code (e.g. CUST-01)"
+                class="input-base"
+              />
             </div>
-            @if (!sameAsBilling) {
-            <app-address-form [address]="newCustomer.shippingAddress!" [title]="'ADDRESS.SHIPPING'"
-              [isExpandable]="true" [isOpen]="false"></app-address-form>
-            }
+            <div class="flex-2">
+              <input
+                type="text"
+                [(ngModel)]="newCustomer.name"
+                name="newCustName"
+                placeholder="Customer Name *"
+                class="input-base"
+              />
+            </div>
+            <div class="flex-1">
+              <select [(ngModel)]="newCustomer.type" name="newCustType" class="select-base">
+                <option value="retail">Retail</option>
+                <option value="wholesale">Wholesale</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <input
+                type="text"
+                [(ngModel)]="newCustomer.gstin"
+                name="newCustGstin"
+                placeholder="GSTIN"
+                class="input-base"
+              />
+            </div>
           </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+            <app-address-form
+              [address]="newCustomer.billingAddress!"
+              [title]="'ADDRESS.BILLING'"
+              [isExpandable]="true"
+              [isOpen]="false"
+            ></app-address-form>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="sameAsBilling"
+                  name="sameAsBilling"
+                  id="invoiceSameAsBilling"
+                  class="w-3.5 h-3.5 accent-accent rounded"
+                />
+                <label for="invoiceSameAsBilling" class="text-xs font-medium text-text-muted">{{
+                  'ADDRESS.SAME_AS_BILLING' | translate
+                }}</label>
+              </div>
+              @if (!sameAsBilling) {
+                <app-address-form
+                  [address]="newCustomer.shippingAddress!"
+                  [title]="'ADDRESS.SHIPPING'"
+                  [isExpandable]="true"
+                  [isOpen]="false"
+                ></app-address-form>
+              }
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn-primary text-xs"
+            (click)="createCustomerInline()"
+            [disabled]="customerSubmitting"
+          >
+            {{ customerSubmitting ? 'Saving...' : 'Save & Select Customer' }}
+          </button>
         </div>
-        <button type="button" class="btn-primary text-xs" (click)="createCustomerInline()"
-          [disabled]="customerSubmitting">
-          {{ customerSubmitting ? 'Saving...' : 'Save & Select Customer' }}
-        </button>
-      </div>
       }
 
       @if (!showNewCustomerForm) {
-      <ng-select [items]="customers()" bindLabel="name" bindValue="id" [(ngModel)]="editingInvoice.customerId"
-        name="customerId" [searchable]="true" [clearable]="true" placeholder="-- Select Customer --"
-        [disabled]="!!editingInvoice.irn" class="w-full text-sm">
-        <ng-template ng-label-tmp let-item="item">
-          {{ item.code }} - {{ item.name }} ({{ item.type | titlecase }})
-        </ng-template>
-        <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-          <div class="font-medium text-text-heading">{{ item.name }}</div>
-          <div class="text-xs text-text-muted">{{ item.code }} &middot; {{ item.type | titlecase }}</div>
-        </ng-template>
-      </ng-select>
+        <ng-select
+          [items]="customers()"
+          bindLabel="name"
+          bindValue="id"
+          [(ngModel)]="editingInvoice.customerId"
+          name="customerId"
+          [searchable]="true"
+          [clearable]="true"
+          placeholder="-- Select Customer --"
+          [disabled]="!!editingInvoice.irn"
+          class="w-full text-sm"
+        >
+          <ng-template ng-label-tmp let-item="item">
+            {{ item.code }} - {{ item.name }} ({{ item.type | titlecase }})
+          </ng-template>
+          <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
+            <div class="font-medium text-text-heading">{{ item.name }}</div>
+            <div class="text-xs text-text-muted">
+              {{ item.code }} &middot; {{ item.type | titlecase }}
+            </div>
+          </ng-template>
+        </ng-select>
       }
     </div>
 
     <div>
       <label class="label-base">Invoice Number</label>
-      <input type="text" [(ngModel)]="editingInvoice.invoiceNumber" name="invoiceNumber"
-        [disabled]="!!editingInvoice.irn" placeholder="Auto-generated if left empty" class="input-base" />
+      <input
+        type="text"
+        [(ngModel)]="editingInvoice.invoiceNumber"
+        name="invoiceNumber"
+        [disabled]="!!editingInvoice.irn"
+        placeholder="Auto-generated if left empty"
+        class="input-base"
+      />
     </div>
 
     <div>
       <label class="label-base">Invoice Date <span class="text-danger">*</span></label>
-      <input type="date" [(ngModel)]="editingInvoice.invoiceDate" name="invoiceDate" required
-        [disabled]="!!editingInvoice.irn" class="input-base" />
+      <input
+        type="date"
+        [(ngModel)]="editingInvoice.invoiceDate"
+        name="invoiceDate"
+        required
+        [disabled]="!!editingInvoice.irn"
+        class="input-base"
+      />
     </div>
 
     <div>
       <label class="label-base">Ref Number</label>
-      <input type="text" [(ngModel)]="editingInvoice.refNumber" name="refNumber" [disabled]="!!editingInvoice.irn"
-        placeholder="e.g. PO-123" class="input-base" />
+      <input
+        type="text"
+        [(ngModel)]="editingInvoice.refNumber"
+        name="refNumber"
+        [disabled]="!!editingInvoice.irn"
+        placeholder="e.g. PO-123"
+        class="input-base"
+      />
     </div>
 
     <div>
       <label class="label-base">Ref Date</label>
-      <input type="date" [(ngModel)]="editingInvoice.refDate" name="refDate" [disabled]="!!editingInvoice.irn"
-        class="input-base" />
+      <input
+        type="date"
+        [(ngModel)]="editingInvoice.refDate"
+        name="refDate"
+        [disabled]="!!editingInvoice.irn"
+        class="input-base"
+      />
     </div>
   </form>
 
@@ -182,86 +296,141 @@
         </thead>
         <tbody>
           @for (item of editingInvoice.items; track $index; let i = $index) {
-          <tr class="table-row">
-            <td class="px-2 py-2">
-              <ng-select [items]="inventories()" bindLabel="gtn" bindValue="id" [(ngModel)]="item.inventoryId"
-                appendTo="body" (change)="onInventorySelect(item)" [disabled]="!!editingInvoice.irn"
-                [typeahead]="inventoryInput$" (scrollToEnd)="onInventoryScrollToEnd()" [loading]="inventoryLoading"
-                [name]="'itemInventory' + i" [searchable]="true" [clearable]="true"
-                placeholder="-- Select Item (GTN) --" class="w-full text-sm">
-                <ng-template ng-label-tmp let-p="item">
-                  <span class="font-medium">{{ p.gtn || p.code }}</span> - {{ p.name }}
-                  <span *ngIf="(p.unitsInStock || 0) <= 0"
-                    class="ml-2 text-[10px] bg-danger-light text-danger px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">No
-                    Stock</span>
-                </ng-template>
-                <ng-template ng-option-tmp let-p="item" let-search="searchTerm">
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <div class="font-medium text-text-heading">{{ p.name }}</div>
-                      <div class="text-xs text-text-muted">GTN: {{ p.gtn || p.code }}</div>
-                    </div>
-                    <div class="text-right">
-                      <div class="text-xs font-semibold" [class.text-danger]="(p.unitsInStock || 0) <= 0"
-                        [class.text-success]="(p.unitsInStock || 0) > 0">
-                        Stock: {{ p.unitsInStock || 0 }}
+            <tr class="table-row">
+              <td class="px-2 py-2">
+                <ng-select
+                  [items]="inventories()"
+                  bindLabel="gtn"
+                  bindValue="id"
+                  [(ngModel)]="item.inventoryId"
+                  appendTo="body"
+                  (change)="onInventorySelect(item)"
+                  [disabled]="!!editingInvoice.irn"
+                  [typeahead]="inventoryInput$"
+                  (scrollToEnd)="onInventoryScrollToEnd()"
+                  [loading]="inventoryLoading"
+                  [name]="'itemInventory' + i"
+                  [searchable]="true"
+                  [clearable]="true"
+                  placeholder="-- Select Item (GTN) --"
+                  class="w-full text-sm"
+                >
+                  <ng-template ng-label-tmp let-p="item">
+                    <span class="font-medium">{{ p.gtn || p.code }}</span> - {{ p.name }}
+                    <span
+                      *ngIf="(p.unitsInStock || 0) <= 0"
+                      class="ml-2 text-[10px] bg-danger-light text-danger px-1.5 py-0.5 rounded font-bold uppercase tracking-tight"
+                      >No Stock</span
+                    >
+                  </ng-template>
+                  <ng-template ng-option-tmp let-p="item" let-search="searchTerm">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <div class="font-medium text-text-heading">{{ p.name }}</div>
+                        <div class="text-xs text-text-muted">GTN: {{ p.gtn || p.code }}</div>
+                      </div>
+                      <div class="text-right">
+                        <div
+                          class="text-xs font-semibold"
+                          [class.text-danger]="(p.unitsInStock || 0) <= 0"
+                          [class.text-success]="(p.unitsInStock || 0) > 0"
+                        >
+                          Stock: {{ p.unitsInStock || 0 }}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </ng-template>
-              </ng-select>
-            </td>
-            <td class="px-2 py-2">
-              <input type="number" step="0.01" min="0" [(ngModel)]="item.qty" (input)="calculateLineTotal(item)"
-                [disabled]="!!editingInvoice.irn" [name]="'itemQty' + i" class="input-base text-right" />
-            </td>
-            <td class="px-2 py-2">
-              <input type="number" step="0.01" min="0" [(ngModel)]="item.unitPrice" (input)="calculateLineTotal(item)"
-                [disabled]="!!editingInvoice.irn" [name]="'itemPrice' + i" class="input-base text-right" />
-            </td>
-            <td class="px-2 py-2">
-              <input type="number" step="0.01" min="0" [(ngModel)]="item.taxPct" (input)="calculateLineTotal(item)"
-                [disabled]="!!editingInvoice.irn" [name]="'itemTaxPct' + i" class="input-base text-right" />
-            </td>
-            <td class="td-cell text-right text-text-muted">
-              {{ item.taxAmount | number:'1.2-2' }}
-            </td>
-            <td class="td-cell text-right font-medium">
-              {{ item.lineTotal | number:'1.2-2' }}
-            </td>
-            <td class="px-2 py-2 text-center">
-              @if (!editingInvoice.irn) {
-              <button type="button"
-                class="text-danger hover:text-danger p-1.5 rounded hover:bg-surface-muted transition"
-                appTooltip="Remove item" (click)="removeItem(i)" [disabled]="editingInvoice.items.length <= 1"
-                [class.opacity-50]="editingInvoice.items.length <= 1">
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                  fill="none" viewBox="0 0 24 24">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                </svg>
-              </button>
-              }
-            </td>
-          </tr>
+                  </ng-template>
+                </ng-select>
+              </td>
+              <td class="px-2 py-2">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  [(ngModel)]="item.qty"
+                  (input)="calculateLineTotal(item)"
+                  [disabled]="!!editingInvoice.irn"
+                  [name]="'itemQty' + i"
+                  class="input-base text-right"
+                />
+              </td>
+              <td class="px-2 py-2">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  [(ngModel)]="item.unitPrice"
+                  (input)="calculateLineTotal(item)"
+                  [disabled]="!!editingInvoice.irn"
+                  [name]="'itemPrice' + i"
+                  class="input-base text-right"
+                />
+              </td>
+              <td class="px-2 py-2">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  [(ngModel)]="item.taxPct"
+                  (input)="calculateLineTotal(item)"
+                  [disabled]="!!editingInvoice.irn"
+                  [name]="'itemTaxPct' + i"
+                  class="input-base text-right"
+                />
+              </td>
+              <td class="td-cell text-right text-text-muted">
+                {{ item.taxAmount | number: '1.2-2' }}
+              </td>
+              <td class="td-cell text-right font-medium">
+                {{ item.lineTotal | number: '1.2-2' }}
+              </td>
+              <td class="px-2 py-2 text-center">
+                @if (!editingInvoice.irn) {
+                  <button
+                    type="button"
+                    class="text-danger hover:text-danger p-1.5 rounded hover:bg-surface-muted transition"
+                    appTooltip="Remove item"
+                    (click)="removeItem(i)"
+                    [disabled]="editingInvoice.items.length <= 1"
+                    [class.opacity-50]="editingInvoice.items.length <= 1"
+                  >
+                    <i-lucide name="trash-2" [size]="16"></i-lucide>
+                  </button>
+                }
+              </td>
+            </tr>
           }
         </tbody>
       </table>
     </div>
 
     @if (!editingInvoice.irn) {
-    <div class="bg-surface-muted px-4 py-3 border-t border-border">
-      <button type="button"
-        class="text-accent hover:text-accent-hover font-medium text-sm flex items-center gap-1 transition"
-        (click)="addItem()">
-        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-          viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M5 12h14m-7 7V5" />
-        </svg>
-        Add Line Item
-      </button>
-    </div>
+      <div class="bg-surface-muted px-4 py-3 border-t border-border">
+        <button
+          type="button"
+          class="text-accent hover:text-accent-hover font-medium text-sm flex items-center gap-1 transition"
+          (click)="addItem()"
+        >
+          <svg
+            class="w-4 h-4"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 12h14m-7 7V5"
+            />
+          </svg>
+          Add Line Item
+        </button>
+      </div>
     }
   </div>
 
@@ -274,22 +443,27 @@
     <div class="w-full md:w-1/3 bg-surface-muted rounded-lg p-5 border border-border space-y-3">
       <div class="flex justify-between items-center text-sm">
         <span class="text-text-muted font-medium">Subtotal</span>
-        <span class="font-medium text-text-heading">{{ subtotal | number:'1.2-2' }}</span>
+        <span class="font-medium text-text-heading">{{ subtotal | number: '1.2-2' }}</span>
       </div>
       <div class="flex justify-between items-center text-sm">
         <span class="text-text-muted font-medium">Total Discount</span>
-        <span class="font-medium text-danger" *ngIf="totalDiscount > 0">- {{ totalDiscount | number:'1.2-2' }}</span>
-        <span class="font-medium text-text-heading" *ngIf="totalDiscount <= 0">{{ totalDiscount | number:'1.2-2'
-          }}</span>
+        <span class="font-medium text-danger" *ngIf="totalDiscount > 0"
+          >- {{ totalDiscount | number: '1.2-2' }}</span
+        >
+        <span class="font-medium text-text-heading" *ngIf="totalDiscount <= 0">{{
+          totalDiscount | number: '1.2-2'
+        }}</span>
       </div>
       <div class="flex justify-between items-center text-sm">
         <span class="text-text-muted font-medium">Total Tax</span>
-        <span class="font-medium text-text-heading">{{ totalTax | number:'1.2-2' }}</span>
+        <span class="font-medium text-text-heading">{{ totalTax | number: '1.2-2' }}</span>
       </div>
       <div class="border-t border-border my-1"></div>
       <div class="flex justify-between items-center">
-        <span class="text-base font-bold text-text-heading uppercase tracking-wider">Net Amount</span>
-        <span class="text-xl font-bold text-success">Rs. {{ netAmount | number:'1.2-2' }}</span>
+        <span class="text-base font-bold text-text-heading uppercase tracking-wider"
+          >Net Amount</span
+        >
+        <span class="text-xl font-bold text-success">Rs. {{ netAmount | number: '1.2-2' }}</span>
       </div>
     </div>
   </div>

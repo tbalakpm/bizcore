@@ -1,9 +1,7 @@
 import { and, eq, inArray, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
-import PDFDocument from 'pdfkit';
-
 import { db, customers, inventories, products, salesInvoices, salesInvoiceItems, addresses, settings } from '../db';
-import { PrintSalesInvoiceService } from '../services/print-sales-invoice.service';
+import { renderSalesInvoice } from '../services/pdf/reports/sales-invoice.report';
 import type { SalesInvoiceInput, SalesInvoiceItemModel } from '../models/sales-invoice.model';
 import { serialNumberService } from '../services/serial-number.service';
 import type { DbTransaction } from '../shared/serial-number.shared';
@@ -500,109 +498,7 @@ salesInvoicesRouter.get('/:id/pdf', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid sales invoice ID' });
     }
 
-    const invoice = await db.select().from(salesInvoices).where(eq(salesInvoices.id, id)).get();
-    if (!invoice) {
-      return res.status(404).json({ error: 'Sales invoice not found' });
-    }
-
-    // 1. Fetch settings
-    const settingRows = await db.select().from(settings).all();
-    const s = Object.fromEntries(settingRows.map(r => [r.key, r.value]));
-
-    // 2. Fetch customer with addresses
-    const customer = await db.select().from(customers).where(eq(customers.id, invoice.customerId)).get();
-    let billingAddress = null;
-    let shippingAddress = null;
-    if (customer?.billingAddressId) {
-      billingAddress = await db.select().from(addresses).where(eq(addresses.id, customer.billingAddressId)).get();
-    }
-    if (customer?.shippingAddressId) {
-      shippingAddress = await db.select().from(addresses).where(eq(addresses.id, customer.shippingAddressId)).get();
-    }
-
-    // 3. Fetch expanded items
-    const items = await db
-      .select({
-        qty: salesInvoiceItems.qty,
-        unitPrice: salesInvoiceItems.unitPrice,
-        discountAmount: salesInvoiceItems.discountAmount,
-        taxPct: salesInvoiceItems.taxPct,
-        taxAmount: salesInvoiceItems.taxAmount,
-        lineTotal: salesInvoiceItems.lineTotal,
-        productName: products.name,
-        hsnSac: inventories.hsnSac,
-      })
-      .from(salesInvoiceItems)
-      .innerJoin(inventories, eq(inventories.id, salesInvoiceItems.inventoryId))
-      .innerJoin(products, eq(products.id, inventories.productId))
-      .where(eq(salesInvoiceItems.salesInvoiceId, id))
-      .all();
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename=sales_invoice_${invoice.invoiceNumber}.pdf`);
-
-    const pdfData = {
-      invoice: {
-        invoiceNumber: invoice.invoiceNumber,
-        invoiceDate: invoice.invoiceDate,
-        refNumber: invoice.refNumber,
-        subtotal: invoice.subtotal,
-        discountAmount: invoice.discountAmount,
-        taxAmount: invoice.taxAmount ?? '0',
-        roundOff: '0', // TODO: add if schema supports it
-        netAmount: invoice.netAmount ?? '0',
-        irn: invoice.irn,
-        ackNo: invoice.ackNo,
-        ackDate: invoice.ackDate,
-        signedQrCode: invoice.signedQrCode,
-      },
-      company: {
-        name: s['company_name'] || '',
-        gstin: s['company_gstin'] || '',
-        addressLine1: s['company_address_line1'],
-        city: s['company_city'],
-        state: s['company_state'],
-        postalCode: s['company_postal_code'],
-        phone: s['company_phone'],
-        bankName: s['bank_name'],
-        bankAccount: s['bank_account'],
-        bankIfsc: s['bank_ifsc'],
-        invoiceTerms: s['invoice_terms'],
-        sgstSharingRate: s['sgst_sharing_rate'] ? Number(s['sgst_sharing_rate']) : 50,
-        igstSharingRate: s['igst_sharing_rate'] ? Number(s['igst_sharing_rate']) : 0,
-      },
-      customer: customer ? {
-        name: customer.name,
-        gstin: customer.gstin,
-        billingAddress: billingAddress ? {
-          addressLine1: billingAddress.addressLine1,
-          city: billingAddress.city,
-          state: billingAddress.state,
-          postalCode: billingAddress.postalCode,
-          country: billingAddress.country,
-        } : null,
-        shippingAddress: shippingAddress ? {
-          addressLine1: shippingAddress.addressLine1,
-          city: shippingAddress.city,
-          state: shippingAddress.state,
-          postalCode: shippingAddress.postalCode,
-          country: shippingAddress.country,
-        } : null,
-      } : null,
-      items: items.map(item => ({
-        productName: item.productName || 'Unknown',
-        hsnSac: item.hsnSac,
-        qty: item.qty ?? '0',
-        unitPrice: item.unitPrice ?? '0',
-        discountAmount: item.discountAmount ?? '0',
-        taxPct: item.taxPct ?? '0',
-        taxAmount: item.taxAmount ?? '0',
-        lineTotal: item.lineTotal ?? '0',
-      })),
-    };
-
-    await new PrintSalesInvoiceService().generatePDF(pdfData, res);
-
+    await renderSalesInvoice(id, db, res);
   } catch (error) {
     console.error('Failed to generate sales invoice PDF', error);
     res.status(500).json({ error: 'Failed to generate PDF' });
