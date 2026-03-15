@@ -2,7 +2,8 @@ import { and, eq, inArray, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 import PDFDocument from 'pdfkit';
 
-import { db, customers, inventories, products, salesInvoices, salesInvoiceItems } from '../db';
+import { db, customers, inventories, products, salesInvoices, salesInvoiceItems, addresses, settings } from '../db';
+import { PrintSalesInvoiceService } from '../services/print-sales-invoice.service';
 import type { SalesInvoiceInput, SalesInvoiceItemModel } from '../models/sales-invoice.model';
 import { serialNumberService } from '../services/serial-number.service';
 import type { DbTransaction } from '../shared/serial-number.shared';
@@ -451,9 +452,13 @@ salesInvoicesRouter.post('/:id/generate-irn', async (req: Request, res: Response
     
     const ackDate = new Date().toISOString();
     
+    // Fetch seller GSTIN from settings
+    const settingRows = await db.select().from(settings).all();
+    const s = Object.fromEntries(settingRows.map(r => [r.key, r.value]));
+
     // Mock Signed QR payload (usually a signed JWT-like string)
     const qrPayload = JSON.stringify({
-       SellerGstin: '07AAGFF2194N1Z1',
+       SellerGstin: s['company_gstin'] || '07AAGFF2194N1Z1',
        BuyerGstin: '27AADCB2230M1Z2',
        DocNo: existing.invoiceNumber,
        DocTyp: 'INV',
@@ -500,15 +505,32 @@ salesInvoicesRouter.get('/:id/pdf', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Sales invoice not found' });
     }
 
-    const customer = await db.select().from(customers).where(eq(customers.id, invoice.customerId)).get();
+    // 1. Fetch settings
+    const settingRows = await db.select().from(settings).all();
+    const s = Object.fromEntries(settingRows.map(r => [r.key, r.value]));
 
+    // 2. Fetch customer with addresses
+    const customer = await db.select().from(customers).where(eq(customers.id, invoice.customerId)).get();
+    let billingAddress = null;
+    let shippingAddress = null;
+    if (customer?.billingAddressId) {
+      billingAddress = await db.select().from(addresses).where(eq(addresses.id, customer.billingAddressId)).get();
+    }
+    if (customer?.shippingAddressId) {
+      shippingAddress = await db.select().from(addresses).where(eq(addresses.id, customer.shippingAddressId)).get();
+    }
+
+    // 3. Fetch expanded items
     const items = await db
       .select({
         qty: salesInvoiceItems.qty,
         unitPrice: salesInvoiceItems.unitPrice,
+        discountAmount: salesInvoiceItems.discountAmount,
+        taxPct: salesInvoiceItems.taxPct,
         taxAmount: salesInvoiceItems.taxAmount,
         lineTotal: salesInvoiceItems.lineTotal,
         productName: products.name,
+        hsnSac: inventories.hsnSac,
       })
       .from(salesInvoiceItems)
       .innerJoin(inventories, eq(inventories.id, salesInvoiceItems.inventoryId))
@@ -517,129 +539,72 @@ salesInvoicesRouter.get('/:id/pdf', async (req: Request, res: Response) => {
       .all();
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'inline; filename=sales_invoice_' + invoice.invoiceNumber + '.pdf');
+    res.setHeader('Content-Disposition', `inline; filename=sales_invoice_${invoice.invoiceNumber}.pdf`);
 
-    const doc = new PDFDocument({ margin: 50, size: 'A4' });
-    doc.pipe(res);
+    const pdfData = {
+      invoice: {
+        invoiceNumber: invoice.invoiceNumber,
+        invoiceDate: invoice.invoiceDate,
+        refNumber: invoice.refNumber,
+        subtotal: invoice.subtotal,
+        discountAmount: invoice.discountAmount,
+        taxAmount: invoice.taxAmount ?? '0',
+        roundOff: '0', // TODO: add if schema supports it
+        netAmount: invoice.netAmount ?? '0',
+        irn: invoice.irn,
+        ackNo: invoice.ackNo,
+        ackDate: invoice.ackDate,
+        signedQrCode: invoice.signedQrCode,
+      },
+      company: {
+        name: s['company_name'] || '',
+        gstin: s['company_gstin'] || '',
+        addressLine1: s['company_address_line1'],
+        city: s['company_city'],
+        state: s['company_state'],
+        postalCode: s['company_postal_code'],
+        phone: s['company_phone'],
+        bankName: s['bank_name'],
+        bankAccount: s['bank_account'],
+        bankIfsc: s['bank_ifsc'],
+        invoiceTerms: s['invoice_terms'],
+        sgstSharingRate: s['sgst_sharing_rate'] ? Number(s['sgst_sharing_rate']) : 50,
+        igstSharingRate: s['igst_sharing_rate'] ? Number(s['igst_sharing_rate']) : 0,
+      },
+      customer: customer ? {
+        name: customer.name,
+        gstin: customer.gstin,
+        billingAddress: billingAddress ? {
+          addressLine1: billingAddress.addressLine1,
+          city: billingAddress.city,
+          state: billingAddress.state,
+          postalCode: billingAddress.postalCode,
+          country: billingAddress.country,
+        } : null,
+        shippingAddress: shippingAddress ? {
+          addressLine1: shippingAddress.addressLine1,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          postalCode: shippingAddress.postalCode,
+          country: shippingAddress.country,
+        } : null,
+      } : null,
+      items: items.map(item => ({
+        productName: item.productName || 'Unknown',
+        hsnSac: item.hsnSac,
+        qty: item.qty ?? '0',
+        unitPrice: item.unitPrice ?? '0',
+        discountAmount: item.discountAmount ?? '0',
+        taxPct: item.taxPct ?? '0',
+        taxAmount: item.taxAmount ?? '0',
+        lineTotal: item.lineTotal ?? '0',
+      })),
+    };
 
-    // Header
-    doc.fontSize(20).font('Helvetica-Bold').text('SALES INVOICE', { align: 'right' });
-    doc.moveDown(0.5);
-    
-    // E-Invoice Metadata Section 
-    let yInvoiceHeader = 90;
-    
-    if (invoice.irn) {
-       // Render the IRN Details
-       doc.fontSize(8).font('Helvetica-Bold').text('IRN:', 250, yInvoiceHeader);
-       doc.font('Helvetica').text(invoice.irn, 270, yInvoiceHeader, { width: 220 });
-       
-       yInvoiceHeader += 15;
-       
-       doc.font('Helvetica-Bold').text('Ack No:', 250, yInvoiceHeader);
-       doc.font('Helvetica').text(invoice.ackNo || '', 290, yInvoiceHeader);
-       
-       yInvoiceHeader += 12;
-       
-       doc.font('Helvetica-Bold').text('Ack Date:', 250, yInvoiceHeader);
-       doc.font('Helvetica').text(invoice.ackDate || '', 295, yInvoiceHeader);
-       
-       // Render the Signed QR Code using bwip-js
-       if (invoice.signedQrCode) {
-           try {
-             // We use bwip-js to securely convert the signed payload to a Buffer
-             const qrPng = await bwipjs.toBuffer({
-                bcid: 'qrcode',
-                text: invoice.signedQrCode,
-                scale: 3,
-                height: 10,
-                width: 10,
-             });
-             // Position QR code in the top right corner
-             doc.image(qrPng, 480, 75, { width: 65 });
-           } catch(e) {
-             console.error('Failed to generate QR Code image for PDF', e);
-           }
-       }
-    }
+    await new PrintSalesInvoiceService().generatePDF(pdfData, res);
 
-    // Invoice Meta
-    doc.fontSize(10).font('Helvetica-Bold').text('Invoice Number:', 50, 90);
-    doc.font('Helvetica').text(invoice.invoiceNumber, 150, 90);
-    
-    doc.font('Helvetica-Bold').text('Invoice Date:', 50, 105);
-    doc.font('Helvetica').text(invoice.invoiceDate || '', 150, 105);
-
-    // Customer Info
-    doc.moveDown(2);
-    doc.font('Helvetica-Bold').text('Bill To:');
-    doc.font('Helvetica').text(customer?.name || 'Unknown Customer');
-    
-    doc.moveDown(3);
-
-    // Table Header
-    const tableTop = doc.y;
-    doc.font('Helvetica-Bold');
-    doc.text('Item', 50, tableTop);
-    doc.text('Qty', 250, tableTop, { width: 50, align: 'right' });
-    doc.text('Unit Price', 300, tableTop, { width: 80, align: 'right' });
-    doc.text('Tax', 380, tableTop, { width: 50, align: 'right' });
-    doc.text('Line Total', 450, tableTop, { width: 90, align: 'right' });
-
-    // Header Line
-    doc.moveTo(50, tableTop + 15).lineTo(540, tableTop + 15).stroke();
-    
-    let y = tableTop + 25;
-    doc.font('Helvetica');
-    
-    // Items
-    for (const item of items) {
-      if (y > 700) {
-        doc.addPage();
-        y = 50; // reset y
-      }
-      
-      const qty = Number(item.qty || 0).toFixed(2);
-      const price = Number(item.unitPrice || 0).toFixed(2);
-      const tax = Number(item.taxAmount || 0).toFixed(2);
-      const total = Number(item.lineTotal || 0).toFixed(2);
-      
-      doc.text(item.productName || 'Unknown', 50, y, { width: 190 });
-      doc.text(qty, 250, y, { width: 50, align: 'right' });
-      doc.text(price, 300, y, { width: 80, align: 'right' });
-      doc.text(tax, 380, y, { width: 50, align: 'right' });
-      doc.text(total, 450, y, { width: 90, align: 'right' });
-      
-      y += 20;
-    }
-    
-    // Summary Line
-    doc.moveTo(250, y + 10).lineTo(540, y + 10).stroke();
-    y += 20;
-
-    // Totals
-    doc.font('Helvetica-Bold');
-    doc.text('Subtotal:', 350, y, { width: 90, align: 'right' });
-    doc.font('Helvetica').text(Number(invoice.subtotal || 0).toFixed(2), 450, y, { width: 90, align: 'right' });
-    y += 15;
-
-    if (Number(invoice.discountAmount) > 0) {
-      doc.font('Helvetica-Bold').text('Discount:', 350, y, { width: 90, align: 'right' });
-      doc.font('Helvetica').text('-' + Number(invoice.discountAmount).toFixed(2), 450, y, { width: 90, align: 'right' });
-      y += 15;
-    }
-    
-    doc.font('Helvetica-Bold').text('Total Tax:', 350, y, { width: 90, align: 'right' });
-    doc.font('Helvetica').text(Number(invoice.taxAmount || 0).toFixed(2), 450, y, { width: 90, align: 'right' });
-    y += 15;
-
-    doc.font('Helvetica-Bold').fontSize(12);
-    doc.text('NET AMOUNT:', 300, y + 5, { width: 140, align: 'right' });
-    doc.text('Rs. ' + Number(invoice.netAmount || 0).toFixed(2), 450, y + 5, { width: 90, align: 'right' });
-
-    doc.end();
   } catch (error) {
     console.error('Failed to generate sales invoice PDF', error);
-    return res.status(500).json({ error: 'Failed to generate PDF' });
+    res.status(500).json({ error: 'Failed to generate PDF' });
   }
 });

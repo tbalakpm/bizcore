@@ -78,7 +78,7 @@
             <td class="td-cell text-center">
               <button type="button" (click)="toggleActive(p)"
                 class="w-6 h-6 rounded-full border flex items-center justify-center"
-                [title]="p.isActive ? 'Deactivate' : 'Activate'"
+                [appTooltip]="p.isActive ? 'Deactivate' : 'Activate'"
                 [ngClass]="p.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
                 @if (p.isActive) {
                 <i-lucide name="check" [size]="14"></i-lucide>
@@ -90,11 +90,11 @@
             @if (permissionService.canWrite('products')) {
             <td class="td-cell text-center">
               <div class="flex items-center justify-center gap-2">
-                <button (click)="editProduct(p.id)" class="btn-link-edit flex items-center gap-1" title="Edit product">
+                <button (click)="editProduct(p.id)" class="btn-link-edit flex items-center gap-1" appTooltip="Edit product">
                   <i-lucide name="pencil" [size]="18"></i-lucide>
                 </button>
                 <button (click)="deleteProduct(p.id)" class="btn-link-danger flex items-center gap-1"
-                  title="Delete product">
+                  appTooltip="Delete product">
                   <i-lucide name="trash-2" [size]="18"></i-lucide>
                 </button>
               </div>

@@ -6,10 +6,11 @@ import { type Customer, type Address, CustomerList, CustomerService } from './cu
 import { AddressForm } from '../shared/components/address-form';
 import { LucideAngularModule } from 'lucide-angular';
 import { PermissionService } from '../auth/permission.service';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-customers',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm, LucideAngularModule],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm, LucideAngularModule, TooltipDirective],
   templateUrl: './customers.html',
 })
 export class Customers implements OnInit {

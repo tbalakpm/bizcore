@@ -36,7 +36,7 @@
           <td class="td-cell">
             <button type="button" (click)="toggleActive(r)"
               class="toggle-btn"
-              [title]="r.isActive ? 'Deactivate' : 'Activate'"
+              [appTooltip]="r.isActive ? 'Deactivate' : 'Activate'"
               [ngClass]="r.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
               @if (r.isActive) {
               <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,10 +51,10 @@
           </td>
           <td class="td-cell text-center">
             <div class="flex items-center justify-center gap-2">
-              <button (click)="editRegister(r.id)" class="btn-link-edit flex items-center gap-1" title="Edit register">
+              <button (click)="editRegister(r.id)" class="btn-link-edit flex items-center gap-1" appTooltip="Edit register">
                 <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
               </button>
-              <button (click)="deleteRegister(r.id)" class="btn-link-danger flex items-center gap-1" title="Delete register">
+              <button (click)="deleteRegister(r.id)" class="btn-link-danger flex items-center gap-1" appTooltip="Delete register">
                 <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
               </button>
             </div>

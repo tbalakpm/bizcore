@@ -9,6 +9,7 @@ import { type PurchaseInvoiceItem, PurchaseInvoiceService } from './purchase-inv
 import { AddressForm } from '../shared/components/address-form';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ProductFormComponent } from '../product/product-form.component';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 type EditablePurchaseInvoiceItem = {
   id?: number;
@@ -47,7 +48,7 @@ type EditablePurchaseInvoice = {
 
 @Component({
   selector: 'app-purchase-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, ProductFormComponent],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, ProductFormComponent, TooltipDirective],
   templateUrl: './purchase-invoice-form.html',
 })
 export class PurchaseInvoiceForm implements OnInit {

@@ -98,7 +98,7 @@
             </td>
             <td class="td-cell">{{ item.lineTotal }}</td>
             <td class="td-cell text-right">
-              <button type="button" class="btn-link-danger" (click)="removeItemRow(i)">Remove</button>
+              <button type="button" class="btn-link-danger" appTooltip="Remove item" (click)="removeItemRow(i)">Remove</button>
             </td>
           </tr>
           }

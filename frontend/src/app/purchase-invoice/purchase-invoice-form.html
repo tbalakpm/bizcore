@@ -168,17 +168,17 @@
                   class="input-base" />
               </td>
               <td class="px-2 py-2 text-right align-bottom">
-                <input type="number" step="0.01" min="1" [(ngModel)]="item.qty" (ngModelChange)="onItemChanged(item)"
+                <input type="number" step="1" min="1" [(ngModel)]="item.qty" (ngModelChange)="onItemChanged(item)"
                   [name]="'itemQty' + i" class="input-base text-right" />
               </td>
               <td class="px-2 py-2 text-right align-bottom">
-                <input type="number" step="0.01" min="0" [(ngModel)]="item.unitPrice"
+                <input type="number" step="1" min="0.01" [(ngModel)]="item.unitPrice"
                   (ngModelChange)="onItemChanged(item)" [name]="'itemPrice' + i" class="input-base text-right" />
               </td>
               <td class="px-2 py-2 align-bottom">
                 <div class="flex border border-border-strong rounded-md overflow-hidden">
                   <select [(ngModel)]="item.discountType" [name]="'itemDiscType' + i" (change)="onItemChanged(item)"
-                    class="text-xs border-r border-border-strong bg-surface-muted px-1 py-1 text-text outline-none">
+                    class="text-xs border-r border-border-strong bg-surface-muted px-1 py-2 text-text outline-none">
                     <option value="none">None</option>
                     <option value="percent">%</option>
                     <option value="amount">Amt</option>
@@ -189,7 +189,7 @@
                     class="w-full border-none px-2 py-1 text-right text-xs bg-surface text-text outline-none"
                     placeholder="0" />
                   } @else if (item.discountType === 'amount') {
-                  <input type="number" step="0.01" [(ngModel)]="item.discountAmount"
+                  <input type="number" step="1" min="0" [(ngModel)]="item.discountAmount"
                     (ngModelChange)="onItemChanged(item)" [name]="'itemDiscVal' + i"
                     class="w-full border-none px-2 py-1 text-right text-xs bg-surface text-text outline-none"
                     placeholder="0" />
@@ -206,7 +206,7 @@
               <td class="px-2 py-2 text-center">
                 <button type="button"
                   class="text-danger hover:text-danger p-1.5 rounded hover:bg-surface-muted transition"
-                  (click)="removeItemRow(i)">
+                  appTooltip="Remove item" (click)="removeItemRow(i)">
                   <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                     fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

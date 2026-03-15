@@ -9,10 +9,11 @@ import { Customer, CustomerService } from '../customer/customer-service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { LucideAngularModule } from 'lucide-angular';
 import { PermissionService } from '../auth/permission.service';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-sales-invoices',
-  imports: [ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, RouterLink, NgSelectModule, LucideAngularModule],
+  imports: [ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, RouterLink, NgSelectModule, LucideAngularModule, TooltipDirective],
   templateUrl: './sales-invoices.html',
 })
 export class SalesInvoices implements OnInit {

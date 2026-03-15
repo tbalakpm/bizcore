@@ -68,17 +68,17 @@
             <div class="flex items-center justify-center gap-2">
               @if (permissionService.canWrite('stock-invoices')) {
               <a [routerLink]="['/stock-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1"
-                title="Edit stock invoice">
+                appTooltip="Edit stock invoice">
                 <i-lucide name="pencil" [size]="18"></i-lucide>
               </a>
               }
-              <button type="button" class="btn-link-edit flex items-center gap-1" title="Print barcodes"
+              <button type="button" class="btn-link-edit flex items-center gap-1" appTooltip="Print barcodes"
                 [disabled]="printingInvoiceId === invoice.id" (click)="printBarcodes(invoice.id)">
                 <i-lucide name="scan-barcode" [size]="18"></i-lucide>
                 {{ printingInvoiceId === invoice.id ? 'Printing...' : '' }}
               </button>
               @if (permissionService.canWrite('stock-invoices')) {
-              <button type="button" class="btn-link-danger flex items-center gap-1" title="Delete stock invoice"
+              <button type="button" class="btn-link-danger flex items-center gap-1" appTooltip="Delete stock invoice"
                 (click)="deleteInvoice(invoice.id)">
                 <i-lucide name="trash-2" [size]="18"></i-lucide>
               </button>

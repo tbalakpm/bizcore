@@ -10,6 +10,7 @@ import {
   StockInvoiceService,
 } from './stock-invoice-service';
 import { PermissionService } from '../auth/permission.service';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 type PrintableBarcodeLabel = {
   title: string;
@@ -19,7 +20,7 @@ type PrintableBarcodeLabel = {
 
 @Component({
   selector: 'app-stock-invoices',
-  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule, TooltipDirective],
   templateUrl: './stock-invoices.html',
 })
 export class StockInvoices implements OnInit {

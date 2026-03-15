@@ -6,6 +6,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { type Product, ProductService } from '../product/product-service';
 import { ProductFormComponent } from '../product/product-form.component';
 import { type StockInvoiceItem, StockInvoiceService } from './stock-invoice-service';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 type EditableStockInvoiceItem = {
   id?: number;
@@ -28,7 +29,7 @@ type EditableStockInvoice = {
 
 @Component({
   selector: 'app-stock-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, ProductFormComponent],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, ProductFormComponent, TooltipDirective],
   templateUrl: './stock-invoice-form.html',
 })
 export class StockInvoiceForm implements OnInit {

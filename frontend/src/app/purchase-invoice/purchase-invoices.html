@@ -64,10 +64,10 @@
             <div class="flex items-center justify-center gap-2">
               @if (permissionService.canWrite('purchase-invoices')) {
               <a [routerLink]="['/purchase-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1"
-                title="Edit purchase invoice">
+                appTooltip="Edit purchase invoice">
                 <i-lucide name="pencil" [size]="18"></i-lucide>
               </a>
-              <button type="button" class="btn-link-danger flex items-center gap-1" title="Delete purchase invoice"
+              <button type="button" class="btn-link-danger flex items-center gap-1" appTooltip="Delete purchase invoice"
                 (click)="deleteInvoice(invoice.id)">
                 <i-lucide name="trash-2" [size]="18"></i-lucide>
               </button>

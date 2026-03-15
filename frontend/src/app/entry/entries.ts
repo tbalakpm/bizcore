@@ -10,10 +10,11 @@ import { Register, RegisterService } from '../register/register-service';
 import { getLocalYYYYMMDD } from '../utils/datefns';
 import { type Entry, type EntryListResponse, EntryService } from './entry-service';
 import { LucideAngularModule } from 'lucide-angular';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-entries',
-  imports: [FormsModule, ReactiveFormsModule, DecimalPipe, TranslatePipe, DatePipe, LucideAngularModule],
+  imports: [FormsModule, ReactiveFormsModule, DecimalPipe, TranslatePipe, DatePipe, LucideAngularModule, TooltipDirective],
   templateUrl: './entries.html',
 })
 export class Entries implements OnInit {

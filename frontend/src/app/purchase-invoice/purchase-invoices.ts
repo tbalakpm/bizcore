@@ -9,10 +9,11 @@ import {
   PurchaseInvoiceService,
 } from './purchase-invoice-service';
 import { PermissionService } from '../auth/permission.service';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-purchase-invoices',
-  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule, TooltipDirective],
   templateUrl: './purchase-invoices.html',
 })
 export class PurchaseInvoices implements OnInit {

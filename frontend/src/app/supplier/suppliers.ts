@@ -6,10 +6,11 @@ import { type Supplier, type Address, SupplierList, SupplierService } from './su
 import { AddressForm } from '../shared/components/address-form';
 import { LucideAngularModule } from 'lucide-angular';
 import { PermissionService } from '../auth/permission.service';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-suppliers',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm, LucideAngularModule],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm, LucideAngularModule, TooltipDirective],
   templateUrl: './suppliers.html',
 })
 export class Suppliers implements OnInit {

@@ -11,6 +11,11 @@
     <a routerLink="/sales-invoices" class="btn-outline">
       {{ editingInvoice.irn ? 'Back' : 'Cancel' }}
     </a>
+    @if (editingInvoice.id) {
+    <button type="button" class="btn-secondary" (click)="previewPdf()">
+      Preview PDF
+    </button>
+    }
     @if (!editingInvoice.irn) {
     <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="submitting">
       {{ submitting ? 'Saving...' : 'Save Invoice' }}
@@ -36,8 +41,8 @@
   @if (editingInvoice.irn) {
   <div class="mb-6 rounded-lg border border-success/30 bg-success-light p-4">
     <div class="flex items-start">
-      <svg class="h-6 w-6 text-success mt-0.5 mr-3 shrink-0" aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+      <svg class="h-6 w-6 text-success mt-0.5 mr-3 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+        width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
         <path fill-rule="evenodd"
           d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
           clip-rule="evenodd" />
@@ -45,7 +50,8 @@
       <div>
         <h3 class="text-sm font-bold text-success uppercase tracking-wider mb-2">Indian E-Invoice Generated</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-success">
-          <div><span class="font-medium">IRN:</span> <span class="font-mono text-xs break-all">{{ editingInvoice.irn }}</span></div>
+          <div><span class="font-medium">IRN:</span> <span class="font-mono text-xs break-all">{{ editingInvoice.irn
+              }}</span></div>
           <div><span class="font-medium">Ack No:</span> {{ editingInvoice.ackNo }}</div>
           <div><span class="font-medium">Ack Date:</span> {{ editingInvoice.ackDate | date:'medium' }}</div>
         </div>
@@ -80,7 +86,7 @@
             <input type="text" [(ngModel)]="newCustomer.code" name="newCustCode" placeholder="Code (e.g. CUST-01)"
               class="input-base" />
           </div>
-          <div class="flex-[2]">
+          <div class="flex-2">
             <input type="text" [(ngModel)]="newCustomer.name" name="newCustName" placeholder="Customer Name *"
               class="input-base" />
           </div>
@@ -112,8 +118,8 @@
             }
           </div>
         </div>
-        <button type="button" class="btn-primary text-xs"
-          (click)="createCustomerInline()" [disabled]="customerSubmitting">
+        <button type="button" class="btn-primary text-xs" (click)="createCustomerInline()"
+          [disabled]="customerSubmitting">
           {{ customerSubmitting ? 'Saving...' : 'Save & Select Customer' }}
         </button>
       </div>
@@ -217,17 +223,17 @@
               <input type="number" step="0.01" min="0" [(ngModel)]="item.taxPct" (input)="calculateLineTotal(item)"
                 [disabled]="!!editingInvoice.irn" [name]="'itemTaxPct' + i" class="input-base text-right" />
             </td>
-            <td class="td-cell text-right text-text-muted bg-surface-muted">
+            <td class="td-cell text-right text-text-muted">
               {{ item.taxAmount | number:'1.2-2' }}
             </td>
-            <td class="td-cell text-right font-medium bg-surface-muted">
+            <td class="td-cell text-right font-medium">
               {{ item.lineTotal | number:'1.2-2' }}
             </td>
             <td class="px-2 py-2 text-center">
               @if (!editingInvoice.irn) {
               <button type="button"
                 class="text-danger hover:text-danger p-1.5 rounded hover:bg-surface-muted transition"
-                (click)="removeItem(i)" [disabled]="editingInvoice.items.length <= 1"
+                appTooltip="Remove item" (click)="removeItem(i)" [disabled]="editingInvoice.items.length <= 1"
                 [class.opacity-50]="editingInvoice.items.length <= 1">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
@@ -273,7 +279,8 @@
       <div class="flex justify-between items-center text-sm">
         <span class="text-text-muted font-medium">Total Discount</span>
         <span class="font-medium text-danger" *ngIf="totalDiscount > 0">- {{ totalDiscount | number:'1.2-2' }}</span>
-        <span class="font-medium text-text-heading" *ngIf="totalDiscount <= 0">{{ totalDiscount | number:'1.2-2' }}</span>
+        <span class="font-medium text-text-heading" *ngIf="totalDiscount <= 0">{{ totalDiscount | number:'1.2-2'
+          }}</span>
       </div>
       <div class="flex justify-between items-center text-sm">
         <span class="text-text-muted font-medium">Total Tax</span>

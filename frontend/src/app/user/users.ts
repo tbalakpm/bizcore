@@ -8,10 +8,11 @@ import { AuthService } from '../auth/auth-service';
 import { PermissionService } from '../auth/permission.service';
 import { ALL_MODULES, MODULE_LABELS, type UserPermissions } from '../models/permission.model';
 import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-users',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, LucideAngularModule, HasPermissionDirective],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, LucideAngularModule, HasPermissionDirective, TooltipDirective],
   templateUrl: './users.html',
 })
 export class Users implements OnInit {

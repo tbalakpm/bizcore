@@ -62,7 +62,7 @@
               <td class="td-cell text-center">
                 <button type="button" (click)="toggleActive(c)"
                   class="w-6 h-6 rounded-full border flex items-center justify-center"
-                  [title]="c.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
+                  [appTooltip]="c.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
                     c.isActive
                       ? 'border-success text-success'
                       : 'border-border-strong text-text-muted'
@@ -78,19 +78,19 @@
               <td class="td-cell text-center">
                 <div class="flex items-center justify-center gap-2">
                   @if (editing?.id == c.id) {
-                  <button class="btn-link-edit text-success flex items-center gap-1" title="Save changes"
+                  <button class="btn-link-edit text-success flex items-center gap-1" appTooltip="Save changes"
                     (click)="saveEdit()">
                     <i-lucide name="check" [size]="18"></i-lucide>
                   </button>
-                  <button class="btn-link-edit text-text-muted flex items-center gap-1" title="Cancel editing"
+                  <button class="btn-link-edit text-text-muted flex items-center gap-1" appTooltip="Cancel editing"
                     (click)="cancelEdit()">
                     <i-lucide name="x" [size]="18"></i-lucide>
                   </button>
                   } @else {
-                  <button class="btn-link-edit flex items-center gap-1" title="Edit category" (click)="startEdit(c)">
+                  <button class="btn-link-edit flex items-center gap-1" appTooltip="Edit category" (click)="startEdit(c)">
                     <i-lucide name="pencil" [size]="18"></i-lucide>
                   </button>
-                  <button class="btn-link-danger flex items-center gap-1" title="Delete category"
+                  <button class="btn-link-danger flex items-center gap-1" appTooltip="Delete category"
                     (click)="deleteCategory(c)">
                     <i-lucide name="trash-2" [size]="18"></i-lucide>
                   </button>

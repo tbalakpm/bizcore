@@ -157,7 +157,7 @@
             <td class="td-cell text-center">
               <button type="button" (click)="toggleActive(u)"
                 class="w-6 h-6 rounded-full border flex items-center justify-center"
-                [title]="u.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
+                [appTooltip]="u.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
                     u.isActive
                       ? 'border-success text-success'
                       : 'border-border-strong text-text-muted'
@@ -172,10 +172,10 @@
             @if (permissionService.canWrite('users')) {
             <td class="td-cell text-center">
               <div class="flex items-center justify-center gap-2">
-                <button (click)="editUser(u.id)" class="btn-link-edit flex items-center gap-1" title="Edit user">
+                <button (click)="editUser(u.id)" class="btn-link-edit flex items-center gap-1" appTooltip="Edit user">
                   <i-lucide name="pencil" [size]="14"></i-lucide>
                 </button>
-                <button (click)="deleteUser(u.id)" class="btn-link-danger flex items-center gap-1" title="Delete user">
+                <button (click)="deleteUser(u.id)" class="btn-link-danger flex items-center gap-1" appTooltip="Delete user">
                   <i-lucide name="trash-2" [size]="14"></i-lucide>
                 </button>
               </div>

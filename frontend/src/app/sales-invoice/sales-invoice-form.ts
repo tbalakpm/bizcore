@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AddressForm } from '../shared/components/address-form';
 import { TranslatePipe } from '@ngx-translate/core';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 import { type Product, ProductService } from '../product/product-service';
 import { type Customer, CustomerService } from '../customer/customer-service';
@@ -43,7 +44,7 @@ type EditableSalesInvoice = {
 
 @Component({
   selector: 'app-sales-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, TranslatePipe, TooltipDirective],
   templateUrl: './sales-invoice-form.html',
 })
 export class SalesInvoiceForm implements OnInit {
@@ -418,6 +419,12 @@ export class SalesInvoiceForm implements OnInit {
           window.scrollTo(0, 0);
         },
       });
+    }
+  }
+
+  previewPdf() {
+    if (this.editingInvoice.id) {
+      window.open(this.salesInvoiceService.getPdfUrl(this.editingInvoice.id), '_blank');
     }
   }
 }

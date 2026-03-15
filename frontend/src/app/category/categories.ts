@@ -5,10 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { PermissionService } from '../auth/permission.service';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-categories',
-  imports: [TranslatePipe, FormsModule, CommonModule, LucideAngularModule],
+  imports: [TranslatePipe, FormsModule, CommonModule, LucideAngularModule, TooltipDirective],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {

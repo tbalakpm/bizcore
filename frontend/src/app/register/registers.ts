@@ -5,10 +5,11 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type Category, CategoryService } from '../category/category-service';
 import { type Register, RegisterService } from './register-service';
 import { LucideAngularModule } from 'lucide-angular';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-registers',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, LucideAngularModule],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, LucideAngularModule, TooltipDirective],
   templateUrl: './registers.html',
 })
 export class Registers implements OnInit {

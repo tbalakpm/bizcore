@@ -94,7 +94,7 @@
             <td class="td-cell text-center">
               <button type="button" (click)="toggleActive(s)"
                 class="w-6 h-6 rounded-full border flex items-center justify-center"
-                [title]="s.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
+                [appTooltip]="s.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
                     s.isActive
                       ? 'border-success text-success'
                       : 'border-border-strong text-text-muted'
@@ -110,11 +110,11 @@
             <td class="td-cell text-center">
               <div class="flex items-center justify-center gap-2">
                 <button (click)="editSupplier(s.id)" class="btn-link-edit flex items-center gap-1"
-                  title="Edit supplier">
+                  appTooltip="Edit supplier">
                   <i-lucide name="pencil" [size]="18"></i-lucide>
                 </button>
                 <button (click)="deleteSupplier(s.id)" class="btn-link-danger flex items-center gap-1"
-                  title="Delete supplier">
+                  appTooltip="Delete supplier">
                   <i-lucide name="trash-2" [size]="18"></i-lucide>
                 </button>
               </div>

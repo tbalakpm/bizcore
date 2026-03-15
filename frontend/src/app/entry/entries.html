@@ -65,10 +65,10 @@
           </td>
           <td class="td-cell text-center">
             <div class="flex items-center justify-center gap-2">
-              <button (click)="editEntry(e.id)" class="btn-link-edit flex items-center gap-1" title="Edit entry">
+              <button (click)="editEntry(e.id)" class="btn-link-edit flex items-center gap-1" appTooltip="Edit entry">
                 <i-lucide name="pencil" [size]="14"></i-lucide> Edit
               </button>
-              <button (click)="deleteEntry(e.id)" class="btn-link-danger flex items-center gap-1" title="Delete entry">
+              <button (click)="deleteEntry(e.id)" class="btn-link-danger flex items-center gap-1" appTooltip="Delete entry">
                 <i-lucide name="trash-2" [size]="14"></i-lucide> Delete
               </button>
             </div>

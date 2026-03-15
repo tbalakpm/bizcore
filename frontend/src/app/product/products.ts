@@ -5,10 +5,11 @@ import { type Product, ProductList, ProductService } from './product-service';
 import { ProductFormComponent } from './product-form.component';
 import { LucideAngularModule } from 'lucide-angular';
 import { PermissionService } from '../auth/permission.service';
+import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, TranslatePipe, ProductFormComponent, LucideAngularModule],
+  imports: [CommonModule, TranslatePipe, ProductFormComponent, LucideAngularModule, TooltipDirective],
   templateUrl: './products.html',
 })
 export class Products implements OnInit {

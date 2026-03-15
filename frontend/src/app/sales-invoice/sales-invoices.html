@@ -32,7 +32,7 @@
       <input type="number" formControlName="minAmount" placeholder="Min amount" class="input-base w-32" />
       <input type="number" formControlName="maxAmount" placeholder="Max amount" class="input-base w-32" />
 
-      <button type="button" class="btn-outline flex items-center gap-1" title="Clear all filters"
+      <button type="button" class="btn-outline flex items-center gap-1" appTooltip="Clear all filters"
         (click)="onClearFilters()">
         <i-lucide name="filter-x" [size]="14"></i-lucide> Clear
       </button>
@@ -84,20 +84,20 @@
           <td class="td-cell w-max">
             <div class="flex items-center justify-center gap-2">
               @if (!invoice.irn && permissionService.canWrite('sales-invoices')) {
-              <button type="button" class="btn-link-warning flex items-center gap-1" title="Generate IRN"
+              <button type="button" class="btn-link-warning flex items-center gap-1" appTooltip="Generate IRN"
                 (click)="generateIrn(invoice.id)">
                 <i-lucide name="file-check" [size]="18"></i-lucide>
               </button>
               <a [routerLink]="['/sales-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1"
-                title="Edit invoice">
+                appTooltip="Edit invoice">
                 <i-lucide name="pencil" [size]="18"></i-lucide>
               </a>
-              <button type="button" class="btn-link-danger flex items-center gap-1" title="Delete invoice"
+              <button type="button" class="btn-link-danger flex items-center gap-1" appTooltip="Delete invoice"
                 (click)="deleteInvoice(invoice.id)">
                 <i-lucide name="trash-2" [size]="18"></i-lucide>
               </button>
               }
-              <button type="button" class="btn-link-edit flex items-center gap-1" title="Print invoice"
+              <button type="button" class="btn-link-edit flex items-center gap-1" appTooltip="Print invoice"
                 (click)="printInvoice(invoice.id)">
                 <i-lucide name="printer" [size]="18"></i-lucide>
               </button>
