@@ -60,30 +60,32 @@
     <table class="min-w-full text-sm">
       <thead class="bg-gray-50">
         <tr class="border-b border-slate-400">
-          <th class="text-left py-2">Invoice #</th>
-          <th class="text-left py-2">Date</th>
-          <th class="text-right py-2">Qty</th>
-          <th class="text-right py-2">Total Amount</th>
-          <th class="text-right py-2">Actions</th>
+          <th class="text-left py-2 px-4">Invoice #</th>
+          <th class="text-left py-2 px-4">Date</th>
+          <th class="text-right py-2 px-4">Total Qty</th>
+          <th class="text-right py-2 px-4">Total Amount</th>
+          <th class="text-center py-2 px-4">Actions</th>
         </tr>
       </thead>
       <tbody>
         @for (invoice of invoices(); track invoice.id) {
         <tr class="border-b border-slate-200 hover:bg-slate-100">
-          <td class="py-2">{{ invoice.invoiceNumber }}</td>
-          <td class="py-2">{{ invoice.invoiceDate | date:'mediumDate' }}</td>
-          <td class="py-2 text-right">{{ invoice.totalQty }}</td>
-          <td class="py-2 text-right">{{ invoice.totalAmount }}</td>
-          <td class="py-2 text-right space-x-2">
+          <td class="py-2 px-4 text-left">{{ invoice.invoiceNumber }}</td>
+          <td class="py-2 px-4 text-left">{{ invoice.invoiceDate | date:'mediumDate' }}</td>
+          <td class="py-2 px-4 text-right">{{ invoice.totalQty }}</td>
+          <td class="py-2 px-4 text-right text-emerald-600 dark:text-emerald-400">{{ invoice.totalAmount |
+            currency:'INR'}}</td>
+          <td class="py-2 px-4 text-center space-x-2">
             <a [routerLink]="['/stock-invoices', invoice.id, 'edit']"
-              class="text-blue-700 rounded text-sm hover:underline cursor-pointer">
+              class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm hover:underline cursor-pointer">
               Edit
             </a>
             <button type="button" class="text-slate-700 rounded text-sm hover:underline cursor-pointer"
               [disabled]="printingInvoiceId === invoice.id" (click)="printBarcodes(invoice.id)">
               {{ printingInvoiceId === invoice.id ? 'Printing...' : 'Print Barcode' }}
             </button>
-            <button type="button" class="text-red-700 rounded text-sm hover:underline cursor-pointer"
+            <button type="button"
+              class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium text-sm hover:underline cursor-pointer"
               (click)="deleteInvoice(invoice.id)">
               Delete
             </button>

@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe, CurrencyPipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -10,7 +10,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-sales-invoices',
-  imports: [ReactiveFormsModule, DatePipe, DecimalPipe, RouterLink, NgSelectModule],
+  imports: [ReactiveFormsModule, DatePipe, CurrencyPipe, RouterLink, NgSelectModule],
   templateUrl: './sales-invoices.html',
 })
 export class SalesInvoices implements OnInit {
@@ -22,7 +22,7 @@ export class SalesInvoices implements OnInit {
   invoices = signal<SalesInvoice[]>([]);
   customers = signal<Customer[]>([]);
   pagination = signal<pagination>({ limit: 10, offset: 0, total: 0, page: 1, totalPages: 1 });
-  
+
   filterForm: FormGroup;
   private filterSubject = new Subject<void>();
 

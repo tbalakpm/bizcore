@@ -1,10 +1,12 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   type ApplicationConfig,
+  LOCALE_ID,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
   // provideZonelessChangeDetection,
 } from '@angular/core';
+import localeEnIn from '@angular/common/locales/en-IN';
 import { provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -27,6 +29,7 @@ export const appConfig: ApplicationConfig = {
       fallbackLang: 'en',
       lang: 'en',
     }),
+    { provide: LOCALE_ID, useValue: 'en-IN' },
     provideHttpClient(withInterceptors([authInterceptor])),
     provideCharts(withDefaultRegisterables()),
     //       providers: [provideCharts({ registerables: [BarController, Legend, Colors] })],

@@ -22,8 +22,8 @@
       <input type="text" formControlName="invoiceNumber" placeholder="Invoice number"
         class="border border-slate-300 dark:border-slate-600 dark:bg-slate-800 rounded px-3 py-1.5 text-sm" />
 
-      <ng-select [items]="customers()" bindLabel="name" bindValue="id" formControlName="customerId"
-        [searchable]="true" [clearable]="true" placeholder="-- All Customers --" class="w-64 text-sm bg-white dark:bg-slate-800">
+      <ng-select [items]="customers()" bindLabel="name" bindValue="id" formControlName="customerId" [searchable]="true"
+        [clearable]="true" placeholder="-- All Customers --" class="w-64 text-sm bg-white dark:bg-slate-800">
         <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
           <div class="font-medium text-slate-900 dark:text-white">{{ item.name }}</div>
           <div class="text-xs text-slate-500">{{ item.code }}</div>
@@ -77,20 +77,20 @@
       <tbody>
         @for (invoice of invoices(); track invoice.id) {
         <tr
-          class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-          <td class="py-3 px-4 font-medium flex items-center gap-2">
+          class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+          <td class="py-2 px-4 font-medium flex items-center gap-2">
             {{ invoice.invoiceNumber }}
             @if (invoice.irn) {
             <span
               class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">IRN</span>
             }
           </td>
-          <td class="py-3 px-4">{{ invoice.invoiceDate | date:'mediumDate' }}</td>
-          <td class="py-3 px-4">{{ invoice.customerName || '—' }}</td>
-          <td class="py-3 px-4 text-right">{{ invoice.totalQty }}</td>
-          <td class="py-3 px-4 text-right font-medium text-emerald-600 dark:text-emerald-400">Rs. {{ invoice.netAmount |
-            number:'1.2-2' }}</td>
-          <td class="py-3 px-4 text-center space-x-3">
+          <td class="py-2 px-4">{{ invoice.invoiceDate | date:'mediumDate' }}</td>
+          <td class="py-2 px-4">{{ invoice.customerName || '—' }}</td>
+          <td class="py-2 px-4 text-right">{{ invoice.totalQty }}</td>
+          <td class="py-2 px-4 text-right font-medium text-emerald-600 dark:text-emerald-400">{{ invoice.netAmount |
+            currency:'INR' }}</td>
+          <td class="py-2 px-4 text-center space-x-3">
             @if (!invoice.irn) {
             <button type="button"
               class="text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 font-medium hover:underline cursor-pointer"
