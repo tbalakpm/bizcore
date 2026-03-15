@@ -1,21 +1,9 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="flex text-2xl font-bold items-center gap-2">
-    <svg
-      class="w-7 h-7 text-gray-800"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2.5"
-        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-      />
+  <h1 class="page-title">
+    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+      fill="none" viewBox="0 0 24 24">
+      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
     </svg>
     {{ 'MENU.REGISTERS' | translate }}
   </h1>
@@ -23,194 +11,112 @@
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
   <!-- List -->
-  <div class="md:col-span-2 bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700">
+  <div class="md:col-span-2 card">
     <div class="flex justify-between mb-2">
-      <h2 class="text-lg font-semibold">{{ 'MENU.REGISTERS' | translate }}</h2>
+      <h2 class="section-title">{{ 'MENU.REGISTERS' | translate }}</h2>
     </div>
 
-    <!-- <div class="h-210 overflow-auto"> -->
-    <div class="overflow-x-auto">
-      <table class="min-w-full text-sm">
-        <thead>
-          <tr class="border-b border-slate-400">
-          <th class="text-left py-2">{{ 'NAME' | translate }}</th>
-          <th class="text-left py-2">{{ 'DESCRIPTION' | translate }}</th>
-          <th class="text-left py-2">{{ 'CATEGORY.TITLE' | translate }}</th>
-          <th class="text-left py-2">{{ 'ACTIVE' | translate }}</th>
-          <th class="py-2 text-right">{{ 'ACTIONS' | translate }}</th>
+    <div class="overflow-x-auto border border-border rounded-lg">
+      <table class="table-base">
+        <thead class="table-head">
+          <tr>
+            <th class="th-cell">{{ 'NAME' | translate }}</th>
+            <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
+            <th class="th-cell">{{ 'CATEGORY.TITLE' | translate }}</th>
+            <th class="th-cell">{{ 'ACTIVE' | translate }}</th>
+            <th class="th-cell text-center">{{ 'ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
         @for (r of registers(); track r.id) {
-        <tr class="border-b border-slate-200 hover:bg-slate-100">
-          <td class="py-2">{{ r.name }}</td>
-          <td class="py-2">{{ r.description }}</td>
-          <td class="py-2">{{ r.categoryName || '-' }}</td>
-          <td>
-            <button
-              type="button"
-              (click)="toggleActive(r)"
-              class="inline-flex items-center justify-center w-5 h-5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:ring-slate-700 hover:outline-none rounded hover:bg-gray-100 transition cursor-pointer"
-              [ngClass]="
-                r.isActive ? 'border-green-500 text-green-600' : 'border-gray-300 text-gray-400'
-              "
-            >
-              <svg
-                *ngIf="r.isActive"
-                class="w-4 h-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 13l4 4L19 7"
-                />
+        <tr class="table-row">
+          <td class="td-cell">{{ r.name }}</td>
+          <td class="td-cell">{{ r.description }}</td>
+          <td class="td-cell">{{ r.categoryName || '-' }}</td>
+          <td class="td-cell">
+            <button type="button" (click)="toggleActive(r)"
+              class="toggle-btn"
+              [title]="r.isActive ? 'Deactivate' : 'Activate'"
+              [ngClass]="r.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
+              @if (r.isActive) {
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <svg
-                *ngIf="!r.isActive"
-                class="w-4 h-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              } @else {
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
+              }
             </button>
           </td>
-          <td class="py-2 px-2 text-right space-x-2">
-            <button
-              (click)="editRegister(r.id)"
-              class="text-blue-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer"
-            >
-              {{ 'EDIT' | translate }}
-            </button>
-            <button
-              (click)="deleteRegister(r.id)"
-              class="text-red-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer"
-            >
-              {{ 'DELETE' | translate }}
-            </button>
+          <td class="td-cell text-center">
+            <div class="flex items-center justify-center gap-2">
+              <button (click)="editRegister(r.id)" class="btn-link-edit flex items-center gap-1" title="Edit register">
+                <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
+              </button>
+              <button (click)="deleteRegister(r.id)" class="btn-link-danger flex items-center gap-1" title="Delete register">
+                <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
+              </button>
+            </div>
           </td>
         </tr>
         }
-        <!---->
         @if(!registers().length) {
         <tr>
-          <td colspan="5" class="py-2 text-center text-gray-400">
-            {{ 'REGISTER.NO_REGISTERS_YET' | translate }}
-          </td>
+          <td colspan="5" class="td-cell text-center text-text-muted">{{ 'REGISTER.NO_REGISTERS_YET' | translate }}</td>
         </tr>
         }
         </tbody>
       </table>
     </div>
-    <!-- </div> -->
   </div>
 
   <!-- Add form -->
-  <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 max-h-max">
-    <h2 class="text-lg font-semibold mb-3">
+  <div class="card max-h-max">
+    <h2 class="section-title">
       {{ editingRegister.id ? ('EDIT' | translate) : ('ADD' | translate) }}
       {{ 'REGISTER.TITLE' | translate }}
     </h2>
     <form (ngSubmit)="onSubmit()" class="space-y-3">
       <div>
-        <label class="block text-sm font-medium">{{ 'REGISTER.TITLE' | translate }}</label>
-        <input
-          type="text"
-          [(ngModel)]="editingRegister.name"
-          name="newRegisterName"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-          autofocus
-        />
+        <label class="label-base">{{ 'REGISTER.TITLE' | translate }}</label>
+        <input type="text" [(ngModel)]="editingRegister.name" name="newRegisterName"
+          class="input-base" autofocus />
       </div>
       <div>
-        <label class="block text-sm font-medium">{{ 'DESCRIPTION' | translate }}</label>
-        <textarea
-          [(ngModel)]="editingRegister.description"
-          name="newRegisterDescription"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-        ></textarea>
+        <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
+        <textarea [(ngModel)]="editingRegister.description" name="newRegisterDescription"
+          class="input-base"></textarea>
       </div>
       <div>
-        <label class="block text-sm font-medium">{{ 'CATEGORY.TITLE' | translate }}</label>
-        <select
-          [(ngModel)]="editingRegister.categoryId"
-          name="newRegisterCategory"
-          class="block w-full px-2 py-1.5 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer focus:ring-brand focus:border-brand placeholder:text-body"
-        >
-          <!-- <option [ngValue]="null">-- Select --</option> -->
+        <label class="label-base">{{ 'CATEGORY.TITLE' | translate }}</label>
+        <select [(ngModel)]="editingRegister.categoryId" name="newRegisterCategory" class="select-base">
           @for(c of categories();track c.id){
-          <option [ngValue]="c.id" selected="{{ editingRegister.categoryId === c.id }}">
-            {{ c.name }}
-          </option>
+          <option [ngValue]="c.id" selected="{{ editingRegister.categoryId === c.id }}">{{ c.name }}</option>
           }
         </select>
       </div>
-
       <div>
-        <label class="block text-sm font-medium">Balance Amount (for asset/liability)</label>
-        <input
-          type="number"
-          step="1.00"
-          [(ngModel)]="editingRegister.amount"
-          name="newRegisterAmount"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 disabled:bg-gray-100 disabled:border-gray-400"
-          [disabled]="editingRegister.categoryType != 'A' && editingRegister.categoryType != 'L'"
-        />
+        <label class="label-base">Balance Amount (for asset/liability)</label>
+        <input type="number" step="1.00" [(ngModel)]="editingRegister.amount" name="newRegisterAmount"
+          class="input-base"
+          [disabled]="editingRegister.categoryType != 'A' && editingRegister.categoryType != 'L'" />
       </div>
       <div>
-        <label class="block text-sm font-medium">Balance as on (for asset/liability)</label>
-        <input
-          type="date"
-          [(ngModel)]="editingRegister.date"
-          name="newRegisterDate"
-          class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 cursor-pointer disabled:bg-gray-100 disabled:border-gray-400 disabled:cursor-default"
-          [disabled]="
-            !(editingRegister.categoryType && ['A', 'L'].includes(editingRegister.categoryType))
-          "
-        />
+        <label class="label-base">Balance as on (for asset/liability)</label>
+        <input type="date" [(ngModel)]="editingRegister.date" name="newRegisterDate"
+          class="input-base cursor-pointer"
+          [disabled]="!(editingRegister.categoryType && ['A', 'L'].includes(editingRegister.categoryType))" />
       </div>
       <div class="flex items-center">
-        <input
-          id="newCategoryActive"
-          type="checkbox"
-          value=""
-          [(ngModel)]="editingRegister.isActive"
-          name="newCategoryActive"
-          class="w-4 h-4 border bg-slate-500 accent-slate-700 rounded-md focus:ring focus:ring-slate-700 focus:outline-none cursor-pointer"
-        />
-        <label
-          for="newCategoryActive"
-          class="select-none ms-2 text-sm font-medium text-heading cursor-pointer"
-          >Active</label
-        >
+        <input id="newCategoryActive" type="checkbox" value="" [(ngModel)]="editingRegister.isActive"
+          name="newCategoryActive" class="w-4 h-4 accent-primary rounded cursor-pointer" />
+        <label for="newCategoryActive" class="select-none ms-2 text-sm font-medium text-text cursor-pointer">Active</label>
       </div>
       <div class="flex gap-4">
-        <button
-          type="submit"
-          class="py-2 w-full border bg-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-white text-sm cursor-pointer"
-        >
-          Save
-        </button>
+        <button type="submit" class="btn-primary w-full">Save</button>
         @if(editingRegister.id){
-        <button
-          type="button"
-          class="py-2 w-full border border-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-sm cursor-pointer"
-          (click)="onCancel()"
-        >
-          Cancel
-        </button>
+        <button type="button" class="btn-outline w-full" (click)="onCancel()">Cancel</button>
         }
       </div>
     </form>

@@ -4,10 +4,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Category, CategoryService } from '../category/category-service';
 import { type Register, RegisterService } from './register-service';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-registers',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, LucideAngularModule],
   templateUrl: './registers.html',
 })
 export class Registers implements OnInit {

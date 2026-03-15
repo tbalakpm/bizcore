@@ -4,10 +4,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Supplier, type Address, SupplierList, SupplierService } from './supplier-service';
 import { AddressForm } from '../shared/components/address-form';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-suppliers',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm, LucideAngularModule],
   templateUrl: './suppliers.html',
 })
 export class Suppliers implements OnInit {

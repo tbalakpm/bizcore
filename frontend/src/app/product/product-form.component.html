@@ -1,121 +1,142 @@
 @if (error) {
-<div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-  {{ error }}
-</div>
+  <div class="error-banner">{{ error }}</div>
 }
 
 <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
   <div>
-    <label class="block text-sm font-medium">{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</label>
-    <input type="text" [(ngModel)]="product.code" name="productCode"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-      autofocus />
+    <label class="label-base">{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</label>
+    <input type="text" [(ngModel)]="product.code" name="productCode" class="input-base" autofocus />
   </div>
   <div>
-    <label class="block text-sm font-medium">{{ 'PRODUCT.TITLE' | translate }} {{ 'NAME' | translate }}</label>
-    <input type="text" [(ngModel)]="product.name" name="productName"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
+    <label class="label-base">{{ 'PRODUCT.TITLE' | translate }} {{ 'NAME' | translate }}</label>
+    <input type="text" [(ngModel)]="product.name" name="productName" class="input-base" />
   </div>
   <div>
-    <label class="block text-sm font-medium">{{ 'DESCRIPTION' | translate }}</label>
-    <textarea rows="1" [(ngModel)]="product.description" name="productDescription"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"></textarea>
+    <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
+    <textarea
+      rows="1"
+      [(ngModel)]="product.description"
+      name="productDescription"
+      class="input-base"
+    ></textarea>
   </div>
   <div>
-    <label class="block text-sm font-medium">{{ 'CATEGORY.TITLE' | translate }}</label>
-    <select [(ngModel)]="product.categoryId" name="productCategory"
-      class="block w-full px-2 py-1.5 mt-1 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer">
+    <label class="label-base">{{ 'CATEGORY.TITLE' | translate }}</label>
+    <select [(ngModel)]="product.categoryId" name="productCategory" class="select-base">
       @for (c of categories(); track c.id) {
-      <option [ngValue]="c.id">{{ c.name }}</option>
+        <option [ngValue]="c.id">{{ c.name }}</option>
       }
     </select>
   </div>
   <div>
-    <label class="block text-sm font-medium">Qty Per Unit</label>
-    <input type="text" [(ngModel)]="product.qtyPerUnit" name="productQtyPerUnit"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
+    <label class="label-base">Qty Per Unit</label>
+    <input
+      type="text"
+      [(ngModel)]="product.qtyPerUnit"
+      name="productQtyPerUnit"
+      class="input-base"
+    />
   </div>
   <div>
-    <label class="block text-sm font-medium">Unit Price</label>
-    <input type="number" step="1.00" [(ngModel)]="product.unitPrice" name="productUnitPrice"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
+    <label class="label-base">Unit Price</label>
+    <input
+      type="number"
+      step="1.00"
+      [(ngModel)]="product.unitPrice"
+      name="productUnitPrice"
+      class="input-base"
+    />
   </div>
   <div>
-    <label class="block text-sm font-medium">HSN/SAC</label>
-    <input type="text" [(ngModel)]="product.hsnSac" name="productHsnSac"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
+    <label class="label-base">HSN/SAC</label>
+    <input type="text" [(ngModel)]="product.hsnSac" name="productHsnSac" class="input-base" />
   </div>
   <div>
-    <label class="block text-sm font-medium">Tax Rate</label>
-    <input type="number" step="0.01" [(ngModel)]="product.taxRate" name="productTaxRate"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
+    <label class="label-base">Tax Rate</label>
+    <input
+      type="number"
+      step="0.01"
+      [(ngModel)]="product.taxRate"
+      name="productTaxRate"
+      class="input-base"
+    />
   </div>
 
   <!-- GTN Setup -->
-  <div class="col-span-full border-t border-slate-200 mt-2 mb-1 pt-2">
-    <h3 class="font-medium text-slate-700">Goods Tracking Number (GTN) Setup</h3>
+  <div class="col-span-full border-t border-border mt-2 mb-1 pt-2">
+    <h3 class="font-medium text-text-heading">Goods Tracking Number (GTN) Setup</h3>
   </div>
 
-  <!-- GTN Mode -->
-  <div>
-    <label class="block text-sm font-medium">GTN Mode</label>
-    <select [(ngModel)]="product.gtnMode" name="productGtnMode"
-      class="block w-full px-2 py-1.5 mt-1 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer">
+  <div class="col-span-2">
+    <label class="label-base">GTN Mode</label>
+    <select [(ngModel)]="product.gtnMode" name="productGtnMode" class="select-base">
       <option value="auto">Auto (System Generated)</option>
       <option value="manual">Manual (User Provided)</option>
     </select>
-    <p class="text-xs text-slate-500 mt-0.5">
+    <p class="text-xs text-text-muted mt-0.5">
       @if (product.gtnMode === 'manual') {
-      GTN will be entered manually during transactions.
+        GTN will be entered manually during transactions.
       } @else {
-      GTN will be auto-generated based on the method below.
+        GTN will be auto-generated based on the method below.
       }
     </p>
   </div>
 
-  <!-- GTN Generation — only when auto -->
   @if (!product.gtnMode || product.gtnMode === 'auto') {
-  <div>
-    <label class="block text-sm font-medium">GTN Generation</label>
-    <select [(ngModel)]="product.gtnGeneration" name="productGtnGeneration"
-      class="block w-full px-2 py-1.5 mt-1 border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded cursor-pointer">
-      <option value="code">Product Code (default)</option>
-      <option value="batch">Batch Level (same GTN per lot)</option>
-      <option value="tag">Tag Level (unique GTN per item)</option>
-    </select>
-  </div>
+    <div class="col-span-2">
+      <label class="label-base">GTN Generation</label>
+      <select [(ngModel)]="product.gtnGeneration" name="productGtnGeneration" class="select-base">
+        <option value="code">Product Code (default)</option>
+        <option value="batch">Batch Level (same GTN per lot)</option>
+        <option value="tag">Tag Level (unique GTN per item)</option>
+      </select>
+    </div>
   }
 
-  <!-- Prefix & Start Sequence — only for batch / tag -->
-  @if (product.gtnMode !== 'manual' && (product.gtnGeneration === 'batch' || product.gtnGeneration === 'tag')) {
-  <div>
-    <label class="block text-sm font-medium">Batch/Tag Prefix</label>
-    <input type="text" [(ngModel)]="product.gtnPrefix" name="productGtnPrefix"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-      placeholder="e.g. BATCH- or TAG-" />
-  </div>
-  <div>
-    <label class="block text-sm font-medium">Start Sequence</label>
-    <input type="number" step="1" [(ngModel)]="product.gtnStartPos" name="productGtnStartPos"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-      placeholder="1" />
-  </div>
-  <div>
-    <label class="block text-sm font-medium">GTN Length</label>
-    <input type="number" step="1" [(ngModel)]="product.gtnLength" name="productGtnLength"
-      class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-      placeholder="10" />
-  </div>
+  @if (
+    product.gtnMode !== 'manual' &&
+    (product.gtnGeneration === 'batch' || product.gtnGeneration === 'tag')
+  ) {
+    <div>
+      <label class="label-base">Batch/Tag Prefix</label>
+      <input
+        type="text"
+        [(ngModel)]="product.gtnPrefix"
+        name="productGtnPrefix"
+        class="input-base"
+        placeholder="e.g. BATCH- or TAG-"
+      />
+    </div>
+    <div>
+      <label class="label-base">Start Sequence</label>
+      <input
+        type="number"
+        step="1"
+        [(ngModel)]="product.gtnStartPos"
+        name="productGtnStartPos"
+        class="input-base"
+        placeholder="1"
+      />
+    </div>
+    <div>
+      <label class="label-base">GTN Length</label>
+      <input
+        type="number"
+        step="1"
+        [(ngModel)]="product.gtnLength"
+        name="productGtnLength"
+        class="input-base"
+        placeholder="10"
+      />
+    </div>
   }
 
   <!-- Actions -->
   <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
-    <button type="submit" [disabled]="loading"
-      class="py-1.5 w-full border bg-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-white text-sm cursor-pointer disabled:opacity-50">
+    <button type="submit" [disabled]="loading" class="btn-primary w-full">
       {{ productId ? ('SAVE' | translate) : ('ADD' | translate) }}
     </button>
-    <button type="button" (click)="onCancel()"
-      class="py-1.5 w-full border border-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-sm cursor-pointer">
+    <button type="button" (click)="onCancel()" class="btn-outline w-full">
       {{ 'CANCEL' | translate }}
     </button>
   </div>

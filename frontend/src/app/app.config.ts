@@ -4,7 +4,6 @@ import {
   LOCALE_ID,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
-  // provideZonelessChangeDetection,
 } from '@angular/core';
 import localeEnIn from '@angular/common/locales/en-IN';
 import { provideRouter } from '@angular/router';
@@ -13,12 +12,21 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { routes } from './app.routes';
 import { authInterceptor } from './auth/auth-interceptor';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-// import { BarController, Legend, Colors } from 'chart.js';
+import {
+  LUCIDE_ICONS,
+  LucideIconProvider,
+  Pencil, Trash2, Printer, FileCheck, FilterX, Plus, ArrowLeft,
+  Check, X, Save, ScanBarcode, Eye, Copy, ToggleLeft, ToggleRight,
+} from 'lucide-angular';
+
+const icons = {
+  Pencil, Trash2, Printer, FileCheck, FilterX, Plus, ArrowLeft,
+  Check, X, Save, ScanBarcode, Eye, Copy, ToggleLeft, ToggleRight,
+};
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    // provideZonelessChangeDetection(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideTranslateService({
@@ -32,6 +40,6 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'en-IN' },
     provideHttpClient(withInterceptors([authInterceptor])),
     provideCharts(withDefaultRegisterables()),
-    //       providers: [provideCharts({ registerables: [BarController, Legend, Colors] })],
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider(icons) },
   ],
 };

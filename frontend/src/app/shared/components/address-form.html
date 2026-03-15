@@ -1,11 +1,11 @@
-<div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden mb-3">
+<div class="border border-border rounded-lg overflow-hidden mb-3">
   <!-- Header / Toggle -->
   <div
-    class="flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+    class="flex items-center justify-between px-3 py-2 bg-surface-muted cursor-pointer hover:bg-surface-alt transition"
     (click)="isExpandable ? toggleOpen() : null">
-    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ title | translate }}</h3>
+    <h3 class="text-sm font-semibold text-text-heading">{{ title | translate }}</h3>
     @if (isExpandable) {
-    <svg class="w-4 h-4 text-slate-500 transition-transform duration-200" [class.rotate-180]="isOpen" aria-hidden="true"
+    <svg class="w-4 h-4 text-text-muted transition-transform duration-200" [class.rotate-180]="isOpen" aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" />
     </svg>
@@ -15,44 +15,44 @@
   <!-- Form Fields -->
   <div class="p-3 grid grid-cols-1 md:grid-cols-2 gap-3" [class.hidden]="isExpandable && !isOpen">
     <div class="md:col-span-2">
-      <label class="block text-xs font-medium text-slate-500">{{ 'ADDRESS.LINE1' | translate }}</label>
+      <label class="label-base">{{ 'ADDRESS.LINE1' | translate }}</label>
       <input type="text" [(ngModel)]="address.addressLine1" name="addr1" [disabled]="disabled"
-        class="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-sm dark:bg-slate-900 focus:ring-1 focus:ring-slate-500 focus:outline-none" />
+        class="input-base" />
     </div>
     <div class="md:col-span-2">
-      <label class="block text-xs font-medium text-slate-500">{{ 'ADDRESS.LINE2' | translate }}</label>
+      <label class="label-base">{{ 'ADDRESS.LINE2' | translate }}</label>
       <input type="text" [(ngModel)]="address.addressLine2" name="addr2" [disabled]="disabled"
-        class="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-sm dark:bg-slate-900 focus:ring-1 focus:ring-slate-500 focus:outline-none" />
+        class="input-base" />
     </div>
     <div>
-      <label class="block text-xs font-medium text-slate-500">{{ 'ADDRESS.AREA' | translate }}</label>
+      <label class="label-base">{{ 'ADDRESS.AREA' | translate }}</label>
       <input type="text" [(ngModel)]="address.area" name="area" [disabled]="disabled"
-        class="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-sm dark:bg-slate-900 focus:ring-1 focus:ring-slate-500 focus:outline-none" />
+        class="input-base" />
     </div>
     <div>
-      <label class="block text-xs font-medium text-slate-500">{{ 'ADDRESS.CITY' | translate }}</label>
+      <label class="label-base">{{ 'ADDRESS.CITY' | translate }}</label>
       <input type="text" [(ngModel)]="address.city" name="city" [disabled]="disabled"
-        class="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-sm dark:bg-slate-900 focus:ring-1 focus:ring-slate-500 focus:outline-none" />
+        class="input-base" />
     </div>
     <div>
-      <label class="block text-xs font-medium text-slate-500">{{ 'ADDRESS.STATE' | translate }}</label>
+      <label class="label-base">{{ 'ADDRESS.STATE' | translate }}</label>
       <input type="text" [(ngModel)]="address.state" name="state" [disabled]="disabled"
-        class="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-sm dark:bg-slate-900 focus:ring-1 focus:ring-slate-500 focus:outline-none" />
+        class="input-base" />
     </div>
     <div>
-      <label class="block text-xs font-medium text-slate-500">{{ 'ADDRESS.PINCODE' | translate }}</label>
+      <label class="label-base">{{ 'ADDRESS.PINCODE' | translate }}</label>
       <input type="text" [(ngModel)]="address.postalCode" name="postalCode" [disabled]="disabled"
-        class="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-sm dark:bg-slate-900 focus:ring-1 focus:ring-slate-500 focus:outline-none" />
+        class="input-base" />
     </div>
     <div>
-      <label class="block text-xs font-medium text-slate-500">{{ 'ADDRESS.MOBILE' | translate }}</label>
+      <label class="label-base">{{ 'ADDRESS.MOBILE' | translate }}</label>
       <input type="text" [(ngModel)]="address.mobile" name="mobile" [disabled]="disabled"
-        class="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-sm dark:bg-slate-900 focus:ring-1 focus:ring-slate-500 focus:outline-none" />
+        class="input-base" />
     </div>
     <div>
-      <label class="block text-xs font-medium text-slate-500">{{ 'ADDRESS.EMAIL' | translate }}</label>
+      <label class="label-base">{{ 'ADDRESS.EMAIL' | translate }}</label>
       <input type="email" [(ngModel)]="address.email" name="email" [disabled]="disabled"
-        class="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-sm dark:bg-slate-900 focus:ring-1 focus:ring-slate-500 focus:outline-none" />
+        class="input-base" />
     </div>
   </div>
 </div>

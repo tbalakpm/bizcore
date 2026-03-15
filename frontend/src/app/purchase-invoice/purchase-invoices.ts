@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 import {
   type PurchaseInvoice,
   type PurchaseInvoiceList,
@@ -10,7 +11,7 @@ import {
 
 @Component({
   selector: 'app-purchase-invoices',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule],
   templateUrl: './purchase-invoices.html',
 })
 export class PurchaseInvoices implements OnInit {

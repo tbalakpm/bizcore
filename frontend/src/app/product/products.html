@@ -1,5 +1,5 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="flex text-2xl font-bold items-center gap-2">
+  <h1 class="page-title">
     <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
       viewBox="0 0 24 24">
       <path stroke="currentColor" stroke-linejoin="round" stroke-width="2.5"
@@ -10,15 +10,13 @@
 </div>
 
 @if (error) {
-<div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-  {{ error }}
-</div>
+<div class="error-banner">{{ error }}</div>
 }
 
 <div class="grid grid-cols-1 gap-4">
   <!-- Add / Edit form via reusable component -->
-  <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 max-h-max">
-    <h2 class="text-lg font-semibold mb-3">
+  <div class="card">
+    <h2 class="section-title">
       {{ editingProductId ? ('EDIT' | translate) : ('ADD' | translate) }}
       {{ 'PRODUCT.TITLE' | translate }}
     </h2>
@@ -26,67 +24,58 @@
   </div>
 
   <!-- List -->
-  <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700">
+  <div class="card">
     <div class="flex justify-between mb-2">
-      <h2 class="text-lg font-semibold">{{ 'MENU.PRODUCTS' | translate }}</h2>
+      <h2 class="section-title">{{ 'MENU.PRODUCTS' | translate }}</h2>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="min-w-full text-sm">
-        <thead class="bg-gray-50">
-          <tr class="border-b border-slate-400">
-            <th class="text-left py-2">{{ 'CODE' | translate }}</th>
-            <th class="text-left py-2">{{ 'NAME' | translate }}</th>
-            <th class="text-left py-2">{{ 'DESCRIPTION' | translate }}</th>
-            <th class="text-left py-2">{{ 'CATEGORY.TITLE' | translate }}</th>
-            <th class="text-left py-2">HSN/SAC</th>
-            <th class="text-left py-2">Tax Rate</th>
-            <th class="text-left py-2">GTN</th>
-            <th class="text-center w-16 py-2">{{ 'ACTIVE' | translate }}</th>
-            <th class="py-2 text-right w-32">{{ 'ACTIONS' | translate }}</th>
+    <div class="overflow-x-auto border border-border rounded-lg">
+      <table class="table-base">
+        <thead class="table-head">
+          <tr>
+            <th class="th-cell">{{ 'CODE' | translate }}</th>
+            <th class="th-cell">{{ 'NAME' | translate }}</th>
+            <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
+            <th class="th-cell">{{ 'CATEGORY.TITLE' | translate }}</th>
+            <th class="th-cell">HSN/SAC</th>
+            <th class="th-cell">Tax Rate</th>
+            <th class="th-cell">GTN</th>
+            <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
+            <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
           @for (p of products(); track p.id) {
-          <tr class="border-b border-slate-200 hover:bg-slate-100"
-            [ngClass]="{ 'bg-slate-200': editingProductId === p.id }">
-            <td class="py-2">{{ p.code }}</td>
-            <td class="py-2">{{ p.name }}</td>
-            <td class="py-2">{{ p.description }}</td>
-            <td class="py-2">{{ p.categoryName || '-' }}</td>
-            <td class="py-2">{{ p.hsnSac || '-' }}</td>
-            <td class="py-2">{{ p.taxRate ?? '-' }}</td>
-            <td class="py-2">
+          <tr class="table-row" [class.table-row-selected]="editingProductId === p.id">
+            <td class="td-cell">{{ p.code }}</td>
+            <td class="td-cell">{{ p.name }}</td>
+            <td class="td-cell">{{ p.description }}</td>
+            <td class="td-cell">{{ p.categoryName || '-' }}</td>
+            <td class="td-cell">{{ p.hsnSac || '-' }}</td>
+            <td class="td-cell">{{ p.taxRate ?? '-' }}</td>
+            <td class="td-cell">
               <div class="flex flex-row gap-0.5">
-                <!-- gtnMode badge -->
                 @if (p.gtnMode === 'manual') {
-                <span
-                  class="bg-orange-100 text-orange-800 text-xs px-2 py-0.5 rounded border border-orange-200 w-fit">Manual</span>
+                <span class="badge bg-warning-light text-warning border border-warning/20">Manual</span>
                 } @else {
-                <span
-                  class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded border border-green-200 w-fit">Auto</span>
+                <span class="badge bg-success-light text-success border border-success/20">Auto</span>
                 }
-                <!-- gtnGeneration badge -->
                 @if (p.gtnMode !== 'manual') {
                 @if (p.gtnGeneration === 'batch') {
-                <span
-                  class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded border border-blue-200 w-fit">Batch</span>
+                <span class="badge bg-accent-light text-accent border border-accent/20">Batch</span>
                 } @else if (p.gtnGeneration === 'tag') {
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded border border-purple-200 w-fit">Tag</span>
+                <span class="badge bg-purple-100 text-purple-800 border border-purple-200">Tag</span>
                 } @else {
-                <span
-                  class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded border border-green-200 w-fit">Code</span>
+                <span class="badge bg-success-light text-success border border-success/20">Code</span>
                 }
                 }
               </div>
             </td>
-            <td class="text-center">
+            <td class="td-cell text-center">
               <button type="button" (click)="toggleActive(p)"
-                class="inline-flex items-center justify-center w-4.5 h-4.5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:outline-none rounded transition cursor-pointer"
-                [ngClass]="
-                  p.isActive ? 'border-green-500 text-green-600' : 'border-gray-300 text-gray-400'
-                ">
+                class="toggle-btn"
+                [title]="p.isActive ? 'Deactivate' : 'Activate'"
+                [ngClass]="p.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
                 @if (p.isActive) {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -98,24 +87,21 @@
                 }
               </button>
             </td>
-            <td class="py-2 px-2 text-right space-x-2">
-              <button (click)="editProduct(p.id)"
-                class="text-blue-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer">
-                {{ 'EDIT' | translate }}
-              </button>
-              <button (click)="deleteProduct(p.id)"
-                class="text-red-700 rounded focus:ring-2 focus:ring-slate-700 focus:outline-none text-sm hover:underline cursor-pointer">
-                {{ 'DELETE' | translate }}
-              </button>
+            <td class="td-cell text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button (click)="editProduct(p.id)" class="btn-link-edit flex items-center gap-1" title="Edit product">
+                  <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
+                </button>
+                <button (click)="deleteProduct(p.id)" class="btn-link-danger flex items-center gap-1" title="Delete product">
+                  <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
+                </button>
+              </div>
             </td>
           </tr>
           }
-          <!---->
           @if (!products().length) {
           <tr>
-            <td colspan="9" class="py-2 text-center text-gray-400">
-              {{ 'PRODUCT.NO_PRODUCTS_YET' | translate }}
-            </td>
+            <td colspan="9" class="td-cell text-center text-text-muted">{{ 'PRODUCT.NO_PRODUCTS_YET' | translate }}</td>
           </tr>
           }
         </tbody>

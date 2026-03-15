@@ -3,10 +3,11 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type User, UserList, UserService } from './user-service';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-users',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, LucideAngularModule],
   templateUrl: './users.html',
 })
 export class Users implements OnInit {

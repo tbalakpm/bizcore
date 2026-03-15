@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 import JsBarcode from 'jsbarcode';
 import {
   type StockInvoice,
@@ -17,7 +18,7 @@ type PrintableBarcodeLabel = {
 
 @Component({
   selector: 'app-stock-invoices',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule],
   templateUrl: './stock-invoices.html',
 })
 export class StockInvoices implements OnInit {

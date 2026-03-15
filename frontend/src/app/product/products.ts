@@ -3,10 +3,11 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Product, ProductList, ProductService } from './product-service';
 import { ProductFormComponent } from './product-form.component';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, TranslatePipe, ProductFormComponent],
+  imports: [CommonModule, TranslatePipe, ProductFormComponent, LucideAngularModule],
   templateUrl: './products.html',
 })
 export class Products implements OnInit {

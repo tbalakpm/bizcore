@@ -1,16 +1,17 @@
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { SalesInvoice, SalesInvoiceService } from './sales-invoice-service';
 import { pagination } from '../models/pagination';
 import { Customer, CustomerService } from '../customer/customer-service';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-sales-invoices',
-  imports: [ReactiveFormsModule, DatePipe, CurrencyPipe, RouterLink, NgSelectModule],
+  imports: [ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, RouterLink, NgSelectModule, LucideAngularModule],
   templateUrl: './sales-invoices.html',
 })
 export class SalesInvoices implements OnInit {
@@ -28,6 +29,7 @@ export class SalesInvoices implements OnInit {
 
   sortColumn = signal<string>('id');
   sortDirection = signal<'asc' | 'desc'>('desc');
+  pageLimit = 10;
 
   constructor() {
     this.filterForm = this.fb.group({
@@ -93,6 +95,11 @@ export class SalesInvoices implements OnInit {
 
   onPageChange(page: number) {
     this.loadInvoices(page);
+  }
+
+  onPageLimitChange() {
+    this.pagination.update(p => ({ ...p, limit: this.pageLimit }));
+    this.loadInvoices(1);
   }
 
   onClearFilters() {

@@ -1,88 +1,38 @@
 <div class="h-full flex items-center justify-center">
-  <div class="bg-white p-6 rounded-lg shadow border border-slate-200 dark:border-slate-700 w-full max-w-sm">
+  <div class="card w-full max-w-sm">
     <div class="flex items-center justify-center gap-2 mb-4">
-      <svg
-        class="w-7 h-7 text-slate-700"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2.5"
-          d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 13 16h-2a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 12 21Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-        />
+      <svg class="w-7 h-7 text-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+        height="24" fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+          d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 13 16h-2a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 12 21Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
       </svg>
-
-      <h1 class="text-2xl font-bold text-center text-slate-700">
-        {{ 'LOGIN.TITLE' | translate }}
-      </h1>
+      <h1 class="text-2xl font-bold text-center text-text-heading">{{ 'LOGIN.TITLE' | translate }}</h1>
     </div>
 
     <form (ngSubmit)="submit()" class="space-y-4">
       <div>
-        <label class="block font-medium" for="username">
-          {{ 'LOGIN.USERNAME' | translate }}
-        </label>
-        <input
-          type="text"
-          [(ngModel)]="username"
-          name="username"
-          id="username"
-          class="w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 focus:ring-brand focus:border-brand block shadow-xs placeholder:text-body"
-          autofocus
-        />
+        <label class="label-base" for="username">{{ 'LOGIN.USERNAME' | translate }}</label>
+        <input type="text" [(ngModel)]="username" name="username" id="username" class="input-base" autofocus />
       </div>
 
       <div>
-        <label class="block font-medium" for="password">
-          {{ 'LOGIN.PASSWORD' | translate }}
-        </label>
-        <input
-          type="password"
-          [(ngModel)]="password"
-          name="password"
-          id="password"
-          class="w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1 bg-neutral-secondary-medium border-default-medium text-heading rounded-base focus:ring-brand focus:border-brand block shadow-xs placeholder:text-body"
-        />
+        <label class="label-base" for="password">{{ 'LOGIN.PASSWORD' | translate }}</label>
+        <input type="password" [(ngModel)]="password" name="password" id="password" class="input-base" />
       </div>
 
-      <button
-        type="submit"
-        [disabled]="loading"
-        class="w-full py-2 border bg-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-white cursor-pointer"
-      >
-        <span class="flex justify-center items-center gap-2"
-          ><svg
-            class="w-6 h-6 text-gray-800 dark:text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
+      <button type="submit" [disabled]="loading" class="btn-primary w-full py-2">
+        <span class="flex justify-center items-center gap-2">
+          <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+            height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
           </svg>
           {{ 'LOGIN.SUBMIT' | translate }}
         </span>
       </button>
 
       @if(error) {
-      <p class="text-red-600">
-        {{ error }}
-      </p>
+      <p class="text-danger text-sm">{{ error }}</p>
       }
     </form>
   </div>

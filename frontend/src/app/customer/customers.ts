@@ -4,10 +4,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Customer, type Address, CustomerList, CustomerService } from './customer-service';
 import { AddressForm } from '../shared/components/address-form';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-customers',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm, LucideAngularModule],
   templateUrl: './customers.html',
 })
 export class Customers implements OnInit {

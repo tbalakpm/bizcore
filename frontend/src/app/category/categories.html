@@ -1,7 +1,7 @@
 <div class="space-y-4">
   <div class="flex justify-between items-center">
-    <h1 class="flex text-2xl font-bold items-center gap-2">
-      <svg class="w-7 h-7 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    <h1 class="page-title">
+      <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
         fill="none" viewBox="0 0 24 24">
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
           d="M5 19V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13H7a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M9 3v14m7 0v4" />
@@ -10,71 +10,57 @@
     </h1>
   </div>
   @if (error) {
-  <div class="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-    {{ error }}
-  </div>
+  <div class="error-banner">{{ error }}</div>
   }
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
     <!-- List -->
-    <div class="lg:col-span-2 bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700">
+    <div class="lg:col-span-2 card">
       <div class="flex justify-between items-center mb-2">
-        <h2 class="text-lg font-semibold">{{ 'MENU.CATEGORIES' | translate }}</h2>
+        <h2 class="section-title">{{ 'MENU.CATEGORIES' | translate }}</h2>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead class="bg-gray-50">
-            <tr class="border-b border-slate-400">
-              <th class="text-left px-1 py-2 w-32">{{ 'CODE' | translate }}</th>
-              <th class="text-left px-1 py-2 w-50">{{ 'NAME' | translate }}</th>
-              <th class="text-left px-1 py-2">{{ 'DESCRIPTION' | translate }}</th>
-              <th class="text-center px-1 py-2 w-16">{{ 'ACTIVE' | translate }}</th>
-              <th class="text-right px-1 py-2 w-32">{{ 'ACTIONS' | translate }}</th>
+      <div class="overflow-x-auto border border-border rounded-lg">
+        <table class="table-base">
+          <thead class="table-head">
+            <tr>
+              <th class="th-cell w-32">{{ 'CODE' | translate }}</th>
+              <th class="th-cell w-50">{{ 'NAME' | translate }}</th>
+              <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
+              <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
+              <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
             </tr>
           </thead>
 
           <tbody>
             @for (c of categories(); track c.id) {
-            <tr class="border-b border-slate-200 hover:bg-slate-100"
-              [ngClass]="{ 'bg-slate-200': editing?.id == c.id }">
-              <!-- Code -->
-              <td class="px-1 py-1">
+            <tr class="table-row" [class.table-row-selected]="editing?.id == c.id">
+              <td class="td-cell">
                 @if (editing?.id == c.id) {
-                <input [(ngModel)]="editing!.code" name="editCode"
-                  class="w-30 border bg-white border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-1 py-1 text-sm" />
+                <input [(ngModel)]="editing!.code" name="editCode" class="input-base" />
                 } @else {
                 {{ c.code }}
                 }
               </td>
-
-              <!-- Name -->
-              <td class="px-1 py-1">
+              <td class="td-cell">
                 @if (editing?.id == c.id) {
-                <input [(ngModel)]="editing!.name" name="editName"
-                  class="w-48 border bg-white border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-1 py-1 text-sm" />
+                <input [(ngModel)]="editing!.name" name="editName" class="input-base" />
                 } @else {
                 {{ c.name }}
                 }
               </td>
-
-              <td class="px-1 py-1">
+              <td class="td-cell">
                 @if (editing?.id == c.id) {
-                <input [(ngModel)]="editing!.description" name="editDesc"
-                  class="w-full border bg-white border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-1 py-1 text-sm" />
+                <input [(ngModel)]="editing!.description" name="editDesc" class="input-base" />
                 } @else {
                 {{ c.description }}
                 }
               </td>
-
-              <td class="px-1 py-2 text-center items-center">
+              <td class="td-cell text-center">
                 <button type="button" (click)="toggleActive(c)"
-                  class="inline-flex items-center w-4.5 h-4.5 border focus:ring focus:ring-slate-700 focus:outline-none hover:ring hover:ring-slate-700 rounded hover:bg-gray-100 transition cursor-pointer"
-                  [ngClass]="
-                      c.isActive
-                        ? 'border-green-500 text-green-600'
-                        : 'border-gray-300 text-gray-400'
-                    ">
+                  class="toggle-btn"
+                  [title]="c.isActive ? 'Deactivate' : 'Activate'"
+                  [ngClass]="c.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
                   @if (c.isActive) {
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -86,95 +72,57 @@
                   }
                 </button>
               </td>
-
-              <td class="px-1 py-2 text-right space-x-2 items-center">
-                @if (editing?.id == c.id) {
-                <button
-                  class="text-green-700 border-slate-400 focus:ring-2 focus:ring-slate-700 focus:outline-none rounded text-sm hover:underline cursor-pointer"
-                  (click)="saveEdit()">
-                  {{ 'SAVE' | translate }}
-                </button>
-                <button
-                  class="text-gray-700 border-slate-400 focus:ring-2 focus:ring-slate-700 focus:outline-none rounded text-sm hover:underline cursor-pointer"
-                  (click)="cancelEdit()">
-                  {{ 'CANCEL' | translate }}
-                </button>
-                } @else {
-                <button
-                  class="text-blue-700 border-slate-400 focus:ring-2 focus:ring-slate-700 focus:outline-none rounded text-sm hover:underline cursor-pointer"
-                  (click)="startEdit(c)">
-                  {{ 'EDIT' | translate }}
-                </button>
-                <button
-                  class="text-red-700 border-slate-400 focus:ring-2 focus:ring-slate-700 focus:outline-none rounded text-sm hover:underline cursor-pointer"
-                  (click)="deleteCategory(c)">
-                  {{ 'DELETE' | translate }}
-                </button>
-                }
+              <td class="td-cell text-center">
+                <div class="flex items-center justify-center gap-2">
+                  @if (editing?.id == c.id) {
+                  <button class="btn-link-edit text-success flex items-center gap-1" title="Save changes" (click)="saveEdit()">
+                    <i-lucide name="check" [size]="14"></i-lucide> {{ 'SAVE' | translate }}
+                  </button>
+                  <button class="btn-link-edit text-text-muted flex items-center gap-1" title="Cancel editing" (click)="cancelEdit()">
+                    <i-lucide name="x" [size]="14"></i-lucide> {{ 'CANCEL' | translate }}
+                  </button>
+                  } @else {
+                  <button class="btn-link-edit flex items-center gap-1" title="Edit category" (click)="startEdit(c)">
+                    <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
+                  </button>
+                  <button class="btn-link-danger flex items-center gap-1" title="Delete category" (click)="deleteCategory(c)">
+                    <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
+                  </button>
+                  }
+                </div>
               </td>
             </tr>
             }
-            <!---->
             @if (categories().length == 0) {
             <tr>
-              <td colspan="5" class="py-3 text-center text-gray-400">
-                <!-- @if (error) {
-                <p class="text-red-600 text-xs mt-4">
-                  {{ error }}
-                </p>
-                } @else { -->
+              <td colspan="5" class="td-cell text-center text-text-muted">
                 {{ 'CATEGORY.NO_CATEGORIES_YET' | translate }}.
-                <!-- } -->
               </td>
             </tr>
             }
           </tbody>
         </table>
       </div>
-
-      <!-- @if (error) {
-        <p class="text-red-600 text-xs mt-4">
-          {{ error }}
-        </p>
-      } -->
     </div>
 
     <!-- Add form -->
-    <div class="bg-white p-4 rounded-lg shadow border border-slate-200 dark:border-slate-700 max-h-max">
-      <h2 class="text-lg font-semibold mb-3">{{ 'CATEGORY.ADD' | translate }}</h2>
+    <div class="card max-h-max">
+      <h2 class="section-title">{{ 'CATEGORY.ADD' | translate }}</h2>
       <form (ngSubmit)="addCategory()" class="space-y-3">
-        <!-- Code -->
         <div>
-          <label class="block text-sm font-medium">{{ 'CODE' | translate }}</label>
-          <input [(ngModel)]="newCategory.code" name="newCategoryCode"
-            class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"
-            autofocus />
+          <label class="label-base">{{ 'CODE' | translate }}</label>
+          <input [(ngModel)]="newCategory.code" name="newCategoryCode" class="input-base" autofocus />
         </div>
-
-        <!-- Name -->
         <div>
-          <label class="block text-sm font-medium">{{ 'NAME' | translate }}</label>
-          <input [(ngModel)]="newCategory.name" name="newCategoryName"
-            class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1" />
+          <label class="label-base">{{ 'NAME' | translate }}</label>
+          <input [(ngModel)]="newCategory.name" name="newCategoryName" class="input-base" />
         </div>
-
-        <!-- Description -->
         <div>
-          <label class="block text-sm font-medium">{{ 'DESCRIPTION' | translate }}</label>
-          <textarea [(ngModel)]="newCategory.description" name="newCategoryDesc"
-            class="mt-1 w-full border border-slate-400 focus:ring focus:ring-slate-700 focus:outline-none rounded px-2 py-1"></textarea>
+          <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
+          <textarea [(ngModel)]="newCategory.description" name="newCategoryDesc" class="input-base"></textarea>
         </div>
-
-        <button type="submit"
-          class="py-2 w-full border bg-slate-700 focus:ring focus:ring-slate-700 focus:outline-none rounded text-white text-sm cursor-pointer">
-          {{ 'SAVE' | translate }}
-        </button>
+        <button type="submit" class="btn-primary w-full">{{ 'SAVE' | translate }}</button>
       </form>
-      <!-- @if (error) {
-      <p class="text-red-600 text-xs mt-2">
-        {{ error }}
-      </p>
-      } -->
     </div>
   </div>
 </div>

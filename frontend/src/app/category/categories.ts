@@ -3,10 +3,11 @@ import { CategoryService, Category, CategoryList } from './category-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-categories',
-  imports: [TranslatePipe, FormsModule, CommonModule],
+  imports: [TranslatePipe, FormsModule, CommonModule, LucideAngularModule],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {
