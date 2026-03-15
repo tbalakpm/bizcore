@@ -1,19 +1,23 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
   <h1 class="flex text-2xl font-bold items-center gap-2">
-    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11"/>
+    <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+      viewBox="0 0 24 24">
+      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+        d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11" />
     </svg>
     {{ isEditMode ? 'Edit Sales Invoice' : 'New Sales Invoice' }}
   </h1>
   <div class="flex gap-2">
-    <a routerLink="/sales-invoices" class="py-1.5 px-4 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 rounded text-sm cursor-pointer transition">
+    <a routerLink="/sales-invoices"
+      class="py-1.5 px-4 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 rounded text-sm cursor-pointer transition">
       {{ editingInvoice.irn ? 'Back' : 'Cancel' }}
     </a>
     @if (!editingInvoice.irn) {
-      <button type="button" class="py-1.5 px-4 border bg-blue-600 hover:bg-blue-700 text-white rounded font-medium shadow-sm text-sm cursor-pointer transition disabled:opacity-50"
-        (click)="onSubmit()" [disabled]="submitting">
-        {{ submitting ? 'Saving...' : 'Save Invoice' }}
-      </button>
+    <button type="button"
+      class="py-1.5 px-4 border bg-blue-600 hover:bg-blue-700 text-white rounded font-medium shadow-sm text-sm cursor-pointer transition disabled:opacity-50"
+      (click)="onSubmit()" [disabled]="submitting">
+      {{ submitting ? 'Saving...' : 'Save Invoice' }}
+    </button>
     }
   </div>
 </div>
@@ -22,7 +26,8 @@
   @if (error) {
   <div class="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800 flex items-start">
     <svg class="h-5 w-5 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
     <div>
       <h3 class="font-medium">Error saving invoice</h3>
@@ -30,24 +35,31 @@
     </div>
   </div>
   }
-  
+
   @if (editingInvoice.irn) {
-    <div class="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-800 p-4">
-      <div class="flex items-start">
-        <svg class="h-6 w-6 text-emerald-600 dark:text-emerald-500 mt-0.5 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-          <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z" clip-rule="evenodd"/>
-        </svg>
-        <div>
-          <h3 class="text-sm font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider mb-2">Indian E-Invoice Generated</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-emerald-700 dark:text-emerald-300">
-            <div><span class="font-medium">IRN:</span> <span class="font-mono text-xs break-all">{{ editingInvoice.irn }}</span></div>
-            <div><span class="font-medium">Ack No:</span> {{ editingInvoice.ackNo }}</div>
-            <div><span class="font-medium">Ack Date:</span> {{ editingInvoice.ackDate | date:'medium' }}</div>
-          </div>
-          <p class="mt-2 text-xs italic opacity-80 text-emerald-700 dark:text-emerald-400">This invoice has been locked from future edits.</p>
+  <div
+    class="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-800 p-4">
+    <div class="flex items-start">
+      <svg class="h-6 w-6 text-emerald-600 dark:text-emerald-500 mt-0.5 mr-3" aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+        <path fill-rule="evenodd"
+          d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
+          clip-rule="evenodd" />
+      </svg>
+      <div>
+        <h3 class="text-sm font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider mb-2">Indian
+          E-Invoice Generated</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-emerald-700 dark:text-emerald-300">
+          <div><span class="font-medium">IRN:</span> <span class="font-mono text-xs break-all">{{ editingInvoice.irn
+              }}</span></div>
+          <div><span class="font-medium">Ack No:</span> {{ editingInvoice.ackNo }}</div>
+          <div><span class="font-medium">Ack Date:</span> {{ editingInvoice.ackDate | date:'medium' }}</div>
         </div>
+        <p class="mt-2 text-xs italic opacity-80 text-emerald-700 dark:text-emerald-400">This invoice has been locked
+          from future edits.</p>
       </div>
     </div>
+  </div>
   }
 
   <!-- Master Details Form -->
@@ -55,99 +67,104 @@
     <!-- Customer Field w/ Inline Add -->
     <div class="xl:col-span-2 space-y-1">
       <div class="flex justify-between items-center mb-1">
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Customer <span class="text-red-500">*</span></label>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Customer <span
+            class="text-red-500">*</span></label>
         @if (!editingInvoice.irn) {
-          <button type="button" class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 font-medium" (click)="toggleNewCustomerForm()">
-            {{ showNewCustomerForm ? 'Cancel Customer' : '+ Add Customer' }}
-          </button>
+        <button type="button" class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 font-medium"
+          (click)="toggleNewCustomerForm()">
+          {{ showNewCustomerForm ? 'Cancel Customer' : '+ Add Customer' }}
+        </button>
         }
       </div>
-      
+
       @if (showNewCustomerForm) {
-        <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded mb-2">
-           <h4 class="text-xs font-semibold uppercase text-slate-500 mb-2">Quick Add Customer</h4>
-           @if (customerError) {
-             <div class="text-xs text-red-600 mb-2">{{ customerError }}</div>
-           }
-           <div class="flex gap-2 mb-2">
-             <div class="flex-1">
-               <input type="text" [(ngModel)]="newCustomer.code" name="newCustCode" placeholder="Code (e.g. CUST-01)" class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-500 dark:bg-slate-900" />
-             </div>
-             <div class="flex-[2]">
-               <input type="text" [(ngModel)]="newCustomer.name" name="newCustName" placeholder="Customer Name *" class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-500 dark:bg-slate-900" />
-             </div>
-             <div class="flex-1">
-                <select [(ngModel)]="newCustomer.type" name="newCustType" class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 dark:bg-slate-900">
-                  <option value="retail">Retail</option>
-                  <option value="wholesale">Wholesale</option>
-                </select>
-             </div>
-             <div class="flex-1">
-               <input type="text" [(ngModel)]="newCustomer.gstin" name="newCustGstin" placeholder="GSTIN" class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-500 dark:bg-slate-900" />
-             </div>
-           </div>
-           
-           <!-- Addresses Inlined -->
-           <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
-             <app-address-form 
-               [address]="newCustomer.billingAddress!" 
-               [title]="'BILLING_ADDRESS'" 
-               [isExpandable]="true"
-               [isOpen]="false"
-             ></app-address-form>
-             <div>
-               <div class="flex items-center gap-2 mb-1">
-                 <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="invoiceSameAsBilling"
-                   class="w-3.5 h-3.5 text-blue-600 border-slate-300 rounded focus:ring-blue-500" />
-                 <label for="invoiceSameAsBilling" class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ 'SAME_AS_BILLING' | translate }}</label>
-               </div>
-               @if (!sameAsBilling) {
-                 <app-address-form 
-                   [address]="newCustomer.shippingAddress!" 
-                   [title]="'SHIPPING_ADDRESS'" 
-                   [isExpandable]="true"
-                   [isOpen]="false"
-                 ></app-address-form>
-               }
-             </div>
-           </div>
-           <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-xs py-1.5 px-3 rounded shadow-sm disabled:opacity-50" (click)="createCustomerInline()" [disabled]="customerSubmitting">
-             {{ customerSubmitting ? 'Saving...' : 'Save & Select Customer' }}
-           </button>
+      <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded mb-2">
+        <h4 class="text-xs font-semibold uppercase text-slate-500 mb-2">Quick Add Customer</h4>
+        @if (customerError) {
+        <div class="text-xs text-red-600 mb-2">{{ customerError }}</div>
+        }
+        <div class="flex gap-2 mb-2">
+          <div class="flex-1">
+            <input type="text" [(ngModel)]="newCustomer.code" name="newCustCode" placeholder="Code (e.g. CUST-01)"
+              class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-500 dark:bg-slate-900" />
+          </div>
+          <div class="flex-[2]">
+            <input type="text" [(ngModel)]="newCustomer.name" name="newCustName" placeholder="Customer Name *"
+              class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-500 dark:bg-slate-900" />
+          </div>
+          <div class="flex-1">
+            <select [(ngModel)]="newCustomer.type" name="newCustType"
+              class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 dark:bg-slate-900">
+              <option value="retail">Retail</option>
+              <option value="wholesale">Wholesale</option>
+            </select>
+          </div>
+          <div class="flex-1">
+            <input type="text" [(ngModel)]="newCustomer.gstin" name="newCustGstin" placeholder="GSTIN"
+              class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-500 dark:bg-slate-900" />
+          </div>
         </div>
+
+        <!-- Addresses Inlined -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+          <app-address-form [address]="newCustomer.billingAddress!" [title]="'ADDRESS.BILLING'" [isExpandable]="true"
+            [isOpen]="false"></app-address-form>
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="invoiceSameAsBilling"
+                class="w-3.5 h-3.5 text-blue-600 border-slate-300 rounded focus:ring-blue-500" />
+              <label for="invoiceSameAsBilling" class="text-xs font-medium text-slate-700 dark:text-slate-300">{{
+                'ADDRESS.SAME_AS_BILLING' | translate }}</label>
+            </div>
+            @if (!sameAsBilling) {
+            <app-address-form [address]="newCustomer.shippingAddress!" [title]="'ADDRESS.SHIPPING'"
+              [isExpandable]="true" [isOpen]="false"></app-address-form>
+            }
+          </div>
+        </div>
+        <button type="button"
+          class="bg-blue-600 hover:bg-blue-700 text-white text-xs py-1.5 px-3 rounded shadow-sm disabled:opacity-50"
+          (click)="createCustomerInline()" [disabled]="customerSubmitting">
+          {{ customerSubmitting ? 'Saving...' : 'Save & Select Customer' }}
+        </button>
+      </div>
       }
-      
+
       @if (!showNewCustomerForm) {
-        <ng-select [items]="customers()" bindLabel="name" bindValue="id" [(ngModel)]="editingInvoice.customerId"
-          name="customerId" [searchable]="true" [clearable]="true" placeholder="-- Select Customer --" [disabled]="!!editingInvoice.irn"
-          class="w-full text-sm">
-          <ng-template ng-label-tmp let-item="item">
-            {{ item.code }} - {{ item.name }} ({{ item.type | titlecase }})
-          </ng-template>
-          <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-            <div class="font-medium">{{ item.name }}</div>
-            <div class="text-xs text-slate-500">{{ item.code }} &middot; {{ item.type | titlecase }}</div>
-          </ng-template>
-        </ng-select>
+      <ng-select [items]="customers()" bindLabel="name" bindValue="id" [(ngModel)]="editingInvoice.customerId"
+        name="customerId" [searchable]="true" [clearable]="true" placeholder="-- Select Customer --"
+        [disabled]="!!editingInvoice.irn" class="w-full text-sm">
+        <ng-template ng-label-tmp let-item="item">
+          {{ item.code }} - {{ item.name }} ({{ item.type | titlecase }})
+        </ng-template>
+        <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
+          <div class="font-medium">{{ item.name }}</div>
+          <div class="text-xs text-slate-500">{{ item.code }} &middot; {{ item.type | titlecase }}</div>
+        </ng-template>
+      </ng-select>
       }
     </div>
 
     <div>
       <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Invoice Number</label>
-      <input type="text" [(ngModel)]="editingInvoice.invoiceNumber" name="invoiceNumber" [disabled]="!!editingInvoice.irn"
-        placeholder="Auto-generated if left empty" class="w-full border border-slate-300 dark:border-slate-600 rounded px-3 py-1.5 text-sm dark:bg-slate-800 disabled:opacity-50" />
+      <input type="text" [(ngModel)]="editingInvoice.invoiceNumber" name="invoiceNumber"
+        [disabled]="!!editingInvoice.irn" placeholder="Auto-generated if left empty"
+        class="w-full border border-slate-300 dark:border-slate-600 rounded px-3 py-1.5 text-sm dark:bg-slate-800 disabled:opacity-50" />
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Invoice Date <span class="text-red-500">*</span></label>
-      <input type="date" [(ngModel)]="editingInvoice.invoiceDate" name="invoiceDate" required [disabled]="!!editingInvoice.irn"
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Invoice Date <span
+          class="text-red-500">*</span></label>
+      <input type="date" [(ngModel)]="editingInvoice.invoiceDate" name="invoiceDate" required
+        [disabled]="!!editingInvoice.irn"
         class="w-full border border-slate-300 dark:border-slate-600 rounded px-3 py-1.5 text-sm dark:bg-slate-800 disabled:opacity-50" />
     </div>
 
     <div>
       <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ref Number</label>
       <input type="text" [(ngModel)]="editingInvoice.refNumber" name="refNumber" [disabled]="!!editingInvoice.irn"
-        placeholder="e.g. PO-123" class="w-full border border-slate-300 dark:border-slate-600 rounded px-3 py-1.5 text-sm dark:bg-slate-800 disabled:opacity-50" />
+        placeholder="e.g. PO-123"
+        class="w-full border border-slate-300 dark:border-slate-600 rounded px-3 py-1.5 text-sm dark:bg-slate-800 disabled:opacity-50" />
     </div>
 
     <div>
@@ -179,11 +196,13 @@
               <ng-select [items]="inventories()" bindLabel="gtn" bindValue="id" [(ngModel)]="item.inventoryId"
                 appendTo="body" (change)="onInventorySelect(item)" [disabled]="!!editingInvoice.irn"
                 [typeahead]="inventoryInput$" (scrollToEnd)="onInventoryScrollToEnd()" [loading]="inventoryLoading"
-                [name]="'itemInventory' + i" [searchable]="true" [clearable]="true" placeholder="-- Select Item (GTN) --"
-                class="w-full text-sm">
+                [name]="'itemInventory' + i" [searchable]="true" [clearable]="true"
+                placeholder="-- Select Item (GTN) --" class="w-full text-sm">
                 <ng-template ng-label-tmp let-p="item">
                   <span class="font-medium">{{ p.gtn || p.code }}</span> - {{ p.name }}
-                  <span *ngIf="(p.unitsInStock || 0) <= 0" class="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">No Stock</span>
+                  <span *ngIf="(p.unitsInStock || 0) <= 0"
+                    class="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">No
+                    Stock</span>
                 </ng-template>
                 <ng-template ng-option-tmp let-p="item" let-search="searchTerm">
                   <div class="flex justify-between items-start">
@@ -192,7 +211,8 @@
                       <div class="text-xs text-slate-500">GTN: {{ p.gtn || p.code }}</div>
                     </div>
                     <div class="text-right">
-                      <div class="text-xs font-semibold" [class.text-red-500]="(p.unitsInStock || 0) <= 0" [class.text-emerald-600]="(p.unitsInStock || 0) > 0">
+                      <div class="text-xs font-semibold" [class.text-red-500]="(p.unitsInStock || 0) <= 0"
+                        [class.text-emerald-600]="(p.unitsInStock || 0) > 0">
                         Stock: {{ p.unitsInStock || 0 }}
                       </div>
                     </div>
@@ -201,16 +221,19 @@
               </ng-select>
             </td>
             <td class="px-2 py-2">
-              <input type="number" step="0.01" min="0" [(ngModel)]="item.qty" (input)="calculateLineTotal(item)" [disabled]="!!editingInvoice.irn"
-                [name]="'itemQty' + i" class="w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-right dark:bg-slate-800 disabled:opacity-50" />
+              <input type="number" step="0.01" min="0" [(ngModel)]="item.qty" (input)="calculateLineTotal(item)"
+                [disabled]="!!editingInvoice.irn" [name]="'itemQty' + i"
+                class="w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-right dark:bg-slate-800 disabled:opacity-50" />
             </td>
             <td class="px-2 py-2">
-              <input type="number" step="0.01" min="0" [(ngModel)]="item.unitPrice" (input)="calculateLineTotal(item)" [disabled]="!!editingInvoice.irn"
-                [name]="'itemPrice' + i" class="w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-right dark:bg-slate-800 disabled:opacity-50" />
+              <input type="number" step="0.01" min="0" [(ngModel)]="item.unitPrice" (input)="calculateLineTotal(item)"
+                [disabled]="!!editingInvoice.irn" [name]="'itemPrice' + i"
+                class="w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-right dark:bg-slate-800 disabled:opacity-50" />
             </td>
             <td class="px-2 py-2">
-              <input type="number" step="0.01" min="0" [(ngModel)]="item.taxPct" (input)="calculateLineTotal(item)" [disabled]="!!editingInvoice.irn"
-                [name]="'itemTaxPct' + i" class="w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-right dark:bg-slate-800 disabled:opacity-50" />
+              <input type="number" step="0.01" min="0" [(ngModel)]="item.taxPct" (input)="calculateLineTotal(item)"
+                [disabled]="!!editingInvoice.irn" [name]="'itemTaxPct' + i"
+                class="w-full border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-right dark:bg-slate-800 disabled:opacity-50" />
             </td>
             <td class="px-4 py-2 text-right text-slate-500 bg-slate-50 dark:bg-slate-800/50">
               {{ item.taxAmount | number:'1.2-2' }}
@@ -220,13 +243,16 @@
             </td>
             <td class="px-2 py-2 text-center">
               @if (!editingInvoice.irn) {
-                <button type="button" class="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                  (click)="removeItem(i)" [disabled]="editingInvoice.items.length <= 1"
-                  [class.opacity-50]="editingInvoice.items.length <= 1">
-                  <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
-                  </svg>
-                </button>
+              <button type="button"
+                class="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                (click)="removeItem(i)" [disabled]="editingInvoice.items.length <= 1"
+                [class.opacity-50]="editingInvoice.items.length <= 1">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                  fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
+                </svg>
+              </button>
               }
             </td>
           </tr>
@@ -234,18 +260,21 @@
         </tbody>
       </table>
     </div>
-    
+
     <!-- Add Row Button -->
     @if (!editingInvoice.irn) {
-      <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-3 border-t border-slate-200 dark:border-slate-700">
-        <button type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm flex items-center gap-1 transition"
-          (click)="addItem()">
-          <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
-          </svg>
-          Add Line Item
-        </button>
-      </div>
+    <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-3 border-t border-slate-200 dark:border-slate-700">
+      <button type="button"
+        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm flex items-center gap-1 transition"
+        (click)="addItem()">
+        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+          viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M5 12h14m-7 7V5" />
+        </svg>
+        Add Line Item
+      </button>
+    </div>
     }
   </div>
 
@@ -255,9 +284,10 @@
     <div class="w-full md:w-1/2 text-sm text-slate-500 dark:text-slate-400">
       <p>Ensure all items possess a valid stock quantity before saving.</p>
     </div>
-    
+
     <!-- Totals Area -->
-    <div class="w-full md:w-1/3 bg-slate-50 dark:bg-slate-800 rounded-lg p-5 border border-slate-200 dark:border-slate-700 space-y-3">
+    <div
+      class="w-full md:w-1/3 bg-slate-50 dark:bg-slate-800 rounded-lg p-5 border border-slate-200 dark:border-slate-700 space-y-3">
       <div class="flex justify-between items-center text-sm">
         <span class="text-slate-500 dark:text-slate-400 font-medium">Subtotal</span>
         <span class="font-medium text-slate-900 dark:text-white">{{ subtotal | number:'1.2-2' }}</span>
@@ -265,7 +295,8 @@
       <div class="flex justify-between items-center text-sm">
         <span class="text-slate-500 dark:text-slate-400 font-medium">Total Discount</span>
         <span class="font-medium text-red-500" *ngIf="totalDiscount > 0">- {{ totalDiscount | number:'1.2-2' }}</span>
-        <span class="font-medium text-slate-900 dark:text-white" *ngIf="totalDiscount <= 0">{{ totalDiscount | number:'1.2-2' }}</span>
+        <span class="font-medium text-slate-900 dark:text-white" *ngIf="totalDiscount <= 0">{{ totalDiscount |
+          number:'1.2-2' }}</span>
       </div>
       <div class="flex justify-between items-center text-sm">
         <span class="text-slate-500 dark:text-slate-400 font-medium">Total Tax</span>
@@ -274,7 +305,8 @@
       <div class="border-t border-slate-200 dark:border-slate-700 my-1"></div>
       <div class="flex justify-between items-center">
         <span class="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider">Net Amount</span>
-        <span class="text-xl font-bold text-emerald-600 dark:text-emerald-400">Rs. {{ netAmount | number:'1.2-2' }}</span>
+        <span class="text-xl font-bold text-emerald-600 dark:text-emerald-400">Rs. {{ netAmount | number:'1.2-2'
+          }}</span>
       </div>
     </div>
   </div>

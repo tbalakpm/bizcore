@@ -11,7 +11,7 @@ const colors = {
 
 export function logger(req: Request, res: Response, next: NextFunction) {
   try {
-    const url = (Array.isArray(req.url) ? req.url.join(', ') : req.url).padEnd(25, ' ').slice(0, 25);
+    const url = (Array.isArray(req.url) ? req.url.join(', ') : req.url).padEnd(60, ' ').slice(0, 60);
     const startTime = Date.now();
     const method = req.method.padEnd(6, ' ');
     const ip = req.ip || 'unknown';
@@ -26,25 +26,19 @@ export function logger(req: Request, res: Response, next: NextFunction) {
       if (statusCode >= 500) {
         // Log server errors with ERR level
         console.error(
-          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.err}[ERR ]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(3, ' ')}ms - Response size: ${responseSize.toString().padStart(5, ' ')} bytes`,
+          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.err}[ERR ]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(4, ' ')}ms - Size: ${responseSize.toString().padStart(6, ' ')} bytes`,
         );
       } else if (statusCode >= 400 && statusCode < 500) {
         // Log client errors with WARN level
         console.warn(
-          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.warn}[WARN]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(3, ' ')}ms - Response size: ${responseSize.toString().padStart(5, ' ')} bytes`,
+          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.warn}[WARN]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(4, ' ')}ms - Size: ${responseSize.toString().padStart(6, ' ')} bytes`,
         );
       } else {
         // Log successful requests with INFO level
         console.log(
-          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.info}[INFO]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(3, ' ')}ms - Response size: ${responseSize.toString().padStart(5, ' ')} bytes`,
+          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.info}[INFO]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(4, ' ')}ms - Size: ${responseSize.toString().padStart(6, ' ')} bytes`,
         );
       }
-      // const logLevel = statusCode >= 400 && statusCode < 500 ? 'WARN' : 'INFO';
-      // const levelColor = statusCode >= 400 && statusCode < 500 ? colors.warn : colors.info;
-
-      // console.log(
-      //   `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${levelColor}[${logLevel}]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(3, ' ')}ms - Response size: ${responseSize.toString().padStart(5, ' ')} bytes`,
-      // );
 
       return originalSend.call(this, data);
     };
