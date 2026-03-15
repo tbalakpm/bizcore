@@ -17,3 +17,5 @@ export type { SalesInvoice, NewSalesInvoice, SalesInvoiceWithItems, NewSalesInvo
 
 export { salesInvoiceItems } from './sales-invoice-items.schema';
 export type { SalesInvoiceItem, NewSalesInvoiceItem } from './sales-invoice-items.schema';
+
+export { purchaseInvoices } from './purchase-invoice.schema';

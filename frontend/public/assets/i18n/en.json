@@ -19,6 +19,7 @@
     "PRODUCTS": "Products",
     "USERS": "Users",
     "CUSTOMERS": "Customers",
+    "SUPPLIERS": "Suppliers",
     "LOGOUT": "Logout"
   },
   "LOGIN": {

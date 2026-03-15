@@ -10,6 +10,7 @@ import { StockInvoices } from './stock-invoice/stock-invoices';
 import { StockInvoiceForm } from './stock-invoice/stock-invoice-form';
 import { SalesInvoices } from './sales-invoice/sales-invoices';
 import { SalesInvoiceForm } from './sales-invoice/sales-invoice-form';
+import { Suppliers } from './supplier/suppliers';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -21,6 +22,7 @@ export const routes: Routes = [
       { path: 'categories', component: Categories },
       { path: 'products', component: Products },
       { path: 'customers', component: Customers },
+      { path: 'suppliers', component: Suppliers },
       {
         path: 'stock-invoices',
         children: [

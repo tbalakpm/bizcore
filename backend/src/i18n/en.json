@@ -9,5 +9,7 @@
   "product.exists": "Product already exists.",
   "product.notFound": "Product not found",
   "customer.exists": "Customer already exists.",
-  "customer.notFound": "Customer not found"
+  "customer.notFound": "Customer not found",
+  "supplier.exists": "Supplier already exists.",
+  "supplier.notFound": "Supplier not found"
 }
