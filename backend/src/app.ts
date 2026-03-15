@@ -21,6 +21,7 @@ import { invoicesRouter } from './routes/invoices';
 import { serialNumbersRouter } from './routes/serial-numbers';
 import { stockInvoicesRouter } from './routes/stock-invoices';
 import { salesInvoicesRouter } from './routes/sales-invoices';
+import { purchaseInvoicesRouter } from './routes/purchase-invoices';
 
 export async function app() {
   console.log(`Environment: ${config.environment}`);
@@ -61,6 +62,7 @@ export async function app() {
   app.use('/api/invoices', authRequired, invoicesRouter);
   app.use('/api/stock-invoices', authRequired, stockInvoicesRouter);
   app.use('/api/sales-invoices', authRequired, salesInvoicesRouter);
+  app.use('/api/purchase-invoices', authRequired, purchaseInvoicesRouter);
   app.use('/api/serial-numbers', authRequired, serialNumbersRouter);
 
   // Handle any requests that don't match the static files by serving the index.html file

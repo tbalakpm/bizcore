@@ -19,3 +19,4 @@ export { salesInvoiceItems } from './sales-invoice-items.schema';
 export type { SalesInvoiceItem, NewSalesInvoiceItem } from './sales-invoice-items.schema';
 
 export { purchaseInvoices } from './purchase-invoice.schema';
+export { purchaseInvoiceItems } from './purchase-invoice-items.schema';

@@ -11,6 +11,8 @@ import { StockInvoiceForm } from './stock-invoice/stock-invoice-form';
 import { SalesInvoices } from './sales-invoice/sales-invoices';
 import { SalesInvoiceForm } from './sales-invoice/sales-invoice-form';
 import { Suppliers } from './supplier/suppliers';
+import { PurchaseInvoices } from './purchase-invoice/purchase-invoices';
+import { PurchaseInvoiceForm } from './purchase-invoice/purchase-invoice-form';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -37,6 +39,14 @@ export const routes: Routes = [
           { path: '', component: SalesInvoices },
           { path: 'new', component: SalesInvoiceForm },
           { path: ':id/edit', component: SalesInvoiceForm },
+        ],
+      },
+      {
+        path: 'purchase-invoices',
+        children: [
+          { path: '', component: PurchaseInvoices },
+          { path: 'new', component: PurchaseInvoiceForm },
+          { path: ':id/edit', component: PurchaseInvoiceForm },
         ],
       },
       { path: 'users', component: Users },
