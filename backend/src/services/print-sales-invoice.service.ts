@@ -61,7 +61,7 @@ export interface SalesInvoicePdfData {
 
 export class PrintSalesInvoiceService {
   async generatePDF(data: SalesInvoicePdfData, res: Response): Promise<void> {
-    const doc = new PDFDocument({ margin: 40, size: 'A4' });
+    const doc = new PDFDocument({ margin: 20, size: 'A4' });
     doc.pipe(res);
 
     let currentY = 40;
@@ -80,23 +80,23 @@ export class PrintSalesInvoiceService {
     const drawHeader = () => {
       doc.fontSize(18).font('Helvetica-Bold').text(data.company.name.toUpperCase(), 40, currentY, { align: 'center' });
       currentY += 22;
-      
+
       const addrLines = [
         data.company.addressLine1,
         [data.company.city, data.company.state, data.company.postalCode].filter(Boolean).join(' '),
       ].filter(Boolean);
-      
+
       doc.fontSize(9).font('Helvetica').text(addrLines.join(', '), 40, currentY, { align: 'center' });
       currentY += 12;
-      
+
       const contactLines = [
         data.company.gstin ? `GSTIN: ${data.company.gstin}` : null,
         data.company.phone ? `Phone: ${data.company.phone}` : null,
       ].filter(Boolean);
-      
+
       doc.text(contactLines.join('  |  '), 40, currentY, { align: 'center' });
       currentY += 15;
-      
+
       doc.moveTo(40, currentY).lineTo(555, currentY).stroke('#CCCCCC');
       currentY += 15;
     };
@@ -105,11 +105,11 @@ export class PrintSalesInvoiceService {
 
     // 2. Title + Invoice Meta
     doc.fontSize(14).font('Helvetica-Bold').text('TAX INVOICE', 40, currentY);
-    
+
     doc.fontSize(9).font('Helvetica-Bold').text('Invoice No:', 380, currentY);
     doc.font('Helvetica').text(data.invoice.invoiceNumber, 450, currentY);
     currentY += 12;
-    
+
     doc.font('Helvetica-Bold').text('Invoice Date:', 380, currentY);
     doc.font('Helvetica').text(data.invoice.invoiceDate, 450, currentY);
     currentY += 12;
@@ -125,9 +125,9 @@ export class PrintSalesInvoiceService {
     if (data.invoice.irn) {
       doc.fontSize(8).font('Helvetica-Bold').text('IRN:', 40, currentY);
       doc.font('Helvetica').text(data.invoice.irn, 70, currentY, { width: 300 });
-      
+
       const irnHeight = doc.heightOfString(data.invoice.irn, { width: 300 });
-      
+
       if (data.invoice.signedQrCode) {
         try {
           const qrPng = await bwipjs.toBuffer({
@@ -140,7 +140,7 @@ export class PrintSalesInvoiceService {
           console.error('QR Gen failed', e);
         }
       }
-      
+
       currentY += irnHeight + 5;
       doc.font('Helvetica-Bold').text('Ack No:', 40, currentY);
       doc.font('Helvetica').text(data.invoice.ackNo || '', 80, currentY);
@@ -189,7 +189,7 @@ export class PrintSalesInvoiceService {
     if (!isSameAddr) {
       doc.text(shippingText, 300, addrY, { width: 250 });
     }
-    
+
     currentY = Math.max(
       doc.y,
       addrY + (isSameAddr ? 0 : 0) // placeholder
@@ -199,7 +199,7 @@ export class PrintSalesInvoiceService {
     const tableHeader = () => {
       doc.rect(40, currentY, 515, 20).fill('#CCCCCC');
       doc.fontSize(9).font('Helvetica-Bold').fillColor('#000000');
-      
+
       doc.text('#', 45, currentY + 5, { width: 20 });
       doc.text('Product', 70, currentY + 5, { width: 160 });
       doc.text('HSN', 235, currentY + 5, { width: 50 });
@@ -209,7 +209,7 @@ export class PrintSalesInvoiceService {
       doc.text('Tax%', 430, currentY + 5, { width: 30, align: 'right' });
       doc.text('Tax Amt', 465, currentY + 5, { width: 45, align: 'right' });
       doc.text('Total', 515, currentY + 5, { width: 40, align: 'right' });
-      
+
       currentY += 25;
     };
 
@@ -223,21 +223,21 @@ export class PrintSalesInvoiceService {
       }
 
       if (rowIndex % 2 === 1) {
-        doc.rect(40, currentY - 2, 515, 18).fill('#F7F7F7');
+        doc.rect(40, currentY - 2, 515, 22).fill('#F7F7F7');
       }
       doc.fillColor('#000000').font('Helvetica').fontSize(9);
 
-      doc.text((rowIndex + 1).toString(), 45, currentY, { width: 20 });
-      doc.text(item.productName, 70, currentY, { width: 160 });
-      doc.text(item.hsnSac || '', 235, currentY, { width: 50 });
-      doc.text(Number(item.qty).toFixed(2), 290, currentY, { width: 35, align: 'right' });
-      doc.text(Number(item.unitPrice).toFixed(2), 330, currentY, { width: 50, align: 'right' });
-      doc.text(Number(item.discountAmount).toFixed(2), 385, currentY, { width: 40, align: 'right' });
-      doc.text(Number(item.taxPct).toFixed(2), 430, currentY, { width: 30, align: 'right' });
-      doc.text(Number(item.taxAmount).toFixed(2), 465, currentY, { width: 45, align: 'right' });
-      doc.text(Number(item.lineTotal).toFixed(2), 515, currentY, { width: 40, align: 'right' });
+      doc.text((rowIndex + 1).toString(), 45, currentY + 4, { width: 20 });
+      doc.text(item.productName, 70, currentY + 4, { width: 160 });
+      doc.text(item.hsnSac || '', 235, currentY + 4, { width: 50 });
+      doc.text(Number(item.qty).toFixed(2), 290, currentY + 4, { width: 35, align: 'right' });
+      doc.text(Number(item.unitPrice).toFixed(2), 330, currentY + 4, { width: 50, align: 'right' });
+      doc.text(Number(item.discountAmount).toFixed(2), 385, currentY + 4, { width: 40, align: 'right' });
+      doc.text(Number(item.taxPct).toFixed(2), 430, currentY + 4, { width: 30, align: 'right' });
+      doc.text(Number(item.taxAmount).toFixed(2), 465, currentY + 4, { width: 45, align: 'right' });
+      doc.text(Number(item.lineTotal).toFixed(2), 515, currentY + 4, { width: 40, align: 'right' });
 
-      currentY += 18;
+      currentY += 22;
       rowIndex++;
     }
 
@@ -248,7 +248,7 @@ export class PrintSalesInvoiceService {
     const valueX = 500;
 
     doc.fontSize(9).font('Helvetica');
-    
+
     doc.text('Subtotal:', totalsX, currentY);
     doc.text(Number(data.invoice.subtotal).toFixed(2), valueX, currentY, { align: 'right', width: 55 });
     currentY += 15;
@@ -290,7 +290,7 @@ export class PrintSalesInvoiceService {
 
     doc.moveTo(totalsX, currentY).lineTo(555, currentY).stroke('#CCCCCC');
     currentY += 5;
-    
+
     doc.font('Helvetica-Bold').fontSize(11);
     doc.text('NET AMOUNT:', totalsX, currentY);
     doc.text(Number(data.invoice.netAmount).toFixed(2), valueX, currentY, { align: 'right', width: 55 });
@@ -301,20 +301,20 @@ export class PrintSalesInvoiceService {
       currentY = 740;
       doc.moveTo(40, currentY).lineTo(555, currentY).stroke('#CCCCCC');
       currentY += 10;
-      
+
       // Bank Info
       doc.fontSize(8).font('Helvetica-Bold').text('Bank Details:', 40, currentY);
       doc.font('Helvetica');
       doc.text(`Bank: ${data.company.bankName || ''}`, 40, currentY + 10);
       doc.text(`A/c: ${data.company.bankAccount || ''}`, 40, currentY + 20);
       doc.text(`IFSC: ${data.company.bankIfsc || ''}`, 40, currentY + 30);
-      
+
       // Terms
       if (data.company.invoiceTerms) {
         doc.font('Helvetica-Bold').text('Terms & Conditions:', 200, currentY);
         doc.font('Helvetica').text(data.company.invoiceTerms, 200, currentY + 10, { width: 180 });
       }
-      
+
       // Signatory
       doc.font('Helvetica-Bold').text(`For ${data.company.name}`, 400, currentY, { align: 'right', width: 155 });
       doc.text('Authorised Signatory', 400, currentY + 45, { align: 'right', width: 155 });
