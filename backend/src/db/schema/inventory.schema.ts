@@ -1,4 +1,4 @@
-import { integer, numeric, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { index, integer, numeric, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { products } from './product.schema';
 
 export const inventories = sqliteTable(
@@ -18,7 +18,8 @@ export const inventories = sqliteTable(
     location: text('location', { length: 255 })
   },
   (t) => [
-    uniqueIndex('inventories_gtn_unique').on(t.gtn)
+    uniqueIndex('inventories_gtn_unique').on(t.gtn),
+    index('inventories_product_id_idx').on(t.productId),
   ]
 );
 

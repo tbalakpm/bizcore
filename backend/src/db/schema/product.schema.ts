@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { integer, sqliteTable, text, numeric, uniqueIndex, check } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text, numeric, uniqueIndex, check, index } from 'drizzle-orm/sqlite-core';
 
 import { categories } from './category.schema';
 import { auditFields, keyFields } from './base';
@@ -23,6 +23,7 @@ export const products = sqliteTable(
   (t) => [
     uniqueIndex('products_code_unique').on(t.code),
     uniqueIndex('products_name_unique').on(t.name),
+    index('products_category_id_idx').on(t.categoryId),
     check('gtn_mode_must_be_in_list', sql`${t.gtnMode} IN ('auto','manual')`),
     check('gtn_generation_must_be_in_list', sql`${t.gtnGeneration} IN ('code','batch','tag','manual')`)
   ]
