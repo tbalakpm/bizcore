@@ -75,12 +75,22 @@
           <td>{{ invoice.invoiceDate | date: 'mediumDate' }}</td>
           <td>{{ invoice.supplierName }}</td>
           <td class="text-right">{{ invoice.totalQty }}</td>
-          <td class="text-right font-medium" style="color: var(--color-success)">
+          <td class="td-cell text-right font-medium text-success">
             {{ invoice.netAmount | currency: 'INR' }}
           </td>
           <td>
             <div class="flex items-center justify-center gap-2">
               @if (permissionService.canWrite('purchase-invoices')) {
+                <button
+                  nz-button
+                  nzType="text"
+                  nzSize="small"
+                  nz-tooltip
+                  nzTooltipTitle="Print purchase invoice"
+                  (click)="printInvoice(invoice.id)"
+                >
+                  <span class="text-accent!" nz-icon nzType="printer" nzTheme="outline"></span>
+                </button>
                 <button
                   [routerLink]="['/purchase-invoices', invoice.id, 'edit']"
                   nz-button
@@ -103,16 +113,6 @@
                   nzTooltipTitle="Delete purchase invoice"
                 >
                   <span nz-icon nzType="delete" nzTheme="outline"></span>
-                </button>
-                <button
-                  nz-button
-                  nzType="text"
-                  nzSize="small"
-                  nz-tooltip
-                  nzTooltipTitle="Print purchase invoice"
-                  (click)="printInvoice(invoice.id)"
-                >
-                  <span class="text-accent!" nz-icon nzType="printer" nzTheme="outline"></span>
                 </button>
               }
             </div>

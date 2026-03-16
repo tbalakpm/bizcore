@@ -9,18 +9,18 @@ import {
 } from '../shared/serial-number.shared';
 
 const MODES = {
-  globalProductSerial: 'global_product_serial',
-  eachProduct: 'each_product',
-  productCodeAsTagBatch: 'product_code_as_tag_batch',
+  manual: 'manual',
+  auto: 'auto'
 } as const;
 
 const SERIAL_TYPES = {
-  tagNumber: 'tag_number',
-  batchNumber: 'batch_number',
+  code: 'code',
+  batch: 'batch',
+  tag: 'tag'
 } as const;
 
-type ProductSerialMode = (typeof MODES)[keyof typeof MODES];
-type ProductSerialType = (typeof SERIAL_TYPES)[keyof typeof SERIAL_TYPES];
+export type ProductSerialMode = (typeof MODES)[keyof typeof MODES];
+export type ProductSerialType = (typeof SERIAL_TYPES)[keyof typeof SERIAL_TYPES];
 
 type GenerateProductSerialParams = {
   productId: number;
@@ -30,12 +30,14 @@ type GenerateProductSerialParams = {
   tx?: DbTransaction;
 };
 
-const defaultConfigBySerialType: Record<ProductSerialType, SerialSequenceConfig> = {
-  [SERIAL_TYPES.tagNumber]: { prefix: 'TAG-', length: 10, start: 1 },
-  [SERIAL_TYPES.batchNumber]: { prefix: 'BAT-', length: 10, start: 1 },
-};
+// const defaultConfigBySerialType: Record<ProductSerialType, SerialSequenceConfig> = {
+//   [SERIAL_TYPES.tagNumber]: { prefix: 'TAG-', length: 10, start: 1 },
+//   [SERIAL_TYPES.batchNumber]: { prefix: 'BAT-', length: 10, start: 1 },
+// };
 
-const requiresCounter = (mode: ProductSerialMode): boolean => mode !== MODES.productCodeAsTagBatch;
+const requiresCounter = (mode: ProductSerialMode, serialType: ProductSerialType): boolean =>
+  mode === MODES.auto &&
+  (serialType === SERIAL_TYPES.tag || serialType === SERIAL_TYPES.batch);
 
 export const productSerialNumberService = {
   modes: MODES,
@@ -72,7 +74,7 @@ export const productSerialNumberService = {
     return productSerialNumberService.generate({
       productId,
       mode,
-      serialType: SERIAL_TYPES.tagNumber,
+      serialType: SERIAL_TYPES.tag,
       tx,
       date,
     });
@@ -87,7 +89,7 @@ export const productSerialNumberService = {
     return productSerialNumberService.generate({
       productId,
       mode,
-      serialType: SERIAL_TYPES.batchNumber,
+      serialType: SERIAL_TYPES.batch,
       tx,
       date,
     });
@@ -100,17 +102,25 @@ export const productSerialNumberService = {
     date,
     tx,
   }: GenerateProductSerialParams & { tx: DbTransaction; date: Date }): Promise<string> => {
-    const [product] = await tx.select().from(products).where(eq(products.id, productId)).limit(1);
+    const [product] = await tx.select({
+      id: products.id,
+      code: products.code,
+      prefix: productSerialNumbers.prefix,
+      current: productSerialNumbers.current,
+      length: productSerialNumbers.length,
+    }).from(products)
+      .leftJoin(productSerialNumbers, eq(productSerialNumbers.productId, products.id))
+      .where(eq(products.id, productId)).limit(1);
 
     if (!product) {
       throw new Error(`Product not found: ${productId}`);
     }
 
-    if (!requiresCounter(mode)) {
+    if (!requiresCounter(mode, serialType)) {
       return product.code;
     }
 
-    const config = defaultConfigBySerialType[serialType];
+    // const config = defaultConfigBySerialType[serialType];
 
     let [currentRecord] = await tx
       .select()
@@ -124,9 +134,9 @@ export const productSerialNumberService = {
       // Use the product's configured prefix and start position if available
       await tx.insert(productSerialNumbers).values({
         productId,
-        prefix: product.gtnPrefix || config.prefix,
-        current: product.gtnStartPos || config.start,
-        length: config.length,
+        prefix: product.prefix || 'AA',
+        current: product.current || 1,
+        length: product.length || 10,
       });
 
       [currentRecord] = await tx
@@ -143,17 +153,17 @@ export const productSerialNumberService = {
 
     let finalPrefix = currentRecord.prefix;
     let finalValue = currentRecord.current;
-    
+
     // Check for overflow (numeric sequence exhaustion)
     const maxValue = Math.pow(10, currentRecord.length) - 1;
     if (finalValue > maxValue) {
       // Roll over prefix and reset current to 1
       finalPrefix = incrementPrefixTemplate(finalPrefix);
       finalValue = 1;
-      
+
       await tx
         .update(productSerialNumbers)
-        .set({ 
+        .set({
           prefix: finalPrefix,
           current: 2 // We are issuing 1 now, so next is 2
         })

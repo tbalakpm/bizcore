@@ -6,7 +6,8 @@ import { db, purchaseInvoices, purchaseInvoiceItems, suppliers, products, invent
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 import { toNumericString, toPositiveNumber } from '../utils/number.util';
 import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
-import { productSerialNumberService } from '../services/product-serial-number.service';
+import { ProductSerialMode, productSerialNumberService } from '../services/product-serial-number.service';
+import { serialNumberService } from '../services/serial-number.service';
 import type { DbTransaction } from '../shared/serial-number.shared';
 import { renderPurchaseInvoice } from '../services/pdf/reports/purchase-invoice.report';
 
@@ -22,11 +23,11 @@ purchaseInvoicesRouter.get('/', async (req: Request, res: Response) => {
 
     const pagination = hasPaginationQuery
       ? parsePagination({
-          limit: req.query.limit as string | undefined,
-          offset: req.query.offset as string | undefined,
-          page: req.query.page as string | undefined,
-          pageNum: req.query.pageNum as string | undefined,
-        })
+        limit: req.query.limit as string | undefined,
+        offset: req.query.offset as string | undefined,
+        page: req.query.page as string | undefined,
+        pageNum: req.query.pageNum as string | undefined,
+      })
       : undefined;
 
     // Build filters dynamically
@@ -89,7 +90,7 @@ purchaseInvoicesRouter.get('/', async (req: Request, res: Response) => {
       .select({ count: sql<number>`cast(count(*) as integer)` })
       .from(purchaseInvoices)
       .where(whereCondition || sql`1=1`);
-    
+
     const filteredCount = filteredCountResult[0].count;
 
     // Get paginated results
@@ -103,12 +104,12 @@ purchaseInvoicesRouter.get('/', async (req: Request, res: Response) => {
       pagination: pagination
         ? toPagination(pagination.limit, pagination.offset, filteredCount, pagination.pageNum)
         : {
-            limit: result.length,
-            offset: 0,
-            total: filteredCount,
-            page: 1,
-            totalPages: 1,
-          },
+          limit: result.length,
+          offset: 0,
+          total: filteredCount,
+          page: 1,
+          totalPages: 1,
+        },
     });
   } catch (error) {
     console.error('Failed to fetch purchase invoices', error);
@@ -188,7 +189,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
         const genType = (product.gtnGeneration || 'CODE').toUpperCase();
         if (genType === 'TAG') {
           for (let i = 0; i < qty; i++) {
-            const generatedGtn = await productSerialNumberService.generateTagNumber(product.id, 'each_product', tx);
+            const generatedGtn = await productSerialNumberService.generateTagNumber(product.id, product.gtnMode as ProductSerialMode, tx);
             const inv = await tx
               .insert(inventories)
               .values({
@@ -201,7 +202,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
               })
               .returning({ id: inventories.id })
               .get();
-            
+
             await tx.insert(purchaseInvoiceItems).values({
               purchaseInvoiceId,
               inventoryId: inv.id,
@@ -217,7 +218,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
         } else {
           let generatedGtn: string | undefined = undefined;
           if (genType === 'BATCH') {
-            generatedGtn = await productSerialNumberService.generateBatchNumber(product.id, 'each_product', tx);
+            generatedGtn = await productSerialNumberService.generateBatchNumber(product.id, product.gtnMode as ProductSerialMode, tx);
           } else if (genType === 'CODE') {
             generatedGtn = product.code;
           } else if (shouldGenerateGtn(product.gtnGeneration)) {
@@ -273,17 +274,18 @@ purchaseInvoicesRouter.post('/', async (req, res) => {
   const body = req.body;
   const items = body.items ?? [];
 
-  if (!body.invoiceNumber || !body.invoiceDate || !body.supplierId || !items.length) {
+  if (!body.invoiceDate || !body.supplierId || !items.length) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
     const result = await db.transaction(async (tx) => {
       // 1. Insert invoice header
+      const invoiceNumber = body.invoiceNumber || (await serialNumberService.generateInvoiceNumber('purchaseInvoice', tx));
       const invoice = await tx
         .insert(purchaseInvoices)
         .values({
-          invoiceNumber: body.invoiceNumber,
+          invoiceNumber,
           invoiceDate: body.invoiceDate,
           supplierId: body.supplierId,
           refNumber: body.refNumber,
@@ -343,7 +345,7 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
             .run();
         }
       }
-      
+
       await tx.delete(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).run();
 
       // 2. Update header
@@ -389,19 +391,19 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
 
 purchaseInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id as string, 10);
-  
+
   try {
     await db.transaction(async (tx) => {
       // Reverse stock
       const items = await tx.select().from(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).all();
       for (const item of items) {
-         const inv = await tx.select().from(inventories).where(eq(inventories.id, item.inventoryId)).get();
-         if (inv) {
-           await tx.update(inventories)
+        const inv = await tx.select().from(inventories).where(eq(inventories.id, item.inventoryId)).get();
+        if (inv) {
+          await tx.update(inventories)
             .set({ unitsInStock: (inv.unitsInStock || 0) - Number(item.qty || 0) })
             .where(eq(inventories.id, inv.id))
             .run();
-         }
+        }
       }
       await tx.delete(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).run();
       await tx.delete(purchaseInvoices).where(eq(purchaseInvoices.id, id)).run();

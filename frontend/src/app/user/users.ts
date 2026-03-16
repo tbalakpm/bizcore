@@ -86,7 +86,7 @@ export class Users implements OnInit {
   }
 
   onSubmit() {
-    const payload: any = { ...this.editingUser };
+    const payload = { ...this.editingUser, password: 'Welcome123' };
     payload.permissions = this.editingUser.permissions;
 
     const request$ = this.editingUser.id

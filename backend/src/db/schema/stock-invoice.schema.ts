@@ -1,4 +1,4 @@
-import { integer, numeric, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { index, integer, numeric, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import type { NewStockInvoiceItem, StockInvoiceItem } from './stock-invoice-items.schema';
 
 export const stockInvoices = sqliteTable('stock_invoices', {
@@ -8,7 +8,8 @@ export const stockInvoices = sqliteTable('stock_invoices', {
   totalQty: numeric('total_qty').notNull().default('0.000'),
   totalAmount: numeric('total_amount').notNull().default('0.00')
 }, (t) => [
-  uniqueIndex('stock_invoices_invoice_number_unique').on(t.invoiceNumber)
+  uniqueIndex('stock_invoices_invoice_number_unique').on(t.invoiceNumber),
+  index('stock_invoices_invoice_date_idx').on(t.invoiceDate)
 ]);
 
 export type StockInvoice = typeof stockInvoices.$inferSelect;

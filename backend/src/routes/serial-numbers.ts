@@ -29,7 +29,7 @@ serialNumbersRouter.post('/invoice/:type', async (req, res) => {
 });
 
 serialNumbersRouter.post('/product/:serialType', async (req, res) => {
-  const serialType = req.params.serialType as 'tag_number' | 'batch_number';
+  const serialType = req.params.serialType as 'code' | 'tag' | 'batch';
   const { productId, mode, date } = req.body;
 
   if (!productId || Number.isNaN(parseInt(productId, 10))) {

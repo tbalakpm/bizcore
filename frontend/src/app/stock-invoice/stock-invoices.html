@@ -99,7 +99,7 @@
           <td class="font-medium">{{ invoice.invoiceNumber }}</td>
           <td>{{ invoice.invoiceDate | date: 'mediumDate' }}</td>
           <td class="text-right">{{ invoice.totalQty }}</td>
-          <td class="text-right font-medium" style="color: var(--color-success)">
+          <td class="td-cell text-right font-medium text-success">
             {{ invoice.totalAmount | currency: 'INR' }}
           </td>
           <td>

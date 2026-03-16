@@ -11,7 +11,7 @@ export const productSerialNumbers = sqliteTable(
     length: integer('length').notNull().default(10)
   },
   (t) => [
-    uniqueIndex('product_serial_numbers_product_id').on(t.productId)
+    uniqueIndex('product_serial_numbers_product_id_unique').on(t.productId)
   ],
 );
 

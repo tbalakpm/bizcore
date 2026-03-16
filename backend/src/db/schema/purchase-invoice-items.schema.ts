@@ -1,5 +1,5 @@
 import { SQL, sql } from 'drizzle-orm';
-import { integer, numeric, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, numeric, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { purchaseInvoices } from './purchase-invoice.schema';
 import { inventories } from './inventory.schema';
 
@@ -23,7 +23,10 @@ export const purchaseInvoiceItems = sqliteTable('purchase_invoice_items', {
     lineTotal: numeric('line_total').generatedAlwaysAs(
         (): SQL => sql`(ROUND((qty * unit_price - discount_amount) + tax_amount, 2))`
     )
-});
+}, (t) => [
+    index('purchase_invoice_items_purchase_invoice_id_idx').on(t.purchaseInvoiceId),
+    index('purchase_invoice_items_inventory_id_idx').on(t.inventoryId)
+]);
 
 export type PurchaseInvoiceItem = typeof purchaseInvoiceItems.$inferSelect;
 export type NewPurchaseInvoiceItem = typeof purchaseInvoiceItems.$inferInsert;

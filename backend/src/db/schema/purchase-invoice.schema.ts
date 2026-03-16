@@ -27,8 +27,9 @@ export const purchaseInvoices = sqliteTable('purchase_invoices', {
     )
 }, (t) => [
     uniqueIndex('purchase_invoices_invoice_number_unique').on(t.invoiceNumber),
-    index('purchase_invoices_invoice_date').on(t.invoiceDate),
-    index('purchase_invoices_ref_number').on(t.refNumber)
+    index('purchase_invoices_supplier_id_idx').on(t.supplierId),
+    index('purchase_invoices_invoice_date_idx').on(t.invoiceDate),
+    index('purchase_invoices_ref_number_idx').on(t.refNumber)
 ]);
 
 export type PurchaseInvoice = typeof purchaseInvoices.$inferSelect;

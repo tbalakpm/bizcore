@@ -33,10 +33,11 @@ export const salesInvoices = sqliteTable('sales_invoices', {
   signedQrCode: text('signed_qr_code') // Large payload string
 }, (t) => [
   uniqueIndex('sales_invoices_invoice_number_unique').on(t.invoiceNumber),
-  index('sales_invoices_invoice_date').on(t.invoiceDate),
-  index('sales_invoices_ref_number').on(t.refNumber),
-  index('sales_invoices_irn').on(t.irn),
-  index('sales_invoices_ack_no').on(t.ackNo)
+  index('sales_invoices_invoice_date_idx').on(t.invoiceDate),
+  index('sales_invoices_customer_id_idx').on(t.customerId),
+  index('sales_invoices_ref_number_idx').on(t.refNumber),
+  index('sales_invoices_irn_idx').on(t.irn),
+  index('sales_invoices_ack_no_idx').on(t.ackNo)
 ]);
 
 export type SalesInvoice = typeof salesInvoices.$inferSelect;

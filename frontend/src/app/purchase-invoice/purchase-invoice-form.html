@@ -149,16 +149,14 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium mb-1"
-          >Invoice # <span style="color: var(--color-danger)">*</span></label
-        >
+        <label class="label-base">Invoice #</label>
         <input
           nz-input
           type="text"
           [(ngModel)]="editingInvoice.invoiceNumber"
           name="invoiceNumber"
-          placeholder="Required"
-          required
+          placeholder="Auto-generated if left empty"
+          class="input-base"
         />
       </div>
 
