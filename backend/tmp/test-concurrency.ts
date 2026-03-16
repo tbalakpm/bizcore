@@ -1,11 +1,11 @@
 
 import { db, initializeDatabase } from '../src/db';
 import { users } from '../src/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, like } from 'drizzle-orm';
 
 async function runTest() {
   await initializeDatabase();
-  
+
   console.log('Starting concurrency test...');
   const concurrentWrites = 20;
   const promises = [];
@@ -33,9 +33,9 @@ async function runTest() {
 
   await Promise.all(promises);
   console.log('Concurrency test completed.');
-  
+
   // Cleanup
-  await db.delete(users).where(eq(users.role, 'user'));
+  await db.delete(users).where(like(users.username, 'u_%'));
 }
 
 runTest().catch(console.error);
