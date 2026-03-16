@@ -5,9 +5,21 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type Category, CategoryService } from '../category/category-service';
 import { type Product, ProductService } from './product-service';
 
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+
 @Component({
   selector: 'app-product-form',
-  imports: [FormsModule, CommonModule, TranslatePipe],
+  imports: [
+    FormsModule, CommonModule, TranslatePipe,
+    NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
+    NzAlertModule, NzIconModule, NzInputNumberModule,
+  ],
   templateUrl: './product-form.component.html',
 })
 export class ProductFormComponent implements OnInit, OnChanges {

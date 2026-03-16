@@ -2,16 +2,25 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { NgSelectModule } from '@ng-select/ng-select';
 import { type Product, ProductService } from '../product/product-service';
 import { type Supplier, SupplierService } from '../supplier/supplier-service';
 import { type PurchaseInvoiceItem, PurchaseInvoiceService } from './purchase-invoice-service';
 import { AddressForm } from '../shared/components/address-form';
-import { TranslatePipe } from '@ngx-translate/core';
 import { ProductFormComponent } from '../product/product-form.component';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
-import { LucideAngularModule } from 'lucide-angular';
-import { NgSelectComponent } from '@ng-select/ng-select';
+
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSelectComponent } from 'ng-zorro-antd/select';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 type EditablePurchaseInvoiceItem = {
   id?: number;
@@ -50,7 +59,12 @@ type EditablePurchaseInvoice = {
 
 @Component({
   selector: 'app-purchase-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, ProductFormComponent, TooltipDirective, LucideAngularModule],
+  imports: [
+    CommonModule, FormsModule, RouterLink, AddressForm, ProductFormComponent,
+    NzSelectModule, NzFormModule, NzInputModule, NzDatePickerModule,
+    NzInputNumberModule, NzButtonModule, NzIconModule, NzTableModule,
+    NzAlertModule, NzTooltipModule, NzCardModule, NzCheckboxModule,
+  ],
   templateUrl: './purchase-invoice-form.html',
 })
 export class PurchaseInvoiceForm implements OnInit {
@@ -59,13 +73,17 @@ export class PurchaseInvoiceForm implements OnInit {
   private supplierService = inject(SupplierService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NgSelectComponent>;
+  @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NzSelectComponent>;
 
   products = signal<Product[]>([]);
   suppliers = signal<Supplier[]>([]);
 
   editingInvoice: EditablePurchaseInvoice = this.defaultInvoice();
   selectedRowIndex = 0;
+
+  // Date bindings for nz-date-picker
+  invoiceDateValue: Date | null = null;
+  refDateValue: Date | null = null;
 
   // Inline Supplier Creation
   showNewSupplierForm = false;
@@ -97,6 +115,11 @@ export class PurchaseInvoiceForm implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadSuppliers();
+
+    // Initialize date from default invoice
+    this.invoiceDateValue = this.editingInvoice.invoiceDate
+      ? new Date(this.editingInvoice.invoiceDate + 'T00:00:00')
+      : null;
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -182,6 +205,15 @@ export class PurchaseInvoiceForm implements OnInit {
         if (this.editingInvoice.items.length === 0) {
           this.editingInvoice.items = [{ qty: 1, unitPrice: 0, lineTotal: 0, taxPct: 0, taxAmount: 0, discountType: 'none', discountPct: 0, discountAmount: 0 }];
         }
+
+        // Sync date pickers
+        this.invoiceDateValue = invoice.invoiceDate
+          ? new Date(invoice.invoiceDate + 'T00:00:00')
+          : null;
+        this.refDateValue = invoice.refDate
+          ? new Date(invoice.refDate + 'T00:00:00')
+          : null;
+
         this.recalculateAll();
         this.loading = false;
       },
@@ -190,6 +222,30 @@ export class PurchaseInvoiceForm implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  onInvoiceDateChange(date: Date | null) {
+    this.invoiceDateValue = date;
+    if (date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      this.editingInvoice.invoiceDate = `${yyyy}-${mm}-${dd}`;
+    } else {
+      this.editingInvoice.invoiceDate = '';
+    }
+  }
+
+  onRefDateChange(date: Date | null) {
+    this.refDateValue = date;
+    if (date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      this.editingInvoice.refDate = `${yyyy}-${mm}-${dd}`;
+    } else {
+      this.editingInvoice.refDate = '';
+    }
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -206,7 +262,6 @@ export class PurchaseInvoiceForm implements OnInit {
       const lastSelect = this.itemRowSelects.last;
       if (lastSelect) {
         lastSelect.focus();
-        lastSelect.open();
       }
     });
   }
@@ -323,7 +378,7 @@ export class PurchaseInvoiceForm implements OnInit {
   }
 
   onProductSaved(product: Product) {
-    // Add to local product list so ng-select shows it immediately
+    // Add to local product list so nz-select shows it immediately
     this.products.set([product, ...this.products()]);
 
     const item = this.editingInvoice.items[this.selectedRowIndex];

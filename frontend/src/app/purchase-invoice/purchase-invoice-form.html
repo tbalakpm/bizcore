@@ -1,63 +1,25 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="page-title">
-    <svg
-      class="w-7 h-7"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M8 20V10m8 10V4M4 20h16"
-      />
-    </svg>
+  <h1 class="text-xl font-semibold flex items-center gap-2">
+    <span nz-icon nzType="car" nzTheme="outline" class="text-2xl"></span>
     {{ isEditMode ? 'Edit' : 'Create' }} Purchase Invoice
   </h1>
   <div class="flex gap-2">
-    <a routerLink="/purchase-invoices" class="btn-outline">Back to List</a>
+    <a routerLink="/purchase-invoices" nz-button nzType="default">Back to List</a>
     @if (isEditMode) {
-      <button
-        type="button"
-        class="btn-outline text-accent flex items-center gap-1"
-        (click)="printInvoice()"
-      >
-        <i-lucide name="printer" [size]="18"></i-lucide>
+      <button nz-button nzType="default" (click)="printInvoice()">
+        <span nz-icon nzType="printer" nzTheme="outline"></span>
         Print
       </button>
     }
-    <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="submitting">
+    <button nz-button nzType="primary" (click)="onSubmit()" [disabled]="submitting">
       {{ submitting ? 'Saving...' : 'Save Invoice' }}
     </button>
   </div>
 </div>
 
-<div class="card">
+<nz-card>
   @if (error) {
-    <div class="error-banner flex items-start">
-      <svg
-        class="h-5 w-5 mr-3 mt-0.5 shrink-0"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-      <div>
-        <h3 class="font-medium">Error saving invoice</h3>
-        <div class="mt-1">{{ error }}</div>
-      </div>
-    </div>
+    <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
   }
 
   <form (ngSubmit)="onSubmit()">
@@ -66,10 +28,13 @@
       <!-- Supplier Field -->
       <div class="lg:col-span-2 space-y-1">
         <div class="flex justify-between items-center mb-1">
-          <label class="label-base">Supplier <span class="text-danger">*</span></label>
+          <label class="block text-sm font-medium"
+            >Supplier <span style="color: var(--color-danger)">*</span></label
+          >
           <button
             type="button"
-            class="text-xs text-accent hover:text-accent-hover font-medium"
+            class="text-xs font-medium"
+            style="color: var(--color-accent)"
             (click)="toggleNewSupplierForm()"
           >
             {{ showNewSupplierForm ? 'Cancel Supplier' : '+ Add Supplier' }}
@@ -77,47 +42,47 @@
         </div>
 
         @if (showNewSupplierForm) {
-          <div class="bg-surface-muted border border-border p-3 rounded-lg mb-2">
+          <nz-card nzSize="small" class="mb-2">
             <h4 class="text-xs font-semibold uppercase text-text-muted mb-2">Quick Add Supplier</h4>
             @if (supplierError) {
-              <div class="text-xs text-danger mb-2">{{ supplierError }}</div>
+              <nz-alert
+                nzType="error"
+                [nzMessage]="supplierError"
+                nzShowIcon
+                class="mb-2"
+                nzCloseable
+              ></nz-alert>
             }
             <div class="grid grid-cols-2 gap-2 mb-2">
               <input
+                nz-input
                 type="text"
                 [(ngModel)]="newSupplier.code"
                 name="newSuppCode"
                 placeholder="Code *"
-                class="input-base"
               />
               <input
+                nz-input
                 type="text"
                 [(ngModel)]="newSupplier.name"
                 name="newSuppName"
                 placeholder="Supplier Name *"
-                class="input-base"
               />
             </div>
             <input
+              nz-input
               type="text"
               [(ngModel)]="newSupplier.gstin"
               name="newSuppGstin"
               placeholder="GSTIN (Optional)"
-              class="input-base mb-2"
+              class="mb-2"
             />
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
               <div class="flex items-center gap-2 mb-1 col-span-full ml-2">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="sameAsBilling"
-                  name="sameAsBilling"
-                  id="suppSameAsBilling"
-                  class="w-3.5 h-3.5 accent-accent rounded"
-                />
-                <label for="suppSameAsBilling" class="text-xs font-medium"
-                  >Shipping Address same as Billing Address</label
-                >
+                <label nz-checkbox [(ngModel)]="sameAsBilling" name="sameAsBilling">
+                  Shipping Address same as Billing Address
+                </label>
               </div>
               <app-address-form
                 [address]="newSupplier.billingAddress!"
@@ -137,83 +102,110 @@
 
             <div class="flex justify-end">
               <button
+                nz-button
+                nzType="primary"
+                nzSize="small"
                 type="button"
-                class="btn-accent text-xs"
                 (click)="createSupplierInline()"
                 [disabled]="supplierSubmitting"
               >
                 {{ supplierSubmitting ? 'Saving...' : 'Save & Select Supplier' }}
               </button>
             </div>
-          </div>
+          </nz-card>
         } @else {
-          <ng-select
-            [items]="suppliers()"
-            bindLabel="name"
-            bindValue="id"
+          <nz-select
             [(ngModel)]="editingInvoice.supplierId"
             name="supplierId"
-            [searchable]="true"
-            [clearable]="true"
-            placeholder="-- Select Supplier --"
-            class="w-full text-sm"
+            [nzShowSearch]="true"
+            nzAllowClear
+            nzPlaceHolder="-- Select Supplier --"
+            class="w-full"
+            [nzDropdownRender]="addSupplierTpl"
+            [nzOptionHeightPx]="50"
+            [nzOptionOverflowSize]="4"
           >
-            <ng-template ng-option-tmp let-item="item">
-              <span class="font-medium text-text-heading">{{ item.code }}</span> -
-              <span class="text-text-muted">{{ item.name }}</span>
-            </ng-template>
-          </ng-select>
+            @for (s of suppliers(); track s.id) {
+              <nz-option [nzValue]="s.id" nzCustomContent [nzLabel]="s.code + ' - ' + s.name">
+                <div class="font-medium">{{ s.name }}</div>
+                <div class="text-xs text-text-muted">{{ s.code }}</div>
+              </nz-option>
+            }
+          </nz-select>
+          <ng-template #addSupplierTpl>
+            <div class="px-2 py-1 border-t">
+              <button
+                nz-button
+                nzType="link"
+                nzSize="small"
+                type="button"
+                (click)="toggleNewSupplierForm()"
+              >
+                <span nz-icon nzType="plus" nzTheme="outline"></span> Add Supplier
+              </button>
+            </div>
+          </ng-template>
         }
       </div>
 
       <div>
-        <label class="label-base">Invoice # <span class="text-danger">*</span></label>
+        <label class="block text-sm font-medium mb-1"
+          >Invoice # <span style="color: var(--color-danger)">*</span></label
+        >
         <input
+          nz-input
           type="text"
           [(ngModel)]="editingInvoice.invoiceNumber"
           name="invoiceNumber"
           placeholder="Required"
           required
-          class="input-base"
         />
       </div>
 
       <div>
-        <label class="label-base">Invoice Date <span class="text-danger">*</span></label>
-        <input
-          type="date"
-          [(ngModel)]="editingInvoice.invoiceDate"
+        <label class="block text-sm font-medium mb-1"
+          >Invoice Date <span style="color: var(--color-danger)">*</span></label
+        >
+        <nz-date-picker
+          [ngModel]="invoiceDateValue"
+          (ngModelChange)="onInvoiceDateChange($event)"
           name="invoiceDate"
-          required
-          class="input-base"
-        />
+          nzFormat="yyyy-MM-dd"
+          class="w-full"
+        ></nz-date-picker>
       </div>
 
       <div>
-        <label class="label-base">Reference #</label>
+        <label class="block text-sm font-medium mb-1">Reference #</label>
         <input
+          nz-input
           type="text"
           [(ngModel)]="editingInvoice.refNumber"
           name="refNumber"
           placeholder="e.g. PO-567"
-          class="input-base"
         />
       </div>
 
       <div>
-        <label class="label-base">Ref Date</label>
-        <input type="date" [(ngModel)]="editingInvoice.refDate" name="refDate" class="input-base" />
+        <label class="block text-sm font-medium mb-1">Ref Date</label>
+        <nz-date-picker
+          [ngModel]="refDateValue"
+          (ngModelChange)="onRefDateChange($event)"
+          name="refDate"
+          nzFormat="yyyy-MM-dd"
+          class="w-full"
+        ></nz-date-picker>
       </div>
 
       <div class="flex items-end justify-end col-span-2">
-        <button type="button" class="btn-outline" (click)="toggleNewProductForm()">
+        <button nz-button nzType="default" type="button" (click)="toggleNewProductForm()">
           {{ showNewProductForm ? 'Hide Product Form' : 'Create New Product' }}
         </button>
       </div>
     </div>
 
     @if (showNewProductForm) {
-      <div class="bg-surface-muted p-3 rounded-lg border border-border mb-6">
+      <nz-card nzSize="small" class="mb-6">
         <p class="text-xs font-semibold uppercase text-text-muted mb-3">
           Quick Add Product — will be auto-selected in the active row
         </p>
@@ -221,270 +213,278 @@
           (saved)="onProductSaved($event)"
           (cancelled)="showNewProductForm = false"
         ></app-product-form>
-      </div>
+      </nz-card>
     }
 
     <!-- Items Section -->
-    <div class="border border-border rounded-lg overflow-hidden mb-6">
-      <div class="overflow-x-auto">
-        <table class="table-base">
-          <thead class="table-head">
-            <tr>
-              <th class="th-cell min-w-[250px]">Product</th>
-              <th class="th-cell w-40">GTN</th>
-              <th class="th-cell text-right w-24">Qty</th>
-              <th class="th-cell text-right w-32">Unit Price</th>
-              <th class="th-cell text-right w-40">Discount</th>
-              <th class="th-cell text-right w-24">Tax %</th>
-              <th class="th-cell text-right w-36">Line Total</th>
-              <th class="th-cell text-center w-16"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (item of editingInvoice.items; track $index; let i = $index) {
-              <tr class="table-row">
-                <td class="px-2 py-2">
-                  <ng-select
-                    #itemRowSelect
-                    [items]="products()"
-                    bindLabel="name"
-                    bindValue="id"
-                    [(ngModel)]="item.productId"
-                    appendTo="body"
-                    (change)="onProductSelect(item)"
-                    (focus)="selectedRowIndex = i"
-                    [name]="'itemProduct' + i"
-                    [searchable]="true"
-                    [clearable]="true"
-                    placeholder="-- Select Product --"
-                    class="text-sm"
+    <nz-table
+      #itemsTable
+      [nzData]="editingInvoice.items"
+      nzSize="small"
+      [nzBordered]="true"
+      [nzShowPagination]="false"
+      [nzFrontPagination]="false"
+      class="mb-6"
+    >
+      <thead>
+        <tr>
+          <th nzWidth="250px">Product</th>
+          <th nzWidth="160px">GTN</th>
+          <th class="text-right" nzWidth="100px">Qty</th>
+          <th class="text-right" nzWidth="130px">Unit Price</th>
+          <th class="text-right" nzWidth="160px">Discount</th>
+          <th class="text-right" nzWidth="100px">Tax %</th>
+          <th class="text-right" nzWidth="140px">Line Total</th>
+          <th class="text-center" nzWidth="60px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of editingInvoice.items; track $index; let i = $index) {
+          <tr>
+            <td class="!px-2 !py-2">
+              <nz-select
+                #itemRowSelect
+                [(ngModel)]="item.productId"
+                (ngModelChange)="onProductSelect(item)"
+                (nzFocus)="selectedRowIndex = i"
+                [name]="'itemProduct' + i"
+                [nzShowSearch]="true"
+                nzAllowClear
+                nzPlaceHolder="-- Select Product --"
+                class="w-full"
+                [nzDropdownRender]="addProductInlineTpl"
+                [nzOptionHeightPx]="48"
+                [nzOptionOverflowSize]="6"
+                [nzDropdownMatchSelectWidth]="false"
+                [nzDropdownStyle]="{ 'min-width': '400px' }"
+              >
+                @for (p of products(); track p.id) {
+                  <nz-option
+                    [nzValue]="p.id"
+                    nzCustomContent
+                    [nzLabel]="
+                      (p.code || p.name) +
+                      (p.code && p.name && p.code !== p.name ? ' - ' + p.name : '')
+                    "
                   >
-                    <ng-template ng-label-tmp let-p="item">
-                      <span class="font-medium text-text-heading">{{ p.code || p.name }}</span>
-                      <span
-                        *ngIf="p.code && p.name && p.code !== p.name"
-                        class="ml-1 text-text-muted"
-                        >- {{ p.name }}</span
-                      >
-                    </ng-template>
-                    <ng-template ng-option-tmp let-p="item">
-                      <div class="font-medium text-text-heading">{{ p.name }}</div>
-                      <div class="text-xs text-text-muted">{{ p.code }}</div>
-                    </ng-template>
-                  </ng-select>
-                </td>
-                <td class="px-2 py-2 align-bottom">
-                  <input
-                    type="text"
-                    [(ngModel)]="item.gtn"
-                    [name]="'itemGtn' + i"
-                    placeholder="Auto generated"
-                    class="input-base"
-                  />
-                </td>
-                <td class="px-2 py-2 text-right align-bottom">
-                  <input
-                    type="number"
-                    step="1"
-                    min="1"
-                    [(ngModel)]="item.qty"
-                    (ngModelChange)="onItemChanged(item)"
-                    [name]="'itemQty' + i"
-                    class="input-base text-right"
-                  />
-                </td>
-                <td class="px-2 py-2 text-right align-bottom">
-                  <input
-                    type="number"
-                    step="1"
-                    min="0.01"
-                    [(ngModel)]="item.unitPrice"
-                    (ngModelChange)="onItemChanged(item)"
-                    [name]="'itemPrice' + i"
-                    class="input-base text-right"
-                  />
-                </td>
-                <td class="px-2 py-2 align-bottom">
-                  <div class="flex border border-border-strong rounded-md overflow-hidden">
-                    <select
-                      [(ngModel)]="item.discountType"
-                      [name]="'itemDiscType' + i"
-                      (change)="onItemChanged(item)"
-                      class="text-xs border-r border-border-strong bg-surface-muted px-1 py-2 text-text outline-none"
-                    >
-                      <option value="none">None</option>
-                      <option value="percent">%</option>
-                      <option value="amount">Amt</option>
-                    </select>
-                    @if (item.discountType === 'percent') {
-                      <input
-                        type="number"
-                        step="0.01"
-                        [(ngModel)]="item.discountPct"
-                        (ngModelChange)="onItemChanged(item)"
-                        [name]="'itemDiscVal' + i"
-                        class="w-full border-none px-2 py-1 text-right text-xs bg-surface text-text outline-none"
-                        placeholder="0"
-                      />
-                    } @else if (item.discountType === 'amount') {
-                      <input
-                        type="number"
-                        step="1"
-                        min="0"
-                        [(ngModel)]="item.discountAmount"
-                        (ngModelChange)="onItemChanged(item)"
-                        [name]="'itemDiscVal' + i"
-                        class="w-full border-none px-2 py-1 text-right text-xs bg-surface text-text outline-none"
-                        placeholder="0"
-                      />
-                    }
-                  </div>
-                </td>
-                <td class="px-2 py-2 text-right align-bottom">
-                  <input
-                    type="number"
-                    [ngModel]="item.taxPct"
-                    name="itemTaxPct{{ i }}"
-                    readonly
-                    tabindex="-1"
-                    class="input-base text-right bg-surface-muted text-text-muted cursor-not-allowed"
-                  />
-                </td>
-                <td class="td-cell text-right font-medium">
-                  {{ item.lineTotal | number: '1.2-2' }}
-                </td>
-                <td class="px-2 py-2 text-center">
+                    <div class="font-medium">{{ p.name }}</div>
+                    <div class="text-xs text-text-muted">{{ p.code }}</div>
+                  </nz-option>
+                }
+              </nz-select>
+              <ng-template #addProductInlineTpl>
+                <div class="px-2 py-1 border-t">
                   <button
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
                     type="button"
-                    class="text-danger hover:text-danger p-1.5 rounded hover:bg-surface-muted transition"
-                    appTooltip="Remove item"
-                    (click)="removeItemRow(i)"
+                    (click)="selectedRowIndex = i; toggleNewProductForm()"
                   >
-                    <i-lucide name="trash-2" [size]="16"></i-lucide>
+                    <span nz-icon nzType="plus" nzTheme="outline"></span> Add Product
                   </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+                </div>
+              </ng-template>
+            </td>
+            <td class="!px-2 !py-2">
+              <input
+                nz-input
+                type="text"
+                [(ngModel)]="item.gtn"
+                [name]="'itemGtn' + i"
+                placeholder="Auto generated"
+              />
+            </td>
+            <td class="!px-2 !py-2">
+              <nz-input-number
+                [(ngModel)]="item.qty"
+                (ngModelChange)="onItemChanged(item)"
+                [name]="'itemQty' + i"
+                [nzStep]="1"
+                [nzMin]="1"
+                class="w-full text-right"
+              ></nz-input-number>
+            </td>
+            <td class="!px-2 !py-2">
+              <nz-input-number
+                [(ngModel)]="item.unitPrice"
+                (ngModelChange)="onItemChanged(item)"
+                [name]="'itemPrice' + i"
+                [nzStep]="1"
+                [nzMin]="0.01"
+                [nzPrecision]="2"
+                class="w-full text-right"
+              ></nz-input-number>
+            </td>
+            <td class="!px-2 !py-2">
+              <div class="flex gap-1">
+                <nz-select
+                  [(ngModel)]="item.discountType"
+                  [name]="'itemDiscType' + i"
+                  (ngModelChange)="onItemChanged(item)"
+                  style="width: 80px"
+                >
+                  <nz-option nzValue="none" nzLabel="None"></nz-option>
+                  <nz-option nzValue="percent" nzLabel="%"></nz-option>
+                  <nz-option nzValue="amount" nzLabel="Amt"></nz-option>
+                </nz-select>
+                @if (item.discountType === 'percent') {
+                  <nz-input-number
+                    [(ngModel)]="item.discountPct"
+                    (ngModelChange)="onItemChanged(item)"
+                    [name]="'itemDiscVal' + i"
+                    [nzStep]="0.01"
+                    [nzMin]="0"
+                    class="flex-1"
+                    nzPlaceHolder="0"
+                  ></nz-input-number>
+                } @else if (item.discountType === 'amount') {
+                  <nz-input-number
+                    [(ngModel)]="item.discountAmount"
+                    (ngModelChange)="onItemChanged(item)"
+                    [name]="'itemDiscVal' + i"
+                    [nzStep]="1"
+                    [nzMin]="0"
+                    class="flex-1"
+                    nzPlaceHolder="0"
+                  ></nz-input-number>
+                }
+              </div>
+            </td>
+            <td class="!px-2 !py-2">
+              <nz-input-number
+                [ngModel]="item.taxPct"
+                [name]="'itemTaxPct' + i"
+                [nzDisabled]="true"
+                class="w-full text-right"
+              ></nz-input-number>
+            </td>
+            <td class="text-right font-medium !px-2 !py-2">
+              {{ item.lineTotal | number: '1.2-2' }}
+            </td>
+            <td class="text-center !px-2 !py-2">
+              <button
+                nz-button
+                nzType="link"
+                nzDanger
+                nzSize="small"
+                nz-tooltip
+                nzTooltipTitle="Remove item"
+                type="button"
+                (click)="removeItemRow(i)"
+                [disabled]="editingInvoice.items.length <= 1"
+              >
+                <span nz-icon nzType="delete" nzTheme="outline"></span>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
 
-      <div class="bg-surface-muted px-4 py-3 border-t border-border">
-        <button
-          type="button"
-          class="text-accent hover:text-accent-hover font-medium text-sm flex items-center gap-1 transition"
-          (click)="addItemRow()"
-        >
-          <i-lucide name="plus" [size]="16"></i-lucide>
-          Add Line Item
-        </button>
-      </div>
+    <div class="mb-6">
+      <button nz-button nzType="dashed" (click)="addItemRow()" type="button">
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        Add Line Item
+      </button>
     </div>
 
     <!-- Summary Section -->
     <div class="flex flex-col md:flex-row justify-between items-start gap-6">
       <!-- Additional Terms -->
       <div class="w-full md:w-1/2 space-y-4">
-        <div class="bg-surface-muted rounded-lg p-4 border border-border space-y-3">
-          <h4 class="text-xs font-semibold uppercase text-text-muted">Additional Terms</h4>
+        <nz-card nzSize="small">
+          <h4 class="text-xs font-semibold uppercase text-text-muted mb-3">Additional Terms</h4>
 
-          <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center justify-between gap-4 mb-3">
             <span class="text-sm font-medium text-text-muted">Invoice Discount</span>
-            <div class="flex border border-border-strong rounded-md overflow-hidden w-48">
-              <select
+            <div class="flex gap-1" style="width: 200px">
+              <nz-select
                 [(ngModel)]="editingInvoice.discountType"
                 name="headerDiscountType"
-                (change)="recalculateAll()"
-                class="text-xs border-r border-border-strong bg-surface px-2 py-1.5 text-text outline-none cursor-pointer"
+                (ngModelChange)="recalculateAll()"
+                style="width: 110px"
               >
-                <option value="none">None</option>
-                <option value="percent">Percent (%)</option>
-                <option value="amount">Value (INR)</option>
-              </select>
+                <nz-option nzValue="none" nzLabel="None"></nz-option>
+                <nz-option nzValue="percent" nzLabel="Percent (%)"></nz-option>
+                <nz-option nzValue="amount" nzLabel="Value (INR)"></nz-option>
+              </nz-select>
               @if (editingInvoice.discountType === 'percent') {
-                <input
-                  type="number"
-                  step="0.01"
+                <nz-input-number
                   [(ngModel)]="editingInvoice.discountPct"
                   (ngModelChange)="recalculateAll()"
                   name="headerDiscVal"
-                  class="w-full border-none px-3 py-1.5 text-right text-sm bg-surface text-text outline-none"
-                  placeholder="0"
-                />
+                  [nzStep]="0.01"
+                  class="flex-1"
+                  nzPlaceHolder="0"
+                ></nz-input-number>
               } @else if (editingInvoice.discountType === 'amount') {
-                <input
-                  type="number"
-                  step="0.01"
+                <nz-input-number
                   [(ngModel)]="editingInvoice.discountAmount"
                   (ngModelChange)="recalculateAll()"
                   name="headerDiscVal"
-                  class="w-full border-none px-3 py-1.5 text-right text-sm bg-surface text-text outline-none"
-                  placeholder="0"
-                />
+                  [nzStep]="0.01"
+                  class="flex-1"
+                  nzPlaceHolder="0"
+                ></nz-input-number>
               }
             </div>
           </div>
 
-          <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center justify-between gap-4 mb-3">
             <span class="text-sm font-medium text-text-muted">Tax Override (%)</span>
-            <input
-              type="number"
-              step="0.01"
+            <nz-input-number
               [(ngModel)]="editingInvoice.taxPct"
               name="hTaxPct"
               (ngModelChange)="recalculateAll()"
-              class="input-base w-24 text-right"
-            />
+              [nzStep]="0.01"
+              style="width: 100px"
+            ></nz-input-number>
           </div>
 
           <div class="flex items-center justify-between gap-4">
             <span class="text-sm font-medium text-text-muted">Round Off</span>
-            <input
-              type="number"
-              step="0.01"
+            <nz-input-number
               [(ngModel)]="editingInvoice.roundOff"
               name="roundOff"
               (ngModelChange)="recalculateAll()"
-              class="input-base w-32 text-right font-semibold"
-            />
+              [nzStep]="0.01"
+              style="width: 130px"
+            ></nz-input-number>
           </div>
-        </div>
+        </nz-card>
       </div>
 
       <!-- Totals Area -->
-      <div class="w-full md:w-1/3 bg-surface-muted rounded-lg p-5 border border-border space-y-3">
-        <div class="flex justify-between items-center text-sm">
-          <span class="text-text-muted font-medium">Subtotal</span>
-          <span class="font-medium text-text-heading">{{
-            editingInvoice.subtotal | number: '1.2-2'
-          }}</span>
-        </div>
+      <nz-card nzSize="small" class="w-full md:w-1/3">
+        <div class="space-y-3">
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-text-muted font-medium">Subtotal</span>
+            <span class="font-medium">{{ editingInvoice.subtotal | number: '1.2-2' }}</span>
+          </div>
 
-        <div class="flex justify-between items-center text-sm">
-          <span class="text-text-muted font-medium">Total Discount</span>
-          <span class="font-medium text-danger"
-            >- {{ editingInvoice.discountAmount | number: '1.2-2' }}</span
-          >
-        </div>
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-text-muted font-medium">Total Discount</span>
+            <span class="font-medium" style="color: var(--color-danger)">
+              - {{ editingInvoice.discountAmount | number: '1.2-2' }}
+            </span>
+          </div>
 
-        <div class="flex justify-between items-center text-sm">
-          <span class="text-text-muted font-medium">Total Tax</span>
-          <span class="font-medium text-text-heading">{{
-            editingInvoice.taxAmount | number: '1.2-2'
-          }}</span>
-        </div>
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-text-muted font-medium">Total Tax</span>
+            <span class="font-medium">{{ editingInvoice.taxAmount | number: '1.2-2' }}</span>
+          </div>
 
-        <div class="border-t border-border my-1"></div>
+          <div class="border-t my-1"></div>
 
-        <div class="flex justify-between items-center">
-          <span class="text-base font-bold text-text-heading uppercase tracking-wider"
-            >Net Amount</span
-          >
-          <span class="text-xl font-bold text-success"
-            >Rs. {{ editingInvoice.netAmount | number: '1.2-2' }}</span
-          >
+          <div class="flex justify-between items-center">
+            <span class="text-base font-bold uppercase tracking-wider">Net Amount</span>
+            <span class="text-xl font-bold" style="color: var(--color-success)">
+              Rs. {{ editingInvoice.netAmount | number: '1.2-2' }}
+            </span>
+          </div>
         </div>
-      </div>
+      </nz-card>
     </div>
   </form>
-</div>
+</nz-card>

@@ -4,13 +4,28 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Supplier, type Address, SupplierList, SupplierService } from './supplier-service';
 import { AddressForm } from '../shared/components/address-form';
-import { LucideAngularModule } from 'lucide-angular';
 import { PermissionService } from '../auth/permission.service';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
+
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzCardModule } from 'ng-zorro-antd/card';
 
 @Component({
   selector: 'app-suppliers',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm, LucideAngularModule, TooltipDirective],
+  imports: [
+    FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm,
+    NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule,
+    NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
+    NzCheckboxModule, NzCardModule,
+  ],
   templateUrl: './suppliers.html',
 })
 export class Suppliers implements OnInit {
@@ -108,7 +123,6 @@ export class Suppliers implements OnInit {
   }
 
   deleteSupplier(id: number) {
-    if (!confirm('Delete this supplier?')) return;
     this.supplierService.delete(id).subscribe(() => this.loadSuppliers());
   }
 }

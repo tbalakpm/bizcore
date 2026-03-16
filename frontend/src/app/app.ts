@@ -4,11 +4,11 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth/auth-service';
 import { PermissionService } from './auth/permission.service';
 import { DatePipe } from '@angular/common';
-import { LucideAngularModule } from 'lucide-angular';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, DatePipe, LucideAngularModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, DatePipe, NzIconModule],
   templateUrl: './app.html',
 })
 export class App implements OnDestroy {
@@ -81,7 +81,7 @@ export class App implements OnDestroy {
   }
 
   toggleSidebar() {
-    this.isSidebarCollapsed.update(v => !v);
+    this.isSidebarCollapsed.update((v) => !v);
     this.saveSidebarState();
   }
 
@@ -96,12 +96,12 @@ export class App implements OnDestroy {
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent) {
     if (!this.isResizing()) return;
-    
+
     // Calculate new width based on mouse position
     let newWidth = event.clientX;
     if (newWidth < this.minSidebarWidth) newWidth = this.minSidebarWidth;
     if (newWidth > this.maxSidebarWidth) newWidth = this.maxSidebarWidth;
-    
+
     this.sidebarWidth.set(newWidth);
   }
 
@@ -116,10 +116,13 @@ export class App implements OnDestroy {
 
   private saveSidebarState() {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(this.sidebarStateKey, JSON.stringify({
-        collapsed: this.isSidebarCollapsed(),
-        width: this.sidebarWidth()
-      }));
+      localStorage.setItem(
+        this.sidebarStateKey,
+        JSON.stringify({
+          collapsed: this.isSidebarCollapsed(),
+          width: this.sidebarWidth(),
+        }),
+      );
     }
   }
 
@@ -156,9 +159,35 @@ export class App implements OnDestroy {
     this.applyResolvedTheme(Boolean(resolvedDarkMode));
   }
 
+  private readonly darkThemeLinkId = 'nz-dark-theme';
+
   private applyResolvedTheme(isDark: boolean) {
     this.isDarkTheme.set(isDark);
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+
+    if (isDark) {
+      this.loadDarkTheme();
+    } else {
+      this.removeDarkTheme();
+    }
+  }
+
+  private loadDarkTheme() {
+    if (document.getElementById(this.darkThemeLinkId)) {
+      return; // already loaded
+    }
+    const link = document.createElement('link');
+    link.id = this.darkThemeLinkId;
+    link.rel = 'stylesheet';
+    link.href = 'dark.css';
+    document.head.appendChild(link);
+  }
+
+  private removeDarkTheme() {
+    const link = document.getElementById(this.darkThemeLinkId);
+    if (link) {
+      link.remove();
+    }
   }
 }

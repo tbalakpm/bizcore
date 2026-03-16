@@ -6,14 +6,30 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { SalesInvoice, SalesInvoiceService } from './sales-invoice-service';
 import { pagination } from '../models/pagination';
 import { Customer, CustomerService } from '../customer/customer-service';
-import { NgSelectModule } from '@ng-select/ng-select';
-import { LucideAngularModule } from 'lucide-angular';
 import { PermissionService } from '../auth/permission.service';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
+
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 @Component({
   selector: 'app-sales-invoices',
-  imports: [ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, RouterLink, NgSelectModule, LucideAngularModule, TooltipDirective],
+  imports: [
+    ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, RouterLink,
+    NzTableModule, NzSelectModule, NzInputModule, NzDatePickerModule,
+    NzInputNumberModule, NzButtonModule, NzIconModule, NzTagModule,
+    NzPaginationModule, NzTooltipModule, NzPopconfirmModule, NzCardModule, NzAlertModule,
+  ],
   templateUrl: './sales-invoices.html',
 })
 export class SalesInvoices implements OnInit {
@@ -33,6 +49,10 @@ export class SalesInvoices implements OnInit {
   sortColumn = signal<string>('id');
   sortDirection = signal<'asc' | 'desc'>('desc');
   pageLimit = 10;
+  loading = false;
+
+  // For nz-date-picker binding
+  filterInvoiceDate: Date | null = null;
 
   constructor() {
     this.filterForm = this.fb.group({
@@ -67,6 +87,7 @@ export class SalesInvoices implements OnInit {
   loadInvoices(page: number = 1) {
     const filters = this.filterForm.value;
     const sort = `${this.sortColumn()}:${this.sortDirection()}`;
+    this.loading = true;
 
     this.service
       .getAll({
@@ -79,9 +100,11 @@ export class SalesInvoices implements OnInit {
         next: (res) => {
           this.invoices.set(res.data);
           this.pagination.set(res.pagination);
+          this.loading = false;
         },
         error: (err) => {
           console.error('Failed to load sales invoices', err);
+          this.loading = false;
         },
       });
   }
@@ -107,21 +130,32 @@ export class SalesInvoices implements OnInit {
 
   onClearFilters() {
     this.filterForm.reset();
+    this.filterInvoiceDate = null;
     this.loadInvoices(1);
   }
 
-  deleteInvoice(id: number) {
-    if (confirm('Are you sure you want to delete this sales invoice? This will restore the exported inventory.')) {
-      this.service.delete(id).subscribe({
-        next: () => {
-          this.loadInvoices(this.pagination().page);
-        },
-        error: (err) => {
-          console.error('Failed to delete sales invoice', err);
-          alert('Failed to delete sales invoice.');
-        },
-      });
+  onInvoiceDateChange(date: Date | null) {
+    this.filterInvoiceDate = date;
+    if (date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      this.filterForm.patchValue({ invoiceDate: `${yyyy}-${mm}-${dd}` });
+    } else {
+      this.filterForm.patchValue({ invoiceDate: '' });
     }
+  }
+
+  deleteInvoice(id: number) {
+    this.service.delete(id).subscribe({
+      next: () => {
+        this.loadInvoices(this.pagination().page);
+      },
+      error: (err) => {
+        console.error('Failed to delete sales invoice', err);
+        alert('Failed to delete sales invoice.');
+      },
+    });
   }
 
   printInvoice(id: number) {

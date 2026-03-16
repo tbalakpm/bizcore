@@ -2,13 +2,21 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { NgSelectModule } from '@ng-select/ng-select';
 import { type Product, ProductService } from '../product/product-service';
 import { ProductFormComponent } from '../product/product-form.component';
 import { type StockInvoiceItem, StockInvoiceService } from './stock-invoice-service';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
-import { LucideAngularModule } from 'lucide-angular';
-import { NgSelectComponent } from '@ng-select/ng-select';
+
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSelectComponent } from 'ng-zorro-antd/select';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzCardModule } from 'ng-zorro-antd/card';
 
 type EditableStockInvoiceItem = {
   id?: number;
@@ -31,7 +39,12 @@ type EditableStockInvoice = {
 
 @Component({
   selector: 'app-stock-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, ProductFormComponent, TooltipDirective, LucideAngularModule],
+  imports: [
+    CommonModule, FormsModule, RouterLink, ProductFormComponent,
+    NzSelectModule, NzInputModule, NzInputNumberModule, NzDatePickerModule,
+    NzButtonModule, NzIconModule, NzTableModule, NzAlertModule,
+    NzTooltipModule, NzCardModule,
+  ],
   templateUrl: './stock-invoice-form.html',
 })
 export class StockInvoiceForm implements OnInit {
@@ -39,12 +52,15 @@ export class StockInvoiceForm implements OnInit {
   private productService = inject(ProductService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NgSelectComponent>;
+  @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NzSelectComponent>;
 
   products = signal<Product[]>([]);
 
   editingInvoice: EditableStockInvoice = this.defaultInvoice();
   selectedRowIndex = 0;
+
+  // Date binding for nz-date-picker
+  invoiceDateValue: Date | null = null;
 
   showNewProductForm = false;
 
@@ -58,6 +74,11 @@ export class StockInvoiceForm implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
+
+    // Initialize date from default invoice
+    this.invoiceDateValue = this.editingInvoice.invoiceDate
+      ? new Date(this.editingInvoice.invoiceDate + 'T00:00:00')
+      : null;
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -88,7 +109,7 @@ export class StockInvoiceForm implements OnInit {
 
   /** Called when the user saves a new product from the inline form */
   onNewProductSaved(product: Product) {
-    // Add to local product list so ng-select shows it immediately
+    // Add to local product list so nz-select shows it immediately
     this.products.set([product, ...this.products()]);
 
     // Auto-select in the active row
@@ -127,6 +148,11 @@ export class StockInvoiceForm implements OnInit {
           this.editingInvoice.items = [{ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '' }];
         }
 
+        // Sync date picker
+        this.invoiceDateValue = invoice.invoiceDate
+          ? new Date(invoice.invoiceDate + 'T00:00:00')
+          : null;
+
         this.loading = false;
       },
       error: (err) => {
@@ -134,6 +160,18 @@ export class StockInvoiceForm implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  onInvoiceDateChange(date: Date | null) {
+    this.invoiceDateValue = date;
+    if (date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      this.editingInvoice.invoiceDate = `${yyyy}-${mm}-${dd}`;
+    } else {
+      this.editingInvoice.invoiceDate = '';
+    }
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -150,7 +188,6 @@ export class StockInvoiceForm implements OnInit {
       const lastSelect = this.itemRowSelects.last;
       if (lastSelect) {
         lastSelect.focus();
-        lastSelect.open();
       }
     });
   }

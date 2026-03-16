@@ -1,130 +1,196 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="page-title">
-    <i-lucide name="building-2" class="w-7 h-7"></i-lucide>
+  <h1 class="text-xl font-semibold flex items-center gap-2">
+    <span nz-icon nzType="bank" nzTheme="outline" class="text-2xl"></span>
     {{ 'MENU.SUPPLIERS' | translate }}
   </h1>
 </div>
+
 @if (error) {
-<div class="error-banner">{{ error }}</div>
+  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
 }
+
 <div class="grid grid-cols-1 gap-4">
   @if (permissionService.canWrite('suppliers')) {
-  <!-- Add form -->
-  <div class="card">
-    <h2 class="section-title">
-      {{ editingSupplier.id ? ('EDIT' | translate) : ('ADD' | translate) }}
-      {{ 'MENU.SUPPLIERS' | translate }}
-    </h2>
-    <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
-      <div>
-        <label class="label-base">{{ 'CODE' | translate }}</label>
-        <input type="text" [(ngModel)]="editingSupplier.code" name="newSupplierCode" class="input-base" autofocus />
-      </div>
-      <div>
-        <label class="label-base">{{ 'NAME' | translate }}</label>
-        <input type="text" [(ngModel)]="editingSupplier.name" name="newSupplierName" class="input-base" autofocus />
-      </div>
-      <div>
-        <label class="label-base">{{ 'GSTIN' | translate }}</label>
-        <input type="text" [(ngModel)]="editingSupplier.gstin" name="newSupplierGstin" class="input-base" />
-      </div>
-      <div class="md:col-span-2 xl:col-span-4">
-        <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
-        <textarea rows="2" [(ngModel)]="editingSupplier.notes" name="newSupplierNotes" class="input-base"></textarea>
-      </div>
+    <!-- Add form -->
+    <nz-card>
+      <h2 class="text-base font-semibold mb-2">
+        {{ editingSupplier.id ? ('EDIT' | translate) : ('ADD' | translate) }}
+        {{ 'MENU.SUPPLIERS' | translate }}
+      </h2>
+      <form
+        nz-form
+        (ngSubmit)="onSubmit()"
+        nzLayout="vertical"
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2"
+      >
+        <nz-form-item>
+          <nz-form-label>{{ 'CODE' | translate }}</nz-form-label>
+          <nz-form-control>
+            <input
+              nz-input
+              [(ngModel)]="editingSupplier.code"
+              name="newSupplierCode"
+              autofocus
+              placeholder="e.g. SUP-001"
+            />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>{{ 'NAME' | translate }}</nz-form-label>
+          <nz-form-control>
+            <input
+              nz-input
+              [(ngModel)]="editingSupplier.name"
+              name="newSupplierName"
+              placeholder="Supplier name"
+            />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>{{ 'GSTIN' | translate }}</nz-form-label>
+          <nz-form-control>
+            <input
+              nz-input
+              [(ngModel)]="editingSupplier.gstin"
+              name="newSupplierGstin"
+              placeholder="e.g. 22AAAAA0000A1Z5"
+            />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="md:col-span-2 xl:col-span-4">
+          <nz-form-label>{{ 'DESCRIPTION' | translate }}</nz-form-label>
+          <nz-form-control>
+            <textarea
+              nz-input
+              rows="2"
+              [(ngModel)]="editingSupplier.notes"
+              name="newSupplierNotes"
+              placeholder="Additional notes (optional)"
+            ></textarea>
+          </nz-form-control>
+        </nz-form-item>
 
-      <!-- Addresses -->
-      <div class="flex items-center gap-2 mb-2 col-span-full">
-        <input type="checkbox" [(ngModel)]="sameAsBilling" name="sameAsBilling" id="sameAsBilling"
-          class="w-4 h-4 accent-primary rounded" />
-        <label for="sameAsBilling" class="text-sm font-medium text-text-muted">{{
-          'ADDRESS.SAME_AS_BILLING' | translate
-          }}</label>
-      </div>
-      <div class="md:col-span-2 xl:col-span-2">
-        <app-address-form [address]="editingSupplier.billingAddress!" [title]="'ADDRESS.BILLING'" [isExpandable]="true"
-          [isOpen]="false"></app-address-form>
-      </div>
-      <div class="md:col-span-2 xl:col-span-2">
-        @if (!sameAsBilling) {
-        <app-address-form [address]="editingSupplier.shippingAddress!" [title]="'ADDRESS.SHIPPING'"
-          [isExpandable]="true" [isOpen]="false"></app-address-form>
-        }
-      </div>
+        <!-- Addresses -->
+        <div class="col-span-full">
+          <div class="flex items-center gap-2 mb-2">
+            <label nz-checkbox [(ngModel)]="sameAsBilling" name="sameAsBilling">
+              {{ 'ADDRESS.SAME_AS_BILLING' | translate }}
+            </label>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2">
+            <app-address-form
+              [address]="editingSupplier.billingAddress!"
+              [title]="'ADDRESS.BILLING'"
+              [isExpandable]="true"
+              [isOpen]="false"
+            ></app-address-form>
+            @if (!sameAsBilling) {
+              <app-address-form
+                [address]="editingSupplier.shippingAddress!"
+                [title]="'ADDRESS.SHIPPING'"
+                [isExpandable]="true"
+                [isOpen]="false"
+              ></app-address-form>
+            }
+          </div>
+        </div>
 
-      <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
-        <button type="submit" class="btn-primary w-full">Save</button>
-        @if (editingSupplier.id) {
-        <button type="button" class="btn-outline w-full" (click)="onCancel()">Cancel</button>
-        }
-      </div>
-    </form>
-  </div>
+        <div class="flex gap-3 mt-2">
+          <button nz-button nzType="primary" type="submit">
+            <span nz-icon nzType="save" nzTheme="outline"></span>
+            Save
+          </button>
+          @if (editingSupplier.id) {
+            <button nz-button nzType="default" type="button" (click)="onCancel()">Cancel</button>
+          }
+        </div>
+      </form>
+    </nz-card>
   }
 
   <!-- List -->
-  <div class="card">
+  <nz-card>
     <div class="flex justify-between mb-2">
-      <h2 class="section-title">{{ 'MENU.SUPPLIERS' | translate }}</h2>
+      <h2 class="text-base font-semibold">{{ 'MENU.SUPPLIERS' | translate }}</h2>
     </div>
 
-    <div class="overflow-x-auto border border-border rounded-lg">
-      <table class="table-base">
-        <thead class="table-head">
-          <tr>
-            <th class="th-cell">{{ 'CODE' | translate }}</th>
-            <th class="th-cell">{{ 'NAME' | translate }}</th>
-            <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
-            <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
-            @if (permissionService.canWrite('suppliers')) {
-            <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
-            }
-          </tr>
-        </thead>
-        <tbody>
-          @for (s of suppliers(); track s.id) {
-          <tr class="table-row" [class.table-row-selected]="editingSupplier.id == s.id">
-            <td class="td-cell">{{ s.code }}</td>
-            <td class="td-cell">{{ s.name }}</td>
-            <td class="td-cell">{{ s.notes || '-' }}</td>
-            <td class="td-cell text-center">
-              <button type="button" (click)="toggleActive(s)"
-                class="w-6 h-6 rounded-full border flex items-center justify-center"
-                [appTooltip]="s.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
-                    s.isActive
-                      ? 'border-success text-success'
-                      : 'border-border-strong text-text-muted'
-                  ">
-                @if (s.isActive) {
-                <i-lucide name="check" [size]="14"></i-lucide>
-                } @else {
-                <i-lucide name="x" [size]="14"></i-lucide>
-                }
-              </button>
+    <nz-table
+      #supplierTable
+      [nzData]="suppliers()"
+      [nzLoading]="loading"
+      nzSize="small"
+      [nzShowPagination]="false"
+      [nzBordered]="true"
+    >
+      <thead>
+        <tr>
+          <th>{{ 'CODE' | translate }}</th>
+          <th>{{ 'NAME' | translate }}</th>
+          <th>{{ 'DESCRIPTION' | translate }}</th>
+          <th class="text-center" nzWidth="80px">{{ 'ACTIVE' | translate }}</th>
+          @if (permissionService.canWrite('suppliers')) {
+            <th class="text-center" nzWidth="120px">{{ 'ACTIONS' | translate }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of supplierTable.data; track s.id) {
+          <tr [class.ant-table-row-selected]="editingSupplier.id === s.id">
+            <td>{{ s.code }}</td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.notes || '-' }}</td>
+            <td class="text-center">
+              <nz-switch
+                [ngModel]="s.isActive"
+                (ngModelChange)="toggleActive(s)"
+                nzSize="small"
+                nz-tooltip
+                [nzTooltipTitle]="s.isActive ? 'Deactivate' : 'Activate'"
+              ></nz-switch>
             </td>
             @if (permissionService.canWrite('suppliers')) {
-            <td class="td-cell text-center">
-              <div class="flex items-center justify-center gap-2">
-                <button (click)="editSupplier(s.id)" class="btn-link-edit flex items-center gap-1"
-                  appTooltip="Edit supplier">
-                  <i-lucide name="pencil" [size]="18"></i-lucide>
-                </button>
-                <button (click)="deleteSupplier(s.id)" class="btn-link-danger flex items-center gap-1"
-                  appTooltip="Delete supplier">
-                  <i-lucide name="trash-2" [size]="18"></i-lucide>
-                </button>
-              </div>
-            </td>
+              <td class="text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    nz-tooltip
+                    nzTooltipTitle="Edit supplier"
+                    style="color: var(--color-accent)"
+                    (click)="editSupplier(s.id)"
+                  >
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                  </button>
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzDanger
+                    nzSize="small"
+                    nz-popconfirm
+                    nzPopconfirmTitle="Delete this supplier?"
+                    (nzOnConfirm)="deleteSupplier(s.id)"
+                    nz-tooltip
+                    nzTooltipTitle="Delete supplier"
+                  >
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                </div>
+              </td>
             }
           </tr>
-          }
-          @if (!suppliers().length) {
+        }
+        @if (!suppliers().length && !loading) {
           <tr>
-            <td colspan="5" class="td-cell text-center text-text-muted">No suppliers yet</td>
+            <td
+              [attr.colspan]="permissionService.canWrite('suppliers') ? 5 : 4"
+              class="text-center text-text-muted"
+            >
+              No suppliers yet
+            </td>
           </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
+        }
+      </tbody>
+    </nz-table>
+  </nz-card>
 </div>

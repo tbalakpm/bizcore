@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
 import JsBarcode from 'jsbarcode';
 import {
   type StockInvoice,
@@ -10,7 +9,19 @@ import {
   StockInvoiceService,
 } from './stock-invoice-service';
 import { PermissionService } from '../auth/permission.service';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
+
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 
 type PrintableBarcodeLabel = {
   title: string;
@@ -20,7 +31,12 @@ type PrintableBarcodeLabel = {
 
 @Component({
   selector: 'app-stock-invoices',
-  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule, TooltipDirective],
+  imports: [
+    CommonModule, FormsModule, RouterLink,
+    NzTableModule, NzInputModule, NzDatePickerModule, NzSelectModule,
+    NzButtonModule, NzIconModule, NzPaginationModule, NzTooltipModule,
+    NzPopconfirmModule, NzCardModule, NzAlertModule, NzInputNumberModule,
+  ],
   templateUrl: './stock-invoices.html',
 })
 export class StockInvoices implements OnInit {
@@ -42,6 +58,9 @@ export class StockInvoices implements OnInit {
     sortField: 'id',
     sortDirection: 'desc' as 'asc' | 'desc',
   };
+
+  // For nz-date-picker binding
+  filterInvoiceDate: Date | null = null;
 
   loading = false;
   printingInvoiceId: number | null = null;
@@ -99,21 +118,20 @@ export class StockInvoices implements OnInit {
     this.loadInvoices();
   }
 
-  goToPreviousPage() {
-    if (this.filters.page <= 1) {
-      return;
+  onInvoiceDateChange(date: Date | null) {
+    this.filterInvoiceDate = date;
+    if (date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      this.filters.invoiceDate = `${yyyy}-${mm}-${dd}`;
+    } else {
+      this.filters.invoiceDate = '';
     }
-
-    this.filters.page -= 1;
-    this.loadInvoices();
   }
 
-  goToNextPage() {
-    if (this.filters.page >= this.pagination().totalPages) {
-      return;
-    }
-
-    this.filters.page += 1;
+  onPageChange(page: number) {
+    this.filters.page = page;
     this.loadInvoices();
   }
 
@@ -128,10 +146,6 @@ export class StockInvoices implements OnInit {
   }
 
   deleteInvoice(invoiceId: number) {
-    if (!confirm('Delete this stock invoice?')) {
-      return;
-    }
-
     this.stockInvoiceService.delete(invoiceId).subscribe({
       next: () => {
         this.loadInvoices();

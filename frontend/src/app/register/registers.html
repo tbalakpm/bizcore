@@ -1,116 +1,164 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="page-title">
-    <i-lucide name="notebook-pen" class="w-7 h-7"></i-lucide>
+  <h1 class="text-xl font-semibold flex items-center gap-2">
+    <span nz-icon nzType="form" nzTheme="outline" class="text-2xl"></span>
     {{ 'MENU.REGISTERS' | translate }}
   </h1>
 </div>
 
+@if (error) {
+<nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
+}
+
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
   <!-- List -->
-  <div class="md:col-span-2 card">
-    <div class="flex justify-between mb-2">
-      <h2 class="section-title">{{ 'MENU.REGISTERS' | translate }}</h2>
-    </div>
+  <div class="md:col-span-2">
+    <nz-card>
+      <div class="flex justify-between mb-2">
+        <h2 class="text-base font-semibold">{{ 'MENU.REGISTERS' | translate }}</h2>
+      </div>
 
-    <div class="overflow-x-auto border border-border rounded-lg">
-      <table class="table-base">
-        <thead class="table-head">
+      <nz-table
+        #registerTable
+        [nzData]="registers()"
+        [nzLoading]="loading"
+        nzSize="small"
+        [nzShowPagination]="false"
+        [nzBordered]="true"
+      >
+        <thead>
           <tr>
-            <th class="th-cell">{{ 'NAME' | translate }}</th>
-            <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
-            <th class="th-cell">{{ 'CATEGORY.TITLE' | translate }}</th>
-            <th class="th-cell">{{ 'ACTIVE' | translate }}</th>
-            <th class="th-cell text-center">{{ 'ACTIONS' | translate }}</th>
+            <th>{{ 'NAME' | translate }}</th>
+            <th>{{ 'DESCRIPTION' | translate }}</th>
+            <th>{{ 'CATEGORY.TITLE' | translate }}</th>
+            <th class="text-center" nzWidth="80px">{{ 'ACTIVE' | translate }}</th>
+            <th class="text-center" nzWidth="120px">{{ 'ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
-        @for (r of registers(); track r.id) {
-        <tr class="table-row">
-          <td class="td-cell">{{ r.name }}</td>
-          <td class="td-cell">{{ r.description }}</td>
-          <td class="td-cell">{{ r.categoryName || '-' }}</td>
-          <td class="td-cell">
-            <button type="button" (click)="toggleActive(r)"
-              class="toggle-btn"
-              [appTooltip]="r.isActive ? 'Deactivate' : 'Activate'"
-              [ngClass]="r.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
-              @if (r.isActive) {
-              <i-lucide name="check" class="w-4 h-4"></i-lucide>
-              } @else {
-              <i-lucide name="x" class="w-4 h-4"></i-lucide>
-              }
-            </button>
-          </td>
-          <td class="td-cell text-center">
-            <div class="flex items-center justify-center gap-2">
-              <button (click)="editRegister(r.id)" class="btn-link-edit flex items-center gap-1" appTooltip="Edit register">
-                <i-lucide name="pencil" [size]="14"></i-lucide> {{ 'EDIT' | translate }}
-              </button>
-              <button (click)="deleteRegister(r.id)" class="btn-link-danger flex items-center gap-1" appTooltip="Delete register">
-                <i-lucide name="trash-2" [size]="14"></i-lucide> {{ 'DELETE' | translate }}
-              </button>
-            </div>
-          </td>
-        </tr>
-        }
-        @if(!registers().length) {
-        <tr>
-          <td colspan="5" class="td-cell text-center text-text-muted">{{ 'REGISTER.NO_REGISTERS_YET' | translate }}</td>
-        </tr>
-        }
+          @for (r of registerTable.data; track r.id) {
+          <tr [class.ant-table-row-selected]="editingRegister.id === r.id">
+            <td>{{ r.name }}</td>
+            <td>{{ r.description }}</td>
+            <td>{{ r.categoryName || '-' }}</td>
+            <td class="text-center">
+              <nz-switch
+                [ngModel]="r.isActive"
+                (ngModelChange)="toggleActive(r)"
+                nzSize="small"
+                nz-tooltip
+                [nzTooltipTitle]="r.isActive ? 'Deactivate' : 'Activate'"
+              ></nz-switch>
+            </td>
+            <td class="text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button
+                  nz-button
+                  nzType="link"
+                  nzSize="small"
+                  nz-tooltip
+                  nzTooltipTitle="Edit register"
+                  style="color: var(--color-accent)"
+                  (click)="editRegister(r.id)"
+                >
+                  <span nz-icon nzType="edit" nzTheme="outline"></span>
+                </button>
+                <button
+                  nz-button
+                  nzType="link"
+                  nzDanger
+                  nzSize="small"
+                  nz-popconfirm
+                  nzPopconfirmTitle="Delete this register?"
+                  (nzOnConfirm)="deleteRegister(r.id)"
+                  nz-tooltip
+                  nzTooltipTitle="Delete register"
+                >
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+          @if (!registers().length && !loading) {
+          <tr>
+            <td colspan="5" class="text-center text-text-muted">{{ 'REGISTER.NO_REGISTERS_YET' | translate }}</td>
+          </tr>
+          }
         </tbody>
-      </table>
-    </div>
+      </nz-table>
+    </nz-card>
   </div>
 
   <!-- Add form -->
-  <div class="card max-h-max">
-    <h2 class="section-title">
-      {{ editingRegister.id ? ('EDIT' | translate) : ('ADD' | translate) }}
-      {{ 'REGISTER.TITLE' | translate }}
-    </h2>
-    <form (ngSubmit)="onSubmit()" class="space-y-3">
-      <div>
-        <label class="label-base">{{ 'REGISTER.TITLE' | translate }}</label>
-        <input type="text" [(ngModel)]="editingRegister.name" name="newRegisterName"
-          class="input-base" autofocus />
-      </div>
-      <div>
-        <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
-        <textarea [(ngModel)]="editingRegister.description" name="newRegisterDescription"
-          class="input-base"></textarea>
-      </div>
-      <div>
-        <label class="label-base">{{ 'CATEGORY.TITLE' | translate }}</label>
-        <select [(ngModel)]="editingRegister.categoryId" name="newRegisterCategory" class="select-base">
-          @for(c of categories();track c.id){
-          <option [ngValue]="c.id" selected="{{ editingRegister.categoryId === c.id }}">{{ c.name }}</option>
+  <div>
+    <nz-card>
+      <h2 class="text-base font-semibold mb-2">
+        {{ editingRegister.id ? ('EDIT' | translate) : ('ADD' | translate) }}
+        {{ 'REGISTER.TITLE' | translate }}
+      </h2>
+      <form nz-form (ngSubmit)="onSubmit()" nzLayout="vertical" class="space-y-3">
+        <nz-form-item>
+          <nz-form-label>{{ 'REGISTER.TITLE' | translate }}</nz-form-label>
+          <nz-form-control>
+            <input nz-input type="text" [(ngModel)]="editingRegister.name" name="newRegisterName" autofocus placeholder="Register name" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>{{ 'DESCRIPTION' | translate }}</nz-form-label>
+          <nz-form-control>
+            <textarea nz-input [(ngModel)]="editingRegister.description" name="newRegisterDescription" placeholder="Brief description (optional)"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>{{ 'CATEGORY.TITLE' | translate }}</nz-form-label>
+          <nz-form-control>
+            <nz-select [(ngModel)]="editingRegister.categoryId" name="newRegisterCategory" nzPlaceHolder="-- Select --" nzAllowClear>
+              @for (c of categories(); track c.id) {
+              <nz-option [nzValue]="c.id" [nzLabel]="c.name"></nz-option>
+              }
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>Balance Amount (for asset/liability)</nz-form-label>
+          <nz-form-control>
+            <nz-input-number
+              [(ngModel)]="editingRegister.amount"
+              name="newRegisterAmount"
+              [nzStep]="1"
+              [nzPrecision]="2"
+              class="w-full"
+              [nzDisabled]="editingRegister.categoryType != 'A' && editingRegister.categoryType != 'L'"
+            ></nz-input-number>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>Balance as on (for asset/liability)</nz-form-label>
+          <nz-form-control>
+            <nz-date-picker
+              [(ngModel)]="editingRegisterDate"
+              name="newRegisterDate"
+              nzFormat="yyyy-MM-dd"
+              class="w-full"
+              [nzDisabled]="!(editingRegister.categoryType && (editingRegister.categoryType === 'A' || editingRegister.categoryType === 'L'))"
+            ></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-control>
+            <label nz-checkbox [(ngModel)]="editingRegister.isActive" name="newCategoryActive">Active</label>
+          </nz-form-control>
+        </nz-form-item>
+        <div class="flex gap-3 mt-2">
+          <button nz-button nzType="primary" type="submit">
+            <span nz-icon nzType="save" nzTheme="outline"></span>
+            Save
+          </button>
+          @if (editingRegister.id) {
+          <button nz-button nzType="default" type="button" (click)="onCancel()">Cancel</button>
           }
-        </select>
-      </div>
-      <div>
-        <label class="label-base">Balance Amount (for asset/liability)</label>
-        <input type="number" step="1.00" [(ngModel)]="editingRegister.amount" name="newRegisterAmount"
-          class="input-base"
-          [disabled]="editingRegister.categoryType != 'A' && editingRegister.categoryType != 'L'" />
-      </div>
-      <div>
-        <label class="label-base">Balance as on (for asset/liability)</label>
-        <input type="date" [(ngModel)]="editingRegister.date" name="newRegisterDate"
-          class="input-base cursor-pointer"
-          [disabled]="!(editingRegister.categoryType && ['A', 'L'].includes(editingRegister.categoryType))" />
-      </div>
-      <div class="flex items-center">
-        <input id="newCategoryActive" type="checkbox" value="" [(ngModel)]="editingRegister.isActive"
-          name="newCategoryActive" class="w-4 h-4 accent-primary rounded cursor-pointer" />
-        <label for="newCategoryActive" class="select-none ms-2 text-sm font-medium text-text cursor-pointer">Active</label>
-      </div>
-      <div class="flex gap-4">
-        <button type="submit" class="btn-primary w-full">Save</button>
-        @if(editingRegister.id){
-        <button type="button" class="btn-outline w-full" (click)="onCancel()">Cancel</button>
-        }
-      </div>
-    </form>
+        </div>
+      </form>
+    </nz-card>
   </div>
 </div>

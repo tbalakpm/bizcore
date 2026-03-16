@@ -3,16 +3,33 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type User, UserList, UserService } from './user-service';
-import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../auth/auth-service';
 import { PermissionService } from '../auth/permission.service';
 import { ALL_MODULES, MODULE_LABELS, type UserPermissions } from '../models/permission.model';
 import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
+
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { NzCardModule } from 'ng-zorro-antd/card';
 
 @Component({
   selector: 'app-users',
-  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, LucideAngularModule, HasPermissionDirective, TooltipDirective],
+  imports: [
+    FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule,
+    HasPermissionDirective,
+    NzTableModule, NzFormModule, NzInputModule, NzSelectModule,
+    NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule,
+    NzAlertModule, NzTooltipModule, NzRadioModule, NzCardModule,
+  ],
   templateUrl: './users.html',
 })
 export class Users implements OnInit {
@@ -114,7 +131,6 @@ export class Users implements OnInit {
   }
 
   deleteUser(id: number) {
-    if (!confirm('Delete this user?')) return;
     this.userService.delete(id).subscribe(() => this.loadUsers());
   }
 }

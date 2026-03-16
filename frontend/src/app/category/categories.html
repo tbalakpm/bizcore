@@ -1,132 +1,134 @@
 <div class="space-y-4">
   <div class="flex justify-between items-center">
-    <h1 class="page-title">
-      <i-lucide name="tag" class="w-7 h-7"></i-lucide>
+    <h1 class="flex items-center gap-2 text-xl font-semibold">
+      <span nz-icon nzType="tags" nzTheme="outline" class="text-2xl"></span>
       {{ 'MENU.CATEGORIES' | translate }}
     </h1>
   </div>
   @if (error) {
-  <div class="error-banner">{{ error }}</div>
+  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable></nz-alert>
   }
 
   <div class="grid gap-4"
     [ngClass]="{ 'grid-cols-1!': !permissionService.canWrite('categories'), 'grid-cols-1 lg:grid-cols-3' : permissionService.canWrite('categories') }">
     <!-- List -->
-    <div class="lg:col-span-2 card">
+    <div class="lg:col-span-2">
+      <nz-card>
       <div class="flex justify-between items-center mb-2">
-        <h2 class="section-title">{{ 'MENU.CATEGORIES' | translate }}</h2>
+        <h2 class="text-base font-semibold">{{ 'MENU.CATEGORIES' | translate }}</h2>
       </div>
 
-      <div class="overflow-x-auto border border-border rounded-lg">
-        <table class="table-base">
-          <thead class="table-head">
-            <tr>
-              <th class="th-cell w-32">{{ 'CODE' | translate }}</th>
-              <th class="th-cell w-50">{{ 'NAME' | translate }}</th>
-              <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
-              <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
-              @if (permissionService.canWrite('categories')) {
-              <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+      <nz-table #categoryTable [nzData]="categories()" [nzShowPagination]="false" [nzLoading]="loading" nzSize="small" [nzBordered]="true">
+        <thead>
+          <tr>
+            <th class="w-32">{{ 'CODE' | translate }}</th>
+            <th class="w-50">{{ 'NAME' | translate }}</th>
+            <th>{{ 'DESCRIPTION' | translate }}</th>
+            <th class="text-center w-16">{{ 'ACTIVE' | translate }}</th>
+            @if (permissionService.canWrite('categories')) {
+            <th class="text-center w-32">{{ 'ACTIONS' | translate }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of categoryTable.data; track c.id) {
+          <tr [class.ant-table-row-selected]="editing?.id == c.id">
+            <td>
+              @if (editing?.id == c.id) {
+              <input nz-input [(ngModel)]="editing!.code" name="editCode" placeholder="Code" />
+              } @else {
+              {{ c.code }}
               }
-            </tr>
-          </thead>
-
-          <tbody>
-            @for (c of categories(); track c.id) {
-            <tr class="table-row" [class.table-row-selected]="editing?.id == c.id">
-              <td class="td-cell">
+            </td>
+            <td>
+              @if (editing?.id == c.id) {
+              <input nz-input [(ngModel)]="editing!.name" name="editName" placeholder="Name" />
+              } @else {
+              {{ c.name }}
+              }
+            </td>
+            <td>
+              @if (editing?.id == c.id) {
+              <input nz-input [(ngModel)]="editing!.description" name="editDesc" placeholder="Description" />
+              } @else {
+              {{ c.description }}
+              }
+            </td>
+            <td class="text-center">
+              <nz-switch [ngModel]="c.isActive" (ngModelChange)="toggleActive(c)"
+                nzSize="small" nz-tooltip [nzTooltipTitle]="c.isActive ? 'Deactivate' : 'Activate'">
+              </nz-switch>
+            </td>
+            @if (permissionService.canWrite('categories')) {
+            <td class="text-center">
+              <div class="flex items-center justify-center gap-2">
                 @if (editing?.id == c.id) {
-                <input [(ngModel)]="editing!.code" name="editCode" class="input-base" />
-                } @else {
-                {{ c.code }}
-                }
-              </td>
-              <td class="td-cell">
-                @if (editing?.id == c.id) {
-                <input [(ngModel)]="editing!.name" name="editName" class="input-base" />
-                } @else {
-                {{ c.name }}
-                }
-              </td>
-              <td class="td-cell">
-                @if (editing?.id == c.id) {
-                <input [(ngModel)]="editing!.description" name="editDesc" class="input-base" />
-                } @else {
-                {{ c.description }}
-                }
-              </td>
-              <td class="td-cell text-center">
-                <button type="button" (click)="toggleActive(c)"
-                  class="w-6 h-6 rounded-full border flex items-center justify-center"
-                  [appTooltip]="c.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
-                    c.isActive
-                      ? 'border-success text-success'
-                      : 'border-border-strong text-text-muted'
-                  ">
-                  @if (c.isActive) {
-                  <i-lucide name="check" [size]="14"></i-lucide>
-                  } @else {
-                  <i-lucide name="x" [size]="14"></i-lucide>
-                  }
+                <button nz-button nzType="link" nzSize="small" class="text-success" nz-tooltip nzTooltipTitle="Save changes"
+                  (click)="saveEdit()">
+                  <span nz-icon nzType="check" nzTheme="outline"></span>
                 </button>
-              </td>
-              @if (permissionService.canWrite('categories')) {
-              <td class="td-cell text-center">
-                <div class="flex items-center justify-center gap-2">
-                  @if (editing?.id == c.id) {
-                  <button class="btn-link-edit text-success flex items-center gap-1" appTooltip="Save changes"
-                    (click)="saveEdit()">
-                    <i-lucide name="check" [size]="18"></i-lucide>
-                  </button>
-                  <button class="btn-link-edit text-text-muted flex items-center gap-1" appTooltip="Cancel editing"
-                    (click)="cancelEdit()">
-                    <i-lucide name="x" [size]="18"></i-lucide>
-                  </button>
-                  } @else {
-                  <button class="btn-link-edit flex items-center gap-1" appTooltip="Edit category" (click)="startEdit(c)">
-                    <i-lucide name="pencil" [size]="18"></i-lucide>
-                  </button>
-                  <button class="btn-link-danger flex items-center gap-1" appTooltip="Delete category"
-                    (click)="deleteCategory(c)">
-                    <i-lucide name="trash-2" [size]="18"></i-lucide>
-                  </button>
-                  }
-                </div>
-              </td>
-              }
-            </tr>
+                <button nz-button nzType="link" nzSize="small" nz-tooltip nzTooltipTitle="Cancel editing"
+                  (click)="cancelEdit()">
+                  <span nz-icon nzType="close" nzTheme="outline"></span>
+                </button>
+                } @else {
+                <button nz-button nzType="link" nzSize="small" nz-tooltip nzTooltipTitle="Edit category"
+                  style="color: var(--color-accent)" (click)="startEdit(c)">
+                  <span nz-icon nzType="edit" nzTheme="outline"></span>
+                </button>
+                <button nz-button nzType="link" nzDanger nzSize="small" nz-tooltip nzTooltipTitle="Delete category"
+                  nz-popconfirm [nzPopconfirmTitle]="'Delete category &quot;' + c.name + '&quot;?'"
+                  (nzOnConfirm)="deleteCategory(c)">
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                </button>
+                }
+              </div>
+            </td>
             }
-            @if (categories().length == 0) {
-            <tr>
-              <td colspan="5" class="td-cell text-center text-text-muted">
-                {{ 'CATEGORY.NO_CATEGORIES_YET' | translate }}.
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+          </tr>
+          }
+          @if (categories().length == 0) {
+          <tr>
+            <td colspan="5" class="text-center text-text-muted">
+              {{ 'CATEGORY.NO_CATEGORIES_YET' | translate }}.
+            </td>
+          </tr>
+          }
+        </tbody>
+      </nz-table>
+      </nz-card>
     </div>
 
     @if (permissionService.canWrite('categories')) {
     <!-- Add form -->
-    <div class="card max-h-max">
-      <h2 class="section-title">{{ 'CATEGORY.ADD' | translate }}</h2>
-      <form (ngSubmit)="addCategory()" class="space-y-3">
-        <div>
-          <label class="label-base">{{ 'CODE' | translate }}</label>
-          <input [(ngModel)]="newCategory.code" name="newCategoryCode" class="input-base" autofocus />
-        </div>
-        <div>
-          <label class="label-base">{{ 'NAME' | translate }}</label>
-          <input [(ngModel)]="newCategory.name" name="newCategoryName" class="input-base" />
-        </div>
-        <div>
-          <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
-          <textarea [(ngModel)]="newCategory.description" name="newCategoryDesc" class="input-base"></textarea>
-        </div>
-        <button type="submit" class="btn-primary w-full">{{ 'SAVE' | translate }}</button>
+    <div class="max-h-max">
+      <nz-card>
+      <h2 class="text-base font-semibold mb-2">{{ 'CATEGORY.ADD' | translate }}</h2>
+      <form nz-form (ngSubmit)="addCategory()" class="space-y-2" nzLayout="vertical">
+        <nz-form-item>
+          <nz-form-label>{{ 'CODE' | translate }}</nz-form-label>
+          <nz-form-control>
+            <input nz-input [(ngModel)]="newCategory.code" name="newCategoryCode" autofocus placeholder="e.g. CAT-01" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>{{ 'NAME' | translate }}</nz-form-label>
+          <nz-form-control>
+            <input nz-input [(ngModel)]="newCategory.name" name="newCategoryName" placeholder="Category name" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>{{ 'DESCRIPTION' | translate }}</nz-form-label>
+          <nz-form-control>
+            <textarea nz-input [(ngModel)]="newCategory.description" name="newCategoryDesc" placeholder="Brief description (optional)"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+        <button nz-button nzType="primary" type="submit" class="w-full">
+          <span nz-icon nzType="save" nzTheme="outline"></span>
+          {{ 'SAVE' | translate }}
+        </button>
       </form>
+      </nz-card>
     </div>
     }
   </div>
