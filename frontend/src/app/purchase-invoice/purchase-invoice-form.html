@@ -167,13 +167,12 @@
       </div>
 
       <div>
-        <label class="label-base">Invoice # <span class="text-danger">*</span></label>
+        <label class="label-base">Invoice #</label>
         <input
           type="text"
           [(ngModel)]="editingInvoice.invoiceNumber"
           name="invoiceNumber"
-          placeholder="Required"
-          required
+          placeholder="Auto-generated if left empty"
           class="input-base"
         />
       </div>

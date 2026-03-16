@@ -73,7 +73,15 @@
               {{ invoice.netAmount | currency: 'INR' }}
             </td>
             <td class="td-cell text-center">
-              <div class="flex items-center justify-center gap-2">
+              <div class="flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  class="btn-link-edit flex items-center gap-1 text-amber-500"
+                  appTooltip="Print purchase invoice"
+                  (click)="printInvoice(invoice.id)"
+                >
+                  <i-lucide name="printer" [size]="18"></i-lucide>
+                </button>
                 @if (permissionService.canWrite('purchase-invoices')) {
                   <a
                     [routerLink]="['/purchase-invoices', invoice.id, 'edit']"
@@ -89,14 +97,6 @@
                     (click)="deleteInvoice(invoice.id)"
                   >
                     <i-lucide name="trash-2" [size]="18"></i-lucide>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn-link-edit flex items-center gap-1 text-accent"
-                    appTooltip="Print purchase invoice"
-                    (click)="printInvoice(invoice.id)"
-                  >
-                    <i-lucide name="printer" [size]="18"></i-lucide>
                   </button>
                 }
               </div>

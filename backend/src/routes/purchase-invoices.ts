@@ -7,6 +7,7 @@ import { parsePagination, resolveSortDirection, toPagination } from '../utils/li
 import { toNumericString, toPositiveNumber } from '../utils/number.util';
 import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
 import { ProductSerialMode, productSerialNumberService } from '../services/product-serial-number.service';
+import { serialNumberService } from '../services/serial-number.service';
 import type { DbTransaction } from '../shared/serial-number.shared';
 import { renderPurchaseInvoice } from '../services/pdf/reports/purchase-invoice.report';
 
@@ -273,17 +274,18 @@ purchaseInvoicesRouter.post('/', async (req, res) => {
   const body = req.body;
   const items = body.items ?? [];
 
-  if (!body.invoiceNumber || !body.invoiceDate || !body.supplierId || !items.length) {
+  if (!body.invoiceDate || !body.supplierId || !items.length) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
     const result = await db.transaction(async (tx) => {
       // 1. Insert invoice header
+      const invoiceNumber = body.invoiceNumber || (await serialNumberService.generateInvoiceNumber('purchaseInvoice', tx));
       const invoice = await tx
         .insert(purchaseInvoices)
         .values({
-          invoiceNumber: body.invoiceNumber,
+          invoiceNumber,
           invoiceDate: body.invoiceDate,
           supplierId: body.supplierId,
           refNumber: body.refNumber,
