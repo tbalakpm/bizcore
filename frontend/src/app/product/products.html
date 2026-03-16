@@ -1,110 +1,138 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="page-title">
-    <i-lucide name="layers" class="w-7 h-7"></i-lucide>
+  <h1 class="text-xl font-semibold flex items-center gap-2">
+    <span nz-icon nzType="appstore" nzTheme="outline" class="text-2xl"></span>
     {{ 'MENU.PRODUCTS' | translate }}
   </h1>
 </div>
 
 @if (error) {
-<div class="error-banner">{{ error }}</div>
+  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
 }
 
 <div class="grid grid-cols-1 gap-4">
   @if (permissionService.canWrite('products')) {
-  <!-- Add / Edit form via reusable component -->
-  <div class="card">
-    <h2 class="section-title">
-      {{ editingProductId ? ('EDIT' | translate) : ('ADD' | translate) }}
-      {{ 'PRODUCT.TITLE' | translate }}
-    </h2>
-    <app-product-form [productId]="editingProductId" (saved)="onFormSaved()" (cancelled)="onFormCancelled()" />
-  </div>
+    <!-- Add / Edit form via reusable component -->
+    <nz-card>
+      <h2 class="text-base font-semibold mb-2">
+        {{ editingProductId ? ('EDIT' | translate) : ('ADD' | translate) }}
+        {{ 'PRODUCT.TITLE' | translate }}
+      </h2>
+      <app-product-form
+        [productId]="editingProductId"
+        (saved)="onFormSaved()"
+        (cancelled)="onFormCancelled()"
+      />
+    </nz-card>
   }
 
   <!-- List -->
-  <div class="card">
+  <nz-card>
     <div class="flex justify-between mb-2">
-      <h2 class="section-title">{{ 'MENU.PRODUCTS' | translate }}</h2>
+      <h2 class="text-base font-semibold">{{ 'MENU.PRODUCTS' | translate }}</h2>
     </div>
 
-    <div class="overflow-x-auto border border-border rounded-lg">
-      <table class="table-base">
-        <thead class="table-head">
-          <tr>
-            <th class="th-cell">{{ 'CODE' | translate }}</th>
-            <th class="th-cell">{{ 'NAME' | translate }}</th>
-            <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
-            <th class="th-cell">{{ 'CATEGORY.TITLE' | translate }}</th>
-            <th class="th-cell">HSN/SAC</th>
-            <th class="th-cell">Tax Rate</th>
-            <th class="th-cell">GTN</th>
-            <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
-            @if (permissionService.canWrite('products')) {
-            <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
-            }
-          </tr>
-        </thead>
-        <tbody>
-          @for (p of products(); track p.id) {
-          <tr class="table-row" [class.table-row-selected]="editingProductId === p.id">
-            <td class="td-cell">{{ p.code }}</td>
-            <td class="td-cell">{{ p.name }}</td>
-            <td class="td-cell">{{ p.description }}</td>
-            <td class="td-cell">{{ p.categoryName || '-' }}</td>
-            <td class="td-cell">{{ p.hsnSac || '-' }}</td>
-            <td class="td-cell">{{ p.taxRate ?? '-' }}</td>
-            <td class="td-cell">
-              <div class="flex flex-row gap-0.5">
+    <nz-table
+      #productTable
+      [nzData]="products()"
+      [nzLoading]="loading"
+      nzSize="small"
+      [nzShowPagination]="false"
+      [nzBordered]="true"
+    >
+      <thead>
+        <tr>
+          <th>{{ 'CODE' | translate }}</th>
+          <th>{{ 'NAME' | translate }}</th>
+          <th>{{ 'DESCRIPTION' | translate }}</th>
+          <th>{{ 'CATEGORY.TITLE' | translate }}</th>
+          <th>HSN/SAC</th>
+          <th>Tax Rate</th>
+          <th>GTN</th>
+          <th class="text-center" nzWidth="80px">{{ 'ACTIVE' | translate }}</th>
+          @if (permissionService.canWrite('products')) {
+            <th class="text-center" nzWidth="120px">{{ 'ACTIONS' | translate }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of productTable.data; track p.id) {
+          <tr [class.ant-table-row-selected]="editingProductId === p.id">
+            <td>{{ p.code }}</td>
+            <td>{{ p.name }}</td>
+            <td>{{ p.description }}</td>
+            <td>{{ p.categoryName || '-' }}</td>
+            <td>{{ p.hsnSac || '-' }}</td>
+            <td>{{ p.taxRate ?? '-' }}</td>
+            <td>
+              <div class="flex flex-row gap-1">
                 @if (p.gtnMode === 'manual') {
-                <span class="badge bg-warning-light text-warning border border-warning/20">Manual</span>
+                  <nz-tag nzColor="warning">Manual</nz-tag>
                 } @else {
-                <span class="badge bg-success-light text-success border border-success/20">Auto</span>
+                  <nz-tag nzColor="success">Auto</nz-tag>
                 }
                 @if (p.gtnMode !== 'manual') {
-                @if (p.gtnGeneration === 'batch') {
-                <span class="badge bg-accent-light text-accent border border-accent/20">Batch</span>
-                } @else if (p.gtnGeneration === 'tag') {
-                <span class="badge bg-purple-100 text-purple-800 border border-purple-200">Tag</span>
-                } @else {
-                <span class="badge bg-success-light text-success border border-success/20">Code</span>
-                }
+                  @if (p.gtnGeneration === 'batch') {
+                    <nz-tag nzColor="processing">Batch</nz-tag>
+                  } @else if (p.gtnGeneration === 'tag') {
+                    <nz-tag nzColor="purple">Tag</nz-tag>
+                  } @else {
+                    <nz-tag nzColor="success">Code</nz-tag>
+                  }
                 }
               </div>
             </td>
-            <td class="td-cell text-center">
-              <button type="button" (click)="toggleActive(p)"
-                class="w-6 h-6 rounded-full border flex items-center justify-center"
-                [appTooltip]="p.isActive ? 'Deactivate' : 'Activate'"
-                [ngClass]="p.isActive ? 'border-success text-success' : 'border-border-strong text-text-muted'">
-                @if (p.isActive) {
-                <i-lucide name="check" [size]="14"></i-lucide>
-                } @else {
-                <i-lucide name="x" [size]="14"></i-lucide>
-                }
-              </button>
+            <td class="text-center">
+              <nz-switch
+                [ngModel]="p.isActive"
+                (ngModelChange)="toggleActive(p)"
+                nzSize="small"
+                nz-tooltip
+                [nzTooltipTitle]="p.isActive ? 'Deactivate' : 'Activate'"
+              ></nz-switch>
             </td>
             @if (permissionService.canWrite('products')) {
-            <td class="td-cell text-center">
-              <div class="flex items-center justify-center gap-2">
-                <button (click)="editProduct(p.id)" class="btn-link-edit flex items-center gap-1" appTooltip="Edit product">
-                  <i-lucide name="pencil" [size]="18"></i-lucide>
-                </button>
-                <button (click)="deleteProduct(p.id)" class="btn-link-danger flex items-center gap-1"
-                  appTooltip="Delete product">
-                  <i-lucide name="trash-2" [size]="18"></i-lucide>
-                </button>
-              </div>
-            </td>
+              <td class="text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    nz-tooltip
+                    nzTooltipTitle="Edit product"
+                    style="color: var(--color-accent)"
+                    (click)="editProduct(p.id)"
+                  >
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                  </button>
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzDanger
+                    nzSize="small"
+                    nz-popconfirm
+                    nzPopconfirmTitle="Delete this product?"
+                    (nzOnConfirm)="deleteProduct(p.id)"
+                    nz-tooltip
+                    nzTooltipTitle="Delete product"
+                  >
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                </div>
+              </td>
             }
           </tr>
-          }
-          @if (!products().length) {
+        }
+        @if (!products().length && !loading) {
           <tr>
-            <td colspan="9" class="td-cell text-center text-text-muted">{{ 'PRODUCT.NO_PRODUCTS_YET' | translate }}</td>
+            <td
+              [attr.colspan]="permissionService.canWrite('products') ? 9 : 8"
+              class="text-center text-text-muted"
+            >
+              {{ 'PRODUCT.NO_PRODUCTS_YET' | translate }}
+            </td>
           </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
+        }
+      </tbody>
+    </nz-table>
+  </nz-card>
 </div>

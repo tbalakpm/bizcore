@@ -1,31 +1,35 @@
 <div class="h-full flex items-center justify-center">
-  <div class="card w-full max-w-sm">
+  <nz-card class="w-full max-w-sm">
     <div class="flex items-center justify-center gap-2 mb-4">
-      <i-lucide name="user-circle-2" class="w-7 h-7 text-primary"></i-lucide>
+      <span nz-icon nzType="user" nzTheme="outline" class="text-2xl text-primary"></span>
       <h1 class="text-2xl font-bold text-center text-text-heading">{{ 'LOGIN.TITLE' | translate }}</h1>
     </div>
 
-    <form (ngSubmit)="submit()" class="space-y-4">
-      <div>
-        <label class="label-base" for="username">{{ 'LOGIN.USERNAME' | translate }}</label>
-        <input type="text" [(ngModel)]="username" name="username" id="username" class="input-base" autofocus />
-      </div>
+    <form nz-form (ngSubmit)="submit()" class="space-y-4">
+      <nz-form-item>
+        <nz-form-label nzFor="username">{{ 'LOGIN.USERNAME' | translate }}</nz-form-label>
+        <nz-form-control>
+          <input nz-input type="text" [(ngModel)]="username" name="username" id="username" autofocus />
+        </nz-form-control>
+      </nz-form-item>
 
-      <div>
-        <label class="label-base" for="password">{{ 'LOGIN.PASSWORD' | translate }}</label>
-        <input type="password" [(ngModel)]="password" name="password" id="password" class="input-base" />
-      </div>
+      <nz-form-item>
+        <nz-form-label nzFor="password">{{ 'LOGIN.PASSWORD' | translate }}</nz-form-label>
+        <nz-form-control>
+          <input nz-input type="password" [(ngModel)]="password" name="password" id="password" />
+        </nz-form-control>
+      </nz-form-item>
 
-      <button type="submit" [disabled]="loading" class="btn-primary w-full py-2">
+      <button nz-button nzType="primary" type="submit" [disabled]="loading" class="w-full">
         <span class="flex justify-center items-center gap-2">
-          <i-lucide name="circle-check" class="w-6 h-6"></i-lucide>
+          <span nz-icon nzType="check-circle" nzTheme="outline"></span>
           {{ 'LOGIN.SUBMIT' | translate }}
         </span>
       </button>
 
       @if(error) {
-      <p class="text-danger text-sm">{{ error }}</p>
+      <nz-alert nzType="error" [nzMessage]="error" nzShowIcon></nz-alert>
       }
     </form>
-  </div>
+  </nz-card>
 </div>

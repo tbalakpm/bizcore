@@ -3,13 +3,26 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Product, ProductList, ProductService } from './product-service';
 import { ProductFormComponent } from './product-form.component';
-import { LucideAngularModule } from 'lucide-angular';
 import { PermissionService } from '../auth/permission.service';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
+
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, TranslatePipe, ProductFormComponent, LucideAngularModule, TooltipDirective],
+  imports: [
+    CommonModule, TranslatePipe, FormsModule, ProductFormComponent,
+    NzTableModule, NzTagModule, NzSwitchModule, NzButtonModule,
+    NzIconModule, NzTooltipModule, NzPopconfirmModule, NzAlertModule, NzCardModule,
+  ],
   templateUrl: './products.html',
 })
 export class Products implements OnInit {
@@ -63,7 +76,6 @@ export class Products implements OnInit {
   }
 
   deleteProduct(id: number) {
-    if (!confirm('Delete this product?')) return;
     this.productService.delete(id).subscribe(() => this.loadProducts());
   }
 }

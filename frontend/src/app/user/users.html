@@ -1,193 +1,236 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="page-title">
-    <i-lucide name="user-round" class="w-7 h-7"></i-lucide>
+  <h1 class="text-xl font-semibold flex items-center gap-2">
+    <span nz-icon nzType="user" nzTheme="outline" class="text-2xl"></span>
     {{ 'MENU.USERS' | translate }}
   </h1>
 </div>
 
 @if (error) {
-<div class="error-banner">{{ error }}</div>
+  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
 }
 
 <div class="grid grid-cols-1 gap-4">
-  <!-- Add form -->
+  <!-- Add / Edit form -->
   @if (permissionService.canWrite('users')) {
-  <div class="card">
-    <h2 class="section-title">
-      {{ editingUser.id ? ('EDIT' | translate) : ('ADD' | translate) }}
-      {{ 'USER.TITLE' | translate }}
-    </h2>
-    <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
-      <div>
-        <label class="label-base">{{ 'USER.USERNAME' | translate }}</label>
-        <input type="text" [(ngModel)]="editingUser.username" name="newUserUsername" class="input-base" autofocus />
-      </div>
-      <div>
-        <label class="label-base">{{ 'USER.FIRST_NAME' | translate }}</label>
-        <input type="text" [(ngModel)]="editingUser.firstName" name="newUserFirstName" class="input-base" />
-      </div>
-      <div>
-        <label class="label-base">{{ 'USER.LAST_NAME' | translate }}</label>
-        <input type="text" [(ngModel)]="editingUser.lastName" name="newUserLastName" class="input-base" />
-      </div>
-      <div>
-        <label class="label-base">{{ 'USER.ROLE' | translate }}</label>
-        <select [(ngModel)]="editingUser.role" name="newUserRole" class="select-base">
-          <option value="user" selected="{{ editingUser.role === 'user' }}">user</option>
-          <option value="manager" selected="{{ editingUser.role === 'manager' }}">manager</option>
-          <option value="admin" selected="{{ editingUser.role === 'admin' }}">admin</option>
-        </select>
-      </div>
-      <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
-        <button *appHasPermission="'users:write'" type="submit" class="btn-primary w-full">
-          Save
-        </button>
-        @if (editingUser.id) {
-        <button type="button" class="btn-outline w-full" (click)="onCancel()">Cancel</button>
-        }
-      </div>
-    </form>
-
-    @if (isAdmin) {
-    <div class="mt-5 pt-4 border-t border-border">
-      <div class="flex items-center gap-2 mb-3">
-        <svg class="w-5 h-5 text-text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-          stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
-        </svg>
-        <h3 class="text-base font-semibold text-text-heading">Module Permissions</h3>
-      </div>
-      <div class="overflow-x-auto border border-border rounded-lg">
-        <table class="table-base">
-          <thead class="table-head">
-            <tr>
-              <th class="th-cell">Module</th>
-              <th class="th-cell text-center w-28">
-                <span class="inline-flex items-center gap-1.5">
-                  No Access
-                </span>
-              </th>
-              <th class="th-cell text-center w-28">
-                <span class="inline-flex items-center gap-1.5">
-                  Read Only
-                </span>
-              </th>
-              <th class="th-cell text-center w-28">
-                <span class="inline-flex items-center gap-1.5">
-                  Full Access
-                </span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (module of allModules; track module) {
-            <tr class="table-row">
-              <td class="td-cell font-medium text-text-heading">
-                {{ moduleLabels[module] }}
-              </td>
-              <td class="td-cell text-center">
-                <label class="permission-radio-label"
-                  [class.permission-radio-none-active]="editingUser.permissions[module] === 'none'">
-                  <input type="radio" [name]="module" value="none" [(ngModel)]="editingUser.permissions[module]"
-                    class="sr-only" />
-                  <i-lucide name="x" [size]="14"></i-lucide>
-                </label>
-              </td>
-              <td class="td-cell text-center">
-                <label class="permission-radio-label"
-                  [class.permission-radio-read-active]="editingUser.permissions[module] === 'read'">
-                  <input type="radio" [name]="module" value="read" [(ngModel)]="editingUser.permissions[module]"
-                    class="sr-only" />
-                  <i-lucide name="eye" [size]="16"></i-lucide>
-                </label>
-              </td>
-              <td class="td-cell text-center">
-                <label class="permission-radio-label"
-                  [class.permission-radio-write-active]="editingUser.permissions[module] === 'write'">
-                  <input type="radio" [name]="module" value="write" [(ngModel)]="editingUser.permissions[module]"
-                    class="sr-only" />
-                  <i-lucide name="pencil" [size]="14"></i-lucide>
-                </label>
-              </td>
-            </tr>
+    <nz-card>
+      <h2 class="text-base font-semibold mb-2">
+        {{ editingUser.id ? ('EDIT' | translate) : ('ADD' | translate) }}
+        {{ 'USER.TITLE' | translate }}
+      </h2>
+      <form nz-form (ngSubmit)="onSubmit()" nzLayout="vertical">
+        <div class="grid grid-cols-12 gap-2">
+          <div class="col-span-12 md:col-span-6 xl:col-span-3">
+            <nz-form-item>
+              <nz-form-label>{{ 'USER.USERNAME' | translate }}</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  type="text"
+                  [(ngModel)]="editingUser.username"
+                  name="newUserUsername"
+                  autofocus
+                  placeholder="e.g. john.doe"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div class="col-span-12 md:col-span-6 xl:col-span-3">
+            <nz-form-item>
+              <nz-form-label>{{ 'USER.FIRST_NAME' | translate }}</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  type="text"
+                  [(ngModel)]="editingUser.firstName"
+                  name="newUserFirstName"
+                  placeholder="First name"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div class="col-span-12 md:col-span-6 xl:col-span-3">
+            <nz-form-item>
+              <nz-form-label>{{ 'USER.LAST_NAME' | translate }}</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  type="text"
+                  [(ngModel)]="editingUser.lastName"
+                  name="newUserLastName"
+                  placeholder="Last name"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div class="col-span-12 md:col-span-6 xl:col-span-3">
+            <nz-form-item>
+              <nz-form-label>{{ 'USER.ROLE' | translate }}</nz-form-label>
+              <nz-form-control>
+                <nz-select
+                  [(ngModel)]="editingUser.role"
+                  name="newUserRole"
+                  nzPlaceHolder="Select role"
+                >
+                  <nz-option nzValue="user" nzLabel="user"></nz-option>
+                  <nz-option nzValue="manager" nzLabel="manager"></nz-option>
+                  <nz-option nzValue="admin" nzLabel="admin"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div class="col-span-12 flex gap-3">
+            <button *appHasPermission="'users:write'" nz-button nzType="primary" type="submit">
+              <span nz-icon nzType="save" nzTheme="outline"></span>
+              Save
+            </button>
+            @if (editingUser.id) {
+              <button nz-button nzType="default" type="button" (click)="onCancel()">Cancel</button>
             }
-          </tbody>
-        </table>
-      </div>
-      <p class="mt-2 text-xs text-text-muted">
-        Admin users bypass all permission checks and always have full access.
-      </p>
-    </div>
-    }
-  </div>
+          </div>
+        </div>
+      </form>
+
+      @if (isAdmin) {
+        <div class="mt-5 pt-4 border-t">
+          <div class="flex items-center gap-2 mb-3">
+            <span nz-icon nzType="safety-certificate" nzTheme="outline" class="text-lg"></span>
+            <h3 class="text-base font-semibold">Module Permissions</h3>
+          </div>
+          <nz-table
+            [nzData]="allModules"
+            [nzShowPagination]="false"
+            nzSize="small"
+            [nzBordered]="true"
+          >
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th class="text-center" nzWidth="120px">No Access</th>
+                <th class="text-center" nzWidth="120px">Read Only</th>
+                <th class="text-center" nzWidth="120px">Full Access</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (module of allModules; track module) {
+                <tr>
+                  <td class="font-medium">{{ moduleLabels[module] }}</td>
+                  <td colspan="3" class="text-center">
+                    <nz-radio-group
+                      [(ngModel)]="editingUser.permissions[module]"
+                      [name]="module"
+                      nzButtonStyle="solid"
+                    >
+                      <label nz-radio-button nzValue="none">
+                        <span nz-icon nzType="close" nzTheme="outline"></span>
+                        None
+                      </label>
+                      <label nz-radio-button nzValue="read">
+                        <span nz-icon nzType="eye" nzTheme="outline"></span>
+                        Read
+                      </label>
+                      <label nz-radio-button nzValue="write">
+                        <span nz-icon nzType="edit" nzTheme="outline"></span>
+                        Write
+                      </label>
+                    </nz-radio-group>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </nz-table>
+          <p class="mt-2 text-xs text-text-muted">
+            Admin users bypass all permission checks and always have full access.
+          </p>
+        </div>
+      }
+    </nz-card>
   }
 
   <!-- List -->
-  <div class="card">
+  <nz-card>
     <div class="flex justify-between mb-2">
-      <h2 class="section-title">{{ 'MENU.USERS' | translate }}</h2>
+      <h2 class="text-base font-semibold">{{ 'MENU.USERS' | translate }}</h2>
     </div>
 
-    <div class="overflow-x-auto border border-border rounded-lg">
-      <table class="table-base">
-        <thead class="table-head">
-          <tr>
-            <th class="th-cell">{{ 'USER.USERNAME' | translate }}</th>
-            <th class="th-cell">{{ 'USER.FIRST_NAME' | translate }}</th>
-            <th class="th-cell">{{ 'USER.LAST_NAME' | translate }}</th>
-            <th class="th-cell">{{ 'USER.ROLE' | translate }}</th>
-            <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
-            @if (permissionService.canWrite('users')) {
-            <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
-            }
-          </tr>
-        </thead>
-        <tbody>
-          @for (u of users(); track u.id) {
-          <tr class="table-row" [class.table-row-selected]="editingUser.id == u.id">
-            <td class="td-cell">{{ u.username }}</td>
-            <td class="td-cell">{{ u.firstName || '-' }}</td>
-            <td class="td-cell">{{ u.lastName || '-' }}</td>
-            <td class="td-cell">{{ u.role }}</td>
-            <td class="td-cell text-center">
-              <button type="button" (click)="toggleActive(u)"
-                class="w-6 h-6 rounded-full border flex items-center justify-center"
-                [appTooltip]="u.isActive ? 'Deactivate' : 'Activate'" [ngClass]="
-                    u.isActive
-                      ? 'border-success text-success'
-                      : 'border-border-strong text-text-muted'
-                  ">
-                @if (u.isActive) {
-                <i-lucide name="check" [size]="14"></i-lucide>
-                } @else {
-                <i-lucide name="x" [size]="14"></i-lucide>
-                }
-              </button>
-            </td>
-            @if (permissionService.canWrite('users')) {
-            <td class="td-cell text-center">
-              <div class="flex items-center justify-center gap-2">
-                <button (click)="editUser(u.id)" class="btn-link-edit flex items-center gap-1" appTooltip="Edit user">
-                  <i-lucide name="pencil" [size]="14"></i-lucide>
-                </button>
-                <button (click)="deleteUser(u.id)" class="btn-link-danger flex items-center gap-1" appTooltip="Delete user">
-                  <i-lucide name="trash-2" [size]="14"></i-lucide>
-                </button>
-              </div>
-            </td>
-            }
-          </tr>
+    <nz-table
+      #userTable
+      [nzData]="users()"
+      [nzLoading]="loading"
+      nzSize="small"
+      [nzShowPagination]="false"
+      [nzBordered]="true"
+    >
+      <thead>
+        <tr>
+          <th>{{ 'USER.USERNAME' | translate }}</th>
+          <th>{{ 'USER.FIRST_NAME' | translate }}</th>
+          <th>{{ 'USER.LAST_NAME' | translate }}</th>
+          <th>{{ 'USER.ROLE' | translate }}</th>
+          <th class="text-center" nzWidth="80px">{{ 'ACTIVE' | translate }}</th>
+          @if (permissionService.canWrite('users')) {
+            <th class="text-center" nzWidth="120px">{{ 'ACTIONS' | translate }}</th>
           }
-          @if (!users().length) {
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of userTable.data; track u.id) {
+          <tr [class.ant-table-row-selected]="editingUser.id == u.id">
+            <td>{{ u.username }}</td>
+            <td>{{ u.firstName || '-' }}</td>
+            <td>{{ u.lastName || '-' }}</td>
+            <td>{{ u.role }}</td>
+            <td class="text-center">
+              <nz-switch
+                [ngModel]="u.isActive"
+                (ngModelChange)="toggleActive(u)"
+                nzSize="small"
+                nz-tooltip
+                [nzTooltipTitle]="u.isActive ? 'Deactivate' : 'Activate'"
+              ></nz-switch>
+            </td>
+            @if (permissionService.canWrite('users')) {
+              <td class="text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    nz-tooltip
+                    nzTooltipTitle="Edit user"
+                    style="color: var(--color-accent)"
+                    (click)="editUser(u.id)"
+                  >
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                  </button>
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzDanger
+                    nzSize="small"
+                    nz-popconfirm
+                    nzPopconfirmTitle="Delete this user?"
+                    (nzOnConfirm)="deleteUser(u.id)"
+                    nz-tooltip
+                    nzTooltipTitle="Delete user"
+                  >
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                </div>
+              </td>
+            }
+          </tr>
+        }
+        @if (!users().length && !loading) {
           <tr>
-            <td colspan="6" class="td-cell text-center text-text-muted">
+            <td
+              [attr.colspan]="permissionService.canWrite('users') ? 6 : 5"
+              class="text-center text-text-muted"
+            >
               {{ 'USER.NO_USERS_YET' | translate }}
             </td>
           </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
+        }
+      </tbody>
+    </nz-table>
+  </nz-card>
 </div>

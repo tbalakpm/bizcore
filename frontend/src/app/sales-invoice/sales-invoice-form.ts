@@ -3,17 +3,29 @@ import { Component, HostListener, inject, OnDestroy, OnInit, QueryList, signal, 
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { NgSelectModule } from '@ng-select/ng-select';
 import { AddressForm } from '../shared/components/address-form';
 import { TranslatePipe } from '@ngx-translate/core';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
 
 import { type Product, ProductService } from '../product/product-service';
 import { type Customer, CustomerService } from '../customer/customer-service';
 import { type SalesInvoiceItem, SalesInvoiceService, SalesInvoice } from './sales-invoice-service';
 import { type Inventory, InventoryService } from '../inventory/inventory-service';
-import { LucideAngularModule } from 'lucide-angular';
-import { NgSelectComponent } from '@ng-select/ng-select';
+
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSelectComponent } from 'ng-zorro-antd/select';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 type EditableSalesInvoiceItem = {
   id?: number;
@@ -51,7 +63,13 @@ type EditableSalesInvoice = {
 
 @Component({
   selector: 'app-sales-invoice-form',
-  imports: [CommonModule, FormsModule, RouterLink, NgSelectModule, AddressForm, TranslatePipe, TooltipDirective, LucideAngularModule],
+  imports: [
+    CommonModule, FormsModule, RouterLink, AddressForm, TranslatePipe,
+    NzSelectModule, NzFormModule, NzInputModule, NzDatePickerModule,
+    NzInputNumberModule, NzButtonModule, NzIconModule, NzTableModule,
+    NzAlertModule, NzTooltipModule, NzCardModule, NzCollapseModule,
+    NzCheckboxModule, NzTagModule,
+  ],
   templateUrl: './sales-invoice-form.html',
 })
 export class SalesInvoiceForm implements OnInit {
@@ -61,7 +79,7 @@ export class SalesInvoiceForm implements OnInit {
   private inventoryService = inject(InventoryService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NgSelectComponent>;
+  @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NzSelectComponent>;
 
   products = signal<Product[]>([]);
   customers = signal<Customer[]>([]);
@@ -78,6 +96,10 @@ export class SalesInvoiceForm implements OnInit {
   inventoryTotal = 0;
 
   editingInvoice: EditableSalesInvoice = this.defaultInvoice();
+
+  // Date bindings for nz-date-picker
+  invoiceDateValue: Date | null = null;
+  refDateValue: Date | null = null;
 
   // Inline Customer Creation
   showNewCustomerForm = false;
@@ -129,6 +151,11 @@ export class SalesInvoiceForm implements OnInit {
     this.loadCustomers();
     this.loadInventories();
     this.setupInventorySearch();
+
+    // Initialize date from default invoice
+    this.invoiceDateValue = this.editingInvoice.invoiceDate
+      ? new Date(this.editingInvoice.invoiceDate + 'T00:00:00')
+      : null;
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -198,6 +225,10 @@ export class SalesInvoiceForm implements OnInit {
     });
   }
 
+  onInventorySearch(term: string) {
+    this.inventoryInput$.next(term);
+  }
+
   onInventoryScrollToEnd() {
     if (this.inventoryLoading || this.inventories().length >= this.inventoryTotal) {
       return;
@@ -240,6 +271,14 @@ export class SalesInvoiceForm implements OnInit {
           })),
         };
 
+        // Sync date pickers
+        this.invoiceDateValue = invoice.invoiceDate
+          ? new Date(invoice.invoiceDate + 'T00:00:00')
+          : null;
+        this.refDateValue = invoice.refDate
+          ? new Date(invoice.refDate + 'T00:00:00')
+          : null;
+
         // Track original inventories to keep them in dropdown even if 0 stock
         const loadedOriginalInvs: Inventory[] = (invoice.items || []).map(item => ({
           id: item.inventoryId!,
@@ -258,6 +297,30 @@ export class SalesInvoiceForm implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  onInvoiceDateChange(date: Date | null) {
+    this.invoiceDateValue = date;
+    if (date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      this.editingInvoice.invoiceDate = `${yyyy}-${mm}-${dd}`;
+    } else {
+      this.editingInvoice.invoiceDate = '';
+    }
+  }
+
+  onRefDateChange(date: Date | null) {
+    this.refDateValue = date;
+    if (date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      this.editingInvoice.refDate = `${yyyy}-${mm}-${dd}`;
+    } else {
+      this.editingInvoice.refDate = '';
+    }
   }
 
   onInventorySelect(item: EditableSalesInvoiceItem) {
@@ -325,7 +388,6 @@ export class SalesInvoiceForm implements OnInit {
       const lastSelect = this.itemRowSelects.last;
       if (lastSelect) {
         lastSelect.focus();
-        lastSelect.open();
       }
     });
   }
@@ -339,12 +401,12 @@ export class SalesInvoiceForm implements OnInit {
   getFilteredInventories(currentItem: EditableSalesInvoiceItem): (Inventory & { disabled?: boolean })[] {
     const available = this.inventories();
     const original = this.originalInventories();
-    
+
     // Merge available with original items (avoiding duplicates)
     const mergedMap = new Map<number, Inventory>();
     original.forEach(inv => mergedMap.set(inv.id, inv));
     available.forEach(inv => mergedMap.set(inv.id, inv));
-    
+
     return Array.from(mergedMap.values()).map(inv => {
       const warehouseLeft = this.getInventoryEffectiveStock(inv);
       return {

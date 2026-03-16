@@ -1,55 +1,65 @@
-<div class="border border-border rounded-lg overflow-hidden mb-3">
-  <!-- Header / Toggle -->
-  <div
-    class="flex items-center justify-between px-3 py-2 bg-surface-raised cursor-pointer hover:bg-surface-alt transition"
-    (click)="isExpandable ? toggleOpen() : null">
-    <h3 class="text-sm font-semibold text-text-heading">{{ title | translate }}</h3>
-    @if (isExpandable) {
-    <i-lucide name="chevron-down" class="w-4 h-4 text-text-muted transition-transform duration-200" [class.rotate-180]="isOpen"></i-lucide>
-    }
+<ng-template #addressFields>
+  <div class="p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+    <nz-form-item class="md:col-span-2 mb-0">
+      <nz-form-label>{{ 'ADDRESS.LINE1' | translate }}</nz-form-label>
+      <nz-form-control>
+        <input nz-input type="text" [(ngModel)]="address.addressLine1" name="addr1" [disabled]="disabled" placeholder="Building, street" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="md:col-span-2 mb-0">
+      <nz-form-label>{{ 'ADDRESS.LINE2' | translate }}</nz-form-label>
+      <nz-form-control>
+        <input nz-input type="text" [(ngModel)]="address.addressLine2" name="addr2" [disabled]="disabled" placeholder="Landmark, floor (optional)" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="mb-0">
+      <nz-form-label>{{ 'ADDRESS.AREA' | translate }}</nz-form-label>
+      <nz-form-control>
+        <input nz-input type="text" [(ngModel)]="address.area" name="area" [disabled]="disabled" placeholder="Area / locality" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="mb-0">
+      <nz-form-label>{{ 'ADDRESS.CITY' | translate }}</nz-form-label>
+      <nz-form-control>
+        <input nz-input type="text" [(ngModel)]="address.city" name="city" [disabled]="disabled" placeholder="City" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="mb-0">
+      <nz-form-label>{{ 'ADDRESS.STATE' | translate }}</nz-form-label>
+      <nz-form-control>
+        <input nz-input type="text" [(ngModel)]="address.state" name="state" [disabled]="disabled" placeholder="State" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="mb-0">
+      <nz-form-label>{{ 'ADDRESS.PINCODE' | translate }}</nz-form-label>
+      <nz-form-control>
+        <input nz-input type="text" [(ngModel)]="address.postalCode" name="postalCode" [disabled]="disabled" placeholder="e.g. 560001" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="mb-0">
+      <nz-form-label>{{ 'ADDRESS.MOBILE' | translate }}</nz-form-label>
+      <nz-form-control>
+        <input nz-input type="text" [(ngModel)]="address.mobile" name="mobile" [disabled]="disabled" placeholder="e.g. 9876543210" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="mb-0">
+      <nz-form-label>{{ 'ADDRESS.EMAIL' | translate }}</nz-form-label>
+      <nz-form-control>
+        <input nz-input type="email" [(ngModel)]="address.email" name="email" [disabled]="disabled" placeholder="e.g. name@example.com" />
+      </nz-form-control>
+    </nz-form-item>
   </div>
+</ng-template>
 
-  <!-- Form Fields -->
-  <div class="p-3 grid grid-cols-1 md:grid-cols-2 gap-3" [class.hidden]="isExpandable && !isOpen">
-    <div class="md:col-span-2">
-      <label class="label-base">{{ 'ADDRESS.LINE1' | translate }}</label>
-      <input type="text" [(ngModel)]="address.addressLine1" name="addr1" [disabled]="disabled"
-        class="input-base" />
-    </div>
-    <div class="md:col-span-2">
-      <label class="label-base">{{ 'ADDRESS.LINE2' | translate }}</label>
-      <input type="text" [(ngModel)]="address.addressLine2" name="addr2" [disabled]="disabled"
-        class="input-base" />
-    </div>
-    <div>
-      <label class="label-base">{{ 'ADDRESS.AREA' | translate }}</label>
-      <input type="text" [(ngModel)]="address.area" name="area" [disabled]="disabled"
-        class="input-base" />
-    </div>
-    <div>
-      <label class="label-base">{{ 'ADDRESS.CITY' | translate }}</label>
-      <input type="text" [(ngModel)]="address.city" name="city" [disabled]="disabled"
-        class="input-base" />
-    </div>
-    <div>
-      <label class="label-base">{{ 'ADDRESS.STATE' | translate }}</label>
-      <input type="text" [(ngModel)]="address.state" name="state" [disabled]="disabled"
-        class="input-base" />
-    </div>
-    <div>
-      <label class="label-base">{{ 'ADDRESS.PINCODE' | translate }}</label>
-      <input type="text" [(ngModel)]="address.postalCode" name="postalCode" [disabled]="disabled"
-        class="input-base" />
-    </div>
-    <div>
-      <label class="label-base">{{ 'ADDRESS.MOBILE' | translate }}</label>
-      <input type="text" [(ngModel)]="address.mobile" name="mobile" [disabled]="disabled"
-        class="input-base" />
-    </div>
-    <div>
-      <label class="label-base">{{ 'ADDRESS.EMAIL' | translate }}</label>
-      <input type="email" [(ngModel)]="address.email" name="email" [disabled]="disabled"
-        class="input-base" />
-    </div>
+@if (isExpandable) {
+  <nz-collapse class="mb-1">
+    <nz-collapse-panel [nzHeader]="title | translate" [nzActive]="isOpen">
+      <ng-container *ngTemplateOutlet="addressFields"></ng-container>
+    </nz-collapse-panel>
+  </nz-collapse>
+} @else {
+  <div class="mb-1">
+    <h3 class="text-sm font-semibold text-text-heading px-3 py-1">{{ title | translate }}</h3>
+    <ng-container *ngTemplateOutlet="addressFields"></ng-container>
   </div>
-</div>
+}

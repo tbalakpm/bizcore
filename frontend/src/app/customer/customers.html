@@ -1,182 +1,222 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="page-title">
-    <i-lucide name="users" class="w-7 h-7"></i-lucide>
+  <h1 class="text-xl font-semibold flex items-center gap-2">
+    <span nz-icon nzType="team" nzTheme="outline" class="text-2xl"></span>
     {{ 'MENU.CUSTOMERS' | translate }}
   </h1>
 </div>
+
 @if (error) {
-  <div class="error-banner">{{ error }}</div>
+  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
 }
+
 <div class="grid grid-cols-1 gap-4">
   @if (permissionService.canWrite('customers')) {
-    <!-- Add form -->
-    <div class="card">
-      <h2 class="section-title">
+    <!-- Add / Edit form -->
+    <nz-card>
+      <h2 class="text-base font-semibold mb-2">
         {{ editingCustomer.id ? ('EDIT' | translate) : ('ADD' | translate) }}
         {{ 'MENU.CUSTOMERS' | translate }}
       </h2>
-      <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
-        <div>
-          <label class="label-base">{{ 'CODE' | translate }}</label>
-          <input
-            type="text"
-            [(ngModel)]="editingCustomer.code"
-            name="newCustomerCode"
-            class="input-base"
-            autofocus
-          />
-        </div>
-        <div>
-          <label class="label-base">{{ 'NAME' | translate }}</label>
-          <input
-            type="text"
-            [(ngModel)]="editingCustomer.name"
-            name="newCustomerName"
-            class="input-base"
-            autofocus
-          />
-        </div>
-        <div>
-          <label class="label-base">{{ 'TYPE' | translate }}</label>
-          <select [(ngModel)]="editingCustomer.type" name="newCustomerType" class="select-base">
-            <option [ngValue]="'retail'">Retail</option>
-            <option [ngValue]="'wholesale'">Wholesale</option>
-          </select>
-        </div>
-        <div>
-          <label class="label-base">{{ 'GSTIN' | translate }}</label>
-          <input
-            type="text"
-            [(ngModel)]="editingCustomer.gstin"
-            name="newCustomerGstin"
-            class="input-base"
-          />
-        </div>
-        <div class="md:col-span-2 xl:col-span-4">
-          <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
-          <textarea
-            rows="2"
-            [(ngModel)]="editingCustomer.notes"
-            name="newCustomerNotes"
-            class="input-base"
-          ></textarea>
-        </div>
-
-        <!-- Addresses -->
-        <div class="col-span-full grid grid-cols-2">
-          <div class="flex items-center col-span-2 gap-2 mb-4">
-            <input
-              type="checkbox"
-              [(ngModel)]="sameAsBilling"
-              name="sameAsBilling"
-              id="sameAsBilling"
-              class="w-4 h-4 accent-primary rounded"
-            />
-            <label for="sameAsBilling" class="text-sm font-medium text-text-muted">{{
-              'ADDRESS.SAME_AS_BILLING' | translate
-            }}</label>
+      <form nz-form (ngSubmit)="onSubmit()" nzLayout="vertical">
+        <div class="grid grid-cols-12 gap-2">
+          <div class="col-span-12 md:col-span-6 xl:col-span-3">
+            <nz-form-item>
+              <nz-form-label>{{ 'CODE' | translate }}</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  type="text"
+                  [(ngModel)]="editingCustomer.code"
+                  name="newCustomerCode"
+                  autofocus
+                  placeholder="e.g. CUST-001"
+                />
+              </nz-form-control>
+            </nz-form-item>
           </div>
-          <app-address-form
-            [address]="editingCustomer.billingAddress!"
-            [title]="'ADDRESS.BILLING'"
-            [isExpandable]="true"
-            [isOpen]="false"
-          ></app-address-form>
-          @if (!sameAsBilling) {
-            <app-address-form
-              [address]="editingCustomer.shippingAddress!"
-              [title]="'ADDRESS.SHIPPING'"
-              [isExpandable]="true"
-              [isOpen]="false"
-            ></app-address-form>
-          }
-        </div>
+          <div class="col-span-12 md:col-span-6 xl:col-span-3">
+            <nz-form-item>
+              <nz-form-label>{{ 'NAME' | translate }}</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  type="text"
+                  [(ngModel)]="editingCustomer.name"
+                  name="newCustomerName"
+                  placeholder="Customer name"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div class="col-span-12 md:col-span-6 xl:col-span-3">
+            <nz-form-item>
+              <nz-form-label>{{ 'TYPE' | translate }}</nz-form-label>
+              <nz-form-control>
+                <nz-select
+                  [(ngModel)]="editingCustomer.type"
+                  name="newCustomerType"
+                  nzPlaceHolder="Select type"
+                >
+                  <nz-option nzValue="retail" nzLabel="Retail"></nz-option>
+                  <nz-option nzValue="wholesale" nzLabel="Wholesale"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div class="col-span-12 md:col-span-6 xl:col-span-3">
+            <nz-form-item>
+              <nz-form-label>{{ 'GSTIN' | translate }}</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  type="text"
+                  [(ngModel)]="editingCustomer.gstin"
+                  name="newCustomerGstin"
+                  placeholder="e.g. 22AAAAA0000A1Z5"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div class="col-span-12">
+            <nz-form-item>
+              <nz-form-label>{{ 'DESCRIPTION' | translate }}</nz-form-label>
+              <nz-form-control>
+                <textarea
+                  nz-input
+                  rows="2"
+                  [(ngModel)]="editingCustomer.notes"
+                  name="newCustomerNotes"
+                  placeholder="Additional notes (optional)"
+                ></textarea>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
 
-        <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
-          <button type="submit" class="btn-primary w-full">Save</button>
-          @if (editingCustomer.id) {
-            <button type="button" class="btn-outline w-full" (click)="onCancel()">Cancel</button>
-          }
+          <!-- Addresses -->
+          <div class="col-span-12">
+            <div class="flex items-center gap-2 mb-2">
+              <label nz-checkbox [(ngModel)]="sameAsBilling" name="sameAsBilling">
+                {{ 'ADDRESS.SAME_AS_BILLING' | translate }}
+              </label>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2">
+              <app-address-form
+                [address]="editingCustomer.billingAddress!"
+                [title]="'ADDRESS.BILLING'"
+                [isExpandable]="true"
+                [isOpen]="false"
+              ></app-address-form>
+              @if (!sameAsBilling) {
+                <app-address-form
+                  [address]="editingCustomer.shippingAddress!"
+                  [title]="'ADDRESS.SHIPPING'"
+                  [isExpandable]="true"
+                  [isOpen]="false"
+                ></app-address-form>
+              }
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-3 mt-2">
+            <button nz-button nzType="primary" type="submit">
+              <span nz-icon nzType="save" nzTheme="outline"></span>
+              Save
+            </button>
+            @if (editingCustomer.id) {
+              <button nz-button nzType="default" type="button" (click)="onCancel()">Cancel</button>
+            }
+          </div>
         </div>
       </form>
-    </div>
+    </nz-card>
   }
 
   <!-- List -->
-  <div class="card">
+  <nz-card>
     <div class="flex justify-between mb-2">
-      <h2 class="section-title">{{ 'MENU.CUSTOMERS' | translate }}</h2>
+      <h2 class="text-base font-semibold">{{ 'MENU.CUSTOMERS' | translate }}</h2>
     </div>
 
-    <div class="overflow-x-auto border border-border rounded-lg">
-      <table class="table-base">
-        <thead class="table-head">
-          <tr>
-            <th class="th-cell">{{ 'CODE' | translate }}</th>
-            <th class="th-cell">{{ 'NAME' | translate }}</th>
-            <th class="th-cell">{{ 'TYPE' | translate }}</th>
-            <th class="th-cell">{{ 'DESCRIPTION' | translate }}</th>
-            <th class="th-cell text-center w-16">{{ 'ACTIVE' | translate }}</th>
+    <nz-table
+      #customerTable
+      [nzData]="customers()"
+      [nzLoading]="loading"
+      nzSize="small"
+      [nzShowPagination]="false"
+      [nzBordered]="true"
+    >
+      <thead>
+        <tr>
+          <th>{{ 'CODE' | translate }}</th>
+          <th>{{ 'NAME' | translate }}</th>
+          <th>{{ 'TYPE' | translate }}</th>
+          <th>{{ 'DESCRIPTION' | translate }}</th>
+          <th class="text-center" nzWidth="80px">{{ 'ACTIVE' | translate }}</th>
+          @if (permissionService.canWrite('customers')) {
+            <th class="text-center" nzWidth="120px">{{ 'ACTIONS' | translate }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of customerTable.data; track c.id) {
+          <tr [class.ant-table-row-selected]="editingCustomer.id == c.id">
+            <td>{{ c.code }}</td>
+            <td>{{ c.name }}</td>
+            <td>{{ c.type }}</td>
+            <td>{{ c.notes || '-' }}</td>
+            <td class="text-center">
+              <nz-switch
+                [ngModel]="c.isActive"
+                (ngModelChange)="toggleActive(c)"
+                nzSize="small"
+                nz-tooltip
+                [nzTooltipTitle]="c.isActive ? 'Deactivate' : 'Activate'"
+              ></nz-switch>
+            </td>
             @if (permissionService.canWrite('customers')) {
-              <th class="th-cell text-center w-32">{{ 'ACTIONS' | translate }}</th>
+              <td class="text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    nz-tooltip
+                    nzTooltipTitle="Edit customer"
+                    style="color: var(--color-accent)"
+                    (click)="editCustomer(c.id)"
+                  >
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                  </button>
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzDanger
+                    nzSize="small"
+                    nz-popconfirm
+                    nzPopconfirmTitle="Delete this customer?"
+                    (nzOnConfirm)="deleteCustomer(c.id)"
+                    nz-tooltip
+                    nzTooltipTitle="Delete customer"
+                  >
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                </div>
+              </td>
             }
           </tr>
-        </thead>
-        <tbody>
-          @for (c of customers(); track c.id) {
-            <tr class="table-row" [class.table-row-selected]="editingCustomer.id == c.id">
-              <td class="td-cell">{{ c.code }}</td>
-              <td class="td-cell">{{ c.name }}</td>
-              <td class="td-cell">{{ c.type }}</td>
-              <td class="td-cell">{{ c.notes || '-' }}</td>
-              <td class="td-cell text-center">
-                <button
-                  type="button"
-                  (click)="toggleActive(c)"
-                  class="w-6 h-6 rounded-full border flex items-center justify-center"
-                  [appTooltip]="c.isActive ? 'Deactivate' : 'Activate'"
-                  [ngClass]="
-                    c.isActive
-                      ? 'border-success text-success'
-                      : 'border-border-strong text-text-muted'
-                  "
-                >
-                  @if (c.isActive) {
-                    <i-lucide name="check" [size]="14"></i-lucide>
-                  } @else {
-                    <i-lucide name="x" [size]="14"></i-lucide>
-                  }
-                </button>
-              </td>
-              @if (permissionService.canWrite('customers')) {
-                <td class="td-cell text-center">
-                  <div class="flex items-center justify-center gap-2">
-                    <button
-                      (click)="editCustomer(c.id)"
-                      class="btn-link-edit flex items-center gap-1"
-                      appTooltip="Edit customer"
-                    >
-                      <i-lucide name="pencil" [size]="18"></i-lucide>
-                    </button>
-                    <button
-                      (click)="deleteCustomer(c.id)"
-                      class="btn-link-danger flex items-center gap-1"
-                      appTooltip="Delete customer"
-                    >
-                      <i-lucide name="trash-2" [size]="18"></i-lucide>
-                    </button>
-                  </div>
-                </td>
-              }
-            </tr>
-          }
-          @if (!customers().length) {
-            <tr>
-              <td colspan="6" class="td-cell text-center text-text-muted">No customers yet</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
+        }
+        @if (!customers().length && !loading) {
+          <tr>
+            <td
+              [attr.colspan]="permissionService.canWrite('customers') ? 6 : 5"
+              class="text-center text-text-muted"
+            >
+              No customers yet
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </nz-card>
 </div>

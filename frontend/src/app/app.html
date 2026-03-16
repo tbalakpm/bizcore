@@ -1,13 +1,15 @@
-<div
-  class="app-shell flex flex-col min-h-screen bg-surface-alt text-text overflow-x-hidden">
+<div class="app-shell flex flex-col min-h-screen bg-surface-alt text-text overflow-x-hidden">
   <!-- Top bar -->
   <header
-    class="flex flex-wrap justify-between items-center gap-2 px-3 md:px-4 py-2 bg-chrome text-chrome-text-bright shadow border-b border-chrome-border">
+    class="flex flex-wrap justify-between items-center gap-2 px-3 md:px-4 py-2 bg-chrome text-chrome-text-bright shadow border-b border-chrome-border"
+  >
     <div class="flex items-center justify-center align-middle gap-3">
-      <button (click)="toggleSidebar()"
+      <button
+        (click)="toggleSidebar()"
         class="p-1.5 rounded hover:bg-chrome-hover text-chrome-text transition-colors focus:outline-none"
-        [title]="isSidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
-        <i-lucide name="menu" class="w-5 h-5"></i-lucide>
+        [title]="isSidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+      >
+        <span nz-icon nzType="menu" nzTheme="outline" class="w-5 h-5"></span>
       </button>
       <a routerLink="/" class="flex items-center justify-center align-middle gap-2 shrink-0">
         <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-chrome-hover">
@@ -20,20 +22,30 @@
     </div>
 
     <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-      <button (click)="toggleTheme()"
-        class="p-[0.35rem] border rounded text-xs bg-chrome-hover text-chrome-text border-chrome-active cursor-pointer hover:bg-chrome-active hover:text-chrome-text-bright transition-colors"
-        [title]="isDarkTheme() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+      <button
+        (click)="toggleTheme()"
+        class="p-0.5 flex items-center justify-center border rounded text-xs bg-chrome-hover text-chrome-text border-chrome-active cursor-pointer hover:bg-chrome-active hover:text-chrome-text-bright transition-colors"
+        [title]="isDarkTheme() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+      >
         @if (isDarkTheme()) {
-        <i-lucide name="sun" class="w-[1.15rem] h-[1.15rem]"></i-lucide>
+          <span nz-icon nzType="sun" nzTheme="outline" class="w-[1.15rem] h-[1.15rem]"></span>
         } @else {
-        <i-lucide name="moon" class="w-[1.15rem] h-[1.15rem]"></i-lucide>
+          <span nz-icon nzType="moon" nzTheme="outline" class="w-[1.15rem] h-[1.15rem]"></span>
         }
       </button>
       @if (this.auth.isLoggedIn) {
-      <i-lucide name="log-out" class="w-6 h-6 text-chrome-text-bright"></i-lucide>
-      <button (click)="logout()" class="underline text-lg cursor-pointer text-chrome-text-bright hover:text-white transition-colors">
-        {{ 'MENU.LOGOUT' | translate }}
-      </button>
+        <span
+          nz-icon
+          nzType="logout"
+          nzTheme="outline"
+          class="w-6 h-6 text-chrome-text-bright"
+        ></span>
+        <button
+          (click)="logout()"
+          class="underline text-lg cursor-pointer text-chrome-text-bright hover:text-white transition-colors"
+        >
+          {{ 'MENU.LOGOUT' | translate }}
+        </button>
       }
     </div>
   </header>
@@ -41,211 +53,496 @@
   <!-- Sidebar + Content -->
   <div class="app-shell-main flex grow min-h-0">
     @if (this.auth.isLoggedIn) {
-    <aside
-      class="app-shell-sidebar bg-chrome text-chrome-text-bright py-4 flex flex-col relative transition-all duration-300 ease-in-out border-r border-chrome-border space-y-1 overflow-x-hidden"
-      [style.width.px]="isSidebarCollapsed() ? 64 : sidebarWidth()" [class.transition-none]="isResizing()">
+      <aside
+        class="app-shell-sidebar bg-chrome text-chrome-text-bright py-4 flex flex-col relative transition-all duration-300 ease-in-out border-r border-chrome-border space-y-1 overflow-x-hidden"
+        [style.width.px]="isSidebarCollapsed() ? 64 : sidebarWidth()"
+        [class.transition-none]="isResizing()"
+      >
+        @if (!isSidebarCollapsed()) {
+          <div
+            class="absolute right-0 top-0 bottom-0 w-1 hover:w-1.5 bg-transparent hover:bg-accent cursor-col-resize z-10 transition-all opacity-0 hover:opacity-100"
+            (mousedown)="startResizing($event)"
+          ></div>
+        }
 
-      @if (!isSidebarCollapsed()) {
-      <div
-        class="absolute right-0 top-0 bottom-0 w-1 hover:w-1.5 bg-transparent hover:bg-accent cursor-col-resize z-10 transition-all opacity-0 hover:opacity-100"
-        (mousedown)="startResizing($event)"></div>
-      }
+        @if (currentMenu() === 'main') {
+          <div
+            class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-2 mb-2"
+            [class.opacity-0]="isSidebarCollapsed()"
+          >
+            Home
+          </div>
+          <!-- Dashboard -->
+          <a
+            routerLink="/dashboard"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+          >
+            <span
+              nz-icon
+              nzType="dashboard"
+              nzTheme="outline"
+              class="shrink-0"
+              style="font-size: 20px"
+            ></span>
+            <span
+              class="truncate whitespace-nowrap transition-opacity duration-300"
+              [class.opacity-0]="isSidebarCollapsed()"
+              [class.w-0]="isSidebarCollapsed()"
+            >
+              {{ 'MENU.DASHBOARD' | translate }}
+            </span></a
+          >
 
-      @if (currentMenu() === 'main') {
-      <div
-        class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-2 mb-2"
-        [class.opacity-0]="isSidebarCollapsed()">Home</div>
-      <!-- Dashboard -->
-      <a routerLink="/dashboard" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <i-lucide name="layout-dashboard" class="w-6 h-6 shrink-0"></i-lucide>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">
-          {{ 'MENU.DASHBOARD' | translate }}
-        </span></a>
+          <hr class="border-chrome-border my-2" />
+          <div
+            class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2"
+            [class.opacity-0]="isSidebarCollapsed()"
+          >
+            Transactions
+          </div>
 
-      <hr class="border-chrome-border my-2" />
-      <div
-        class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2"
-        [class.opacity-0]="isSidebarCollapsed()">Transactions</div>
+          <!-- Sales -->
+          @if (permissions.canRead('sales-invoices')) {
+            <a
+              routerLink="/sales-invoices"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            >
+              <svg
+                class="w-6 h-6 shrink-0"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11"
+                />
+              </svg>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >Sales</span
+              ></a
+            >
+          }
 
-      <!-- Sales -->
-      @if (permissions.canRead('sales-invoices')) {
-      <a routerLink="/sales-invoices" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11" />
-        </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Sales</span></a>
-      }
+          <!-- Opening Stock -->
+          @if (permissions.canRead('stock-invoices')) {
+            <a
+              routerLink="/stock-invoices"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            >
+              <span
+                nz-icon
+                nzType="inbox"
+                nzTheme="outline"
+                class="shrink-0"
+                style="font-size: 20px"
+              ></span>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >Opening Stock</span
+              ></a
+            >
+          }
 
-      <!-- Opening Stock -->
-      @if (permissions.canRead('stock-invoices')) {
-      <a routerLink="/stock-invoices" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <i-lucide name="package" class="w-6 h-6 shrink-0"></i-lucide>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Opening Stock</span></a>
-      }
+          <!-- Purchase Invoices -->
+          @if (permissions.canRead('purchase-invoices')) {
+            <a
+              routerLink="/purchase-invoices"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            >
+              <svg
+                class="w-6 h-6 shrink-0"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11"
+                />
+              </svg>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >Purchase</span
+              ></a
+            >
+          }
 
-      <!-- Purchase Invoices -->
-      @if (permissions.canRead('purchase-invoices')) {
-      <a routerLink="/purchase-invoices" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11" />
-        </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Purchase</span></a>
-      }
+          <hr class="border-chrome-border my-2" />
+          <div
+            class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2"
+            [class.opacity-0]="isSidebarCollapsed()"
+          >
+            Masters
+          </div>
 
-      <hr class="border-chrome-border my-2" />
-      <div
-        class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2"
-        [class.opacity-0]="isSidebarCollapsed()">Masters</div>
+          <!-- Products -->
+          @if (permissions.canRead('products')) {
+            <a
+              routerLink="/products"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            >
+              <span
+                nz-icon
+                nzType="appstore"
+                nzTheme="outline"
+                class="shrink-0"
+                style="font-size: 20px"
+              ></span>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >{{ 'MENU.PRODUCTS' | translate }}</span
+              ></a
+            >
+          }
 
-      <!-- Products -->
-      @if (permissions.canRead('products')) {
-      <a routerLink="/products" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <i-lucide name="layers" class="w-6 h-6 shrink-0"></i-lucide>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.PRODUCTS' | translate }}</span></a>
-      }
+          <!-- Customers -->
+          @if (permissions.canRead('customers')) {
+            <a
+              routerLink="/customers"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            >
+              <svg
+                class="w-6 h-6 shrink-0"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                />
+              </svg>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >{{ 'MENU.CUSTOMERS' | translate }}</span
+              ></a
+            >
+          }
 
-      <!-- Customers -->
-      @if (permissions.canRead('customers')) {
-      <a routerLink="/customers" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
-        </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.CUSTOMERS' | translate }}</span></a>
-      }
+          <!-- Suppliers -->
+          @if (permissions.canRead('suppliers')) {
+            <a
+              routerLink="/suppliers"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            >
+              <svg
+                class="w-6 h-6 shrink-0"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                />
+              </svg>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >{{ 'MENU.SUPPLIERS' | translate }}</span
+              ></a
+            >
+          }
 
-      <!-- Suppliers -->
-      @if (permissions.canRead('suppliers')) {
-      <a routerLink="/suppliers" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
-        </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.SUPPLIERS' | translate }}</span></a>
-      }
+          <!-- Categories -->
+          @if (permissions.canRead('categories')) {
+            <a
+              routerLink="/categories"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            >
+              <span
+                nz-icon
+                nzType="tags"
+                nzTheme="outline"
+                class="shrink-0"
+                style="font-size: 20px"
+              ></span>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >{{ 'MENU.CATEGORIES' | translate }}</span
+              ></a
+            >
+          }
 
-      <!-- Categories -->
-      @if (permissions.canRead('categories')) {
-      <a routerLink="/categories" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <i-lucide name="tag" class="w-6 h-6 shrink-0"></i-lucide>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.CATEGORIES' | translate }}</span></a>
-      }
+          <!-- Users -->
+          @if (permissions.canRead('users')) {
+            <a
+              routerLink="/users"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            >
+              <span
+                nz-icon
+                nzType="user"
+                nzTheme="outline"
+                class="shrink-0"
+                style="font-size: 20px"
+              ></span>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >{{ 'MENU.USERS' | translate }}</span
+              ></a
+            >
+          }
 
-      <!-- Users -->
-      @if (permissions.canRead('users')) {
-      <a routerLink="/users" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <i-lucide name="user-round" class="w-6 h-6 shrink-0"></i-lucide>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">{{ 'MENU.USERS' | translate }}</span></a>
-      }
+          <hr class="border-chrome-border my-2" />
+          <!-- Reports -->
+          <button
+            (click)="switchMenu('reports')"
+            class="w-full flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden justify-between gap-2 text-left transition-colors"
+          >
+            <span class="flex items-center overflow-hidden gap-2">
+              <span
+                nz-icon
+                nzType="fund"
+                nzTheme="outline"
+                class="shrink-0"
+                style="font-size: 20px"
+              ></span>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >Reports</span
+              >
+              <span
+                nz-icon
+                nzType="right"
+                nzTheme="outline"
+                class="text-chrome-muted"
+                style="font-size: 14px"
+              ></span>
+            </span>
+          </button>
 
-      <hr class="border-chrome-border my-2" />
-      <!-- Reports -->
-      <button (click)="switchMenu('reports')"
-        class="w-full flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden justify-between gap-2 text-left transition-colors">
-        <span class="flex items-center overflow-hidden gap-2">
-          <i-lucide name="file-bar-chart" class="w-6 h-6 shrink-0"></i-lucide>
-          <span class="truncate whitespace-nowrap transition-opacity duration-300"
-            [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Reports</span>
-          <i-lucide name="chevron-right" class="w-4 h-4 text-chrome-muted"></i-lucide>
-        </span>
-      </button>
+          <hr class="border-chrome-border my-2" />
+          <!-- Settings -->
+          <a
+            routerLink="/settings"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+          >
+            <svg
+              class="w-6 h-6 shrink-0"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535 1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.707.536.535a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H20a1 1 0 0 0 1-1Z"
+              />
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+              />
+            </svg>
+            <span
+              class="truncate whitespace-nowrap transition-opacity duration-300"
+              [class.opacity-0]="isSidebarCollapsed()"
+              [class.w-0]="isSidebarCollapsed()"
+              >Settings</span
+            ></a
+          >
+        }
 
-      <hr class="border-chrome-border my-2" />
-      <!-- Settings -->
-      <a routerLink="/settings" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535 1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.707.536.535a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H20a1 1 0 0 0 1-1Z" />
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-        </svg>
-        <span class="truncate whitespace-nowrap transition-opacity duration-300"
-          [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Settings</span></a>
-      }
+        @if (currentMenu() === 'reports') {
+          <div class="mt-2 mb-4">
+            <button
+              (click)="switchMenu('main')"
+              class="flex items-center gap-2 overflow-hidden px-4 text-sm text-chrome-muted hover:text-chrome-text-bright transition-colors cursor-pointer px-2 py-1 rounded hover:bg-chrome-hover"
+            >
+              <span
+                nz-icon
+                nzType="arrow-left"
+                nzTheme="outline"
+                class="shrink-0"
+                style="font-size: 14px"
+              ></span>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >Back to Menu</span
+              >
+            </button>
+          </div>
 
-      @if (currentMenu() === 'reports') {
-      <div class="mt-2 mb-4">
-        <button (click)="switchMenu('main')"
-          class="flex items-center gap-2 overflow-hidden px-4 text-sm text-chrome-muted hover:text-chrome-text-bright transition-colors cursor-pointer px-2 py-1 rounded hover:bg-chrome-hover">
-          <i-lucide name="arrow-left" class="w-4 h-4 shrink-0"></i-lucide>
-          <span class="truncate whitespace-nowrap transition-opacity duration-300"
-            [class.opacity-0]="isSidebarCollapsed()" [class.w-0]="isSidebarCollapsed()">Back to Menu</span>
-        </button>
-      </div>
+          <div
+            class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 mb-2 flex items-center gap-2 whitespace-nowrap transition-opacity duration-300"
+            [class.opacity-0]="isSidebarCollapsed()"
+          >
+            Reports
+          </div>
 
-      <div class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 mb-2 flex items-center gap-2">
-        Reports
-      </div>
+          <a
+            routerLink="/reports/sales"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-chrome-muted transition-colors"
+          >
+            <svg
+              class="w-6 h-6 shrink-0"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10"
+              />
+            </svg>
+            <span
+              class="truncate whitespace-nowrap transition-opacity duration-300"
+              [class.opacity-0]="isSidebarCollapsed()"
+              [class.w-0]="isSidebarCollapsed()"
+              >Sales Report</span
+            >
+          </a>
 
-      <a routerLink="/reports/sales" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-chrome-muted transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10" />
-        </svg>
-        Sales Report
-      </a>
+          <a
+            routerLink="/reports/stock"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-chrome-muted transition-colors"
+          >
+            <svg
+              class="w-6 h-6 shrink-0"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10"
+              />
+            </svg>
+            <span
+              class="truncate whitespace-nowrap transition-opacity duration-300"
+              [class.opacity-0]="isSidebarCollapsed()"
+              [class.w-0]="isSidebarCollapsed()"
+              >Stock Report</span
+            >
+          </a>
 
-      <a routerLink="/reports/stock" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-chrome-muted transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10" />
-        </svg>
-        Stock Report
-      </a>
-
-      <a routerLink="/reports/tax" routerLinkActive="bg-chrome-hover font-semibold"
-        class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-chrome-muted transition-colors">
-        <svg class="w-6 h-6 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-          height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10" />
-        </svg>
-        Tax Output
-      </a>
-      }
-    </aside>
+          <a
+            routerLink="/reports/tax"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-chrome-muted transition-colors"
+          >
+            <svg
+              class="w-6 h-6 shrink-0"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10"
+              />
+            </svg>
+            <span
+              class="truncate whitespace-nowrap transition-opacity duration-300"
+              [class.opacity-0]="isSidebarCollapsed()"
+              [class.w-0]="isSidebarCollapsed()"
+              >Tax Output</span
+            >
+          </a>
+        }
+      </aside>
     }
 
     <!-- Content area -->
-    <div class="app-shell-content w-full m-2 md:m-4 p-3 md:p-4 bg-surface-raised border border-border rounded-lg">
+    <div
+      class="app-shell-content w-full m-2 md:m-4 p-3 md:p-4 bg-surface-raised border border-border rounded-lg"
+    >
       <router-outlet></router-outlet>
     </div>
   </div>
 
   <!-- Footer -->
-  <footer class="p-3 bg-chrome text-chrome-text-bright text-center text-sm border-t border-chrome-border">
-    <span>&copy; {{ today | date: 'yyyy' }}
+  <footer
+    class="p-3 bg-chrome text-chrome-text-bright text-center text-sm border-t border-chrome-border"
+  >
+    <span
+      >&copy; {{ today | date: 'yyyy' }}
       <a href="https://fandatech.net" target="_blank" class="hover:underline">FandaTech</a>.
-      {{ 'ALL_RIGHTS_RESERVED' | translate }}.</span>
+      {{ 'ALL_RIGHTS_RESERVED' | translate }}.</span
+    >
   </footer>
 </div>

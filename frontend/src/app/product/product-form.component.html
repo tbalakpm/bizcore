@@ -1,143 +1,224 @@
 @if (error) {
-  <div class="error-banner">{{ error }}</div>
+  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-3"></nz-alert>
 }
 
-<form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
-  <div>
-    <label class="label-base">{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</label>
-    <input type="text" [(ngModel)]="product.code" name="productCode" class="input-base" autofocus />
-  </div>
-  <div>
-    <label class="label-base">{{ 'PRODUCT.TITLE' | translate }} {{ 'NAME' | translate }}</label>
-    <input type="text" [(ngModel)]="product.name" name="productName" class="input-base" />
-  </div>
-  <div>
-    <label class="label-base">{{ 'DESCRIPTION' | translate }}</label>
-    <textarea
-      rows="1"
-      [(ngModel)]="product.description"
-      name="productDescription"
-      class="input-base"
-    ></textarea>
-  </div>
-  <div>
-    <label class="label-base">{{ 'CATEGORY.TITLE' | translate }}</label>
-    <select [(ngModel)]="product.categoryId" name="productCategory" class="select-base">
-      @for (c of categories(); track c.id) {
-        <option [ngValue]="c.id">{{ c.name }}</option>
-      }
-    </select>
-  </div>
-  <div>
-    <label class="label-base">Qty Per Unit</label>
-    <input
-      type="text"
-      [(ngModel)]="product.qtyPerUnit"
-      name="productQtyPerUnit"
-      class="input-base"
-    />
-  </div>
-  <div>
-    <label class="label-base">Unit Price</label>
-    <input
-      type="number"
-      step="1.00"
-      [(ngModel)]="product.unitPrice"
-      name="productUnitPrice"
-      class="input-base"
-    />
-  </div>
-  <div>
-    <label class="label-base">HSN/SAC</label>
-    <input type="text" [(ngModel)]="product.hsnSac" name="productHsnSac" class="input-base" />
-  </div>
-  <div>
-    <label class="label-base">Tax Rate</label>
-    <input
-      type="number"
-      step="0.01"
-      [(ngModel)]="product.taxRate"
-      name="productTaxRate"
-      class="input-base"
-    />
-  </div>
-
-  <!-- GTN Setup -->
-  <div class="col-span-full border-t border-border mt-2 mb-1 pt-2">
-    <h3 class="font-medium text-text-heading">Goods Tracking Number (GTN) Setup</h3>
-  </div>
-
-  <div class="col-span-2">
-    <label class="label-base">GTN Mode</label>
-    <select [(ngModel)]="product.gtnMode" name="productGtnMode" class="select-base">
-      <option value="auto">Auto (System Generated)</option>
-      <option value="manual">Manual (User Provided)</option>
-    </select>
-    <p class="text-xs text-text-muted mt-0.5">
-      @if (product.gtnMode === 'manual') {
-        GTN will be entered manually during transactions.
-      } @else {
-        GTN will be auto-generated based on the method below.
-      }
-    </p>
-  </div>
-
-  @if (!product.gtnMode || product.gtnMode === 'auto') {
-    <div class="col-span-2">
-      <label class="label-base">GTN Generation</label>
-      <select [(ngModel)]="product.gtnGeneration" name="productGtnGeneration" class="select-base">
-        <option value="code">Product Code (default)</option>
-        <option value="batch">Batch Level (same GTN per lot)</option>
-        <option value="tag">Tag Level (unique GTN per item)</option>
-      </select>
+<form nz-form (ngSubmit)="onSubmit()" nzLayout="vertical">
+  <div class="grid grid-cols-12 gap-2">
+    <div class="col-span-12 md:col-span-6 xl:col-span-3">
+      <nz-form-item>
+        <nz-form-label>{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            type="text"
+            [(ngModel)]="product.code"
+            name="productCode"
+            autofocus
+            placeholder="e.g. PRD-001"
+          />
+        </nz-form-control>
+      </nz-form-item>
     </div>
-  }
+    <div class="col-span-12 md:col-span-6 xl:col-span-3">
+      <nz-form-item>
+        <nz-form-label>{{ 'PRODUCT.TITLE' | translate }} {{ 'NAME' | translate }}</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            type="text"
+            [(ngModel)]="product.name"
+            name="productName"
+            placeholder="Product name"
+          />
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="col-span-12 md:col-span-6 xl:col-span-3">
+      <nz-form-item>
+        <nz-form-label>{{ 'DESCRIPTION' | translate }}</nz-form-label>
+        <nz-form-control>
+          <textarea
+            nz-input
+            rows="1"
+            [(ngModel)]="product.description"
+            name="productDescription"
+            placeholder="Brief description (optional)"
+          ></textarea>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="col-span-12 md:col-span-6 xl:col-span-3">
+      <nz-form-item>
+        <nz-form-label>{{ 'CATEGORY.TITLE' | translate }}</nz-form-label>
+        <nz-form-control>
+          <nz-select
+            [(ngModel)]="product.categoryId"
+            name="productCategory"
+            nzPlaceHolder="Select category"
+            nzAllowClear
+          >
+            @for (c of categories(); track c.id) {
+              <nz-option [nzValue]="c.id" [nzLabel]="c.name"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="col-span-12 md:col-span-6 xl:col-span-3">
+      <nz-form-item>
+        <nz-form-label>Qty Per Unit</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            type="text"
+            [(ngModel)]="product.qtyPerUnit"
+            name="productQtyPerUnit"
+            placeholder="e.g. 1 box = 12 pcs"
+          />
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="col-span-12 md:col-span-6 xl:col-span-3">
+      <nz-form-item>
+        <nz-form-label>Unit Price</nz-form-label>
+        <nz-form-control>
+          <nz-input-number
+            [(ngModel)]="product.unitPrice"
+            name="productUnitPrice"
+            [nzStep]="1"
+            [nzPrecision]="2"
+            class="w-full"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="col-span-12 md:col-span-6 xl:col-span-3">
+      <nz-form-item>
+        <nz-form-label>HSN/SAC</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            type="text"
+            [(ngModel)]="product.hsnSac"
+            name="productHsnSac"
+            placeholder="e.g. 8471"
+          />
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="col-span-12 md:col-span-6 xl:col-span-3">
+      <nz-form-item>
+        <nz-form-label>Tax Rate</nz-form-label>
+        <nz-form-control>
+          <nz-input-number
+            [(ngModel)]="product.taxRate"
+            name="productTaxRate"
+            [nzStep]="0.01"
+            [nzPrecision]="2"
+            class="w-full"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
 
-  @if (
-    product.gtnMode !== 'manual' &&
-    (product.gtnGeneration === 'batch' || product.gtnGeneration === 'tag')
-  ) {
-    <div>
-      <label class="label-base">Batch/Tag Prefix</label>
-      <input
-        type="text"
-        [(ngModel)]="product.gtnPrefix"
-        name="productGtnPrefix"
-        class="input-base"
-        placeholder="e.g. BATCH- or TAG-"
-      />
+    <!-- GTN Setup -->
+    <div class="col-span-12">
+      <div class="border-t border-surface-muted mt-2 mb-1 pt-2">
+        <h3 class="font-medium">Goods Tracking Number (GTN) Setup</h3>
+      </div>
     </div>
-    <div>
-      <label class="label-base">Start Sequence</label>
-      <input
-        type="number"
-        step="1"
-        [(ngModel)]="product.gtnStartPos"
-        name="productGtnStartPos"
-        class="input-base"
-        placeholder="1"
-      />
-    </div>
-    <div>
-      <label class="label-base">GTN Length</label>
-      <input
-        type="number"
-        step="1"
-        [(ngModel)]="product.gtnLength"
-        name="productGtnLength"
-        class="input-base"
-        placeholder="10"
-      />
-    </div>
-  }
 
-  <!-- Actions -->
-  <div class="gap-4 md:col-span-2 xl:col-start-4 xl:col-span-1 flex items-end">
-    <button type="submit" [disabled]="loading" class="btn-primary w-full">
-      {{ productId ? ('SAVE' | translate) : ('ADD' | translate) }}
-    </button>
-    <button type="button" (click)="onCancel()" class="btn-outline w-full">
-      {{ 'CANCEL' | translate }}
-    </button>
+    <div class="col-span-12 md:col-span-6">
+      <nz-form-item>
+        <nz-form-label>GTN Mode</nz-form-label>
+        <nz-form-control>
+          <nz-select [(ngModel)]="product.gtnMode" name="productGtnMode">
+            <nz-option nzValue="auto" nzLabel="Auto (System Generated)"></nz-option>
+            <nz-option nzValue="manual" nzLabel="Manual (User Provided)"></nz-option>
+          </nz-select>
+        </nz-form-control>
+        <p class="text-xs text-text-muted mt-1 mb-0!">
+          @if (product.gtnMode === 'manual') {
+            GTN will be entered manually during transactions.
+          } @else {
+            GTN will be auto-generated based on the method below.
+          }
+        </p>
+      </nz-form-item>
+    </div>
+
+    @if (!product.gtnMode || product.gtnMode === 'auto') {
+      <div class="col-span-12 md:col-span-6">
+        <nz-form-item>
+          <nz-form-label>GTN Generation</nz-form-label>
+          <nz-form-control>
+            <nz-select [(ngModel)]="product.gtnGeneration" name="productGtnGeneration">
+              <nz-option nzValue="code" nzLabel="Product Code (default)"></nz-option>
+              <nz-option nzValue="batch" nzLabel="Batch Level (same GTN per lot)"></nz-option>
+              <nz-option nzValue="tag" nzLabel="Tag Level (unique GTN per item)"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    }
+
+    @if (
+      product.gtnMode !== 'manual' &&
+      (product.gtnGeneration === 'batch' || product.gtnGeneration === 'tag')
+    ) {
+      <div class="col-span-12 md:col-span-4">
+        <nz-form-item>
+          <nz-form-label>Batch/Tag Prefix</nz-form-label>
+          <nz-form-control>
+            <input
+              nz-input
+              type="text"
+              [(ngModel)]="product.gtnPrefix"
+              name="productGtnPrefix"
+              placeholder="e.g. BATCH- or TAG-"
+            />
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div class="col-span-12 md:col-span-4">
+        <nz-form-item>
+          <nz-form-label>Start Sequence</nz-form-label>
+          <nz-form-control>
+            <nz-input-number
+              [(ngModel)]="product.gtnStartPos"
+              name="productGtnStartPos"
+              [nzStep]="1"
+              nzPlaceHolder="1"
+              class="w-full"
+            ></nz-input-number>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div class="col-span-12 md:col-span-4">
+        <nz-form-item>
+          <nz-form-label>GTN Length</nz-form-label>
+          <nz-form-control>
+            <nz-input-number
+              [(ngModel)]="product.gtnLength"
+              name="productGtnLength"
+              [nzStep]="1"
+              nzPlaceHolder="10"
+              class="w-full"
+            ></nz-input-number>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    }
+
+    <!-- Actions -->
+    <div class="flex gap-3">
+      <button nz-button nzType="primary" type="submit" [disabled]="loading">
+        <span nz-icon nzType="save" nzTheme="outline"></span>
+        {{ productId ? ('SAVE' | translate) : ('ADD' | translate) }}
+      </button>
+      <button nz-button nzType="default" type="button" (click)="onCancel()">
+        {{ 'CANCEL' | translate }}
+      </button>
+    </div>
   </div>
 </form>

@@ -4,11 +4,16 @@ import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from './auth-service';
 
-import { LucideAngularModule } from 'lucide-angular';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 @Component({
   selector: 'app-login',
-  imports: [TranslatePipe, FormsModule, ReactiveFormsModule, LucideAngularModule],
+  imports: [TranslatePipe, FormsModule, ReactiveFormsModule, NzCardModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzAlertModule],
   templateUrl: './login.html',
 })
 export class Login {

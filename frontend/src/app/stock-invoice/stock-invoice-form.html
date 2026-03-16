@@ -1,46 +1,27 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="page-title">
-    <svg
-      class="w-7 h-7"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M8 20V10m8 10V4M4 20h16"
-      />
-    </svg>
+  <h1 class="text-xl font-semibold flex items-center gap-2">
+    <span nz-icon nzType="inbox" nzTheme="outline" class="text-2xl"></span>
     {{ isEditMode ? 'Edit' : 'Create' }} Opening Stock
   </h1>
   <div class="flex gap-2 items-center">
-    <a routerLink="/stock-invoices" class="btn-outline">Back to List</a>
-    <button
-      type="submit"
-      (click)="onSubmit()"
-      [disabled]="submitting"
-      class="btn-primary sm:ml-auto"
-    >
+    <a routerLink="/stock-invoices" nz-button nzType="default">Back to List</a>
+    <button nz-button nzType="primary" (click)="onSubmit()" [disabled]="submitting">
       {{ submitting ? 'Saving...' : 'Save Invoice' }}
     </button>
   </div>
 </div>
 
-<div class="card">
+<nz-card>
   @if (error) {
-    <div class="error-banner">{{ error }}</div>
+    <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
   }
+
   <form (ngSubmit)="onSubmit()" class="space-y-3">
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
       <div>
-        <label class="label-base">Invoice Number</label>
+        <label class="block text-sm font-medium mb-1">Invoice Number</label>
         <input
+          nz-input
           type="text"
           [(ngModel)]="editingInvoice.invoiceNumber"
           name="invoiceNumber"
@@ -49,18 +30,20 @@
         />
       </div>
       <div>
-        <label class="label-base">Invoice Date</label>
-        <input
-          type="date"
-          [(ngModel)]="editingInvoice.invoiceDate"
+        <label class="block text-sm font-medium mb-1">Invoice Date</label>
+        <nz-date-picker
+          [ngModel]="invoiceDateValue"
+          (ngModelChange)="onInvoiceDateChange($event)"
           name="invoiceDate"
-          class="input-base"
-        />
+          nzFormat="yyyy-MM-dd"
+          class="w-full"
+        ></nz-date-picker>
       </div>
       <div class="flex items-end justify-end md:col-span-2 xl:col-span-2">
         <button
+          nz-button
+          nzType="default"
           type="button"
-          class="btn-outline"
           (click)="showNewProductForm = !showNewProductForm"
         >
           {{ showNewProductForm ? 'Hide Product Form' : 'Create New Product' }}
@@ -69,7 +52,7 @@
     </div>
 
     @if (showNewProductForm) {
-      <div class="bg-surface-muted p-3 rounded-lg border border-border">
+      <nz-card nzSize="small" class="mb-2">
         <p class="text-sm font-medium text-text-muted mb-2">
           New Product — will be auto-selected in the active row
         </p>
@@ -77,126 +60,142 @@
           (saved)="onNewProductSaved($event)"
           (cancelled)="showNewProductForm = false"
         />
-      </div>
+      </nz-card>
     }
 
-    <div class="overflow-auto border border-border rounded-lg">
-      <table class="table-base">
-        <thead class="table-head">
+    <nz-table
+      #itemsTable
+      [nzData]="editingInvoice.items"
+      nzSize="small"
+      [nzBordered]="true"
+      [nzShowPagination]="false"
+      [nzFrontPagination]="false"
+    >
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th nzWidth="150px">GTN</th>
+          <th nzWidth="120px">HSN/SAC</th>
+          <th nzWidth="100px">Tax Rate</th>
+          <th nzWidth="100px">Qty</th>
+          <th nzWidth="120px">Unit Price</th>
+          <th nzWidth="120px">Line Total</th>
+          <th class="text-right" nzWidth="80px">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of editingInvoice.items; track $index; let i = $index) {
           <tr>
-            <th class="th-cell">Product</th>
-            <th class="th-cell w-40">GTN</th>
-            <th class="th-cell w-32">HSN/SAC</th>
-            <th class="th-cell w-28">Tax Rate</th>
-            <th class="th-cell w-28">Qty</th>
-            <th class="th-cell w-32">Unit Price</th>
-            <th class="th-cell w-32">Line Total</th>
-            <th class="th-cell text-right w-28">Actions</th>
+            <td>
+              <nz-select
+                #itemRowSelect
+                [(ngModel)]="item.productId"
+                [name]="'itemProduct' + i"
+                (ngModelChange)="onProductSelect(item)"
+                (nzFocus)="selectedRowIndex = i"
+                [nzShowSearch]="true"
+                nzAllowClear
+                nzPlaceHolder="-- Select Product --"
+                class="w-full"
+                [nzDropdownRender]="addProductTpl"
+                [nzOptionOverflowSize]="6"
+                [nzDropdownMatchSelectWidth]="false"
+                [nzDropdownStyle]="{ 'min-width': '400px' }"
+              >
+                @for (p of products(); track p.id) {
+                  <nz-option [nzValue]="p.id" [nzLabel]="p.code + ' - ' + p.name" nzCustomContent>
+                    <div class="font-medium">{{ p.code }} - {{ p.name }}</div>
+                  </nz-option>
+                }
+              </nz-select>
+              <ng-template #addProductTpl>
+                <div class="px-2 py-1 border-t">
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    type="button"
+                    (click)="showNewProductForm = true"
+                  >
+                    <span nz-icon nzType="plus" nzTheme="outline"></span> Create New Product
+                  </button>
+                </div>
+              </ng-template>
+            </td>
+            <td class="!px-2 !py-2">
+              <input
+                nz-input
+                type="text"
+                [(ngModel)]="item.gtn"
+                [name]="'itemGtn' + i"
+                placeholder="Auto-generate"
+              />
+            </td>
+            <td class="!px-2 !py-2">
+              <input nz-input type="text" [(ngModel)]="item.hsnSac" [name]="'itemHsnSac' + i" />
+            </td>
+            <td class="!px-2 !py-2">
+              <nz-input-number
+                [(ngModel)]="item.taxRate"
+                [name]="'itemTaxRate' + i"
+                [nzStep]="0.01"
+                [nzMin]="0"
+                class="w-full"
+              ></nz-input-number>
+            </td>
+            <td class="!px-2 !py-2">
+              <nz-input-number
+                [(ngModel)]="item.qty"
+                (ngModelChange)="onItemChanged(item)"
+                [name]="'itemQty' + i"
+                [nzStep]="1"
+                [nzMin]="1"
+                class="w-full"
+              ></nz-input-number>
+            </td>
+            <td class="!px-2 !py-2">
+              <nz-input-number
+                [(ngModel)]="item.unitPrice"
+                (ngModelChange)="onItemChanged(item)"
+                [name]="'itemPrice' + i"
+                [nzStep]="0.01"
+                [nzMin]="0"
+                [nzPrecision]="2"
+                class="w-full"
+              ></nz-input-number>
+            </td>
+            <td class="text-right font-medium !px-2 !py-2">
+              {{ item.lineTotal | number: '1.2-2' }}
+            </td>
+            <td class="text-right !px-2 !py-2">
+              <button
+                nz-button
+                nzType="link"
+                nzDanger
+                nzSize="small"
+                nz-tooltip
+                nzTooltipTitle="Remove item"
+                type="button"
+                (click)="removeItemRow(i)"
+                [disabled]="editingInvoice.items.length <= 1"
+              >
+                <span nz-icon nzType="delete" nzTheme="outline"></span>
+              </button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @for (item of editingInvoice.items; track $index; let i = $index) {
-            <tr class="table-row">
-              <td class="td-cell">
-                <ng-select
-                  #itemRowSelect
-                  [items]="products()"
-                  bindLabel="name"
-                  bindValue="id"
-                  [(ngModel)]="item.productId"
-                  appendTo="body"
-                  (change)="onProductSelect(item)"
-                  (focus)="selectedRowIndex = i"
-                  [name]="'itemProduct' + i"
-                  [searchable]="true"
-                  [clearable]="true"
-                  placeholder="-- Select Product --"
-                  class="w-full text-sm"
-                >
-                  <ng-template ng-label-tmp let-item="item">
-                    {{ item.code }} - {{ item.name }}
-                  </ng-template>
-                  <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-                    {{ item.code }} - {{ item.name }}
-                  </ng-template>
-                </ng-select>
-              </td>
-              <td class="td-cell">
-                <input
-                  type="text"
-                  [(ngModel)]="item.gtn"
-                  [name]="'itemGtn' + i"
-                  placeholder="Auto-generate"
-                  class="input-base"
-                />
-              </td>
-              <td class="td-cell">
-                <input
-                  type="text"
-                  [(ngModel)]="item.hsnSac"
-                  [name]="'itemHsnSac' + i"
-                  class="input-base"
-                />
-              </td>
-              <td class="td-cell">
-                <input
-                  type="number"
-                  step="0.01"
-                  [(ngModel)]="item.taxRate"
-                  [name]="'itemTaxRate' + i"
-                  class="input-base"
-                />
-              </td>
-              <td class="td-cell">
-                <input
-                  type="number"
-                  min="1"
-                  [(ngModel)]="item.qty"
-                  (ngModelChange)="onItemChanged(item)"
-                  [name]="'itemQty' + i"
-                  class="input-base"
-                />
-              </td>
-              <td class="td-cell">
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  [(ngModel)]="item.unitPrice"
-                  (ngModelChange)="onItemChanged(item)"
-                  [name]="'itemPrice' + i"
-                  class="input-base"
-                />
-              </td>
-              <td class="td-cell">{{ item.lineTotal }}</td>
-              <td class="td-cell text-right">
-                <button
-                  type="button"
-                  class="btn-link-danger"
-                  appTooltip="Remove item"
-                  (click)="removeItemRow(i)"
-                >
-                  <i-lucide name="trash-2" [size]="18"></i-lucide>
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-      <div class="bg-surface-muted px-4 py-3 border-t border-border">
-        <button
-          type="button"
-          class="text-accent hover:text-accent-hover font-medium text-sm flex items-center gap-1 transition"
-          (click)="addItemRow()"
-        >
-          <i-lucide name="plus" [size]="16"></i-lucide>
-          Add Line Item
-        </button>
-      </div>
+        }
+      </tbody>
+    </nz-table>
+
+    <div class="mb-4">
+      <button nz-button nzType="dashed" (click)="addItemRow()" type="button">
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        Add Line Item
+      </button>
     </div>
 
     @if (error) {
-      <p class="text-danger text-xs">{{ error }}</p>
+      <p class="text-xs" style="color: var(--color-danger)">{{ error }}</p>
     }
   </form>
-</div>
+</nz-card>

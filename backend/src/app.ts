@@ -1,27 +1,27 @@
-import path from 'node:path';
-import cors from 'cors';
-import express, { type Request, type Response } from 'express';
-import { i18nMiddleware } from './middleware/i18n';
+import path from "node:path";
+import cors from "cors";
+import express, { type Request, type Response } from "express";
+import { i18nMiddleware } from "./middleware/i18n";
 
-import { config } from './config';
-import { initializeDatabase, migrateDatabase } from './db';
-import { createAdminUser } from './db/seed/admin-user.seed';
+import { config } from "./config";
+import { initializeDatabase, migrateDatabase } from "./db";
+import { createAdminUser } from "./db/seed/admin-user.seed";
 
-import { authRouter } from './routes/auth';
-import { categoriesRouter } from './routes/categories';
-import { authRequired, requireRole } from './middleware/auth';
-import { usersRouter } from './routes/users';
-import { productsRouter } from './routes/products';
-import { customersRouter } from './routes/customers';
-import { logger } from './middleware/logger';
-import { suppliersRouter } from './routes/suppliers';
-import { inventoriesRouter } from './routes/inventories';
-import { settingsRouter } from './routes/settings';
-import { invoicesRouter } from './routes/invoices';
-import { serialNumbersRouter } from './routes/serial-numbers';
-import { stockInvoicesRouter } from './routes/stock-invoices';
-import { salesInvoicesRouter } from './routes/sales-invoices';
-import { purchaseInvoicesRouter } from './routes/purchase-invoices';
+import { authRouter } from "./routes/auth";
+import { categoriesRouter } from "./routes/categories";
+import { authRequired, requireRole } from "./middleware/auth";
+import { usersRouter } from "./routes/users";
+import { productsRouter } from "./routes/products";
+import { customersRouter } from "./routes/customers";
+import { logger } from "./middleware/logger";
+import { suppliersRouter } from "./routes/suppliers";
+import { inventoriesRouter } from "./routes/inventories";
+import { settingsRouter } from "./routes/settings";
+import { invoicesRouter } from "./routes/invoices";
+import { serialNumbersRouter } from "./routes/serial-numbers";
+import { stockInvoicesRouter } from "./routes/stock-invoices";
+import { salesInvoicesRouter } from "./routes/sales-invoices";
+import { purchaseInvoicesRouter } from "./routes/purchase-invoices";
 
 export async function app() {
   console.log(`Environment: ${config.environment}`);
@@ -35,8 +35,8 @@ export async function app() {
   app.use(
     cors({
       origin: config.corsOrigins,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'Accept-Language'],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "Accept-Language"],
     }),
   );
   app.use(express.json());
@@ -46,32 +46,36 @@ export async function app() {
 
   // Serve the static files from the Angular dist directory
   // Replace 'my-angular-app' with your actual project name from the dist folder
-  app.use(express.static(path.join(__dirname, '/public')));
+  app.use(express.static(path.join(__dirname, "/public")));
 
-  app.get('/api/health', (req: Request, res: Response): void => {
-    res.json({ status: 'ok', username: req.user?.username || '', lang: req.i18n?.lang || 'en' });
+  app.get("/api/health", (req: Request, res: Response): void => {
+    res.json({
+      status: "ok",
+      username: req.user?.username || "",
+      lang: req.i18n?.lang || "en",
+    });
   });
-  app.use('/api/auth', authRouter);
-  app.use('/api/users', authRequired, requireRole('admin'), usersRouter);
-  app.use('/api/categories', authRequired, categoriesRouter);
-  app.use('/api/products', authRequired, productsRouter);
-  app.use('/api/customers', authRequired, customersRouter);
-  app.use('/api/suppliers', authRequired, suppliersRouter);
-  app.use('/api/inventories', authRequired, inventoriesRouter);
-  app.use('/api/settings', authRequired, requireRole('admin'), settingsRouter);
-  app.use('/api/invoices', authRequired, invoicesRouter);
-  app.use('/api/stock-invoices', authRequired, stockInvoicesRouter);
-  app.use('/api/sales-invoices', authRequired, salesInvoicesRouter);
-  app.use('/api/purchase-invoices', authRequired, purchaseInvoicesRouter);
-  app.use('/api/serial-numbers', authRequired, serialNumbersRouter);
+  app.use("/api/auth", authRouter);
+  app.use("/api/users", authRequired, requireRole("admin"), usersRouter);
+  app.use("/api/categories", authRequired, categoriesRouter);
+  app.use("/api/products", authRequired, productsRouter);
+  app.use("/api/customers", authRequired, customersRouter);
+  app.use("/api/suppliers", authRequired, suppliersRouter);
+  app.use("/api/inventories", authRequired, inventoriesRouter);
+  app.use("/api/settings", authRequired, requireRole("admin"), settingsRouter);
+  app.use("/api/invoices", authRequired, invoicesRouter);
+  app.use("/api/stock-invoices", authRequired, stockInvoicesRouter);
+  app.use("/api/sales-invoices", authRequired, salesInvoicesRouter);
+  app.use("/api/purchase-invoices", authRequired, purchaseInvoicesRouter);
+  app.use("/api/serial-numbers", authRequired, serialNumbersRouter);
 
   // Handle any requests that don't match the static files by serving the index.html file
-  app.get('/{*any}', (req, res, next) => {
-    if (req.url.startsWith('/api')) {
+  app.get("/{*any}", (req, res, next) => {
+    if (req.url.startsWith("/api")) {
       return res.status(404).json({ message: `Url '${req.url}' not found` });
     }
 
-    res.sendFile(path.join(__dirname, '/public/index.html'), (err) => {
+    res.sendFile(path.join(__dirname, "/public/index.html"), (err) => {
       if (err) {
         next(err);
       }

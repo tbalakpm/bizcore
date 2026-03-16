@@ -1,137 +1,224 @@
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-  <h1 class="page-title">
-    <i-lucide name="receipt-text" class="w-7 h-7"></i-lucide>
+  <h1 class="text-xl font-semibold flex items-center gap-2">
+    <span nz-icon nzType="file-text" nzTheme="outline" class="text-2xl"></span>
     Sales Invoices
   </h1>
   @if (permissionService.canWrite('sales-invoices')) {
-  <a routerLink="/sales-invoices/new" class="btn-primary">New Sales Invoice</a>
+    <a routerLink="/sales-invoices/new" nz-button nzType="primary">New Sales Invoice</a>
   }
 </div>
 
-<div class="card">
+<nz-card>
   <!-- Filters Bar -->
   <div class="flex flex-col md:flex-row gap-4 mb-3" [formGroup]="filterForm">
     <div class="flex flex-wrap items-center grow gap-2">
       <span class="text-xs font-semibold uppercase tracking-wide text-text-muted">Filter</span>
 
-      <input type="text" formControlName="invoiceNumber" placeholder="Invoice number" class="input-base w-auto" />
+      <input
+        nz-input
+        type="text"
+        formControlName="invoiceNumber"
+        placeholder="Invoice number"
+        style="width: 160px"
+      />
 
-      <ng-select [items]="customers()" bindLabel="name" bindValue="id" formControlName="customerId" [searchable]="true"
-        [clearable]="true" placeholder="-- All Customers --" class="w-64 text-sm">
-        <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-          <div class="font-medium text-text-heading">{{ item.name }}</div>
-          <div class="text-xs text-text-muted">{{ item.code }}</div>
-        </ng-template>
-      </ng-select>
+      <nz-select
+        formControlName="customerId"
+        [nzShowSearch]="true"
+        nzAllowClear
+        nzPlaceHolder="-- All Customers --"
+        class="w-64"
+        [nzOptionHeightPx]="48"
+        [nzOptionOverflowSize]="6"
+      >
+        @for (c of customers(); track c.id) {
+          <nz-option [nzValue]="c.id" [nzLabel]="c.name" nzCustomContent>
+            <div class="font-medium">{{ c.name }}</div>
+            <div class="text-xs text-text-muted">{{ c.code }}</div>
+          </nz-option>
+        }
+      </nz-select>
 
-      <input type="date" formControlName="invoiceDate" class="input-base w-auto" />
-      <input type="number" formControlName="minAmount" placeholder="Min amount" class="input-base w-32" />
-      <input type="number" formControlName="maxAmount" placeholder="Max amount" class="input-base w-32" />
+      <nz-date-picker
+        [ngModel]="filterInvoiceDate"
+        (ngModelChange)="onInvoiceDateChange($event)"
+        [ngModelOptions]="{ standalone: true }"
+        nzFormat="yyyy-MM-dd"
+        nzPlaceHolder="Invoice date"
+      ></nz-date-picker>
 
-      <button type="button" class="btn-outline flex items-center gap-1" appTooltip="Clear all filters"
-        (click)="onClearFilters()">
-        <i-lucide name="filter-x" [size]="14"></i-lucide> Clear
+      <nz-input-number
+        formControlName="minAmount"
+        nzPlaceHolder="Min amount"
+        [nzStep]="1"
+        style="width: 130px"
+      ></nz-input-number>
+
+      <nz-input-number
+        formControlName="maxAmount"
+        nzPlaceHolder="Max amount"
+        [nzStep]="1"
+        style="width: 130px"
+      ></nz-input-number>
+
+      <button
+        nz-button
+        nzType="default"
+        nz-tooltip
+        nzTooltipTitle="Clear all filters"
+        (click)="onClearFilters()"
+      >
+        <span nz-icon nzType="filter" nzTheme="outline"></span> Clear
       </button>
     </div>
   </div>
 
-  <div class="overflow-x-auto border border-border rounded-lg">
-    <table class="table-base">
-      <thead class="table-head">
+  <nz-table
+    #invoiceTable
+    [nzData]="invoices()"
+    [nzLoading]="loading"
+    nzSize="small"
+    [nzBordered]="true"
+    [nzShowPagination]="false"
+    [nzFrontPagination]="false"
+  >
+    <thead>
+      <tr>
+        <th (click)="onSort('invoiceNumber')" class="cursor-pointer">
+          Invoice #
+          @if (sortColumn() === 'invoiceNumber') {
+            <span
+              nz-icon
+              [nzType]="sortDirection() === 'asc' ? 'caret-up' : 'caret-down'"
+              nzTheme="outline"
+            ></span>
+          }
+        </th>
+        <th (click)="onSort('invoiceDate')" class="cursor-pointer">
+          Date
+          @if (sortColumn() === 'invoiceDate') {
+            <span
+              nz-icon
+              [nzType]="sortDirection() === 'asc' ? 'caret-up' : 'caret-down'"
+              nzTheme="outline"
+            ></span>
+          }
+        </th>
+        <th>Customer</th>
+        <th class="text-right">Total Qty</th>
+        <th (click)="onSort('netAmount')" class="text-right cursor-pointer">
+          Net Amount
+          @if (sortColumn() === 'netAmount') {
+            <span
+              nz-icon
+              [nzType]="sortDirection() === 'asc' ? 'caret-up' : 'caret-down'"
+              nzTheme="outline"
+            ></span>
+          }
+        </th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (invoice of invoiceTable.data; track invoice.id) {
         <tr>
-          <th class="th-cell cursor-pointer hover:bg-surface-alt transition" (click)="onSort('invoiceNumber')">
-            Invoice #
-            @if (sortColumn() === 'invoiceNumber') {
-            <span>{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span>
-            }
-          </th>
-          <th class="th-cell cursor-pointer hover:bg-surface-alt transition" (click)="onSort('invoiceDate')">
-            Date
-            @if (sortColumn() === 'invoiceDate') {
-            <span>{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span>
-            }
-          </th>
-          <th class="th-cell">Customer</th>
-          <th class="th-cell text-right">Total Qty</th>
-          <th class="th-cell text-right cursor-pointer hover:bg-surface-alt transition" (click)="onSort('netAmount')">
-            Net Amount
-            @if (sortColumn() === 'netAmount') {
-            <span>{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span>
-            }
-          </th>
-          <th class="th-cell text-center">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (invoice of invoices(); track invoice.id) {
-        <tr class="table-row">
-          <td class="td-cell font-medium flex items-center gap-2">
-            {{ invoice.invoiceNumber }}
-            @if (invoice.irn) {
-            <span class="badge bg-success-light text-success">IRN</span>
-            }
+          <td class="font-medium">
+            <div class="flex items-center gap-2">
+              {{ invoice.invoiceNumber }}
+              @if (invoice.irn) {
+                <nz-tag nzColor="success">IRN</nz-tag>
+              }
+            </div>
           </td>
-          <td class="td-cell">{{ invoice.invoiceDate | date: 'mediumDate' }}</td>
-          <td class="td-cell">{{ invoice.customerName || '—' }}</td>
-          <td class="td-cell text-right">{{ invoice.totalQty }}</td>
-          <td class="td-cell text-right font-medium text-success">
+          <td>{{ invoice.invoiceDate | date: 'mediumDate' }}</td>
+          <td>{{ invoice.customerName || '—' }}</td>
+          <td class="text-right">{{ invoice.totalQty }}</td>
+          <td class="text-right font-medium" style="color: var(--color-success)">
             {{ invoice.netAmount | currency: 'INR' }}
           </td>
-          <td class="td-cell w-max">
+          <td>
             <div class="flex items-center justify-center gap-2">
               @if (!invoice.irn && permissionService.canWrite('sales-invoices')) {
-              <button type="button" class="btn-link-warning flex items-center gap-1" appTooltip="Generate IRN"
-                (click)="generateIrn(invoice.id)">
-                <i-lucide name="file-check" [size]="18"></i-lucide>
-              </button>
-              <a [routerLink]="['/sales-invoices', invoice.id, 'edit']" class="btn-link-edit flex items-center gap-1"
-                appTooltip="Edit invoice">
-                <i-lucide name="pencil" [size]="18"></i-lucide>
-              </a>
-              <button type="button" class="btn-link-danger flex items-center gap-1" appTooltip="Delete invoice"
-                (click)="deleteInvoice(invoice.id)">
-                <i-lucide name="trash-2" [size]="18"></i-lucide>
-              </button>
+                <button
+                  [routerLink]="['/sales-invoices', invoice.id, 'edit']"
+                  nz-button
+                  nzType="text"
+                  nzSize="small"
+                  nz-tooltip
+                  nzTooltipTitle="Edit invoice"
+                >
+                  <span class="text-accent!" nz-icon nzType="edit" nzTheme="outline"></span>
+                </button>
+                <button
+                  nz-button
+                  nzType="text"
+                  nzDanger
+                  nzSize="small"
+                  nz-popconfirm
+                  nzPopconfirmTitle="Are you sure you want to delete this sales invoice? This will restore the exported inventory."
+                  (nzOnConfirm)="deleteInvoice(invoice.id)"
+                  nz-tooltip
+                  nzTooltipTitle="Delete invoice"
+                >
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                </button>
+                <button
+                  nz-button
+                  nzType="text"
+                  nzSize="small"
+                  nz-tooltip
+                  nzTooltipTitle="Generate IRN"
+                  (click)="generateIrn(invoice.id)"
+                >
+                  <span
+                    class="text-yellow-400!"
+                    nz-icon
+                    nzType="file-done"
+                    nzTheme="outline"
+                  ></span>
+                </button>
               }
-              <button type="button" class="btn-link-edit flex items-center gap-1" appTooltip="Print invoice"
-                (click)="printInvoice(invoice.id)">
-                <i-lucide name="printer" [size]="18"></i-lucide>
+              <button
+                nz-button
+                nzType="text"
+                nzSize="small"
+                nz-tooltip
+                nzTooltipTitle="Print invoice"
+                style="color: var(--color-text-muted)"
+                (click)="printInvoice(invoice.id)"
+              >
+                <span class="text-accent!" nz-icon nzType="printer" nzTheme="outline"></span>
               </button>
             </div>
           </td>
         </tr>
-        }
-        @if (!invoices().length) {
+      }
+      @if (!invoices().length) {
         <tr>
-          <td colspan="6" class="td-cell text-center text-text-muted italic py-8">
+          <td colspan="6" class="text-center text-text-muted">
             No sales invoices found based on the current filters.
           </td>
         </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+      }
+    </tbody>
+  </nz-table>
 
   <!-- Pagination Controls -->
   <div class="mt-3 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
     <div class="flex items-center gap-2">
       <span class="text-sm text-text-muted">Rows</span>
-      <select [(ngModel)]="pageLimit" (change)="onPageLimitChange()" name="pageLimit" class="select-base w-auto">
-        <option [ngValue]="10">10</option>
-        <option [ngValue]="25">25</option>
-        <option [ngValue]="50">50</option>
-      </select>
+      <nz-select [(ngModel)]="pageLimit" (ngModelChange)="onPageLimitChange()" style="width: 80px">
+        <nz-option [nzValue]="10" nzLabel="10"></nz-option>
+        <nz-option [nzValue]="25" nzLabel="25"></nz-option>
+        <nz-option [nzValue]="50" nzLabel="50"></nz-option>
+      </nz-select>
     </div>
-    <div class="flex items-center gap-2 text-sm">
-      <button type="button" class="pagination-btn" [disabled]="pagination().page <= 1"
-        (click)="onPageChange(pagination().page - 1)">
-        Prev
-      </button>
-      <span class="text-text-muted">Page {{ pagination().page }} of {{ pagination().totalPages || 1 }}</span>
-      <button type="button" class="pagination-btn" [disabled]="pagination().page >= pagination().totalPages"
-        (click)="onPageChange(pagination().page + 1)">
-        Next
-      </button>
-    </div>
+    <nz-pagination
+      [nzPageIndex]="pagination().page"
+      [nzTotal]="pagination().total"
+      [nzPageSize]="pagination().limit"
+      (nzPageIndexChange)="onPageChange($event)"
+      nzSimple
+    ></nz-pagination>
   </div>
-</div>
+</nz-card>

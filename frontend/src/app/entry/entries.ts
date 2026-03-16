@@ -9,12 +9,28 @@ import { Register, RegisterService } from '../register/register-service';
 // import { type Category, CategoryService } from '../category/category-service';
 import { getLocalYYYYMMDD } from '../utils/datefns';
 import { type Entry, type EntryListResponse, EntryService } from './entry-service';
-import { LucideAngularModule } from 'lucide-angular';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
+
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 
 @Component({
   selector: 'app-entries',
-  imports: [FormsModule, ReactiveFormsModule, DecimalPipe, TranslatePipe, DatePipe, LucideAngularModule, TooltipDirective],
+  imports: [
+    FormsModule, ReactiveFormsModule, DecimalPipe, TranslatePipe, DatePipe,
+    NzTableModule, NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
+    NzIconModule, NzDatePickerModule, NzAlertModule, NzTooltipModule,
+    NzPopconfirmModule, NzCardModule, NzInputNumberModule,
+  ],
   templateUrl: './entries.html',
 })
 export class Entries implements OnInit {
@@ -28,8 +44,8 @@ export class Entries implements OnInit {
   totalExpenses = 0;
   totalIncome = 0;
 
-  startDate!: string;
-  endDate!: string;
+  startDate: Date | null = null;
+  endDate: Date | null = null;
 
   editingEntry: Partial<Entry> = {
     id: undefined, // for editing purpose
@@ -39,17 +55,16 @@ export class Entries implements OnInit {
     amount: 0,
   };
 
+  editingEntryDate: Date | null = null;
+
   loading = false;
   error: string | null = null;
 
   ngOnInit(): void {
     const today = new Date();
 
-    const monthEnd = getLocalYYYYMMDD(today);
-    const monthStart = getLocalYYYYMMDD(new Date(today.getFullYear(), today.getMonth(), 1));
-
-    this.startDate = monthStart;
-    this.endDate = monthEnd;
+    this.endDate = today;
+    this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
     // this.loadCategories();
     this.loadRegisters();
@@ -66,7 +81,9 @@ export class Entries implements OnInit {
 
   loadEntries() {
     this.loading = true;
-    this.entryService.getEntries(this.startDate, this.endDate).subscribe({
+    const start = this.startDate ? getLocalYYYYMMDD(this.startDate) : undefined;
+    const end = this.endDate ? getLocalYYYYMMDD(this.endDate) : undefined;
+    this.entryService.getEntries(start, end).subscribe({
       next: (res: EntryListResponse) => {
         this.entries.set(res.items);
         this.totalExpenses = res.totalExpenses;
@@ -85,6 +102,7 @@ export class Entries implements OnInit {
   }
 
   onSubmit() {
+    this.editingEntry.date = this.editingEntryDate ? getLocalYYYYMMDD(this.editingEntryDate) : '';
     if (!this.editingEntry.amount || !this.editingEntry.date) return;
 
     const request$ = this.editingEntry.id
@@ -110,6 +128,7 @@ export class Entries implements OnInit {
       description: '',
       amount: 0,
     };
+    this.editingEntryDate = defaultDate ? new Date(defaultDate + 'T00:00:00') : null;
   }
 
   editEntry(id: number) {
@@ -122,6 +141,7 @@ export class Entries implements OnInit {
           description: entry.description,
           amount: entry.amount,
         };
+        this.editingEntryDate = entry.date ? new Date(entry.date + 'T00:00:00') : null;
       },
       error: (err) => {
         this.error = err.error?.error || 'Failed to load entry';
@@ -130,7 +150,6 @@ export class Entries implements OnInit {
   }
 
   deleteEntry(id: number) {
-    if (!confirm('Delete this entry?')) return;
     this.entryService.delete(id).subscribe(() => this.loadEntries());
   }
 }

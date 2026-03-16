@@ -3,13 +3,22 @@ import { CategoryService, Category, CategoryList } from './category-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from 'lucide-angular';
 import { PermissionService } from '../auth/permission.service';
-import { TooltipDirective } from '../shared/directives/tooltip.directive';
+
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzCardModule } from 'ng-zorro-antd/card';
 
 @Component({
   selector: 'app-categories',
-  imports: [TranslatePipe, FormsModule, CommonModule, LucideAngularModule, TooltipDirective],
+  imports: [TranslatePipe, FormsModule, CommonModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {
@@ -91,7 +100,6 @@ export class Categories implements OnInit {
   }
 
   deleteCategory(cat: Category) {
-    if (!confirm(`Delete category "${cat.name}"?`)) return;
     this.categoryService.delete(cat.id).subscribe({
       next: () => {
         this.loadCategories();

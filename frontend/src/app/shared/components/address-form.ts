@@ -4,12 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Address } from '../../customer/customer-service';
 
-import { LucideAngularModule } from 'lucide-angular';
+import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
   selector: 'app-address-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, LucideAngularModule],
+  imports: [CommonModule, FormsModule, TranslatePipe, NzCollapseModule, NzFormModule, NzInputModule, NzIconModule],
   templateUrl: './address-form.html',
 })
 export class AddressForm {
