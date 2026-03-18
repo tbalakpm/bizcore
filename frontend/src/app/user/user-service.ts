@@ -25,8 +25,27 @@ export interface UserList {
 export class UserService {
   private http = inject(HttpClient);
 
-  getAll(): Observable<UserList> {
+  getAll(paramsObj?: {
+    page?: number;
+    limit?: number;
+    sort?: string;
+    username?: string;
+    firstName?: string;
+    lastName?: string;
+    role?: string;
+    isActive?: boolean;
+  }): Observable<UserList> {
     let params = new HttpParams();
+    if (paramsObj) {
+      if (paramsObj.page) params = params.set('page', paramsObj.page.toString());
+      if (paramsObj.limit) params = params.set('limit', paramsObj.limit.toString());
+      if (paramsObj.sort) params = params.set('sort', paramsObj.sort);
+      if (paramsObj.username) params = params.set('username', paramsObj.username);
+      if (paramsObj.firstName) params = params.set('firstName', paramsObj.firstName);
+      if (paramsObj.lastName) params = params.set('lastName', paramsObj.lastName);
+      if (paramsObj.role) params = params.set('role', paramsObj.role);
+      if (paramsObj.isActive !== undefined) params = params.set('isActive', paramsObj.isActive.toString());
+    }
     return this.http.get<UserList>(`${environment.apiUrl}/users`, { params });
   }
 

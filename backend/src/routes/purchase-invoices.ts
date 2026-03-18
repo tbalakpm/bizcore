@@ -1,5 +1,4 @@
 import { and, eq, like, sql, type SQL, getTableColumns } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/sqlite-core';
 import express, { type Request, type Response } from 'express';
 
 import { db, purchaseInvoices, purchaseInvoiceItems, suppliers, products, inventories } from '../db';

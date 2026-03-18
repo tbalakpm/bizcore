@@ -4,6 +4,8 @@
   "SUBMIT": "Submit",
   "SAVE": "Save",
   "CANCEL": "Cancel",
+  "UPDATE": "Update User",
+  "ADD_USER": "Add User",
   "ADD": "Add",
   "EDIT": "Edit",
   "DELETE": "Delete",
@@ -41,12 +43,7 @@
     "EXPENSE": "Expense",
     "ASSET": "Asset",
     "LIABILITY": "Liability",
-    "TYPES": [
-      "I:Income",
-      "E:Expense",
-      "A:Asset",
-      "L:Liability"
-    ],
+    "TYPES": ["I:Income", "E:Expense", "A:Asset", "L:Liability"],
     "NO_CATEGORIES_YET": "No categories yet"
   },
   "USER": {
@@ -70,5 +67,15 @@
     "MOBILE": "Mobile",
     "EMAIL": "Email",
     "SAME_AS_BILLING": "Shipping address is same as Billing Address"
+  },
+  "SUPPLIER": {
+    "TITLE": "Supplier",
+    "NO_SUPPLIERS_YET": "No suppliers yet",
+    "BANK_ACCOUNTS": "Bank Accounts",
+    "BANK_NAME": "Bank Name",
+    "ACCOUNT_NUMBER": "Account Number",
+    "IFSC_CODE": "IFSC Code",
+    "BRANCH": "Branch",
+    "PRIMARY_ACCOUNT": "Primary Account"
   }
 }

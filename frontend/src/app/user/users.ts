@@ -8,7 +8,7 @@ import { PermissionService } from '../auth/permission.service';
 import { ALL_MODULES, MODULE_LABELS, type UserPermissions } from '../models/permission.model';
 import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
-import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -21,6 +21,7 @@ import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
 @Component({
   selector: 'app-users',
@@ -30,7 +31,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
     HasPermissionDirective,
     NzTableModule, NzFormModule, NzInputModule, NzSelectModule,
     NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule,
-    NzAlertModule, NzTooltipModule, NzRadioModule, NzCardModule, NzTagModule,
+    NzAlertModule, NzTooltipModule, NzRadioModule, NzCardModule, NzTagModule, NzDropDownModule,
   ],
   templateUrl: './users.html',
 })
@@ -40,6 +41,22 @@ export class Users implements OnInit {
   permissionService = inject(PermissionService);
 
   users = signal<User[]>([]);
+  total = 0;
+  pageSize = 10;
+  pageIndex = 1;
+  sort: string | null = null;
+  filterValues: Record<string, string> = {
+    username: '',
+    firstName: '',
+    lastName: '',
+    role: '',
+  };
+  filterVisible: Record<string, boolean> = {
+    username: false,
+    firstName: false,
+    lastName: false,
+    role: false,
+  };
 
   allModules = ALL_MODULES;
   moduleLabels = MODULE_LABELS;
@@ -69,16 +86,48 @@ export class Users implements OnInit {
 
   loadUsers() {
     this.loading = true;
-    this.userService.getAll().subscribe({
-      next: (res: UserList) => {
-        this.users.set(res.data);
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = err.error?.error || 'Failed to load users';
-        this.loading = false;
-      },
-    });
+    this.userService
+      .getAll({
+        page: this.pageIndex,
+        limit: this.pageSize,
+        sort: this.sort || undefined,
+        ...this.filterValues,
+      })
+      .subscribe({
+        next: (res: UserList) => {
+          this.users.set(res.data);
+          this.total = res.pagination.total;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = err.error?.error || 'Failed to load users';
+          this.loading = false;
+        },
+      });
+  }
+
+  onQueryParamsChange(params: any): void {
+    const { pageSize, pageIndex, sort } = params;
+    this.pageSize = pageSize;
+    this.pageIndex = pageIndex;
+
+    const currentSort = sort.find((item: any) => item.value !== null);
+    const sortField = (currentSort && currentSort.key) || null;
+    const sortOrder = (currentSort && currentSort.value) || null;
+
+    if (sortField && sortOrder) {
+      this.sort = `${sortField}:${sortOrder === 'descend' ? 'desc' : 'asc'}`;
+    } else {
+      this.sort = null;
+    }
+
+    this.loadUsers();
+  }
+
+  onFilterChange(field: string, value: string) {
+    this.filterValues[field] = value;
+    this.pageIndex = 1; // Reset to first page on filter change
+    this.loadUsers();
   }
 
   toggleActive(user: User) {

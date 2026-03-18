@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PermissionService } from '../auth/permission.service';
 
-import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -15,10 +15,11 @@ import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
 @Component({
   selector: 'app-categories',
-  imports: [TranslatePipe, FormsModule, CommonModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule],
+  imports: [TranslatePipe, FormsModule, CommonModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {
@@ -26,17 +27,26 @@ export class Categories implements OnInit {
   permissionService = inject(PermissionService);
 
   categories = signal<Category[]>([]);
+  total = 0;
+  pageSize = 10;
+  pageIndex = 1;
+  sort: string | null = null;
+  filterValues: Record<string, string> = {
+    code: '',
+    name: '',
+    description: '',
+  };
+  filterVisible: Record<string, boolean> = {
+    code: false,
+    name: false,
+    description: false,
+  };
+
   newCategory: Partial<Category> = { code: '', name: '', description: '', isActive: true };
   loading = false;
   error: string | null = null;
 
   editing: Category | null = null;
-  // categoryTypes: { [key: string]: string } = {
-  //   I: 'CATEGORY.INCOME',
-  //   E: 'CATEGORY.EXPENSE',
-  //   A: 'CATEGORY.ASSET',
-  //   L: 'CATEGORY.LIABILITY',
-  // };
 
   ngOnInit(): void {
     this.loadCategories();
@@ -44,16 +54,48 @@ export class Categories implements OnInit {
 
   loadCategories() {
     this.loading = true;
-    this.categoryService.getAll().subscribe({
-      next: (cats: CategoryList) => {
-        this.categories.set(cats.data);
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = err.error?.error || 'Failed to load categories';
-        this.loading = false;
-      },
-    });
+    this.categoryService
+      .getAll({
+        page: this.pageIndex,
+        limit: this.pageSize,
+        sort: this.sort || undefined,
+        ...this.filterValues,
+      })
+      .subscribe({
+        next: (res: CategoryList) => {
+          this.categories.set(res.data);
+          this.total = res.pagination.total;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = err.error?.error || 'Failed to load categories';
+          this.loading = false;
+        },
+      });
+  }
+
+  onQueryParamsChange(params: any): void {
+    const { pageSize, pageIndex, sort } = params;
+    this.pageSize = pageSize;
+    this.pageIndex = pageIndex;
+
+    const currentSort = sort.find((item: any) => item.value !== null);
+    const sortField = (currentSort && currentSort.key) || null;
+    const sortOrder = (currentSort && currentSort.value) || null;
+
+    if (sortField && sortOrder) {
+      this.sort = `${sortField}:${sortOrder === 'descend' ? 'desc' : 'asc'}`;
+    } else {
+      this.sort = null;
+    }
+
+    this.loadCategories();
+  }
+
+  onFilterChange(field: string, value: string) {
+    this.filterValues[field] = value;
+    this.pageIndex = 1; // Reset to first page on filter change
+    this.loadCategories();
   }
 
   addCategory() {
