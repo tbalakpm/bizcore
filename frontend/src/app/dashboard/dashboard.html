@@ -5,7 +5,7 @@
   </h1>
 
   @if (error) {
-  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
+    <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
   }
 
   <!-- Summary cards -->
@@ -14,9 +14,14 @@
       <div class="flex justify-between items-center">
         <div>
           <p class="text-xs uppercase" style="color: var(--color-text-muted)">Income - Today</p>
-          <p class="text-2xl font-bold mt-1">{{ todayTotalIncome | number : '1.2-2' }}</p>
+          <p class="text-2xl font-bold mt-1">{{ todayTotalIncome | number: '1.2-2' }}</p>
         </div>
-        <span nz-icon nzType="wallet" nzTheme="outline" style="font-size: 24px; color: var(--color-primary)"></span>
+        <span
+          nz-icon
+          nzType="wallet"
+          nzTheme="outline"
+          style="font-size: 24px; color: var(--color-primary)"
+        ></span>
       </div>
     </nz-card>
 
@@ -24,53 +29,91 @@
       <div class="flex justify-between items-center">
         <div>
           <p class="text-xs uppercase" style="color: var(--color-text-muted)">Expenses - Today</p>
-          <p class="text-2xl font-bold mt-1">{{ todayTotalExpenses | number : '1.2-2' }}</p>
+          <p class="text-2xl font-bold mt-1">{{ todayTotalExpenses | number: '1.2-2' }}</p>
         </div>
-        <span nz-icon nzType="money-collect" nzTheme="outline" style="font-size: 24px; color: var(--color-primary)"></span>
+        <span
+          nz-icon
+          nzType="money-collect"
+          nzTheme="outline"
+          style="font-size: 24px; color: var(--color-primary)"
+        ></span>
       </div>
     </nz-card>
 
     <nz-card>
       <div class="flex justify-between items-center">
         <div>
-          <p class="text-xs uppercase" style="color: var(--color-text-muted)">Income - This Month</p>
-          <p class="text-2xl font-bold mt-1">{{ monthTotalIncome | number : '1.2-2' }}</p>
+          <p class="text-xs uppercase" style="color: var(--color-text-muted)">
+            Income - This Month
+          </p>
+          <p class="text-2xl font-bold mt-1">{{ monthTotalIncome | number: '1.2-2' }}</p>
         </div>
-        <span nz-icon nzType="calendar" nzTheme="outline" style="font-size: 24px; color: var(--color-primary)"></span>
+        <span
+          nz-icon
+          nzType="calendar"
+          nzTheme="outline"
+          style="font-size: 24px; color: var(--color-primary)"
+        ></span>
       </div>
     </nz-card>
 
     <nz-card>
       <div class="flex justify-between items-center">
         <div>
-          <p class="text-xs uppercase" style="color: var(--color-text-muted)">Expenses - This Month</p>
-          <p class="text-2xl font-bold mt-1">{{ monthTotalExpenses | number : '1.2-2' }}</p>
+          <p class="text-xs uppercase" style="color: var(--color-text-muted)">
+            Expenses - This Month
+          </p>
+          <p class="text-2xl font-bold mt-1">{{ monthTotalExpenses | number: '1.2-2' }}</p>
         </div>
-        <span nz-icon nzType="schedule" nzTheme="outline" style="font-size: 24px; color: var(--color-primary)"></span>
+        <span
+          nz-icon
+          nzType="schedule"
+          nzTheme="outline"
+          style="font-size: 24px; color: var(--color-primary)"
+        ></span>
       </div>
     </nz-card>
   </div>
 
   <!-- Charts row -->
-  <nz-card class="h-72">
+  <nz-card>
     <h2 class="text-sm font-semibold mb-2">Daily entries (this month)</h2>
-    <canvas baseChart [data]="dailyChartData" [options]="dailyChartOptions" [type]="'bar'" class="mb-6">
-    </canvas>
+    <div class="relative h-[320px] mb-6">
+      <canvas
+        baseChart
+        [data]="dailyChartData"
+        [options]="dailyChartOptions"
+        [type]="'bar'"
+      >
+      </canvas>
+    </div>
   </nz-card>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <nz-card class="h-72">
+    <nz-card>
       <h2 class="text-sm font-semibold mb-2">Income By Register (this month)</h2>
-      <canvas baseChart [data]="incomeCategoryChartData" [options]="incomeCategoryChartOptions" [type]="'pie'"
-        class="mb-6">
-      </canvas>
+      <div class="relative h-[280px] mb-6">
+        <canvas
+          baseChart
+          [data]="incomeCategoryChartData"
+          [options]="incomeCategoryChartOptions"
+          [type]="'pie'"
+        >
+        </canvas>
+      </div>
     </nz-card>
 
-    <nz-card class="h-72">
+    <nz-card>
       <h2 class="text-sm font-semibold mb-2">Expenses By Category (this month)</h2>
-      <canvas baseChart [data]="expenseCategoryChartData" [options]="expenseCategoryChartOptions" [type]="'pie'"
-        class="mb-6">
-      </canvas>
+      <div class="relative h-[280px] mb-6">
+        <canvas
+          baseChart
+          [data]="expenseCategoryChartData"
+          [options]="expenseCategoryChartOptions"
+          [type]="'pie'"
+        >
+        </canvas>
+      </div>
     </nz-card>
   </div>
 
@@ -78,7 +121,9 @@
   <nz-card>
     <h2 class="text-base font-semibold mb-2">
       Recent Entries
-      <span class="text-sm font-normal" style="color: var(--color-text-muted)">- Quick overview of your last 10 days entries.</span>
+      <span class="text-sm font-normal" style="color: var(--color-text-muted)"
+        >- Quick overview of your last 10 days entries.</span
+      >
     </h2>
 
     <nz-table
@@ -101,23 +146,29 @@
       </thead>
       <tbody>
         @for (e of recentTable.data; track e.id) {
-        <tr>
-          <td>{{ e.date | date : 'dd-MM-yyyy' }}</td>
-          <td>{{ e.registerName || '-' }}</td>
-          <td>{{ e.description }}</td>
-          <td>{{ e.categoryName || '-' }}</td>
-          <td class="text-right">
-            {{ e.categoryType === 'I' ? (e.amount | number : '1.2-2') : '' }}
-          </td>
-          <td class="text-right">
-            {{ e.categoryType === 'E' ? (e.amount | number : '1.2-2') : '' }}
-          </td>
-        </tr>
+          <tr>
+            <td>{{ e.date | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ e.registerName || '-' }}</td>
+            <td>{{ e.description }}</td>
+            <td>{{ e.categoryName || '-' }}</td>
+            <td class="text-right">
+              {{ e.categoryType === 'I' ? (e.amount | number: '1.2-2') : '' }}
+            </td>
+            <td class="text-right">
+              {{ e.categoryType === 'E' ? (e.amount | number: '1.2-2') : '' }}
+            </td>
+          </tr>
         }
         @if (!recentEntries().length && !loading) {
-        <tr>
-          <td colspan="6" class="text-center" style="color: var(--color-text-muted); padding: 24px 0;">No entries in the last 7 days.</td>
-        </tr>
+          <tr>
+            <td
+              colspan="6"
+              class="text-center"
+              style="color: var(--color-text-muted); padding: 24px 0"
+            >
+              No entries in the last 7 days.
+            </td>
+          </tr>
         }
       </tbody>
     </nz-table>
