@@ -2,7 +2,7 @@ import { and, eq, like, sql, type SQL, getTableColumns } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/sqlite-core';
 import express, { type Request, type Response } from 'express';
 
-import { suppliers, db, addresses } from '../db';
+import { suppliers, db, addresses, supplierBanks } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 
 export const suppliersRouter = express.Router();
@@ -142,7 +142,9 @@ suppliersRouter.get('/:id', async (req: Request, res: Response) => {
     });
   }
 
-  res.json(supplier);
+  const bankAccounts = await db.select().from(supplierBanks).where(eq(supplierBanks.supplierId, id)).all();
+
+  res.json({ ...supplier, bankAccounts });
 });
 
 suppliersRouter.post('/', async (req, res) => {
@@ -166,7 +168,7 @@ suppliersRouter.post('/', async (req, res) => {
         shippingAddressId = addr.id;
       }
 
-      return await tx
+      const supplier = await tx
         .insert(suppliers)
         .values({
           code,
@@ -179,6 +181,18 @@ suppliersRouter.post('/', async (req, res) => {
         })
         .returning()
         .get();
+
+      const bankAccounts = req.body.bankAccounts;
+      if (Array.isArray(bankAccounts) && bankAccounts.length > 0) {
+        for (const bank of bankAccounts) {
+          await tx.insert(supplierBanks).values({
+            ...bank,
+            supplierId: supplier.id,
+          }).run();
+        }
+      }
+
+      return supplier;
     });
 
     res.status(201).json(result);
@@ -237,6 +251,20 @@ suppliersRouter.put('/:id', async (req, res) => {
         })
         .where(eq(suppliers.id, id))
         .run();
+
+      const bankAccounts = req.body.bankAccounts;
+      if (Array.isArray(bankAccounts)) {
+        // Simple strategy: delete existing and re-insert
+        // Better: diff and update/delete/insert
+        await tx.delete(supplierBanks).where(eq(supplierBanks.supplierId, id)).run();
+        for (const bank of bankAccounts) {
+          const { id: bankId, ...bankData } = bank;
+          await tx.insert(supplierBanks).values({
+            ...bankData,
+            supplierId: id,
+          }).run();
+        }
+      }
 
       return { ...existingSupplier, code, name, gstin, notes, isActive, billingAddressId: bAddrId, shippingAddressId: sAddrId };
     });

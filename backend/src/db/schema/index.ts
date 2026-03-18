@@ -20,3 +20,6 @@ export type { SalesInvoiceItem, NewSalesInvoiceItem } from './sales-invoice-item
 
 export { purchaseInvoices } from './purchase-invoice.schema';
 export { purchaseInvoiceItems } from './purchase-invoice-items.schema';
+
+export { supplierBanks } from './supplier-bank.schema';
+export type { SupplierBank, NewSupplierBank } from './supplier-bank.schema';

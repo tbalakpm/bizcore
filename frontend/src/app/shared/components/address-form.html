@@ -1,58 +1,114 @@
 <ng-template #addressFields>
-  <div class="p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
     <nz-form-item class="md:col-span-2 mb-0">
       <nz-form-label>{{ 'ADDRESS.LINE1' | translate }}</nz-form-label>
       <nz-form-control>
-        <input nz-input type="text" [(ngModel)]="address.addressLine1" name="addr1" [disabled]="disabled" placeholder="Building, street" />
+        <input
+          nz-input
+          type="text"
+          [(ngModel)]="address.addressLine1"
+          name="addr1"
+          [disabled]="disabled"
+          placeholder="Building, street"
+        />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item class="md:col-span-2 mb-0">
       <nz-form-label>{{ 'ADDRESS.LINE2' | translate }}</nz-form-label>
       <nz-form-control>
-        <input nz-input type="text" [(ngModel)]="address.addressLine2" name="addr2" [disabled]="disabled" placeholder="Landmark, floor (optional)" />
+        <input
+          nz-input
+          type="text"
+          [(ngModel)]="address.addressLine2"
+          name="addr2"
+          [disabled]="disabled"
+          placeholder="Landmark, floor (optional)"
+        />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item class="mb-0">
       <nz-form-label>{{ 'ADDRESS.AREA' | translate }}</nz-form-label>
       <nz-form-control>
-        <input nz-input type="text" [(ngModel)]="address.area" name="area" [disabled]="disabled" placeholder="Area / locality" />
+        <input
+          nz-input
+          type="text"
+          [(ngModel)]="address.area"
+          name="area"
+          [disabled]="disabled"
+          placeholder="Area / locality"
+        />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item class="mb-0">
       <nz-form-label>{{ 'ADDRESS.CITY' | translate }}</nz-form-label>
       <nz-form-control>
-        <input nz-input type="text" [(ngModel)]="address.city" name="city" [disabled]="disabled" placeholder="City" />
+        <input
+          nz-input
+          type="text"
+          [(ngModel)]="address.city"
+          name="city"
+          [disabled]="disabled"
+          placeholder="City"
+        />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item class="mb-0">
       <nz-form-label>{{ 'ADDRESS.STATE' | translate }}</nz-form-label>
       <nz-form-control>
-        <input nz-input type="text" [(ngModel)]="address.state" name="state" [disabled]="disabled" placeholder="State" />
+        <input
+          nz-input
+          type="text"
+          [(ngModel)]="address.state"
+          name="state"
+          [disabled]="disabled"
+          placeholder="State"
+        />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item class="mb-0">
       <nz-form-label>{{ 'ADDRESS.PINCODE' | translate }}</nz-form-label>
       <nz-form-control>
-        <input nz-input type="text" [(ngModel)]="address.postalCode" name="postalCode" [disabled]="disabled" placeholder="e.g. 560001" />
+        <input
+          nz-input
+          type="text"
+          [(ngModel)]="address.postalCode"
+          name="postalCode"
+          [disabled]="disabled"
+          placeholder="e.g. 560001"
+        />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item class="mb-0">
       <nz-form-label>{{ 'ADDRESS.MOBILE' | translate }}</nz-form-label>
       <nz-form-control>
-        <input nz-input type="text" [(ngModel)]="address.mobile" name="mobile" [disabled]="disabled" placeholder="e.g. 9876543210" />
+        <input
+          nz-input
+          type="text"
+          [(ngModel)]="address.mobile"
+          name="mobile"
+          [disabled]="disabled"
+          placeholder="e.g. 9876543210"
+        />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item class="mb-0">
       <nz-form-label>{{ 'ADDRESS.EMAIL' | translate }}</nz-form-label>
       <nz-form-control>
-        <input nz-input type="email" [(ngModel)]="address.email" name="email" [disabled]="disabled" placeholder="e.g. name@example.com" />
+        <input
+          nz-input
+          type="email"
+          [(ngModel)]="address.email"
+          name="email"
+          [disabled]="disabled"
+          placeholder="e.g. name@example.com"
+        />
       </nz-form-control>
     </nz-form-item>
   </div>
 </ng-template>
 
 @if (isExpandable) {
-  <nz-collapse class="mb-1">
+  <nz-collapse class="mb-1" nzSize="small">
     <nz-collapse-panel [nzHeader]="title | translate" [nzActive]="isOpen">
       <ng-container *ngTemplateOutlet="addressFields"></ng-container>
     </nz-collapse-panel>

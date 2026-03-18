@@ -36,6 +36,20 @@
       "when": 1773637352299,
       "tag": "0004_fk-indices",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1773815001112,
+      "tag": "0005_supplier-banks",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1773835689084,
+      "tag": "0006_supplier-banks-id-auto",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,51 @@
+@baseUrl = http://localhost:3000
+
+### Get Suppliers
+GET {{baseUrl}}/suppliers
+
+### Create Supplier with Bank Accounts
+POST {{baseUrl}}/suppliers
+Content-Type: application/json
+
+{
+    "code": "SUP-BANK-001",
+    "name": "Supplier with Bank",
+    "notes": "Testing bank accounts",
+    "isActive": true,
+    "bankAccounts": [
+        {
+            "bankName": "HDFC Bank",
+            "accountNumber": "1234567890",
+            "ifscCode": "HDFC0001234",
+            "branchName": "Downtown",
+            "isPrimary": true
+        },
+        {
+            "bankName": "ICICI Bank",
+            "accountNumber": "0987654321",
+            "ifscCode": "ICIC0005678",
+            "branchName": "Uptown",
+            "isPrimary": false
+        }
+    ]
+}
+
+### Get Supplier by ID (Replace ID after creation)
+GET {{baseUrl}}/suppliers/1
+
+### Update Supplier Bank Accounts (Replace ID after creation)
+PUT {{baseUrl}}/suppliers/1
+Content-Type: application/json
+
+{
+    "name": "Supplier with Bank Updated",
+    "bankAccounts": [
+        {
+            "bankName": "HDFC Bank Updated",
+            "accountNumber": "1234567890",
+            "ifscCode": "HDFC0001234",
+            "branchName": "Downtown",
+            "isPrimary": true
+        }
+    ]
+}

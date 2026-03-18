@@ -21,5 +21,16 @@ export const suppliers = sqliteTable(
   ]
 );
 
+// export const supplierRelations = relations(suppliers, ({ one }) => ({
+//   billingAddress: one(addresses, {
+//     fields: [suppliers.billingAddressId],
+//     references: [addresses.id],
+//   }),
+//   shippingAddress: one(addresses, {
+//     fields: [suppliers.shippingAddressId],
+//     references: [addresses.id],
+//   }),
+// }));
+
 export type Supplier = typeof suppliers.$inferSelect;
 export type NewSupplier = typeof suppliers.$inferInsert;

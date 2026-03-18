@@ -23,6 +23,16 @@ export interface Address {
   longitude?: string;
 }
 
+export interface SupplierBank {
+  id?: number;
+  supplierId?: number;
+  bankName: string;
+  accountNumber: string;
+  ifscCode: string;
+  branchName: string;
+  isPrimary: boolean;
+}
+
 export interface Supplier {
   id: number;
   code: string;
@@ -34,6 +44,7 @@ export interface Supplier {
   shippingAddress?: Address;
   notes?: string;
   isActive: boolean;
+  bankAccounts?: SupplierBank[];
 }
 
 export interface SupplierList {

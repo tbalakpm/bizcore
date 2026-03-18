@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { type Supplier, type Address, SupplierList, SupplierService } from './supplier-service';
+import { type Supplier, type Address, SupplierList, SupplierService, type SupplierBank } from './supplier-service';
 import { AddressForm } from '../shared/components/address-form';
 import { PermissionService } from '../auth/permission.service';
 
@@ -43,6 +43,7 @@ export class Suppliers implements OnInit {
     shippingAddress: {},
     notes: '',
     isActive: true,
+    bankAccounts: [],
   };
 
   sameAsBilling = false;
@@ -94,6 +95,29 @@ export class Suppliers implements OnInit {
     });
   }
 
+  addBankAccount() {
+    if (!this.editingSupplier.bankAccounts) {
+      this.editingSupplier.bankAccounts = [];
+    }
+    this.editingSupplier.bankAccounts.push({
+      bankName: '',
+      accountNumber: '',
+      ifscCode: '',
+      branchName: '',
+      isPrimary: this.editingSupplier.bankAccounts.length === 0,
+    });
+  }
+
+  removeBankAccount(index: number) {
+    this.editingSupplier.bankAccounts?.splice(index, 1);
+  }
+
+  setPrimaryBank(index: number) {
+    this.editingSupplier.bankAccounts?.forEach((b, i) => {
+      b.isPrimary = i === index;
+    });
+  }
+
   onCancel() {
     this.editingSupplier = {
       id: undefined,
@@ -104,6 +128,7 @@ export class Suppliers implements OnInit {
       shippingAddress: {},
       notes: '',
       isActive: true,
+      bankAccounts: [],
     };
     this.sameAsBilling = false;
   }
@@ -118,6 +143,7 @@ export class Suppliers implements OnInit {
       this.editingSupplier.shippingAddress = res.shippingAddress || {};
       this.editingSupplier.notes = res.notes;
       this.editingSupplier.isActive = res.isActive;
+      this.editingSupplier.bankAccounts = res.bankAccounts || [];
       this.sameAsBilling = false;
     });
   }

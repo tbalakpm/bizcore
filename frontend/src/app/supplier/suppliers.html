@@ -15,7 +15,7 @@
     <nz-card>
       <h2 class="text-base font-semibold mb-2">
         {{ editingSupplier.id ? ('EDIT' | translate) : ('ADD' | translate) }}
-        {{ 'MENU.SUPPLIERS' | translate }}
+        {{ 'SUPPLIER.TITLE' | translate }}
       </h2>
       <form
         nz-form
@@ -77,7 +77,7 @@
               {{ 'ADDRESS.SAME_AS_BILLING' | translate }}
             </label>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <app-address-form
               [address]="editingSupplier.billingAddress!"
               [title]="'ADDRESS.BILLING'"
@@ -95,7 +95,110 @@
           </div>
         </div>
 
-        <div class="flex gap-3 mt-2">
+        <!-- Bank Accounts -->
+        <div class="col-span-full mt-4">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-sm font-semibold">{{ 'SUPPLIER.BANK_ACCOUNTS' | translate }}</h3>
+            <button
+              nz-button
+              nzType="dashed"
+              nzSize="small"
+              type="button"
+              (click)="addBankAccount()"
+            >
+              <span nz-icon nzType="plus" nzTheme="outline"></span>
+              Add Bank Account
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 gap-2">
+            <div
+              class="border border-slate-200 dark:border-slate-600 rounded-md p-3 relative group"
+            >
+              @for (bank of editingSupplier.bankAccounts; track $index) {
+                <button
+                  nz-button
+                  nzType="text"
+                  nzDanger
+                  class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  (click)="removeBankAccount($index)"
+                >
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                </button>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
+                  <nz-form-item class="mb-0">
+                    <nz-form-label nzRequired>{{ 'SUPPLIER.BANK_NAME' | translate }}</nz-form-label>
+                    <nz-form-control>
+                      <input
+                        nz-input
+                        [(ngModel)]="bank.bankName"
+                        name="bankName_{{ $index }}"
+                        placeholder="e.g. HDFC Bank"
+                      />
+                    </nz-form-control>
+                  </nz-form-item>
+
+                  <nz-form-item class="mb-0">
+                    <nz-form-label nzRequired>{{
+                      'SUPPLIER.ACCOUNT_NUMBER' | translate
+                    }}</nz-form-label>
+                    <nz-form-control>
+                      <input
+                        nz-input
+                        [(ngModel)]="bank.accountNumber"
+                        name="accNum_{{ $index }}"
+                        placeholder="Account number"
+                      />
+                    </nz-form-control>
+                  </nz-form-item>
+
+                  <nz-form-item class="mb-0">
+                    <nz-form-label nzRequired>{{ 'SUPPLIER.IFSC_CODE' | translate }}</nz-form-label>
+                    <nz-form-control>
+                      <input
+                        nz-input
+                        [(ngModel)]="bank.ifscCode"
+                        name="ifsc_{{ $index }}"
+                        placeholder="IFSC Code"
+                      />
+                    </nz-form-control>
+                  </nz-form-item>
+
+                  <nz-form-item class="mb-0">
+                    <nz-form-label nzRequired>{{ 'SUPPLIER.BRANCH' | translate }}</nz-form-label>
+                    <nz-form-control>
+                      <input
+                        nz-input
+                        [(ngModel)]="bank.branchName"
+                        name="branch_{{ $index }}"
+                        placeholder="Branch name"
+                      />
+                    </nz-form-control>
+                  </nz-form-item>
+
+                  <nz-form-item class="mb-0 flex items-end">
+                    <label
+                      nz-checkbox
+                      [(ngModel)]="bank.isPrimary"
+                      name="primary_{{ $index }}"
+                      (ngModelChange)="$event && setPrimaryBank($index)"
+                    >
+                      {{ 'SUPPLIER.PRIMARY_ACCOUNT' | translate }}
+                    </label>
+                  </nz-form-item>
+                </div>
+              }
+              @if (!editingSupplier.bankAccounts?.length) {
+                <div class="text-center py-4 text-gray-400 border border-dashed rounded-md">
+                  No bank accounts added. Click "Add Bank Account" to add one.
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="flex col-span-full justify-end gap-3 mt-2">
           <button nz-button nzType="primary" type="submit">
             <span nz-icon nzType="save" nzTheme="outline"></span>
             Save

@@ -9,10 +9,10 @@
   <!-- Add / Edit form -->
   @if (permissionService.canWrite('users')) {
     <nz-card>
-      <!-- <h2 class="text-base font-semibold mb-2">
+      <h2 class="text-base font-semibold">
         {{ editingUser.id ? ('EDIT' | translate) : ('ADD' | translate) }}
         {{ 'USER.TITLE' | translate }}
-      </h2> -->
+      </h2>
       @if (error) {
         <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
       }
