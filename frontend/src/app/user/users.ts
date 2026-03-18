@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { type User, UserList, UserService } from './user-service';
+import { type User, type UserList, UserService } from './user-service';
 import { AuthService } from '../auth/auth-service';
 import { PermissionService } from '../auth/permission.service';
 import { ALL_MODULES, MODULE_LABELS, type UserPermissions } from '../models/permission.model';
@@ -20,15 +20,17 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 @Component({
   selector: 'app-users',
+  standalone: true,
   imports: [
-    FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule,
+    FormsModule, TranslatePipe, CommonModule,
     HasPermissionDirective,
     NzTableModule, NzFormModule, NzInputModule, NzSelectModule,
     NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule,
-    NzAlertModule, NzTooltipModule, NzRadioModule, NzCardModule,
+    NzAlertModule, NzTooltipModule, NzRadioModule, NzCardModule, NzTagModule,
   ],
   templateUrl: './users.html',
 })

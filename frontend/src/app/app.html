@@ -21,29 +21,34 @@
       </a>
     </div>
 
-    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+    <div class="flex gap-4 w-full sm:w-auto justify-end">
       <button
         (click)="toggleTheme()"
-        class="p-0.5 flex items-center justify-center border rounded text-xs bg-chrome-hover text-chrome-text border-chrome-active cursor-pointer hover:bg-chrome-active hover:text-chrome-text-bright transition-colors"
+        class="w-8 h-8 flex items-center justify-center border rounded text-xs bg-chrome-hover text-chrome-text border-chrome-active cursor-pointer hover:bg-chrome-active hover:text-chrome-text-bright transition-colors"
         [title]="isDarkTheme() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
       >
         @if (isDarkTheme()) {
-          <span nz-icon nzType="sun" nzTheme="outline" class="w-[1.15rem] h-[1.15rem]"></span>
+          <span
+            nz-icon
+            nzType="sun"
+            nzTheme="outline"
+            class="flex items-center justify-center w-[1.15rem] h-[1.15rem]"
+          ></span>
         } @else {
-          <span nz-icon nzType="moon" nzTheme="outline" class="w-[1.15rem] h-[1.15rem]"></span>
+          <span
+            nz-icon
+            nzType="moon"
+            nzTheme="outline"
+            class="flex items-center justify-center w-[1.15rem] h-[1.15rem]"
+          ></span>
         }
       </button>
       @if (this.auth.isLoggedIn) {
-        <span
-          nz-icon
-          nzType="logout"
-          nzTheme="outline"
-          class="w-6 h-6 text-chrome-text-bright"
-        ></span>
         <button
           (click)="logout()"
           class="underline text-lg cursor-pointer text-chrome-text-bright hover:text-white transition-colors"
         >
+          <span nz-icon nzType="logout" nzTheme="outline" class="text-chrome-text-bright"></span>
           {{ 'MENU.LOGOUT' | translate }}
         </button>
       }
@@ -409,7 +414,7 @@
           <div class="mt-2 mb-4">
             <button
               (click)="switchMenu('main')"
-              class="flex items-center gap-2 overflow-hidden px-4 text-sm text-chrome-muted hover:text-chrome-text-bright transition-colors cursor-pointer px-2 py-1 rounded hover:bg-chrome-hover"
+              class="flex items-center gap-2 overflow-hidden text-sm text-chrome-muted hover:text-chrome-text-bright transition-colors cursor-pointer px-2 py-1 rounded hover:bg-chrome-hover"
             >
               <span
                 nz-icon

@@ -5,18 +5,17 @@
   </h1>
 </div>
 
-@if (error) {
-  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
-}
-
 <div class="grid grid-cols-1 gap-4">
   <!-- Add / Edit form -->
   @if (permissionService.canWrite('users')) {
     <nz-card>
-      <h2 class="text-base font-semibold mb-2">
+      <!-- <h2 class="text-base font-semibold mb-2">
         {{ editingUser.id ? ('EDIT' | translate) : ('ADD' | translate) }}
         {{ 'USER.TITLE' | translate }}
-      </h2>
+      </h2> -->
+      @if (error) {
+        <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
+      }
       <form nz-form (ngSubmit)="onSubmit()" nzLayout="vertical">
         <div class="grid grid-cols-12 gap-2">
           <div class="col-span-12 md:col-span-6 xl:col-span-3">
@@ -73,25 +72,16 @@
                 >
                   <nz-option nzValue="user" nzLabel="user"></nz-option>
                   <nz-option nzValue="manager" nzLabel="manager"></nz-option>
+                  <nz-option nzValue="salesperson" nzLabel="salesperson"></nz-option>
                   <nz-option nzValue="admin" nzLabel="admin"></nz-option>
                 </nz-select>
               </nz-form-control>
             </nz-form-item>
           </div>
-          <div class="col-span-12 flex gap-3">
-            <button *appHasPermission="'users:write'" nz-button nzType="primary" type="submit">
-              <span nz-icon nzType="save" nzTheme="outline"></span>
-              Save
-            </button>
-            @if (editingUser.id) {
-              <button nz-button nzType="default" type="button" (click)="onCancel()">Cancel</button>
-            }
-          </div>
         </div>
-      </form>
 
-      @if (isAdmin) {
-        <div class="mt-5 pt-4 border-t">
+        @if (isAdmin) {
+          <!-- <div class="mt-5 pt-4 border-t" style="border-color: var(--color-border)"> -->
           <div class="flex items-center gap-2 mb-3">
             <span nz-icon nzType="safety-certificate" nzTheme="outline" class="text-lg"></span>
             <h3 class="text-base font-semibold">Module Permissions</h3>
@@ -105,9 +95,9 @@
             <thead>
               <tr>
                 <th>Module</th>
-                <th class="text-center" nzWidth="120px">No Access</th>
-                <th class="text-center" nzWidth="120px">Read Only</th>
-                <th class="text-center" nzWidth="120px">Full Access</th>
+                <th class="text-center" nzWidth="100px">No Access</th>
+                <th class="text-center" nzWidth="100px">Read Only</th>
+                <th class="text-center" nzWidth="100px">Full Access</th>
               </tr>
             </thead>
             <tbody>
@@ -118,6 +108,7 @@
                     <nz-radio-group
                       [(ngModel)]="editingUser.permissions[module]"
                       [name]="module"
+                      nzSize="small"
                       nzButtonStyle="solid"
                     >
                       <label nz-radio-button nzValue="none">
@@ -138,11 +129,27 @@
               }
             </tbody>
           </nz-table>
-          <p class="mt-2 text-xs text-text-muted">
-            Admin users bypass all permission checks and always have full access.
-          </p>
-        </div>
-      }
+
+          <div class="flex col-span-12 md:col-span-6 xl:col-span-3 justify-between mt-2">
+            <p class="text-xs text-text-muted">
+              Admin users bypass all permission checks and always have full access.
+            </p>
+            <div class="flex gap-3">
+              <button *appHasPermission="'users:write'" nz-button nzType="primary" type="submit">
+                <!-- <nz-icon [nzType]="editingUser.id ? 'save' : 'user-add'" nzTheme="outline" /> -->
+                {{ (editingUser.id ? 'UPDATE' : 'ADD_USER') | translate }}
+              </button>
+              @if (editingUser.id) {
+                <button nz-button nzType="default" type="button" (click)="onCancel()">
+                  Cancel
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- </div> -->
+        }
+      </form>
     </nz-card>
   }
 
@@ -178,7 +185,22 @@
             <td>{{ u.username }}</td>
             <td>{{ u.firstName || '-' }}</td>
             <td>{{ u.lastName || '-' }}</td>
-            <td>{{ u.role }}</td>
+            <td>
+              @switch (u.role) {
+                @case ('admin') {
+                  <nz-tag nzColor="error">{{ u.role }}</nz-tag>
+                }
+                @case ('manager') {
+                  <nz-tag nzColor="processing">{{ u.role }}</nz-tag>
+                }
+                @case ('salesperson') {
+                  <nz-tag nzColor="warning">{{ u.role }}</nz-tag>
+                }
+                @default {
+                  <nz-tag>{{ u.role }}</nz-tag>
+                }
+              }
+            </td>
             <td class="text-center">
               <nz-switch
                 [ngModel]="u.isActive"
@@ -220,7 +242,7 @@
             }
           </tr>
         }
-        @if (!users().length && !loading) {
+        <!-- @if (!users().length && !loading) {
           <tr>
             <td
               [attr.colspan]="permissionService.canWrite('users') ? 6 : 5"
@@ -229,7 +251,7 @@
               {{ 'USER.NO_USERS_YET' | translate }}
             </td>
           </tr>
-        }
+        } -->
       </tbody>
     </nz-table>
   </nz-card>

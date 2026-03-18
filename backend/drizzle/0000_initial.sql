@@ -204,7 +204,7 @@ CREATE TABLE `users` (
 	`is_active` integer DEFAULT true NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	CONSTRAINT "role_must_be_in_list" CHECK("users"."role" IN ('user', 'manager', 'admin'))
+	CONSTRAINT "role_must_be_in_list" CHECK("users"."role" IN ('user', 'salesperson', 'manager', 'admin'))
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);
