@@ -4,13 +4,15 @@
     class="flex flex-wrap justify-between items-center gap-2 px-3 md:px-4 py-2 bg-chrome text-chrome-text-bright shadow border-b border-chrome-border"
   >
     <div class="flex items-center justify-center align-middle gap-3">
-      <button
-        (click)="toggleSidebar()"
-        class="p-1.5 rounded hover:bg-chrome-hover text-chrome-text transition-colors focus:outline-none"
-        [title]="isSidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
-      >
-        <span nz-icon nzType="menu" nzTheme="outline" class="w-5 h-5"></span>
-      </button>
+      @if (this.auth.isLoggedIn) {
+        <button
+          (click)="toggleSidebar()"
+          class="p-1.5 rounded hover:bg-chrome-hover text-chrome-text transition-colors focus:outline-none"
+          [title]="isSidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+        >
+          <span nz-icon nzType="menu" nzTheme="outline" class="w-5 h-5"></span>
+        </button>
+      }
       <a routerLink="/" class="flex items-center justify-center align-middle gap-2 shrink-0">
         <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-chrome-hover">
           <img src="bizcore.png" alt="Application logo" />

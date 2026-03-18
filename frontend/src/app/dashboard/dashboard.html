@@ -78,13 +78,8 @@
   <!-- Charts row -->
   <nz-card>
     <h2 class="text-sm font-semibold mb-2">Daily entries (this month)</h2>
-    <div class="relative h-[320px] mb-6">
-      <canvas
-        baseChart
-        [data]="dailyChartData"
-        [options]="dailyChartOptions"
-        [type]="'bar'"
-      >
+    <div class="relative h-[250px] mb-6">
+      <canvas baseChart [data]="dailyChartData" [options]="dailyChartOptions" [type]="'bar'">
       </canvas>
     </div>
   </nz-card>
@@ -92,7 +87,7 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <nz-card>
       <h2 class="text-sm font-semibold mb-2">Income By Register (this month)</h2>
-      <div class="relative h-[280px] mb-6">
+      <div class="relative h-[200px] mb-6">
         <canvas
           baseChart
           [data]="incomeCategoryChartData"
@@ -105,7 +100,7 @@
 
     <nz-card>
       <h2 class="text-sm font-semibold mb-2">Expenses By Category (this month)</h2>
-      <div class="relative h-[280px] mb-6">
+      <div class="relative h-[200px] mb-6">
         <canvas
           baseChart
           [data]="expenseCategoryChartData"
@@ -159,7 +154,7 @@
             </td>
           </tr>
         }
-        @if (!recentEntries().length && !loading) {
+        <!-- @if (!recentEntries().length && !loading) {
           <tr>
             <td
               colspan="6"
@@ -169,7 +164,7 @@
               No entries in the last 7 days.
             </td>
           </tr>
-        }
+        } -->
       </tbody>
     </nz-table>
   </nz-card>

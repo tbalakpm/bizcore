@@ -211,7 +211,7 @@
     }
 
     <!-- Actions -->
-    <div class="flex gap-3">
+    <div class="flex col-span-full justify-end gap-3">
       <button nz-button nzType="primary" type="submit" [disabled]="loading">
         <span nz-icon nzType="save" nzTheme="outline"></span>
         {{ productId ? ('SAVE' | translate) : ('ADD' | translate) }}
