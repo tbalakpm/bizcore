@@ -5,8 +5,10 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type Supplier, type Address, SupplierList, SupplierService, type SupplierBank } from './supplier-service';
 import { AddressForm } from '../shared/components/address-form';
 import { PermissionService } from '../auth/permission.service';
+import { GstService } from '../shared/services/gst.service';
 
-import { NzTableModule } from 'ng-zorro-antd/table';
+
+import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -17,6 +19,9 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+
 
 @Component({
   selector: 'app-suppliers',
@@ -24,15 +29,33 @@ import { NzCardModule } from 'ng-zorro-antd/card';
     FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm,
     NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule,
     NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
-    NzCheckboxModule, NzCardModule,
+    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule,
   ],
   templateUrl: './suppliers.html',
 })
 export class Suppliers implements OnInit {
   private supplierService = inject(SupplierService);
+  private gstService = inject(GstService);
+  private modalService = inject(NzModalService);
   permissionService = inject(PermissionService);
 
+
+
   suppliers = signal<Supplier[]>([]);
+  total = 0;
+  pageSize = 10;
+  pageIndex = 1;
+  sort: string | null = null;
+  filterValues: Record<string, string> = {
+    code: '',
+    name: '',
+    gstin: '',
+  };
+  filterVisible: Record<string, boolean> = {
+    code: false,
+    name: false,
+    gstin: false,
+  };
 
   editingSupplier: Partial<Supplier> = {
     id: undefined,
@@ -48,7 +71,12 @@ export class Suppliers implements OnInit {
 
   sameAsBilling = false;
 
+  captchaData: { captcha: string; sessionId: string } | null = null;
+  captchaValue = '';
+  captchaVisible = false;
+
   loading = false;
+
   error: string | null = null;
 
   ngOnInit(): void {
@@ -57,16 +85,48 @@ export class Suppliers implements OnInit {
 
   loadSuppliers() {
     this.loading = true;
-    this.supplierService.getAll().subscribe({
-      next: (res: SupplierList) => {
-        this.suppliers.set(res.data);
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = err.error?.error || 'Failed to load suppliers';
-        this.loading = false;
-      },
-    });
+    this.supplierService
+      .getAll({
+        page: this.pageIndex,
+        limit: this.pageSize,
+        sort: this.sort || undefined,
+        ...this.filterValues,
+      })
+      .subscribe({
+        next: (res: SupplierList) => {
+          this.suppliers.set(res.data);
+          this.total = res.pagination.total;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = err.error?.error || 'Failed to load suppliers';
+          this.loading = false;
+        },
+      });
+  }
+
+  onQueryParamsChange(params: any): void {
+    const { pageSize, pageIndex, sort } = params;
+    this.pageSize = pageSize;
+    this.pageIndex = pageIndex;
+
+    const currentSort = sort.find((item: any) => item.value !== null);
+    const sortField = (currentSort && currentSort.key) || null;
+    const sortOrder = (currentSort && currentSort.value) || null;
+
+    if (sortField && sortOrder) {
+      this.sort = `${sortField}:${sortOrder === 'descend' ? 'desc' : 'asc'}`;
+    } else {
+      this.sort = null;
+    }
+
+    this.loadSuppliers();
+  }
+
+  onFilterChange(field: string, value: string) {
+    this.filterValues[field] = value;
+    this.pageIndex = 1; // Reset to first page on filter change
+    this.loadSuppliers();
   }
 
   toggleActive(s: Supplier) {
@@ -94,6 +154,58 @@ export class Suppliers implements OnInit {
       },
     });
   }
+
+  searchGstin() {
+    const gstin = this.editingSupplier.gstin;
+    if (!gstin || gstin.length < 15) return;
+
+    this.loading = true;
+    this.gstService.getCaptcha().subscribe({
+      next: (res) => {
+        this.captchaData = res;
+        this.captchaValue = '';
+        this.captchaVisible = true;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = err.error?.error || 'Failed to fetch captcha';
+        this.loading = false;
+      }
+    });
+  }
+
+  submitCaptcha() {
+    if (!this.captchaValue || !this.captchaData) return;
+
+    this.loading = true;
+    this.gstService.getGstinDetails(this.editingSupplier.gstin!, this.captchaValue, this.captchaData.sessionId).subscribe({
+      next: (res) => {
+        this.editingSupplier.name = res.name;
+        if (res.addressLine1) {
+          this.editingSupplier.billingAddress = {
+            ...this.editingSupplier.billingAddress,
+            addressLine1: res.addressLine1,
+            addressLine2: res.addressLine2,
+            city: res.city,
+            state: res.state,
+            postalCode: res.postalCode,
+            phone: res.phone,
+            mobile: res.mobile
+          };
+        }
+        this.captchaVisible = false;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = err.error?.error || 'Failed to fetch GSTIN details';
+        this.loading = false;
+        // Refresh captcha on error
+        this.searchGstin();
+      }
+    });
+  }
+
+
 
   addBankAccount() {
     if (!this.editingSupplier.bankAccounts) {

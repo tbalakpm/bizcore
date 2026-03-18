@@ -25,7 +25,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
 
     // Build filters dynamically
     const filters: SQL[] = [];
-    const filterableFields = ['code', 'name', 'description', 'qtyPerUnit'] as const;
+    const filterableFields = ['code', 'name', 'description', 'qtyPerUnit', 'hsnSac'] as const;
     const sortableFields = [
       'id',
       ...filterableFields,

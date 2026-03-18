@@ -213,7 +213,7 @@
     <!-- Actions -->
     <div class="flex col-span-full justify-end gap-3">
       <button nz-button nzType="primary" type="submit" [disabled]="loading">
-        <span nz-icon nzType="save" nzTheme="outline"></span>
+        <!-- <span nz-icon nzType="save" nzTheme="outline"></span> -->
         {{ productId ? ('SAVE' | translate) : ('ADD' | translate) }}
       </button>
       <button nz-button nzType="default" type="button" (click)="onCancel()">

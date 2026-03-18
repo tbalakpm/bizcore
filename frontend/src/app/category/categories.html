@@ -33,8 +33,16 @@
           [nzTotal]="total"
           [nzPageIndex]="pageIndex"
           [nzPageSize]="pageSize"
+          [nzShowSizeChanger]="true"
+          [nzPageSizeOptions]="[10, 20, 50, 100]"
+          [nzShowTotal]="totalTemplate"
           (nzQueryParams)="onQueryParamsChange($event)"
         >
+          <ng-template #totalTemplate let-total let-range="range">
+            <div style="position: absolute; left: 0;">
+              <span class="text-text-muted text-sm">Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span>
+            </div>
+          </ng-template>
           <thead>
             <tr>
               <th nzColumnKey="code" nzShowSort [nzSortFn]="true" nzCustomFilter class="w-32">{{ 'CODE' | translate }}

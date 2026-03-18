@@ -49,12 +49,26 @@
         <nz-form-item>
           <nz-form-label>{{ 'GSTIN' | translate }}</nz-form-label>
           <nz-form-control>
-            <input
-              nz-input
-              [(ngModel)]="editingSupplier.gstin"
-              name="newSupplierGstin"
-              placeholder="e.g. 22AAAAA0000A1Z5"
-            />
+            <nz-input-group [nzSuffix]="suffixIconButton">
+              <input
+                nz-input
+                [(ngModel)]="editingSupplier.gstin"
+                name="newSupplierGstin"
+                placeholder="e.g. 22AAAAA0000A1Z5"
+              />
+            </nz-input-group>
+            <ng-template #suffixIconButton>
+              <button
+                nz-button
+                nzType="primary"
+                nzSearch
+                type="button"
+                (click)="searchGstin()"
+                [disabled]="!editingSupplier.gstin || editingSupplier.gstin.length < 15"
+              >
+                <span nz-icon nzType="search"></span>
+              </button>
+            </ng-template>
           </nz-form-control>
         </nz-form-item>
         <nz-form-item class="md:col-span-2 xl:col-span-4">
@@ -222,14 +236,55 @@
       [nzData]="suppliers()"
       [nzLoading]="loading"
       nzSize="small"
-      [nzShowPagination]="false"
       [nzBordered]="true"
+      [nzFrontPagination]="false"
+      [nzTotal]="total"
+      [nzPageIndex]="pageIndex"
+      [nzPageSize]="pageSize"
+      [nzShowSizeChanger]="true"
+      [nzPageSizeOptions]="[10, 20, 50, 100]"
+      [nzShowTotal]="totalTemplate"
+      (nzQueryParams)="onQueryParamsChange($event)"
     >
+      <ng-template #totalTemplate let-total let-range="range">
+        <div style="position: absolute; left: 0">
+          <span class="text-text-muted text-sm"
+            >Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span
+          >
+        </div>
+      </ng-template>
       <thead>
         <tr>
-          <th>{{ 'CODE' | translate }}</th>
-          <th>{{ 'NAME' | translate }}</th>
-          <th>{{ 'DESCRIPTION' | translate }}</th>
+          <th nzColumnKey="code" nzShowSort [nzSortFn]="true" nzCustomFilter>
+            {{ 'CODE' | translate }}
+            <nz-filter-trigger
+              [(nzVisible)]="filterVisible['code']"
+              [nzActive]="filterValues['code'].length > 0"
+              [nzDropdownMenu]="codeMenu"
+            >
+              <span nz-icon nzType="search"></span>
+            </nz-filter-trigger>
+          </th>
+          <th nzColumnKey="name" nzShowSort [nzSortFn]="true" nzCustomFilter>
+            {{ 'NAME' | translate }}
+            <nz-filter-trigger
+              [(nzVisible)]="filterVisible['name']"
+              [nzActive]="filterValues['name'].length > 0"
+              [nzDropdownMenu]="nameMenu"
+            >
+              <span nz-icon nzType="search"></span>
+            </nz-filter-trigger>
+          </th>
+          <th nzColumnKey="gstin" nzShowSort [nzSortFn]="true" nzCustomFilter>
+            {{ 'GSTIN' | translate }}
+            <nz-filter-trigger
+              [(nzVisible)]="filterVisible['gstin']"
+              [nzActive]="filterValues['gstin'].length > 0"
+              [nzDropdownMenu]="gstinMenu"
+            >
+              <span nz-icon nzType="search"></span>
+            </nz-filter-trigger>
+          </th>
           <th class="text-center" nzWidth="80px">{{ 'ACTIVE' | translate }}</th>
           @if (permissionService.canWrite('suppliers')) {
             <th class="text-center" nzWidth="120px">{{ 'ACTIONS' | translate }}</th>
@@ -297,3 +352,136 @@
     </nz-table>
   </nz-card>
 </div>
+
+<!-- Filter Menus -->
+<nz-dropdown-menu #codeMenu="nzDropdownMenu">
+  <div
+    class="p-3 shadow-lg rounded-md border"
+    style="
+      background-color: var(--color-surface-raised);
+      border-color: var(--color-border);
+      min-width: 200px;
+    "
+  >
+    <div class="mb-3">
+      <input
+        type="text"
+        nz-input
+        placeholder="Search code"
+        [(ngModel)]="filterValues['code']"
+        (ngModelChange)="onFilterChange('code', $event)"
+      />
+    </div>
+    <div class="flex justify-end gap-2">
+      <button
+        nz-button
+        nzType="default"
+        nzSize="small"
+        (click)="onFilterChange('code', ''); filterVisible['code'] = false"
+      >
+        Reset
+      </button>
+      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['code'] = false">
+        OK
+      </button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<nz-dropdown-menu #nameMenu="nzDropdownMenu">
+  <div
+    class="p-3 shadow-lg rounded-md border"
+    style="
+      background-color: var(--color-surface-raised);
+      border-color: var(--color-border);
+      min-width: 200px;
+    "
+  >
+    <div class="mb-3">
+      <input
+        type="text"
+        nz-input
+        placeholder="Search name"
+        [(ngModel)]="filterValues['name']"
+        (ngModelChange)="onFilterChange('name', $event)"
+      />
+    </div>
+    <div class="flex justify-end gap-2">
+      <button
+        nz-button
+        nzType="default"
+        nzSize="small"
+        (click)="onFilterChange('name', ''); filterVisible['name'] = false"
+      >
+        Reset
+      </button>
+      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['name'] = false">
+        OK
+      </button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<nz-dropdown-menu #gstinMenu="nzDropdownMenu">
+  <div
+    class="p-3 shadow-lg rounded-md border"
+    style="
+      background-color: var(--color-surface-raised);
+      border-color: var(--color-border);
+      min-width: 200px;
+    "
+  >
+    <div class="mb-3">
+      <input
+        type="text"
+        nz-input
+        placeholder="Search GSTIN"
+        [(ngModel)]="filterValues['gstin']"
+        (ngModelChange)="onFilterChange('gstin', $event)"
+      />
+    </div>
+    <div class="flex justify-end gap-2">
+      <button
+        nz-button
+        nzType="default"
+        nzSize="small"
+        (click)="onFilterChange('gstin', ''); filterVisible['gstin'] = false"
+      >
+        Reset
+      </button>
+      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['gstin'] = false">
+        OK
+      </button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<!-- Captcha Modal -->
+<nz-modal
+  [(nzVisible)]="captchaVisible"
+  nzTitle="Enter Captcha"
+  (nzOnCancel)="captchaVisible = false"
+  (nzOnOk)="submitCaptcha()"
+  [nzOkDisabled]="!captchaValue"
+  [nzOkLoading]="loading"
+>
+  <div *nzModalContent class="flex flex-col items-center gap-4">
+    <p>Please enter the captcha shown below to fetch details from the GST portal.</p>
+    @if (captchaData) {
+      <div class="bg-white p-2 border rounded">
+        <img [src]="captchaData.captcha" alt="GST Captcha" class="h-12" />
+      </div>
+    }
+    <input
+      nz-input
+      placeholder="Enter captcha"
+      [(ngModel)]="captchaValue"
+      (keyup.enter)="submitCaptcha()"
+      autofocus
+    />
+    <button nz-button nzType="link" (click)="searchGstin()" [nzLoading]="loading">
+      <span nz-icon nzType="reload"></span> Refresh Captcha
+    </button>
+  </div>
+</nz-modal>
+

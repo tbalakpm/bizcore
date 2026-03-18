@@ -22,6 +22,8 @@ import { serialNumbersRouter } from "./routes/serial-numbers";
 import { stockInvoicesRouter } from "./routes/stock-invoices";
 import { salesInvoicesRouter } from "./routes/sales-invoices";
 import { purchaseInvoicesRouter } from "./routes/purchase-invoices";
+import { gstRouter } from "./routes/gst";
+
 
 export async function app() {
   console.log(`Environment: ${config.environment}`);
@@ -68,6 +70,8 @@ export async function app() {
   app.use("/api/sales-invoices", authRequired, salesInvoicesRouter);
   app.use("/api/purchase-invoices", authRequired, purchaseInvoicesRouter);
   app.use("/api/serial-numbers", authRequired, serialNumbersRouter);
+  app.use("/api/gst", authRequired, gstRouter);
+
 
   // Handle any requests that don't match the static files by serving the index.html file
   app.get("/{*any}", (req, res, next) => {

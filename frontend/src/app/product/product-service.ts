@@ -33,8 +33,37 @@ export interface ProductList {
 export class ProductService {
   private http = inject(HttpClient);
 
-  getAll(): Observable<ProductList> {
+  getAll(paramsObj?: {
+    page?: number;
+    limit?: number;
+    sort?: string;
+    code?: string;
+    name?: string;
+    description?: string;
+    categoryName?: string;
+    categoryId?: number;
+    qtyPerUnit?: string;
+    hsnSac?: string;
+    isActive?: boolean;
+    minPrice?: number;
+    maxPrice?: number;
+  }): Observable<ProductList> {
     let params = new HttpParams();
+    if (paramsObj) {
+      if (paramsObj.page) params = params.set('page', paramsObj.page.toString());
+      if (paramsObj.limit) params = params.set('limit', paramsObj.limit.toString());
+      if (paramsObj.sort) params = params.set('sort', paramsObj.sort);
+      if (paramsObj.code) params = params.set('code', paramsObj.code);
+      if (paramsObj.name) params = params.set('name', paramsObj.name);
+      if (paramsObj.description) params = params.set('description', paramsObj.description);
+      if (paramsObj.categoryName) params = params.set('categoryName', paramsObj.categoryName);
+      if (paramsObj.categoryId) params = params.set('categoryId', paramsObj.categoryId.toString());
+      if (paramsObj.qtyPerUnit) params = params.set('qtyPerUnit', paramsObj.qtyPerUnit);
+      if (paramsObj.hsnSac) params = params.set('hsnSac', paramsObj.hsnSac);
+      if (paramsObj.isActive !== undefined) params = params.set('isActive', paramsObj.isActive.toString());
+      if (paramsObj.minPrice) params = params.set('minPrice', paramsObj.minPrice.toString());
+      if (paramsObj.maxPrice) params = params.set('maxPrice', paramsObj.maxPrice.toString());
+    }
     return this.http.get<ProductList>(`${environment.apiUrl}/products`, { params });
   }
 
