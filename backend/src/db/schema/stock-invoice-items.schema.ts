@@ -13,12 +13,12 @@ export const stockInvoiceItems = sqliteTable('stock_invoice_items', {
     .notNull(),
   qty: numeric('qty').notNull().default('1'),
   unitPrice: numeric('unit_price').notNull().default('0.00'),
+  lineTotal: numeric('line_total').generatedAlwaysAs(
+    (): SQL => sql`(ROUND(qty * unit_price, 2))`),
   marginType: text('margin_type', { length: 25 }).notNull().default('none'),  // none, percent, amount
   marginPct: numeric('margin_pct').notNull().default('0'),
   marginAmount: numeric('margin_amount').notNull().default('0.00'),
-  sellingPrice: numeric('selling_price').notNull().default('0.00'),
-  lineTotal: numeric('line_total').generatedAlwaysAs(
-    (): SQL => sql`(ROUND(qty * unit_price, 2))`)
+  sellingPrice: numeric('selling_price').notNull().default('0.00')
 }, (t) => [
   index('stock_invoice_items_stock_invoice_id_idx').on(t.stockInvoiceId),
   index('stock_invoice_items_inventory_id_idx').on(t.inventoryId)

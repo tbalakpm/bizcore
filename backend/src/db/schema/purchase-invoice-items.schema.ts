@@ -21,8 +21,11 @@ export const purchaseInvoiceItems = sqliteTable('purchase_invoice_items', {
         (): SQL => sql`(ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))`
     ),
     lineTotal: numeric('line_total').generatedAlwaysAs(
-        (): SQL => sql`(ROUND((qty * unit_price - discount_amount) + tax_amount, 2))`
-    )
+        (): SQL => sql`(ROUND((qty * unit_price - discount_amount) + tax_amount, 2))`),
+    marginType: text('margin_type', { length: 25 }).notNull().default('none'),  // none, percent, amount
+    marginPct: numeric('margin_pct').notNull().default('0'),
+    marginAmount: numeric('margin_amount').notNull().default('0.00'),
+    sellingPrice: numeric('selling_price').notNull().default('0.00')
 }, (t) => [
     index('purchase_invoice_items_purchase_invoice_id_idx').on(t.purchaseInvoiceId),
     index('purchase_invoice_items_inventory_id_idx').on(t.inventoryId)

@@ -21,6 +21,10 @@ export interface PurchaseInvoiceItem {
   taxPct: number | string;
   taxAmount?: number | string;
   lineTotal?: number | string;
+  marginType?: string;
+  marginPct?: number | string;
+  marginAmount?: number | string;
+  sellingPrice?: number | string;
   productCode?: string;
   productName?: string;
 }

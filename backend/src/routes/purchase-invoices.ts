@@ -170,19 +170,33 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
 
       if (item.gtn) {
         // Manual GTN
-        const inv = await tx
-          .insert(inventories)
-          .values({
-            productId: product.id,
-            gtn: item.gtn,
-            hsnSac: item.hsnSac || product.hsnSac,
-            taxRate: toNumericString(item.taxPct) || product.taxRate,
-            buyingPrice: toNumericString(unitPrice) || product.unitPrice,
-            unitsInStock: qty,
-          })
-          .returning({ id: inventories.id })
-          .get();
-        inventoryId = inv.id;
+        let inv = await tx.select().from(inventories).where(
+          and(eq(inventories.productId, product.id), eq(inventories.gtn, item.gtn))
+        ).get();
+
+        if (inv) {
+          const updateData: any = { unitsInStock: (inv.unitsInStock || 0) + qty };
+          if (item.sellingPrice !== undefined && item.sellingPrice !== null) {
+              updateData.sellingPrice = toNumericString(item.sellingPrice);
+          }
+          await tx.update(inventories).set(updateData).where(eq(inventories.id, inv.id)).run();
+          inventoryId = inv.id;
+        } else {
+          const newInv = await tx
+            .insert(inventories)
+            .values({
+              productId: product.id,
+              gtn: item.gtn,
+              hsnSac: item.hsnSac || product.hsnSac,
+              taxRate: toNumericString(item.taxPct) || product.taxRate,
+              buyingPrice: toNumericString(unitPrice) || product.unitPrice,
+              sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : undefined,
+              unitsInStock: qty,
+            })
+            .returning({ id: inventories.id })
+            .get();
+          inventoryId = newInv.id;
+        }
       } else {
         // Auto GTN
         const genType = (product.gtnGeneration || 'CODE').toUpperCase();
@@ -197,6 +211,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
                 hsnSac: item.hsnSac || product.hsnSac,
                 taxRate: toNumericString(item.taxPct) || product.taxRate,
                 buyingPrice: toNumericString(unitPrice) || product.unitPrice,
+                sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : undefined,
                 unitsInStock: 1,
               })
               .returning({ id: inventories.id })
@@ -211,6 +226,10 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
               discountPct: toNumericString(item.discountPct),
               discountAmount: toNumericString(item.discountAmount),
               taxPct: toNumericString(item.taxPct),
+              marginType: item.marginType || 'none',
+              marginPct: toNumericString(item.marginPct) || '0',
+              marginAmount: toNumericString(item.marginAmount) || '0.00',
+              sellingPrice: toNumericString(item.sellingPrice) || '0.00',
             }).run();
           }
           inventoryId = -1; // Marker that we handled insertion
@@ -224,26 +243,47 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
             generatedGtn = generateGtn(product.code);
           }
 
-          const inv = await tx
-            .insert(inventories)
-            .values({
-              productId: product.id,
-              gtn: generatedGtn,
-              hsnSac: item.hsnSac || product.hsnSac,
-              taxRate: toNumericString(item.taxPct) || product.taxRate,
-              buyingPrice: toNumericString(unitPrice) || product.unitPrice,
-              unitsInStock: qty,
-            })
-            .returning({ id: inventories.id })
-            .get();
-          inventoryId = inv.id;
+          let inv;
+          if (generatedGtn) {
+            inv = await tx.select().from(inventories).where(
+              and(eq(inventories.productId, product.id), eq(inventories.gtn, generatedGtn))
+            ).get();
+          }
+
+          if (inv) {
+            const updateData: any = { unitsInStock: (inv.unitsInStock || 0) + qty };
+            if (item.sellingPrice !== undefined && item.sellingPrice !== null) {
+                updateData.sellingPrice = toNumericString(item.sellingPrice);
+            }
+            await tx.update(inventories).set(updateData).where(eq(inventories.id, inv.id)).run();
+            inventoryId = inv.id;
+          } else {
+            const newInv = await tx
+              .insert(inventories)
+              .values({
+                productId: product.id,
+                gtn: generatedGtn,
+                hsnSac: item.hsnSac || product.hsnSac,
+                taxRate: toNumericString(item.taxPct) || product.taxRate,
+                buyingPrice: toNumericString(unitPrice) || product.unitPrice,
+                sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : undefined,
+                unitsInStock: qty,
+              })
+              .returning({ id: inventories.id })
+              .get();
+            inventoryId = newInv.id;
+          }
         }
       }
     } else if (inventoryId) {
       const existing = await tx.select().from(inventories).where(eq(inventories.id, inventoryId)).get();
       if (existing) {
+        const updateData: any = { unitsInStock: (existing.unitsInStock || 0) + qty };
+        if (item.sellingPrice !== undefined && item.sellingPrice !== null) {
+            updateData.sellingPrice = toNumericString(item.sellingPrice);
+        }
         await tx.update(inventories)
-          .set({ unitsInStock: (existing.unitsInStock || 0) + qty })
+          .set(updateData)
           .where(eq(inventories.id, inventoryId))
           .run();
       }
@@ -259,6 +299,10 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
         discountPct: toNumericString(item.discountPct),
         discountAmount: toNumericString(item.discountAmount),
         taxPct: toNumericString(item.taxPct),
+        marginType: item.marginType || 'none',
+        marginPct: toNumericString(item.marginPct) || '0',
+        marginAmount: toNumericString(item.marginAmount) || '0.00',
+        sellingPrice: toNumericString(item.sellingPrice) || '0.00',
       }).run();
     }
 

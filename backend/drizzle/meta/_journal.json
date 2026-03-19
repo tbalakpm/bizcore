@@ -57,6 +57,13 @@
       "when": 1773899731229,
       "tag": "0007_stock-invoice-margin",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1773901905754,
+      "tag": "0008_purchase-invoice-margin",
+      "breakpoints": true
     }
   ]
 }

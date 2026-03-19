@@ -108,6 +108,11 @@
   padding-bottom: 2px !important;
 }
 
+/* Right align inputs inside nz-input-number when text-right class is present */
+.text-right .ant-input-number-input {
+  text-align: right !important;
+}
+
 /* ============================================================
    BASE STYLES
    ============================================================ */
