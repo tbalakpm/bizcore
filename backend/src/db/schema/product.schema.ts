@@ -18,8 +18,9 @@ export const products = sqliteTable(
     taxRate: numeric('tax_rate'),
     gtnMode: text('gtn_mode', { length: 25 }).notNull().default('auto'), // auto (default), manual
     gtnGeneration: text('gtn_generation', { length: 25 }).notNull().default('code'),  // code (default), batch, tag, manual
-    gtnPrefix: text('gtn_prefix', { length: 50 }),
-    gtnStartPos: integer('gtn_start_pos'),
+    // gtnPrefix: text('gtn_prefix', { length: 50 }).notNull().default(''),
+    // gtnCurrent: integer('gtn_current').notNull().default(1),
+    // gtnLength: integer('gtn_length').notNull().default(10),
     ...auditFields
   },
   (t) => [

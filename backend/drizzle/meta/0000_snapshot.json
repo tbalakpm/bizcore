@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3184e75b-f683-4e8f-8b13-c5b2b1caba76",
+  "id": "65cb8f53-2e4f-49b6-8086-5bc802e7250f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "addresses": {
@@ -121,14 +121,32 @@
         }
       },
       "indexes": {
-        "address_city": {
-          "name": "address_city",
-          "columns": ["city"],
+        "address_city_idx": {
+          "name": "address_city_idx",
+          "columns": [
+            "city"
+          ],
           "isUnique": false
         },
-        "address_mobile": {
-          "name": "address_mobile",
-          "columns": ["mobile"],
+        "address_phone_idx": {
+          "name": "address_phone_idx",
+          "columns": [
+            "phone"
+          ],
+          "isUnique": false
+        },
+        "address_mobile_idx": {
+          "name": "address_mobile_idx",
+          "columns": [
+            "mobile"
+          ],
+          "isUnique": false
+        },
+        "address_email_idx": {
+          "name": "address_email_idx",
+          "columns": [
+            "email"
+          ],
           "isUnique": false
         }
       },
@@ -196,12 +214,16 @@
       "indexes": {
         "categories_code_unique": {
           "name": "categories_code_unique",
-          "columns": ["code"],
+          "columns": [
+            "code"
+          ],
           "isUnique": true
         },
         "categories_name_unique": {
           "name": "categories_name_unique",
-          "columns": ["name"],
+          "columns": [
+            "name"
+          ],
           "isUnique": true
         }
       },
@@ -298,13 +320,38 @@
       "indexes": {
         "customers_code_unique": {
           "name": "customers_code_unique",
-          "columns": ["code"],
+          "columns": [
+            "code"
+          ],
           "isUnique": true
         },
         "customers_name_unique": {
           "name": "customers_name_unique",
-          "columns": ["name"],
+          "columns": [
+            "name"
+          ],
           "isUnique": true
+        },
+        "customers_billing_address_id_idx": {
+          "name": "customers_billing_address_id_idx",
+          "columns": [
+            "billing_address_id"
+          ],
+          "isUnique": false
+        },
+        "customers_shipping_address_id_idx": {
+          "name": "customers_shipping_address_id_idx",
+          "columns": [
+            "shipping_address_id"
+          ],
+          "isUnique": false
+        },
+        "cusotomers_gstin_idx": {
+          "name": "cusotomers_gstin_idx",
+          "columns": [
+            "gstin"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -312,8 +359,12 @@
           "name": "customers_billing_address_id_addresses_id_fk",
           "tableFrom": "customers",
           "tableTo": "addresses",
-          "columnsFrom": ["billing_address_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "billing_address_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -321,8 +372,12 @@
           "name": "customers_shipping_address_id_addresses_id_fk",
           "tableFrom": "customers",
           "tableTo": "addresses",
-          "columnsFrom": ["shipping_address_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "shipping_address_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -411,9 +466,18 @@
         }
       },
       "indexes": {
-        "inventories_product_id": {
-          "name": "inventories_product_id",
-          "columns": ["product_id"],
+        "inventories_gtn_unique": {
+          "name": "inventories_gtn_unique",
+          "columns": [
+            "gtn"
+          ],
+          "isUnique": true
+        },
+        "inventories_product_id_idx": {
+          "name": "inventories_product_id_idx",
+          "columns": [
+            "product_id"
+          ],
           "isUnique": false
         }
       },
@@ -422,8 +486,12 @@
           "name": "inventories_product_id_products_id_fk",
           "tableFrom": "inventories",
           "tableTo": "products",
-          "columnsFrom": ["product_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -451,7 +519,7 @@
         },
         "prefix": {
           "name": "prefix",
-          "type": "text(10)",
+          "type": "text(50)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
@@ -475,9 +543,11 @@
         }
       },
       "indexes": {
-        "product_serial_numbers_product_id": {
-          "name": "product_serial_numbers_product_id",
-          "columns": ["product_id"],
+        "product_serial_numbers_product_id_unique": {
+          "name": "product_serial_numbers_product_id_unique",
+          "columns": [
+            "product_id"
+          ],
           "isUnique": true
         }
       },
@@ -486,8 +556,12 @@
           "name": "product_serial_numbers_product_id_products_id_fk",
           "tableFrom": "product_serial_numbers",
           "tableTo": "products",
-          "columnsFrom": ["product_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -606,13 +680,24 @@
       "indexes": {
         "products_code_unique": {
           "name": "products_code_unique",
-          "columns": ["code"],
+          "columns": [
+            "code"
+          ],
           "isUnique": true
         },
         "products_name_unique": {
           "name": "products_name_unique",
-          "columns": ["name"],
+          "columns": [
+            "name"
+          ],
           "isUnique": true
+        },
+        "products_category_id_idx": {
+          "name": "products_category_id_idx",
+          "columns": [
+            "category_id"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -620,8 +705,12 @@
           "name": "products_category_id_categories_id_fk",
           "tableFrom": "products",
           "tableTo": "categories",
-          "columnsFrom": ["category_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -638,6 +727,343 @@
           "value": "\"products\".\"gtn_generation\" IN ('code','batch','tag','manual')"
         }
       }
+    },
+    "purchase_invoice_items": {
+      "name": "purchase_invoice_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "purchase_invoice_id": {
+          "name": "purchase_invoice_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inventory_id": {
+          "name": "inventory_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "qty": {
+          "name": "qty",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.000'"
+        },
+        "unit_price": {
+          "name": "unit_price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "discount_type": {
+          "name": "discount_type",
+          "type": "text(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'none'"
+        },
+        "discount_pct": {
+          "name": "discount_pct",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "discount_amount": {
+          "name": "discount_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "tax_pct": {
+          "name": "tax_pct",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "tax_amount": {
+          "name": "tax_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "((ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2)))",
+            "type": "virtual"
+          }
+        },
+        "line_total": {
+          "name": "line_total",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "((ROUND((qty * unit_price - discount_amount) + tax_amount, 2)))",
+            "type": "virtual"
+          }
+        },
+        "margin_type": {
+          "name": "margin_type",
+          "type": "text(25)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'none'"
+        },
+        "margin_pct": {
+          "name": "margin_pct",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0'"
+        },
+        "margin_amount": {
+          "name": "margin_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "selling_price": {
+          "name": "selling_price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        }
+      },
+      "indexes": {
+        "purchase_invoice_items_purchase_invoice_id_idx": {
+          "name": "purchase_invoice_items_purchase_invoice_id_idx",
+          "columns": [
+            "purchase_invoice_id"
+          ],
+          "isUnique": false
+        },
+        "purchase_invoice_items_inventory_id_idx": {
+          "name": "purchase_invoice_items_inventory_id_idx",
+          "columns": [
+            "inventory_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "purchase_invoice_items_purchase_invoice_id_purchase_invoices_id_fk": {
+          "name": "purchase_invoice_items_purchase_invoice_id_purchase_invoices_id_fk",
+          "tableFrom": "purchase_invoice_items",
+          "tableTo": "purchase_invoices",
+          "columnsFrom": [
+            "purchase_invoice_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "purchase_invoice_items_inventory_id_inventories_id_fk": {
+          "name": "purchase_invoice_items_inventory_id_inventories_id_fk",
+          "tableFrom": "purchase_invoice_items",
+          "tableTo": "inventories",
+          "columnsFrom": [
+            "inventory_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "purchase_invoices": {
+      "name": "purchase_invoices",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "invoice_number": {
+          "name": "invoice_number",
+          "type": "text(25)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "invoice_date": {
+          "name": "invoice_date",
+          "type": "text(25)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "supplier_id": {
+          "name": "supplier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ref_number": {
+          "name": "ref_number",
+          "type": "text(25)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "ref_date": {
+          "name": "ref_date",
+          "type": "text(25)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "total_qty": {
+          "name": "total_qty",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.000'"
+        },
+        "subtotal": {
+          "name": "subtotal",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "discount_type": {
+          "name": "discount_type",
+          "type": "text(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'none'"
+        },
+        "discount_pct": {
+          "name": "discount_pct",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "discount_amount": {
+          "name": "discount_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "total_tax_amount": {
+          "name": "total_tax_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "round_off": {
+          "name": "round_off",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "net_amount": {
+          "name": "net_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "((ROUND(subtotal - discount_amount + total_tax_amount + round_off, 2)))",
+            "type": "virtual"
+          }
+        }
+      },
+      "indexes": {
+        "purchase_invoices_invoice_number_unique": {
+          "name": "purchase_invoices_invoice_number_unique",
+          "columns": [
+            "invoice_number"
+          ],
+          "isUnique": true
+        },
+        "purchase_invoices_supplier_id_idx": {
+          "name": "purchase_invoices_supplier_id_idx",
+          "columns": [
+            "supplier_id"
+          ],
+          "isUnique": false
+        },
+        "purchase_invoices_invoice_date_idx": {
+          "name": "purchase_invoices_invoice_date_idx",
+          "columns": [
+            "invoice_date"
+          ],
+          "isUnique": false
+        },
+        "purchase_invoices_ref_number_idx": {
+          "name": "purchase_invoices_ref_number_idx",
+          "columns": [
+            "ref_number"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "purchase_invoices_supplier_id_suppliers_id_fk": {
+          "name": "purchase_invoices_supplier_id_suppliers_id_fk",
+          "tableFrom": "purchase_invoices",
+          "tableTo": "suppliers",
+          "columnsFrom": [
+            "supplier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "sales_invoice_items": {
       "name": "sales_invoice_items",
@@ -734,14 +1160,33 @@
           }
         }
       },
-      "indexes": {},
+      "indexes": {
+        "sales_invoice_items_sales_invoice_id_idx": {
+          "name": "sales_invoice_items_sales_invoice_id_idx",
+          "columns": [
+            "sales_invoice_id"
+          ],
+          "isUnique": false
+        },
+        "sales_invoice_items_inventory_id_idx": {
+          "name": "sales_invoice_items_inventory_id_idx",
+          "columns": [
+            "inventory_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "sales_invoice_items_sales_invoice_id_sales_invoices_id_fk": {
           "name": "sales_invoice_items_sales_invoice_id_sales_invoices_id_fk",
           "tableFrom": "sales_invoice_items",
           "tableTo": "sales_invoices",
-          "columnsFrom": ["sales_invoice_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "sales_invoice_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -749,8 +1194,12 @@
           "name": "sales_invoice_items_inventory_id_inventories_id_fk",
           "tableFrom": "sales_invoice_items",
           "tableTo": "inventories",
-          "columnsFrom": ["inventory_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "inventory_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -914,27 +1363,44 @@
       "indexes": {
         "sales_invoices_invoice_number_unique": {
           "name": "sales_invoices_invoice_number_unique",
-          "columns": ["invoice_number"],
+          "columns": [
+            "invoice_number"
+          ],
           "isUnique": true
         },
-        "sales_invoices_invoice_date": {
-          "name": "sales_invoices_invoice_date",
-          "columns": ["invoice_date"],
+        "sales_invoices_invoice_date_idx": {
+          "name": "sales_invoices_invoice_date_idx",
+          "columns": [
+            "invoice_date"
+          ],
           "isUnique": false
         },
-        "sales_invoices_ref_number": {
-          "name": "sales_invoices_ref_number",
-          "columns": ["ref_number"],
+        "sales_invoices_customer_id_idx": {
+          "name": "sales_invoices_customer_id_idx",
+          "columns": [
+            "customer_id"
+          ],
           "isUnique": false
         },
-        "sales_invoices_irn": {
-          "name": "sales_invoices_irn",
-          "columns": ["irn"],
+        "sales_invoices_ref_number_idx": {
+          "name": "sales_invoices_ref_number_idx",
+          "columns": [
+            "ref_number"
+          ],
           "isUnique": false
         },
-        "sales_invoices_ack_no": {
-          "name": "sales_invoices_ack_no",
-          "columns": ["ack_no"],
+        "sales_invoices_irn_idx": {
+          "name": "sales_invoices_irn_idx",
+          "columns": [
+            "irn"
+          ],
+          "isUnique": false
+        },
+        "sales_invoices_ack_no_idx": {
+          "name": "sales_invoices_ack_no_idx",
+          "columns": [
+            "ack_no"
+          ],
           "isUnique": false
         }
       },
@@ -943,8 +1409,12 @@
           "name": "sales_invoices_customer_id_customers_id_fk",
           "tableFrom": "sales_invoices",
           "tableTo": "customers",
-          "columnsFrom": ["customer_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -998,7 +1468,9 @@
       "indexes": {
         "serial_numbers_key_unique": {
           "name": "serial_numbers_key_unique",
-          "columns": ["key"],
+          "columns": [
+            "key"
+          ],
           "isUnique": true
         }
       },
@@ -1036,7 +1508,9 @@
       "indexes": {
         "settings_key_unique": {
           "name": "settings_key_unique",
-          "columns": ["key"],
+          "columns": [
+            "key"
+          ],
           "isUnique": true
         }
       },
@@ -1073,32 +1547,89 @@
           "name": "qty",
           "type": "numeric",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'1'"
         },
         "unit_price": {
           "name": "unit_price",
           "type": "numeric",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
         },
         "line_total": {
           "name": "line_total",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "generated": {
+            "as": "((ROUND(qty * unit_price, 2)))",
+            "type": "virtual"
+          }
+        },
+        "margin_type": {
+          "name": "margin_type",
+          "type": "text(25)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'none'"
+        },
+        "margin_pct": {
+          "name": "margin_pct",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0'"
+        },
+        "margin_amount": {
+          "name": "margin_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "selling_price": {
+          "name": "selling_price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "stock_invoice_items_stock_invoice_id_idx": {
+          "name": "stock_invoice_items_stock_invoice_id_idx",
+          "columns": [
+            "stock_invoice_id"
+          ],
+          "isUnique": false
+        },
+        "stock_invoice_items_inventory_id_idx": {
+          "name": "stock_invoice_items_inventory_id_idx",
+          "columns": [
+            "inventory_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "stock_invoice_items_stock_invoice_id_stock_invoices_id_fk": {
           "name": "stock_invoice_items_stock_invoice_id_stock_invoices_id_fk",
           "tableFrom": "stock_invoice_items",
           "tableTo": "stock_invoices",
-          "columnsFrom": ["stock_invoice_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "stock_invoice_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1106,8 +1637,12 @@
           "name": "stock_invoice_items_inventory_id_inventories_id_fk",
           "tableFrom": "stock_invoice_items",
           "tableTo": "inventories",
-          "columnsFrom": ["inventory_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "inventory_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1160,11 +1695,102 @@
       "indexes": {
         "stock_invoices_invoice_number_unique": {
           "name": "stock_invoices_invoice_number_unique",
-          "columns": ["invoice_number"],
+          "columns": [
+            "invoice_number"
+          ],
           "isUnique": true
+        },
+        "stock_invoices_invoice_date_idx": {
+          "name": "stock_invoices_invoice_date_idx",
+          "columns": [
+            "invoice_date"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "supplier_banks": {
+      "name": "supplier_banks",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "supplier_id": {
+          "name": "supplier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bank_name": {
+          "name": "bank_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_number": {
+          "name": "account_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ifsc_code": {
+          "name": "ifsc_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "branch_name": {
+          "name": "branch_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "is_primary": {
+          "name": "is_primary",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        }
+      },
+      "indexes": {
+        "supplier_bank_supplier_id_idx": {
+          "name": "supplier_bank_supplier_id_idx",
+          "columns": [
+            "supplier_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "supplier_banks_supplier_id_suppliers_id_fk": {
+          "name": "supplier_banks_supplier_id_suppliers_id_fk",
+          "tableFrom": "supplier_banks",
+          "tableTo": "suppliers",
+          "columnsFrom": [
+            "supplier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -1249,13 +1875,38 @@
       "indexes": {
         "suppliers_code_unique": {
           "name": "suppliers_code_unique",
-          "columns": ["code"],
+          "columns": [
+            "code"
+          ],
           "isUnique": true
         },
         "suppliers_name_unique": {
           "name": "suppliers_name_unique",
-          "columns": ["name"],
+          "columns": [
+            "name"
+          ],
           "isUnique": true
+        },
+        "suppliers_billing_address_id_idx": {
+          "name": "suppliers_billing_address_id_idx",
+          "columns": [
+            "billing_address_id"
+          ],
+          "isUnique": false
+        },
+        "suppliers_shipping_address_id_idx": {
+          "name": "suppliers_shipping_address_id_idx",
+          "columns": [
+            "shipping_address_id"
+          ],
+          "isUnique": false
+        },
+        "suppliers_gstin_idx": {
+          "name": "suppliers_gstin_idx",
+          "columns": [
+            "gstin"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -1263,8 +1914,12 @@
           "name": "suppliers_billing_address_id_addresses_id_fk",
           "tableFrom": "suppliers",
           "tableTo": "addresses",
-          "columnsFrom": ["billing_address_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "billing_address_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1272,8 +1927,12 @@
           "name": "suppliers_shipping_address_id_addresses_id_fk",
           "tableFrom": "suppliers",
           "tableTo": "addresses",
-          "columnsFrom": ["shipping_address_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "shipping_address_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1328,6 +1987,14 @@
           "autoincrement": false,
           "default": "'user'"
         },
+        "permissions": {
+          "name": "permissions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'{}'"
+        },
         "is_active": {
           "name": "is_active",
           "type": "integer",
@@ -1356,7 +2023,9 @@
       "indexes": {
         "users_username_unique": {
           "name": "users_username_unique",
-          "columns": ["username"],
+          "columns": [
+            "username"
+          ],
           "isUnique": true
         }
       },

@@ -232,11 +232,11 @@
       <thead>
         <tr>
           <th nzWidth="200px">Product</th>
-          <th nzWidth="120px">GTN</th>
+          <th nzWidth="150px">GTN</th>
           <th nzAlign="right" nzWidth="100px">Qty</th>
           <th nzAlign="right" nzWidth="100px">Unit Price</th>
           <th nzAlign="right" nzWidth="100px">Tax</th>
-          <th nzAlign="right" nzWidth="110px">Line Total</th>
+          <th nzAlign="right" nzWidth="100px">Line Total</th>
           <th nzAlign="right" nzWidth="100px">Margin</th>
           <th nzAlign="right" nzWidth="100px">Selling Price</th>
           <th nzAlign="center" nzWidth="60px">
@@ -409,7 +409,7 @@
                 class="w-full text-right"
               ></nz-input-number>
             </td>
-            <td class="text-right">
+            <td class="text-center">
               <button
                 nz-button
                 nzType="link"
@@ -420,6 +420,7 @@
                 type="button"
                 (click)="removeItemRow(item)"
                 [disabled]="editingInvoice.items.length <= 1"
+                nzAlign="center"
               >
                 <span nz-icon nzType="delete" nzTheme="outline"></span>
               </button>

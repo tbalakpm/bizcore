@@ -17,8 +17,10 @@ CREATE TABLE `addresses` (
 	`longitude` text(25)
 );
 --> statement-breakpoint
-CREATE INDEX `address_city` ON `addresses` (`city`);--> statement-breakpoint
-CREATE INDEX `address_mobile` ON `addresses` (`mobile`);--> statement-breakpoint
+CREATE INDEX `address_city_idx` ON `addresses` (`city`);--> statement-breakpoint
+CREATE INDEX `address_phone_idx` ON `addresses` (`phone`);--> statement-breakpoint
+CREATE INDEX `address_mobile_idx` ON `addresses` (`mobile`);--> statement-breakpoint
+CREATE INDEX `address_email_idx` ON `addresses` (`email`);--> statement-breakpoint
 CREATE TABLE `categories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text(20) NOT NULL,
@@ -50,6 +52,9 @@ CREATE TABLE `customers` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `customers_code_unique` ON `customers` (`code`);--> statement-breakpoint
 CREATE UNIQUE INDEX `customers_name_unique` ON `customers` (`name`);--> statement-breakpoint
+CREATE INDEX `customers_billing_address_id_idx` ON `customers` (`billing_address_id`);--> statement-breakpoint
+CREATE INDEX `customers_shipping_address_id_idx` ON `customers` (`shipping_address_id`);--> statement-breakpoint
+CREATE INDEX `cusotomers_gstin_idx` ON `customers` (`gstin`);--> statement-breakpoint
 CREATE TABLE `inventories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`product_id` integer NOT NULL,
@@ -64,17 +69,18 @@ CREATE TABLE `inventories` (
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE INDEX `inventories_product_id` ON `inventories` (`product_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `inventories_gtn_unique` ON `inventories` (`gtn`);--> statement-breakpoint
+CREATE INDEX `inventories_product_id_idx` ON `inventories` (`product_id`);--> statement-breakpoint
 CREATE TABLE `product_serial_numbers` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`product_id` integer,
-	`prefix` text(10) DEFAULT '' NOT NULL,
+	`prefix` text(50) DEFAULT '' NOT NULL,
 	`current` integer DEFAULT 1 NOT NULL,
 	`length` integer DEFAULT 10 NOT NULL,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `product_serial_numbers_product_id` ON `product_serial_numbers` (`product_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `product_serial_numbers_product_id_unique` ON `product_serial_numbers` (`product_id`);--> statement-breakpoint
 CREATE TABLE `products` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text(20) NOT NULL,
@@ -97,6 +103,51 @@ CREATE TABLE `products` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `products_code_unique` ON `products` (`code`);--> statement-breakpoint
 CREATE UNIQUE INDEX `products_name_unique` ON `products` (`name`);--> statement-breakpoint
+CREATE INDEX `products_category_id_idx` ON `products` (`category_id`);--> statement-breakpoint
+CREATE TABLE `purchase_invoice_items` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`purchase_invoice_id` integer NOT NULL,
+	`inventory_id` integer NOT NULL,
+	`qty` numeric DEFAULT '0.000' NOT NULL,
+	`unit_price` numeric DEFAULT '0.00' NOT NULL,
+	`discount_type` text(10) DEFAULT 'none' NOT NULL,
+	`discount_pct` numeric DEFAULT '0.00' NOT NULL,
+	`discount_amount` numeric DEFAULT '0.00' NOT NULL,
+	`tax_pct` numeric DEFAULT '0.00' NOT NULL,
+	`tax_amount` numeric GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))) VIRTUAL,
+	`line_total` numeric GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) + tax_amount, 2))) VIRTUAL,
+	`margin_type` text(25) DEFAULT 'none' NOT NULL,
+	`margin_pct` numeric DEFAULT '0' NOT NULL,
+	`margin_amount` numeric DEFAULT '0.00' NOT NULL,
+	`selling_price` numeric DEFAULT '0.00' NOT NULL,
+	FOREIGN KEY (`purchase_invoice_id`) REFERENCES `purchase_invoices`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`inventory_id`) REFERENCES `inventories`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE INDEX `purchase_invoice_items_purchase_invoice_id_idx` ON `purchase_invoice_items` (`purchase_invoice_id`);--> statement-breakpoint
+CREATE INDEX `purchase_invoice_items_inventory_id_idx` ON `purchase_invoice_items` (`inventory_id`);--> statement-breakpoint
+CREATE TABLE `purchase_invoices` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`invoice_number` text(25) NOT NULL,
+	`invoice_date` text(25) NOT NULL,
+	`supplier_id` integer NOT NULL,
+	`ref_number` text(25),
+	`ref_date` text(25),
+	`total_qty` numeric DEFAULT '0.000' NOT NULL,
+	`subtotal` numeric DEFAULT '0.00' NOT NULL,
+	`discount_type` text(20) DEFAULT 'none' NOT NULL,
+	`discount_pct` numeric DEFAULT '0.00' NOT NULL,
+	`discount_amount` numeric DEFAULT '0.00' NOT NULL,
+	`total_tax_amount` numeric DEFAULT '0.00' NOT NULL,
+	`round_off` numeric DEFAULT '0.00' NOT NULL,
+	`net_amount` numeric GENERATED ALWAYS AS ((ROUND(subtotal - discount_amount + total_tax_amount + round_off, 2))) VIRTUAL,
+	FOREIGN KEY (`supplier_id`) REFERENCES `suppliers`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `purchase_invoices_invoice_number_unique` ON `purchase_invoices` (`invoice_number`);--> statement-breakpoint
+CREATE INDEX `purchase_invoices_supplier_id_idx` ON `purchase_invoices` (`supplier_id`);--> statement-breakpoint
+CREATE INDEX `purchase_invoices_invoice_date_idx` ON `purchase_invoices` (`invoice_date`);--> statement-breakpoint
+CREATE INDEX `purchase_invoices_ref_number_idx` ON `purchase_invoices` (`ref_number`);--> statement-breakpoint
 CREATE TABLE `sales_invoice_items` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`sales_invoice_id` integer NOT NULL,
@@ -113,6 +164,8 @@ CREATE TABLE `sales_invoice_items` (
 	FOREIGN KEY (`inventory_id`) REFERENCES `inventories`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE INDEX `sales_invoice_items_sales_invoice_id_idx` ON `sales_invoice_items` (`sales_invoice_id`);--> statement-breakpoint
+CREATE INDEX `sales_invoice_items_inventory_id_idx` ON `sales_invoice_items` (`inventory_id`);--> statement-breakpoint
 CREATE TABLE `sales_invoices` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`invoice_number` text(25) NOT NULL,
@@ -137,10 +190,11 @@ CREATE TABLE `sales_invoices` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `sales_invoices_invoice_number_unique` ON `sales_invoices` (`invoice_number`);--> statement-breakpoint
-CREATE INDEX `sales_invoices_invoice_date` ON `sales_invoices` (`invoice_date`);--> statement-breakpoint
-CREATE INDEX `sales_invoices_ref_number` ON `sales_invoices` (`ref_number`);--> statement-breakpoint
-CREATE INDEX `sales_invoices_irn` ON `sales_invoices` (`irn`);--> statement-breakpoint
-CREATE INDEX `sales_invoices_ack_no` ON `sales_invoices` (`ack_no`);--> statement-breakpoint
+CREATE INDEX `sales_invoices_invoice_date_idx` ON `sales_invoices` (`invoice_date`);--> statement-breakpoint
+CREATE INDEX `sales_invoices_customer_id_idx` ON `sales_invoices` (`customer_id`);--> statement-breakpoint
+CREATE INDEX `sales_invoices_ref_number_idx` ON `sales_invoices` (`ref_number`);--> statement-breakpoint
+CREATE INDEX `sales_invoices_irn_idx` ON `sales_invoices` (`irn`);--> statement-breakpoint
+CREATE INDEX `sales_invoices_ack_no_idx` ON `sales_invoices` (`ack_no`);--> statement-breakpoint
 CREATE TABLE `serial_numbers` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`key` text(25) NOT NULL,
@@ -161,13 +215,19 @@ CREATE TABLE `stock_invoice_items` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`stock_invoice_id` integer NOT NULL,
 	`inventory_id` integer NOT NULL,
-	`qty` numeric,
-	`unit_price` numeric,
-	`line_total` numeric,
+	`qty` numeric DEFAULT '1' NOT NULL,
+	`unit_price` numeric DEFAULT '0.00' NOT NULL,
+	`line_total` numeric GENERATED ALWAYS AS ((ROUND(qty * unit_price, 2))) VIRTUAL,
+	`margin_type` text(25) DEFAULT 'none' NOT NULL,
+	`margin_pct` numeric DEFAULT '0' NOT NULL,
+	`margin_amount` numeric DEFAULT '0.00' NOT NULL,
+	`selling_price` numeric DEFAULT '0.00' NOT NULL,
 	FOREIGN KEY (`stock_invoice_id`) REFERENCES `stock_invoices`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`inventory_id`) REFERENCES `inventories`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE INDEX `stock_invoice_items_stock_invoice_id_idx` ON `stock_invoice_items` (`stock_invoice_id`);--> statement-breakpoint
+CREATE INDEX `stock_invoice_items_inventory_id_idx` ON `stock_invoice_items` (`inventory_id`);--> statement-breakpoint
 CREATE TABLE `stock_invoices` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`invoice_number` text(20) NOT NULL,
@@ -177,6 +237,19 @@ CREATE TABLE `stock_invoices` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `stock_invoices_invoice_number_unique` ON `stock_invoices` (`invoice_number`);--> statement-breakpoint
+CREATE INDEX `stock_invoices_invoice_date_idx` ON `stock_invoices` (`invoice_date`);--> statement-breakpoint
+CREATE TABLE `supplier_banks` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`supplier_id` integer NOT NULL,
+	`bank_name` text NOT NULL,
+	`account_number` text NOT NULL,
+	`ifsc_code` text NOT NULL,
+	`branch_name` text NOT NULL,
+	`is_primary` integer DEFAULT false NOT NULL,
+	FOREIGN KEY (`supplier_id`) REFERENCES `suppliers`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE INDEX `supplier_bank_supplier_id_idx` ON `supplier_banks` (`supplier_id`);--> statement-breakpoint
 CREATE TABLE `suppliers` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text(20) NOT NULL,
@@ -194,6 +267,9 @@ CREATE TABLE `suppliers` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `suppliers_code_unique` ON `suppliers` (`code`);--> statement-breakpoint
 CREATE UNIQUE INDEX `suppliers_name_unique` ON `suppliers` (`name`);--> statement-breakpoint
+CREATE INDEX `suppliers_billing_address_id_idx` ON `suppliers` (`billing_address_id`);--> statement-breakpoint
+CREATE INDEX `suppliers_shipping_address_id_idx` ON `suppliers` (`shipping_address_id`);--> statement-breakpoint
+CREATE INDEX `suppliers_gstin_idx` ON `suppliers` (`gstin`);--> statement-breakpoint
 CREATE TABLE `users` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`username` text(20) NOT NULL,
@@ -201,6 +277,7 @@ CREATE TABLE `users` (
 	`first_name` text(50),
 	`last_name` text(50),
 	`role` text(20) DEFAULT 'user' NOT NULL,
+	`permissions` text DEFAULT '{}',
 	`is_active` integer DEFAULT true NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
