@@ -143,29 +143,6 @@
             >
           }
 
-          <!-- Opening Stock -->
-          @if (permissions.canRead('stock-invoices')) {
-            <a
-              routerLink="/stock-invoices"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
-            >
-              <span
-                nz-icon
-                nzType="inbox"
-                nzTheme="outline"
-                class="shrink-0"
-                style="font-size: 20px"
-              ></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >Opening Stock</span
-              ></a
-            >
-          }
-
           <!-- Purchase Invoices -->
           @if (permissions.canRead('purchase-invoices')) {
             <a
@@ -195,6 +172,29 @@
                 [class.opacity-0]="isSidebarCollapsed()"
                 [class.w-0]="isSidebarCollapsed()"
                 >Purchase</span
+              ></a
+            >
+          }
+
+          <!-- Opening Stock -->
+          @if (permissions.canRead('stock-invoices')) {
+            <a
+              routerLink="/stock-invoices"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            >
+              <span
+                nz-icon
+                nzType="inbox"
+                nzTheme="outline"
+                class="shrink-0"
+                style="font-size: 20px"
+              ></span>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >Opening Stock</span
               ></a
             >
           }

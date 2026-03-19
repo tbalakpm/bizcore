@@ -66,7 +66,7 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
             hsnSac: item.hsnSac ?? product.hsnSac,
             taxRate: toNumericString(item.taxRate) ?? product.taxRate,
             buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
-            sellingPrice: product.unitPrice,
+            sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : product.unitPrice,
             unitsInStock: qty,
             location: item.location,
           })
@@ -80,7 +80,10 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
             inventoryId: createdInventory.id,
             qty: toNumericString(qty),
             unitPrice: toNumericString(unitPrice),
-            lineTotal: toNumericString(lineTotal),
+            marginType: item.marginType ?? 'none',
+            marginPct: toNumericString(item.marginPct) ?? '0',
+            marginAmount: toNumericString(item.marginAmount) ?? '0',
+            sellingPrice: toNumericString(item.sellingPrice) ?? '0',
           })
           .run();
       } else {
@@ -100,7 +103,7 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
                 hsnSac: item.hsnSac ?? product.hsnSac,
                 taxRate: toNumericString(item.taxRate) ?? product.taxRate,
                 buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
-                sellingPrice: product.unitPrice,
+                sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : product.unitPrice,
                 unitsInStock: 1,
                 location: item.location,
               })
@@ -114,7 +117,10 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
                 inventoryId: createdInventory.id,
                 qty: '1',
                 unitPrice: toNumericString(unitPrice),
-                lineTotal: toNumericString(unitPrice), // Line total for 1 qty is unit price
+                marginType: item.marginType ?? 'none',
+                marginPct: toNumericString(item.marginPct) ?? '0',
+                marginAmount: toNumericString(item.marginAmount) ?? '0',
+                sellingPrice: toNumericString(item.sellingPrice) ?? '0',
               })
               .run();
           }
@@ -138,7 +144,7 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
               hsnSac: item.hsnSac ?? product.hsnSac,
               taxRate: toNumericString(item.taxRate) ?? product.taxRate,
               buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
-              sellingPrice: product.unitPrice,
+              sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : product.unitPrice,
               unitsInStock: qty,
               location: item.location,
             })
@@ -152,7 +158,10 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
               inventoryId: createdInventory.id,
               qty: toNumericString(qty),
               unitPrice: toNumericString(unitPrice),
-              lineTotal: toNumericString(lineTotal),
+              marginType: item.marginType ?? 'none',
+              marginPct: toNumericString(item.marginPct) ?? '0',
+              marginAmount: toNumericString(item.marginAmount) ?? '0',
+              sellingPrice: toNumericString(item.sellingPrice) ?? '0',
             })
             .run();
         }
@@ -165,9 +174,14 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
       }
 
       const updatedUnitsInStock = (inventory.unitsInStock ?? 0) + qty;
+      const updatingPayload: any = { unitsInStock: updatedUnitsInStock };
+      if (item.sellingPrice !== undefined) {
+        updatingPayload.sellingPrice = toNumericString(item.sellingPrice);
+      }
+
       await tx
         .update(inventories)
-        .set({ unitsInStock: updatedUnitsInStock })
+        .set(updatingPayload)
         .where(eq(inventories.id, inventory.id))
         .run();
 
@@ -178,7 +192,10 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
           inventoryId: inventory.id,
           qty: toNumericString(qty),
           unitPrice: toNumericString(unitPrice),
-          lineTotal: toNumericString(lineTotal),
+          marginType: item.marginType ?? 'none',
+          marginPct: toNumericString(item.marginPct) ?? '0',
+          marginAmount: toNumericString(item.marginAmount) ?? '0',
+          sellingPrice: toNumericString(item.sellingPrice) ?? '0',
         })
         .run();
     }
@@ -333,6 +350,10 @@ stockInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
         inventoryId: stockInvoiceItems.inventoryId,
         qty: stockInvoiceItems.qty,
         unitPrice: stockInvoiceItems.unitPrice,
+        marginType: stockInvoiceItems.marginType,
+        marginPct: stockInvoiceItems.marginPct,
+        marginAmount: stockInvoiceItems.marginAmount,
+        sellingPrice: stockInvoiceItems.sellingPrice,
         lineTotal: stockInvoiceItems.lineTotal,
         productId: inventories.productId,
         gtn: inventories.gtn,
@@ -374,6 +395,10 @@ stockInvoicesRouter.get('/:id/barcodes', async (req: Request, res: Response) => 
         inventoryId: stockInvoiceItems.inventoryId,
         qty: stockInvoiceItems.qty,
         unitPrice: stockInvoiceItems.unitPrice,
+        marginType: stockInvoiceItems.marginType,
+        marginPct: stockInvoiceItems.marginPct,
+        marginAmount: stockInvoiceItems.marginAmount,
+        sellingPrice: stockInvoiceItems.sellingPrice,
         lineTotal: stockInvoiceItems.lineTotal,
         productId: inventories.productId,
         gtn: inventories.gtn,
@@ -416,6 +441,10 @@ stockInvoicesRouter.get('/:id/barcodes/pdf', async (req: Request, res: Response)
         inventoryId: stockInvoiceItems.inventoryId,
         qty: stockInvoiceItems.qty,
         unitPrice: stockInvoiceItems.unitPrice,
+        marginType: stockInvoiceItems.marginType,
+        marginPct: stockInvoiceItems.marginPct,
+        marginAmount: stockInvoiceItems.marginAmount,
+        sellingPrice: stockInvoiceItems.sellingPrice,
         lineTotal: stockInvoiceItems.lineTotal,
         productId: inventories.productId,
         gtn: inventories.gtn,

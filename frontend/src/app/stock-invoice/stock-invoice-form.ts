@@ -27,6 +27,10 @@ type EditableStockInvoiceItem = {
   taxRate?: number;
   qty: number;
   unitPrice: number;
+  marginType: string;
+  marginPct: number;
+  marginAmount: number;
+  sellingPrice: number;
   lineTotal: number;
 };
 
@@ -94,7 +98,7 @@ export class StockInvoiceForm implements OnInit {
       id: undefined,
       invoiceNumber: '',
       invoiceDate: new Date().toISOString().slice(0, 10),
-      items: [{ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '' }],
+      items: [{ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '', marginType: 'none', marginPct: 0, marginAmount: 0, sellingPrice: 0 }],
     };
   }
 
@@ -141,11 +145,15 @@ export class StockInvoiceForm implements OnInit {
           taxRate: item.taxRate !== undefined ? Number(item.taxRate) : undefined,
           qty: Number(item.qty ?? 0),
           unitPrice: Number(item.unitPrice ?? 0),
+          marginType: item.marginType ?? 'none',
+          marginPct: Number(item.marginPct ?? 0),
+          marginAmount: Number(item.marginAmount ?? 0),
+          sellingPrice: Number(item.sellingPrice ?? 0),
           lineTotal: Number(item.lineTotal ?? 0),
         }));
 
         if (this.editingInvoice.items.length === 0) {
-          this.editingInvoice.items = [{ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '' }];
+          this.editingInvoice.items = [{ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '', marginType: 'none', marginPct: 0, marginAmount: 0, sellingPrice: 0 }];
         }
 
         // Sync date picker
@@ -183,7 +191,7 @@ export class StockInvoiceForm implements OnInit {
   }
 
   addItemRow() {
-    this.editingInvoice.items.push({ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '' });
+    this.editingInvoice.items.push({ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '', marginType: 'none', marginPct: 0, marginAmount: 0, sellingPrice: 0 });
     setTimeout(() => {
       const lastSelect = this.itemRowSelects.last;
       if (lastSelect) {
@@ -207,6 +215,47 @@ export class StockInvoiceForm implements OnInit {
     item.qty = qty;
     item.unitPrice = unitPrice;
     item.lineTotal = Number((qty * unitPrice).toFixed(2));
+    this.recalculateMargin(item);
+  }
+
+  recalculateMargin(item: EditableStockInvoiceItem) {
+    if (item.marginType === 'none') {
+      item.marginPct = 0;
+      item.marginAmount = 0;
+      item.sellingPrice = item.unitPrice;
+      return;
+    }
+    if (item.marginType === 'pct') {
+      item.marginAmount = Number((item.unitPrice * (item.marginPct || 0) / 100).toFixed(2));
+      item.sellingPrice = Number((item.unitPrice + item.marginAmount).toFixed(2));
+    } else if (item.marginType === 'amount') {
+      item.marginPct = item.unitPrice > 0 ? Number(((item.marginAmount || 0) / item.unitPrice * 100).toFixed(2)) : 0;
+      item.sellingPrice = Number((item.unitPrice + (item.marginAmount || 0)).toFixed(2));
+    }
+  }
+
+  onMarginChanged(item: EditableStockInvoiceItem) {
+    this.recalculateMargin(item);
+  }
+
+  onSellingPriceChanged(item: EditableStockInvoiceItem) {
+    const diff = (item.sellingPrice || 0) - item.unitPrice;
+    if (diff === 0) {
+      item.marginType = 'none';
+      item.marginPct = 0;
+      item.marginAmount = 0;
+    } else {
+      if (item.marginType === 'none') {
+        item.marginType = 'amount';
+      }
+      if (item.marginType === 'amount') {
+         item.marginAmount = Number(diff.toFixed(2));
+         item.marginPct = item.unitPrice > 0 ? Number((diff / item.unitPrice * 100).toFixed(2)) : 0;
+      } else if (item.marginType === 'pct') {
+         item.marginPct = item.unitPrice > 0 ? Number((diff / item.unitPrice * 100).toFixed(2)) : 0;
+         item.marginAmount = Number(diff.toFixed(2));
+      }
+    }
   }
 
   onProductSelect(item: EditableStockInvoiceItem) {
@@ -238,6 +287,10 @@ export class StockInvoiceForm implements OnInit {
         taxRate: item.taxRate,
         qty: Number(item.qty || 0),
         unitPrice: Number(item.unitPrice || 0),
+        marginType: item.marginType,
+        marginPct: Number(item.marginPct || 0),
+        marginAmount: Number(item.marginAmount || 0),
+        sellingPrice: Number(item.sellingPrice || 0),
         lineTotal: Number(item.lineTotal || 0),
       }));
 

@@ -17,6 +17,10 @@ export interface StockInvoiceItem {
   productName?: string;
   qty: number;
   unitPrice: number;
+  marginType?: string;
+  marginPct?: number | string;
+  marginAmount?: number | string;
+  sellingPrice?: number | string;
   lineTotal: number;
 }
 

@@ -9,6 +9,10 @@ export interface StockInvoiceItemModel {
   // inventory?: InventoryModel;
   qty: number;
   unitPrice: number;
+  marginType?: string;
+  marginPct?: number | string;
+  marginAmount?: number | string;
+  sellingPrice?: number | string;
   lineTotal: number;
   location?: string;
 }

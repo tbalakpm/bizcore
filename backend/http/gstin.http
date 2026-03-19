@@ -1,0 +1,23 @@
+POST https://publicservices.gst.gov.in/publicservices/auth/api/search/tp
+
+{
+    "gstin": "33FFTPB6340K1Z7"
+}
+
+###
+GET https://publicservices.gst.gov.in/publicservices/auth/api/search/goodservice?gstin=33FFTPB6340K1Z7
+
+
+###
+POST https://publicservices.gst.gov.in/publicservices/auth/api/search/tp/busplaces
+
+{
+    "gstin": "33FFTPB6340K1Z7"
+}
+
+
+
+###
+GET https://commonapi.mastersindia.co/commonapis/searchgstin?gstin=33FFTPB6340K1Z7
+Authorization: Bearer 5e3da6h338262e81cb4ded9e38948388c30aa3a9
+client_id: JarZChUcsytSBbnkpt
