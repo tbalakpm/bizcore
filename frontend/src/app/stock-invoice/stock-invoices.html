@@ -152,13 +152,18 @@
 
   <!-- Pagination Controls -->
   <div class="mt-3 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-    <div class="flex items-center gap-2">
-      <span class="text-sm text-text-muted">Rows</span>
-      <nz-select [(ngModel)]="filters.limit" (ngModelChange)="onLimitChange()" style="width: 80px">
-        <nz-option [nzValue]="10" nzLabel="10"></nz-option>
-        <nz-option [nzValue]="25" nzLabel="25"></nz-option>
-        <nz-option [nzValue]="50" nzLabel="50"></nz-option>
-      </nz-select>
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-text-muted">Rows</span>
+        <nz-select [(ngModel)]="filters.limit" (ngModelChange)="onLimitChange()" style="width: 80px">
+          <nz-option [nzValue]="10" nzLabel="10"></nz-option>
+          <nz-option [nzValue]="25" nzLabel="25"></nz-option>
+          <nz-option [nzValue]="50" nzLabel="50"></nz-option>
+        </nz-select>
+      </div>
+      <span class="text-sm text-text-muted">
+        Showing {{ pagination().total === 0 ? 0 : (pagination().page - 1) * pagination().limit + 1 }}-{{ pagination().page * pagination().limit > pagination().total ? pagination().total : pagination().page * pagination().limit }} of {{ pagination().total }} items
+      </span>
     </div>
     <nz-pagination
       [nzPageIndex]="pagination().page"
