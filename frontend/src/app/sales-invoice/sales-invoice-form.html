@@ -248,13 +248,19 @@
   </form>
 
   <!-- Items Table -->
+  <ng-template #totalTemplate let-total let-range="range">
+    Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items
+  </ng-template>
+
   <nz-table
     #itemsTable
     [nzData]="editingInvoice.items"
     nzSize="small"
     [nzBordered]="true"
-    [nzShowPagination]="false"
-    [nzFrontPagination]="false"
+    [nzShowPagination]="true"
+    [nzFrontPagination]="true"
+    [nzPageSize]="10"
+    [nzShowTotal]="totalTemplate"
     class="mb-6"
   >
     <thead>
@@ -262,10 +268,25 @@
         <th nzWidth="300px">Item (GTN / Product)</th>
         <th class="text-right" nzWidth="100px">Qty</th>
         <th class="text-right" nzWidth="120px">Unit Price</th>
-        <th class="text-right" nzWidth="100px">Tax %</th>
-        <th class="text-right" nzWidth="110px">Tax Amt</th>
+        <th class="text-center" nzWidth="150px">Discount</th>
+        <th class="text-right" nzWidth="140px">Tax</th>
         <th class="text-right" nzWidth="130px">Line Total</th>
-        <th class="text-center" nzWidth="60px"></th>
+        <th class="text-center" nzWidth="60px">
+          @if (!editingInvoice.irn) {
+            <button
+              nz-button
+              nzType="primary"
+              nzShape="circle"
+              nzSize="small"
+              (click)="addItemRow()"
+              type="button"
+              nz-tooltip
+              nzTooltipTitle="Add Line Item"
+            >
+              <span nz-icon nzType="plus" nzTheme="outline"></span>
+            </button>
+          }
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -328,7 +349,7 @@
             <nz-input-number
               [(ngModel)]="item.qty"
               (ngModelChange)="calculateLineTotal(item)"
-              [nzDisabled]="!!editingInvoice.irn"
+              [nzDisabled]="!!editingInvoice.irn || isQtyLocked(item)"
               [name]="'itemQty' + i"
               [nzStep]="0.01"
               [nzMin]="0"
@@ -348,18 +369,47 @@
             ></nz-input-number>
           </td>
           <td class="!px-2 !py-2">
-            <nz-input-number
-              [(ngModel)]="item.taxPct"
-              (ngModelChange)="calculateLineTotal(item)"
-              [nzDisabled]="!!editingInvoice.irn"
-              [name]="'itemTaxPct' + i"
-              [nzStep]="0.01"
-              [nzMin]="0"
-              class="w-full text-right"
-            ></nz-input-number>
+            <div class="flex gap-1 items-center">
+              <nz-select
+                [(ngModel)]="item.discountType"
+                [name]="'itemDiscountType' + i"
+                (ngModelChange)="calculateLineTotal(item)"
+                [nzDisabled]="!!editingInvoice.irn"
+                class="w-[60px]"
+              >
+                <nz-option nzValue="none" nzLabel="-"></nz-option>
+                <nz-option nzValue="percent" nzLabel="%"></nz-option>
+                <nz-option nzValue="amount" nzLabel="₹"></nz-option>
+              </nz-select>
+              @if (item.discountType === 'percent') {
+                <nz-input-number
+                  [(ngModel)]="item.discountPct"
+                  (ngModelChange)="calculateLineTotal(item)"
+                  [nzDisabled]="!!editingInvoice.irn"
+                  [name]="'itemDiscountPct' + i"
+                  [nzMin]="0"
+                  class="flex-1 w-full text-right"
+                ></nz-input-number>
+              } @else if (item.discountType === 'amount') {
+                <nz-input-number
+                  [(ngModel)]="item.discountAmount"
+                  (ngModelChange)="calculateLineTotal(item)"
+                  [nzDisabled]="!!editingInvoice.irn"
+                  [name]="'itemDiscountAmount' + i"
+                  [nzMin]="0"
+                  class="flex-1 w-full text-right"
+                ></nz-input-number>
+              } @else {
+                <nz-input-number
+                  [ngModel]="0"
+                  nzDisabled
+                  class="flex-1 w-full text-right"
+                ></nz-input-number>
+              }
+            </div>
           </td>
           <td class="text-right text-text-muted !px-2 !py-2">
-            {{ item.taxAmount | number: '1.2-2' }}
+            {{ item.taxPct || 0 }}% (₹{{ item.taxAmount || 0 | number: '1.2-2' }})
           </td>
           <td class="text-right font-medium !px-2 !py-2">
             {{ item.lineTotal | number: '1.2-2' }}
@@ -385,15 +435,6 @@
     </tbody>
   </nz-table>
 
-  @if (!editingInvoice.irn) {
-    <div class="mb-6">
-      <button nz-button nzType="dashed" (click)="addItemRow()" type="button">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
-        Add Line Item
-      </button>
-    </div>
-  }
-
   <!-- Summary Section -->
   <div class="flex flex-col md:flex-row justify-between items-start gap-6">
     <div class="w-full md:w-1/2 text-sm text-text-muted">
@@ -418,6 +459,16 @@
         <div class="flex justify-between items-center text-sm">
           <span class="text-text-muted font-medium">Total Tax</span>
           <span class="font-medium">{{ totalTax | number: '1.2-2' }}</span>
+        </div>
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-text-muted font-medium">Round Off</span>
+          <nz-input-number
+            [(ngModel)]="editingInvoice.roundOff"
+            name="roundOff"
+            [nzStep]="0.01"
+            [nzDisabled]="!!editingInvoice.irn"
+            class="w-24 text-right"
+          ></nz-input-number>
         </div>
         <div class="border-t my-1"></div>
         <div class="flex justify-between items-center">

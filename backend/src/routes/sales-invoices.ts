@@ -155,6 +155,7 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
         customerId: salesInvoices.customerId,
         customerName: customers.name,
         totalQty: salesInvoices.totalQty,
+        roundOff: salesInvoices.roundOff,
         netAmount: salesInvoices.netAmount,
       })
       .from(salesInvoices)
@@ -263,6 +264,7 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
           discountPct: toNumericString(body.discountPct),
           discountAmount: toNumericString(body.discountAmount),
           taxPct: toNumericString(body.taxPct),
+          roundOff: toNumericString(body.roundOff) ?? '0',
         })
         .returning()
         .get();
@@ -355,6 +357,7 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
           discountPct: toNumericString(body.discountPct) ?? existing.discountPct,
           discountAmount: toNumericString(body.discountAmount) ?? toNumericString(totals.totalDiscount),
           taxPct: toNumericString(body.taxPct) ?? existing.taxPct,
+          roundOff: toNumericString(body.roundOff) ?? existing.roundOff,
         })
         .where(eq(salesInvoices.id, id))
         .run();

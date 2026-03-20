@@ -40,6 +40,7 @@ export interface SalesInvoice {
   discountAmount?: number | string;
   taxPct?: number | string;
   taxAmount?: number | string;
+  roundOff?: number | string;
   netAmount: number;
   
   // E-Invoice Metadata

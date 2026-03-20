@@ -10,6 +10,7 @@ export interface Inventory {
   gtn?: string;
   unitsInStock: number;
   location?: string;
+  sellingPrice?: number | string;
   // Joined fields
   code?: string;
   name?: string;

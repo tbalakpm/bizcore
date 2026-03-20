@@ -58,6 +58,7 @@ type EditableSalesInvoice = {
   ackNo?: string;
   ackDate?: string;
   signedQrCode?: string;
+  roundOff?: number;
   items: EditableSalesInvoiceItem[];
 };
 
@@ -143,7 +144,8 @@ export class SalesInvoiceForm implements OnInit {
   }
 
   get netAmount() {
-    return this.editingInvoice.items.reduce((sum, item) => sum + (Number(item.lineTotal) || 0), 0);
+    const sum = this.editingInvoice.items.reduce((acc, item) => acc + (Number(item.lineTotal) || 0), 0);
+    return sum + (Number(this.editingInvoice.roundOff) || 0);
   }
 
   ngOnInit(): void {
@@ -176,6 +178,7 @@ export class SalesInvoiceForm implements OnInit {
       id: undefined,
       invoiceNumber: '',
       invoiceDate: new Date().toISOString().slice(0, 10),
+      roundOff: 0,
       items: [{ qty: 1, unitPrice: 0, taxPct: 0, taxAmount: 0, discountAmount: 0, lineTotal: 0 }],
     };
   }
@@ -252,6 +255,7 @@ export class SalesInvoiceForm implements OnInit {
           ackNo: invoice.ackNo,
           ackDate: invoice.ackDate,
           signedQrCode: invoice.signedQrCode,
+          roundOff: Number(invoice.roundOff || 0),
           items: (invoice.items || []).map((item) => ({
             id: item.id,
             inventoryId: item.inventoryId,
@@ -340,7 +344,7 @@ export class SalesInvoiceForm implements OnInit {
 
       const product = this.products().find((p) => p.id === inventory.productId);
       if (product) {
-        item.unitPrice = Number(product.unitPrice || 0);
+        item.unitPrice = inventory.sellingPrice !== undefined && inventory.sellingPrice !== null ? Number(inventory.sellingPrice) : Number(product.unitPrice || 0);
         item.taxPct = Number(product.taxRate || 0);
       }
       item.unitsInStock = inventory.unitsInStock;
@@ -433,6 +437,12 @@ export class SalesInvoiceForm implements OnInit {
       .reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
 
     return pool - totalCurrentUsage;
+  }
+
+  isQtyLocked(item: EditableSalesInvoiceItem): boolean {
+    if (!item.productId) return false;
+    const product = this.products().find(p => p.id === item.productId);
+    return product ? product.gtnGeneration === 'tag' : false;
   }
 
   isInventoryDisabledFor(currentItem: EditableSalesInvoiceItem) {
@@ -545,6 +555,7 @@ export class SalesInvoiceForm implements OnInit {
       subtotal: this.subtotal,
       discountAmount: this.totalDiscount,
       taxAmount: this.totalTax,
+      roundOff: this.editingInvoice.roundOff,
       netAmount: this.netAmount,
       items: this.editingInvoice.items as SalesInvoiceItem[],
     };
