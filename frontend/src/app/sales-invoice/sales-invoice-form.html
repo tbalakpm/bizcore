@@ -92,7 +92,7 @@
                 placeholder="Code (e.g. CUST-01)"
               />
             </div>
-            <div class="flex-[2]">
+            <div>
               <input
                 nz-input
                 type="text"
@@ -292,7 +292,7 @@
     <tbody>
       @for (item of editingInvoice.items; track $index; let i = $index) {
         <tr>
-          <td class="!px-2 !py-2">
+          <td>
             <nz-select
               #itemRowSelect
               [(ngModel)]="item.inventoryId"
@@ -345,7 +345,7 @@
               <span class="font-medium">{{ selected.nzLabel }}</span>
             </ng-template>
           </td>
-          <td class="!px-2 !py-2">
+          <td>
             <nz-input-number
               [(ngModel)]="item.qty"
               (ngModelChange)="calculateLineTotal(item)"
@@ -356,7 +356,7 @@
               class="w-full text-right"
             ></nz-input-number>
           </td>
-          <td class="!px-2 !py-2">
+          <td>
             <nz-input-number
               [(ngModel)]="item.unitPrice"
               (ngModelChange)="calculateLineTotal(item)"
@@ -368,7 +368,7 @@
               class="w-full text-right"
             ></nz-input-number>
           </td>
-          <td class="!px-2 !py-2">
+          <td>
             <div class="flex gap-1 items-center">
               <nz-select
                 [(ngModel)]="item.discountType"
@@ -408,13 +408,13 @@
               }
             </div>
           </td>
-          <td class="text-right text-text-muted !px-2 !py-2">
+          <td class="text-right text-text-muted">
             {{ item.taxPct || 0 }}% (₹{{ item.taxAmount || 0 | number: '1.2-2' }})
           </td>
-          <td class="text-right font-medium !px-2 !py-2">
+          <td class="text-right font-medium">
             {{ item.lineTotal | number: '1.2-2' }}
           </td>
-          <td class="text-center !px-2 !py-2">
+          <td class="text-center">
             @if (!editingInvoice.irn) {
               <button
                 nz-button

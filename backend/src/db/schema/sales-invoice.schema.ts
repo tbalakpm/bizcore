@@ -17,13 +17,11 @@ export const salesInvoices = sqliteTable('sales_invoices', {
   discountType: text('discount_type', { length: 20 }).notNull().default('none'), // none, percent, amount
   discountPct: numeric('discount_pct').notNull().default('0.00'),
   discountAmount: numeric('discount_amount').notNull().default('0.00'),
-  taxPct: numeric('tax_pct').notNull().default('0.00'),
-  taxAmount: numeric('tax_amount').generatedAlwaysAs(
-    (): SQL => sql`(ROUND((subtotal - discount_amount) * tax_pct / 100, 2))`
-  ),
+  // taxPct: numeric('tax_pct').notNull().default('0.00'),
+  totalTaxAmount: numeric('total_tax_amount').notNull().default('0.00'),
   roundOff: numeric('round_off').notNull().default('0.00'),
   netAmount: numeric('net_amount').generatedAlwaysAs(
-    (): SQL => sql`(ROUND(subtotal - discount_amount + tax_amount + round_off, 2))`
+    (): SQL => sql`(ROUND(subtotal - discount_amount + total_tax_amount + round_off, 2))`
   ),
 
   // E-Invoice Metadata
