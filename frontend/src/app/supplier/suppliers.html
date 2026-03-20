@@ -47,6 +47,15 @@
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
+          <nz-form-label>{{ 'TYPE' | translate }}</nz-form-label>
+          <nz-form-control>
+            <nz-select [(ngModel)]="editingSupplier.type" name="newSupplierType" nzPlaceHolder="Select type">
+              <nz-option nzValue="supplier" [nzLabel]="'Supplier'"></nz-option>
+              <nz-option nzValue="weaver" [nzLabel]="'Weaver'"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
           <nz-form-label>{{ 'GSTIN' | translate }}</nz-form-label>
           <nz-form-control>
             <!-- <nz-input-group [nzSuffix]="suffixIconButton"> -->
@@ -275,6 +284,16 @@
               <span nz-icon nzType="search"></span>
             </nz-filter-trigger>
           </th>
+          <th nzColumnKey="type" nzShowSort [nzSortFn]="true" nzCustomFilter>
+            {{ 'TYPE' | translate }}
+            <nz-filter-trigger
+              [(nzVisible)]="filterVisible['type']"
+              [nzActive]="filterValues['type'].length > 0"
+              [nzDropdownMenu]="typeMenu"
+            >
+              <span nz-icon nzType="search"></span>
+            </nz-filter-trigger>
+          </th>
           <th nzColumnKey="gstin" nzShowSort [nzSortFn]="true" nzCustomFilter>
             {{ 'GSTIN' | translate }}
             <nz-filter-trigger
@@ -298,6 +317,7 @@
           <tr [class.ant-table-row-selected]="editingSupplier.id === s.id">
             <td>{{ s.code }}</td>
             <td>{{ s.name }}</td>
+            <td class="capitalize">{{ s.type }}</td>
             <td>{{ s.gstin || '-' }}</td>
             <td class="text-center" nzAlign="center">
               <nz-switch
@@ -343,7 +363,7 @@
         @if (!suppliers().length && !loading) {
           <tr>
             <td
-              [attr.colspan]="permissionService.canWrite('suppliers') ? 5 : 4"
+              [attr.colspan]="permissionService.canWrite('suppliers') ? 6 : 5"
               class="text-center text-text-muted"
             >
               No suppliers yet
@@ -418,6 +438,43 @@
         Reset
       </button>
       <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['name'] = false">
+        OK
+      </button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<nz-dropdown-menu #typeMenu="nzDropdownMenu">
+  <div
+    class="p-3 shadow-lg rounded-md border"
+    style="
+      background-color: var(--color-surface-raised);
+      border-color: var(--color-border);
+      min-width: 200px;
+    "
+  >
+    <div class="mb-3">
+      <nz-select
+        class="w-full"
+        [(ngModel)]="filterValues['type']"
+        (ngModelChange)="onFilterChange('type', $event)"
+        nzPlaceHolder="Select type"
+        nzAllowClear
+      >
+        <nz-option nzValue="supplier" [nzLabel]="'Supplier'"></nz-option>
+        <nz-option nzValue="weaver" [nzLabel]="'Weaver'"></nz-option>
+      </nz-select>
+    </div>
+    <div class="flex justify-end gap-2">
+      <button
+        nz-button
+        nzType="default"
+        nzSize="small"
+        (click)="onFilterChange('type', ''); filterVisible['type'] = false"
+      >
+        Reset
+      </button>
+      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['type'] = false">
         OK
       </button>
     </div>

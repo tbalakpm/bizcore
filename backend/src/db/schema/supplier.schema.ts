@@ -6,6 +6,7 @@ export const suppliers = sqliteTable(
   'suppliers',
   {
     ...keyFields,
+    type: text('type', { enum: ['weaver', 'supplier'] }).notNull().default('supplier'),
     gstin: text('gstin', { length: 25 }),
     billingAddressId: integer('billing_address_id').references(() => addresses.id),
     shippingAddressId: integer('shipping_address_id').references(() => addresses.id),

@@ -21,6 +21,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 
 @Component({
@@ -29,7 +30,7 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
     FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm,
     NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule,
     NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
-    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule,
+    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule, NzSelectModule,
   ],
   templateUrl: './suppliers.html',
 })
@@ -49,11 +50,13 @@ export class Suppliers implements OnInit {
   filterValues: Record<string, string> = {
     code: '',
     name: '',
+    type: '',
     gstin: '',
   };
   filterVisible: Record<string, boolean> = {
     code: false,
     name: false,
+    type: false,
     gstin: false,
   };
 
@@ -61,6 +64,7 @@ export class Suppliers implements OnInit {
     id: undefined,
     code: '',
     name: '',
+    type: 'supplier',
     gstin: '',
     billingAddress: {},
     shippingAddress: {},
@@ -235,6 +239,7 @@ export class Suppliers implements OnInit {
       id: undefined,
       code: '',
       name: '',
+      type: 'supplier',
       gstin: '',
       billingAddress: {},
       shippingAddress: {},
@@ -250,6 +255,7 @@ export class Suppliers implements OnInit {
       this.editingSupplier.id = res.id;
       this.editingSupplier.code = res.code;
       this.editingSupplier.name = res.name;
+      this.editingSupplier.type = res.type || 'supplier';
       this.editingSupplier.gstin = res.gstin;
       this.editingSupplier.billingAddress = res.billingAddress || {};
       this.editingSupplier.shippingAddress = res.shippingAddress || {};

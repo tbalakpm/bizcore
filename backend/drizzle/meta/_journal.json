@@ -15,6 +15,13 @@
       "when": 1773982000503,
       "tag": "0001_sales-invoice-tax",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774016669965,
+      "tag": "0002_supplier-type",
+      "breakpoints": true
     }
   ]
 }

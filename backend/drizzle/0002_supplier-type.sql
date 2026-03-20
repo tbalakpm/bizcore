@@ -1,0 +1,1 @@
+ALTER TABLE `suppliers` ADD `type` text DEFAULT 'supplier' NOT NULL;

@@ -30,7 +30,7 @@ suppliersRouter.get('/', async (req: Request, res: Response) => {
     // Build filters dynamically
     const filters: SQL[] = [];
     const filterableFields = ['code', 'name', 'notes', 'gstin'] as const;
-    const sortableFields = ['id', ...filterableFields, 'isActive', 'createdAt', 'updatedAt'] as const;
+    const sortableFields = ['id', ...filterableFields, 'type', 'isActive', 'createdAt', 'updatedAt'] as const;
     type SortableField = (typeof sortableFields)[number];
     const isSortableField = (value: string): value is SortableField =>
       (sortableFields as readonly string[]).includes(value);
@@ -42,6 +42,11 @@ suppliersRouter.get('/', async (req: Request, res: Response) => {
           filters.push(like(column, `%${req.query[field]}%`));
         }
       }
+    }
+
+    // Filter by type
+    if (req.query.type) {
+      filters.push(eq(suppliers.type, req.query.type as 'supplier' | 'weaver'));
     }
 
     // Filter by active status
@@ -148,7 +153,7 @@ suppliersRouter.get('/:id', async (req: Request, res: Response) => {
 });
 
 suppliersRouter.post('/', async (req, res) => {
-  const { code, name, notes, isActive, gstin, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
+  const { code, name, type, notes, isActive, gstin, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
 
   if (!name) return res.status(400).json({ error: 'Name is required' });
   if (!code) return res.status(400).json({ error: 'Code is required' });
@@ -173,6 +178,7 @@ suppliersRouter.post('/', async (req, res) => {
         .values({
           code,
           name,
+          type,
           gstin,
           billingAddressId,
           shippingAddressId,
@@ -213,7 +219,7 @@ suppliersRouter.put('/:id', async (req, res) => {
       error: req.i18n?.t('supplier.notFound') || 'Supplier not found',
     });
 
-  const { code, name, notes, isActive, gstin, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
+  const { code, name, type, notes, isActive, gstin, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
 
   try {
     const updatedSupplier = await db.transaction(async (tx) => {
@@ -243,6 +249,7 @@ suppliersRouter.put('/:id', async (req, res) => {
         .set({
           code: code ?? existingSupplier.code,
           name: name ?? existingSupplier.name,
+          type: type ?? existingSupplier.type,
           gstin: gstin ?? existingSupplier.gstin,
           billingAddressId: bAddrId,
           shippingAddressId: sAddrId,
@@ -266,7 +273,7 @@ suppliersRouter.put('/:id', async (req, res) => {
         }
       }
 
-      return { ...existingSupplier, code, name, gstin, notes, isActive, billingAddressId: bAddrId, shippingAddressId: sAddrId };
+      return { ...existingSupplier, code, name, type: type ?? existingSupplier.type, gstin, notes, isActive, billingAddressId: bAddrId, shippingAddressId: sAddrId };
     });
 
     res.json(updatedSupplier);
