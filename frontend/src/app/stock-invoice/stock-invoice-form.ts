@@ -61,7 +61,7 @@ export class StockInvoiceForm implements OnInit {
   products = signal<Product[]>([]);
 
   editingInvoice: EditableStockInvoice = this.defaultInvoice();
-  selectedRowIndex = 0;
+  selectedRowItem: EditableStockInvoiceItem | null = null;
 
   // Date binding for nz-date-picker
   invoiceDateValue: Date | null = null;
@@ -117,7 +117,7 @@ export class StockInvoiceForm implements OnInit {
     this.products.set([product, ...this.products()]);
 
     // Auto-select in the active row
-    const item = this.editingInvoice.items[this.selectedRowIndex];
+    const item = this.selectedRowItem || this.editingInvoice.items[this.editingInvoice.items.length - 1];
     if (item) {
       item.productId = product.id;
       item.unitPrice = Number(product.unitPrice ?? 0);
@@ -192,6 +192,7 @@ export class StockInvoiceForm implements OnInit {
 
   addItemRow() {
     this.editingInvoice.items.push({ qty: 1, unitPrice: 0, lineTotal: 0, gtn: '', marginType: 'none', marginPct: 0, marginAmount: 0, sellingPrice: 0 });
+    this.editingInvoice.items = [...this.editingInvoice.items];
     setTimeout(() => {
       const lastSelect = this.itemRowSelects.last;
       if (lastSelect) {
@@ -200,13 +201,25 @@ export class StockInvoiceForm implements OnInit {
     });
   }
 
-  removeItemRow(index: number) {
+  removeItemRow(item: EditableStockInvoiceItem) {
     if (this.editingInvoice.items.length <= 1) {
       return;
     }
 
-    this.editingInvoice.items.splice(index, 1);
-    this.selectedRowIndex = Math.max(0, this.selectedRowIndex - 1);
+    const index = this.editingInvoice.items.indexOf(item);
+    if (index > -1) {
+      this.editingInvoice.items.splice(index, 1);
+      this.editingInvoice.items = [...this.editingInvoice.items];
+      if (this.selectedRowItem === item) {
+        this.selectedRowItem = null;
+      }
+    }
+  }
+
+  isQtyDisabled(item: EditableStockInvoiceItem): boolean {
+    if (!item.id) return false;
+    const product = this.products().find((p) => p.id === item.productId);
+    return product?.gtnGeneration?.toLowerCase() === 'tag';
   }
 
   onItemChanged(item: EditableStockInvoiceItem) {

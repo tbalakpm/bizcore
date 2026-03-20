@@ -206,6 +206,16 @@
               <span nz-icon nzType="search"></span>
             </nz-filter-trigger>
           </th>
+          <th nzColumnKey="gstin" nzShowSort [nzSortFn]="true" nzCustomFilter>
+            {{ 'GSTIN' | translate }}
+            <nz-filter-trigger
+              [(nzVisible)]="filterVisible['gstin']"
+              [nzActive]="filterValues['gstin'].length > 0"
+              [nzDropdownMenu]="gstinMenu"
+            >
+              <span nz-icon nzType="search"></span>
+            </nz-filter-trigger>
+          </th>
           <th nzColumnKey="notes" nzShowSort [nzSortFn]="true">{{ 'DESCRIPTION' | translate }}</th>
           <th class="text-center" nzWidth="80px" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
           @if (permissionService.canWrite('customers')) {
@@ -221,6 +231,7 @@
             <td>{{ c.code }}</td>
             <td>{{ c.name }}</td>
             <td>{{ c.type }}</td>
+            <td>{{ c.gstin }}</td>
             <td>{{ c.notes || '-' }}</td>
             <td class="text-center" nzAlign="center">
               <nz-switch
@@ -378,6 +389,40 @@
         Reset
       </button>
       <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['type'] = false">
+        OK
+      </button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<nz-dropdown-menu #gstinMenu="nzDropdownMenu">
+  <div
+    class="p-3 shadow-lg rounded-md border"
+    style="
+      background-color: var(--color-surface-raised);
+      border-color: var(--color-border);
+      min-width: 200px;
+    "
+  >
+    <div class="mb-3">
+      <input
+        type="text"
+        nz-input
+        placeholder="Search gstin"
+        [(ngModel)]="filterValues['gstin']"
+        (ngModelChange)="onFilterChange('gstin', $event)"
+      />
+    </div>
+    <div class="flex justify-end gap-2">
+      <button
+        nz-button
+        nzType="default"
+        nzSize="small"
+        (click)="onFilterChange('gstin', ''); filterVisible['gstin'] = false"
+      >
+        Reset
+      </button>
+      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['gstin'] = false">
         OK
       </button>
     </div>

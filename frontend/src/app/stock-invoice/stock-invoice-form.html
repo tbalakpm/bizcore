@@ -63,28 +63,48 @@
       </nz-card>
     }
 
+    <ng-template #totalTemplate let-total let-range="range">
+      Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items
+    </ng-template>
+
     <nz-table
       #itemsTable
       [nzData]="editingInvoice.items"
       nzSize="small"
       [nzBordered]="true"
-      [nzShowPagination]="false"
-      [nzFrontPagination]="false"
+      [nzShowPagination]="true"
+      [nzFrontPagination]="true"
+      [nzPageSize]="10"
+      [nzShowTotal]="totalTemplate"
+      class="mb-4"
     >
       <thead>
         <tr>
           <th>Product</th>
-          <th nzWidth="150px">GTN</th>
-          <th nzWidth="100px">Qty</th>
-          <th nzWidth="100px">Unit Price</th>
-          <th nzWidth="100px">Line Total</th>
-          <th nzWidth="180px">Margin</th>
-          <th nzWidth="120px">Selling Price</th>
-          <th class="text-right" nzWidth="80px">Actions</th>
+          <th nzWidth="160px">GTN</th>
+          <th nzWidth="100px" nzAlign="right">Qty</th>
+          <th nzWidth="120px" nzAlign="right">Unit Price</th>
+          <th nzWidth="120px" nzAlign="right">Line Total</th>
+          <th nzWidth="180px" nzAlign="center">Margin</th>
+          <th nzWidth="120px" nzAlign="right">Selling Price</th>
+          <th nzAlign="center" nzWidth="60px">
+            <button
+              nz-button
+              nzType="primary"
+              nzShape="circle"
+              nzSize="small"
+              (click)="addItemRow()"
+              type="button"
+              nz-tooltip
+              nzTooltipTitle="Add Line Item"
+            >
+              <span nz-icon nzType="plus" nzTheme="outline"></span>
+            </button>
+          </th>
         </tr>
       </thead>
       <tbody>
-        @for (item of editingInvoice.items; track $index; let i = $index) {
+        @for (item of itemsTable.data; track item; let i = $index) {
           <tr>
             <td>
               <nz-select
@@ -92,7 +112,7 @@
                 [(ngModel)]="item.productId"
                 [name]="'itemProduct' + i"
                 (ngModelChange)="onProductSelect(item)"
-                (nzFocus)="selectedRowIndex = i"
+                (nzFocus)="selectedRowItem = item"
                 [nzShowSearch]="true"
                 nzAllowClear
                 nzPlaceHolder="-- Select Product --"
@@ -103,9 +123,24 @@
                 [nzDropdownStyle]="{ 'min-width': '400px' }"
               >
                 @for (p of products(); track p.id) {
-                  <nz-option [nzValue]="p.id" [nzLabel]="p.code + ' - ' + p.name + ' | HSN: ' + (p.hsnSac || 'N/A') + ' | Tax: ' + (p.taxRate || 0) + '%'" nzCustomContent>
+                  <nz-option
+                    [nzValue]="p.id"
+                    [nzLabel]="
+                      p.code +
+                      ' - ' +
+                      p.name +
+                      ' | HSN: ' +
+                      (p.hsnSac || 'N/A') +
+                      ' | Tax: ' +
+                      (p.taxRate || 0) +
+                      '%'
+                    "
+                    nzCustomContent
+                  >
                     <div class="font-medium">{{ p.code }} - {{ p.name }}</div>
-                    <div class="text-xs text-text-muted">HSN: {{ p.hsnSac || 'N/A' }} | Tax: {{ p.taxRate || 0 }}%</div>
+                    <div class="text-xs text-text-muted">
+                      HSN: {{ p.hsnSac || 'N/A' }} | Tax: {{ p.taxRate || 0 }}%
+                    </div>
                   </nz-option>
                 }
               </nz-select>
@@ -116,7 +151,7 @@
                     nzType="link"
                     nzSize="small"
                     type="button"
-                    (click)="showNewProductForm = true"
+                    (click)="selectedRowItem = item; showNewProductForm = true"
                   >
                     <span nz-icon nzType="plus" nzTheme="outline"></span> Create New Product
                   </button>
@@ -132,17 +167,18 @@
                 placeholder="Auto-generate"
               />
             </td>
-            <td class="px-2! py-2!">
+            <td ngAlign="right">
               <nz-input-number
                 [(ngModel)]="item.qty"
                 (ngModelChange)="onItemChanged(item)"
                 [name]="'itemQty' + i"
                 [nzStep]="1"
                 [nzMin]="1"
-                class="w-full"
+                [nzDisabled]="isQtyDisabled(item)"
+                class="w-full text-right"
               ></nz-input-number>
             </td>
-            <td class="px-2! py-2!">
+            <td ngAlign="right">
               <nz-input-number
                 [(ngModel)]="item.unitPrice"
                 (ngModelChange)="onItemChanged(item)"
@@ -150,25 +186,46 @@
                 [nzStep]="0.01"
                 [nzMin]="0"
                 [nzPrecision]="2"
-                class="w-full"
+                class="w-full text-right"
               ></nz-input-number>
             </td>
-            <td class="text-right font-medium px-2! py-2!">
+            <td class="text-right font-medium px-2! py-2!" ngAlign="right">
               {{ item.lineTotal | number: '1.2-2' }}
             </td>
-            <td class="px-2! py-2!">
+            <td>
               <div class="flex gap-1 items-center">
-                <nz-select [(ngModel)]="item.marginType" [name]="'itemMarginType' + i" (ngModelChange)="onMarginChanged(item)" class="w-[70px]">
+                <nz-select
+                  [(ngModel)]="item.marginType"
+                  [name]="'itemMarginType' + i"
+                  (ngModelChange)="onMarginChanged(item)"
+                  class="w-[70px]"
+                >
                   <nz-option nzValue="none" nzLabel="-"></nz-option>
                   <nz-option nzValue="pct" nzLabel="%"></nz-option>
                   <nz-option nzValue="amount" nzLabel="Amt"></nz-option>
                 </nz-select>
                 @if (item.marginType === 'pct') {
-                  <nz-input-number [(ngModel)]="item.marginPct" (ngModelChange)="onMarginChanged(item)" [name]="'itemMarginPct' + i" [nzMin]="0" class="flex-1 w-full"></nz-input-number>
+                  <nz-input-number
+                    [(ngModel)]="item.marginPct"
+                    (ngModelChange)="onMarginChanged(item)"
+                    [name]="'itemMarginPct' + i"
+                    [nzMin]="0"
+                    class="flex-1 w-full text-right"
+                  ></nz-input-number>
                 } @else if (item.marginType === 'amount') {
-                  <nz-input-number [(ngModel)]="item.marginAmount" (ngModelChange)="onMarginChanged(item)" [name]="'itemMarginAmount' + i" [nzMin]="0" class="flex-1 w-full"></nz-input-number>
+                  <nz-input-number
+                    [(ngModel)]="item.marginAmount"
+                    (ngModelChange)="onMarginChanged(item)"
+                    [name]="'itemMarginAmount' + i"
+                    [nzMin]="0"
+                    class="flex-1 w-full text-right"
+                  ></nz-input-number>
                 } @else {
-                  <nz-input-number [ngModel]="0" nzDisabled class="flex-1 w-full"></nz-input-number>
+                  <nz-input-number
+                    [ngModel]="0"
+                    nzDisabled
+                    class="flex-1 w-full text-right"
+                  ></nz-input-number>
                 }
               </div>
             </td>
@@ -180,10 +237,10 @@
                 [nzStep]="0.01"
                 [nzMin]="0"
                 [nzPrecision]="2"
-                class="w-full"
+                class="w-full text-right"
               ></nz-input-number>
             </td>
-            <td class="text-right px-2! py-2!">
+            <td class="text-center px-2! py-2!">
               <button
                 nz-button
                 nzType="link"
@@ -192,7 +249,7 @@
                 nz-tooltip
                 nzTooltipTitle="Remove item"
                 type="button"
-                (click)="removeItemRow(i)"
+                (click)="removeItemRow(item)"
                 [disabled]="editingInvoice.items.length <= 1"
               >
                 <span nz-icon nzType="delete" nzTheme="outline"></span>
@@ -202,13 +259,6 @@
         }
       </tbody>
     </nz-table>
-
-    <div class="mb-4">
-      <button nz-button nzType="dashed" (click)="addItemRow()" type="button">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
-        Add Line Item
-      </button>
-    </div>
 
     @if (error) {
       <p class="text-xs" style="color: var(--color-danger)">{{ error }}</p>

@@ -88,9 +88,9 @@
       <tr>
         <th>Invoice #</th>
         <th>Date</th>
-        <th class="text-right">Total Qty</th>
-        <th class="text-right">Total Amount</th>
-        <th class="text-center">Actions</th>
+        <th nzAlign="right">Total Qty</th>
+        <th nzAlign="right">Total Amount</th>
+        <th nzAlign="center">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -102,7 +102,7 @@
           <td class="td-cell text-right font-medium text-success">
             {{ invoice.totalAmount | currency: 'INR' }}
           </td>
-          <td>
+          <td class="td-cell" nzAlign="center">
             <div class="flex items-center justify-center gap-2">
               @if (permissionService.canWrite('stock-invoices')) {
                 <button
