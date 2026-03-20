@@ -67,16 +67,16 @@
             <nz-form-item>
               <nz-form-label>{{ 'GSTIN' | translate }}</nz-form-label>
               <nz-form-control>
-                <nz-input-group [nzSuffix]="suffixIconButton">
-                  <input
-                    nz-input
-                    type="text"
-                    [(ngModel)]="editingCustomer.gstin"
-                    name="newCustomerGstin"
-                    placeholder="e.g. 22AAAAA0000A1Z5"
-                  />
-                </nz-input-group>
-                <ng-template #suffixIconButton>
+                <!-- <nz-input-group [nzSuffix]="suffixIconButton"> -->
+                <input
+                  nz-input
+                  type="text"
+                  [(ngModel)]="editingCustomer.gstin"
+                  name="newCustomerGstin"
+                  placeholder="e.g. 22AAAAA0000A1Z5"
+                />
+                <!-- </nz-input-group> -->
+                <!-- <ng-template #suffixIconButton>
                   <button
                     nz-button
                     nzType="primary"
@@ -87,7 +87,7 @@
                   >
                     <span nz-icon nzType="search"></span>
                   </button>
-                </ng-template>
+                </ng-template> -->
               </nz-form-control>
             </nz-form-item>
           </div>
@@ -113,7 +113,7 @@
                 {{ 'ADDRESS.SAME_AS_BILLING' | translate }}
               </label>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <app-address-form
                 [address]="editingCustomer.billingAddress!"
                 [title]="'ADDRESS.BILLING'"
@@ -149,7 +149,7 @@
   <!-- List -->
   <nz-card>
     <div class="flex justify-between mb-2">
-      <h2 class="text-base font-semibold">{{ 'MENU.CUSTOMERS' | translate }}</h2>
+      <h2 class="text-base font-semibold">List of {{ 'MENU.CUSTOMERS' | translate }}</h2>
     </div>
 
     <nz-table
@@ -168,31 +168,50 @@
       (nzQueryParams)="onQueryParamsChange($event)"
     >
       <ng-template #totalTemplate let-total let-range="range">
-        <div style="position: absolute; left: 0;">
-          <span class="text-text-muted text-sm">Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span>
+        <div style="position: absolute; left: 0">
+          <span class="text-text-muted text-sm"
+            >Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span
+          >
         </div>
       </ng-template>
       <thead>
         <tr>
-          <th nzColumnKey="code" nzShowSort [nzSortFn]="true" nzCustomFilter>{{ 'CODE' | translate }}
-            <nz-filter-trigger [(nzVisible)]="filterVisible['code']" [nzActive]="filterValues['code'].length > 0" [nzDropdownMenu]="codeMenu">
+          <th nzColumnKey="code" nzShowSort [nzSortFn]="true" nzCustomFilter>
+            {{ 'CODE' | translate }}
+            <nz-filter-trigger
+              [(nzVisible)]="filterVisible['code']"
+              [nzActive]="filterValues['code'].length > 0"
+              [nzDropdownMenu]="codeMenu"
+            >
               <span nz-icon nzType="search"></span>
             </nz-filter-trigger>
           </th>
-          <th nzColumnKey="name" nzShowSort [nzSortFn]="true" nzCustomFilter>{{ 'NAME' | translate }}
-            <nz-filter-trigger [(nzVisible)]="filterVisible['name']" [nzActive]="filterValues['name'].length > 0" [nzDropdownMenu]="nameMenu">
+          <th nzColumnKey="name" nzShowSort [nzSortFn]="true" nzCustomFilter>
+            {{ 'NAME' | translate }}
+            <nz-filter-trigger
+              [(nzVisible)]="filterVisible['name']"
+              [nzActive]="filterValues['name'].length > 0"
+              [nzDropdownMenu]="nameMenu"
+            >
               <span nz-icon nzType="search"></span>
             </nz-filter-trigger>
           </th>
-          <th nzColumnKey="type" nzShowSort [nzSortFn]="true" nzCustomFilter>{{ 'TYPE' | translate }}
-            <nz-filter-trigger [(nzVisible)]="filterVisible['type']" [nzActive]="filterValues['type'].length > 0" [nzDropdownMenu]="typeMenu">
+          <th nzColumnKey="type" nzShowSort [nzSortFn]="true" nzCustomFilter>
+            {{ 'TYPE' | translate }}
+            <nz-filter-trigger
+              [(nzVisible)]="filterVisible['type']"
+              [nzActive]="filterValues['type'].length > 0"
+              [nzDropdownMenu]="typeMenu"
+            >
               <span nz-icon nzType="search"></span>
             </nz-filter-trigger>
           </th>
           <th nzColumnKey="notes" nzShowSort [nzSortFn]="true">{{ 'DESCRIPTION' | translate }}</th>
-          <th class="text-center" nzWidth="80px">{{ 'ACTIVE' | translate }}</th>
+          <th class="text-center" nzWidth="80px" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
           @if (permissionService.canWrite('customers')) {
-            <th class="text-center" nzWidth="120px">{{ 'ACTIONS' | translate }}</th>
+            <th class="text-center" nzWidth="120px" nzAlign="center">
+              {{ 'ACTIONS' | translate }}
+            </th>
           }
         </tr>
       </thead>
@@ -203,7 +222,7 @@
             <td>{{ c.name }}</td>
             <td>{{ c.type }}</td>
             <td>{{ c.notes || '-' }}</td>
-            <td class="text-center">
+            <td class="text-center" nzAlign="center">
               <nz-switch
                 [ngModel]="c.isActive"
                 (ngModelChange)="toggleActive(c)"
@@ -213,7 +232,7 @@
               ></nz-switch>
             </td>
             @if (permissionService.canWrite('customers')) {
-              <td class="text-center">
+              <td class="text-center" nzAlign="center">
                 <div class="flex items-center justify-center gap-2">
                   <button
                     nz-button
@@ -255,47 +274,112 @@
           </tr>
         }
       </tbody>
-  </nz-table>
+    </nz-table>
   </nz-card>
 </div>
 
 <!-- Filter Menus -->
 <nz-dropdown-menu #codeMenu="nzDropdownMenu">
-  <div class="p-3 shadow-lg rounded-md border" style="background-color: var(--color-surface-raised); border-color: var(--color-border); min-width: 200px;">
+  <div
+    class="p-3 shadow-lg rounded-md border"
+    style="
+      background-color: var(--color-surface-raised);
+      border-color: var(--color-border);
+      min-width: 200px;
+    "
+  >
     <div class="mb-3">
-      <input type="text" nz-input placeholder="Search code" [(ngModel)]="filterValues['code']" (ngModelChange)="onFilterChange('code', $event)" />
+      <input
+        type="text"
+        nz-input
+        placeholder="Search code"
+        [(ngModel)]="filterValues['code']"
+        (ngModelChange)="onFilterChange('code', $event)"
+      />
     </div>
     <div class="flex justify-end gap-2">
-      <button nz-button nzType="default" nzSize="small" (click)="onFilterChange('code', ''); filterVisible['code'] = false">Reset</button>
-      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['code'] = false">OK</button>
+      <button
+        nz-button
+        nzType="default"
+        nzSize="small"
+        (click)="onFilterChange('code', ''); filterVisible['code'] = false"
+      >
+        Reset
+      </button>
+      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['code'] = false">
+        OK
+      </button>
     </div>
   </div>
 </nz-dropdown-menu>
 
 <nz-dropdown-menu #nameMenu="nzDropdownMenu">
-  <div class="p-3 shadow-lg rounded-md border" style="background-color: var(--color-surface-raised); border-color: var(--color-border); min-width: 200px;">
+  <div
+    class="p-3 shadow-lg rounded-md border"
+    style="
+      background-color: var(--color-surface-raised);
+      border-color: var(--color-border);
+      min-width: 200px;
+    "
+  >
     <div class="mb-3">
-      <input type="text" nz-input placeholder="Search name" [(ngModel)]="filterValues['name']" (ngModelChange)="onFilterChange('name', $event)" />
+      <input
+        type="text"
+        nz-input
+        placeholder="Search name"
+        [(ngModel)]="filterValues['name']"
+        (ngModelChange)="onFilterChange('name', $event)"
+      />
     </div>
     <div class="flex justify-end gap-2">
-      <button nz-button nzType="default" nzSize="small" (click)="onFilterChange('name', ''); filterVisible['name'] = false">Reset</button>
-      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['name'] = false">OK</button>
+      <button
+        nz-button
+        nzType="default"
+        nzSize="small"
+        (click)="onFilterChange('name', ''); filterVisible['name'] = false"
+      >
+        Reset
+      </button>
+      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['name'] = false">
+        OK
+      </button>
     </div>
   </div>
 </nz-dropdown-menu>
 
 <nz-dropdown-menu #typeMenu="nzDropdownMenu">
-  <div class="p-3 shadow-lg rounded-md border" style="background-color: var(--color-surface-raised); border-color: var(--color-border); min-width: 200px;">
+  <div
+    class="p-3 shadow-lg rounded-md border"
+    style="
+      background-color: var(--color-surface-raised);
+      border-color: var(--color-border);
+      min-width: 200px;
+    "
+  >
     <div class="mb-3">
-       <nz-select [(ngModel)]="filterValues['type']" (ngModelChange)="onFilterChange('type', $event)" nzPlaceHolder="Select type" class="w-full">
-         <nz-option nzValue="" nzLabel="All"></nz-option>
-         <nz-option nzValue="retail" nzLabel="Retail"></nz-option>
-         <nz-option nzValue="wholesale" nzLabel="Wholesale"></nz-option>
-       </nz-select>
+      <nz-select
+        [(ngModel)]="filterValues['type']"
+        (ngModelChange)="onFilterChange('type', $event)"
+        nzPlaceHolder="Select type"
+        class="w-full"
+      >
+        <nz-option nzValue="" nzLabel="All"></nz-option>
+        <nz-option nzValue="retail" nzLabel="Retail"></nz-option>
+        <nz-option nzValue="wholesale" nzLabel="Wholesale"></nz-option>
+      </nz-select>
     </div>
     <div class="flex justify-end gap-2">
-      <button nz-button nzType="default" nzSize="small" (click)="onFilterChange('type', ''); filterVisible['type'] = false">Reset</button>
-      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['type'] = false">OK</button>
+      <button
+        nz-button
+        nzType="default"
+        nzSize="small"
+        (click)="onFilterChange('type', ''); filterVisible['type'] = false"
+      >
+        Reset
+      </button>
+      <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['type'] = false">
+        OK
+      </button>
     </div>
   </div>
 </nz-dropdown-menu>
@@ -328,4 +412,3 @@
     </button>
   </div>
 </nz-modal>
-

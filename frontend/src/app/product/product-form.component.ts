@@ -12,13 +12,14 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 
 @Component({
   selector: 'app-product-form',
   imports: [
     FormsModule, CommonModule, TranslatePipe,
     NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
-    NzAlertModule, NzIconModule, NzInputNumberModule,
+    NzAlertModule, NzIconModule, NzInputNumberModule, NzTooltipModule
   ],
   templateUrl: './product-form.component.html',
 })

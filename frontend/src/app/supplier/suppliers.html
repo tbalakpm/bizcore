@@ -49,15 +49,15 @@
         <nz-form-item>
           <nz-form-label>{{ 'GSTIN' | translate }}</nz-form-label>
           <nz-form-control>
-            <nz-input-group [nzSuffix]="suffixIconButton">
-              <input
-                nz-input
-                [(ngModel)]="editingSupplier.gstin"
-                name="newSupplierGstin"
-                placeholder="e.g. 22AAAAA0000A1Z5"
-              />
-            </nz-input-group>
-            <ng-template #suffixIconButton>
+            <!-- <nz-input-group [nzSuffix]="suffixIconButton"> -->
+            <input
+              nz-input
+              [(ngModel)]="editingSupplier.gstin"
+              name="newSupplierGstin"
+              placeholder="e.g. 22AAAAA0000A1Z5"
+            />
+            <!-- </nz-input-group> -->
+            <!-- <ng-template #suffixIconButton>
               <button
                 nz-button
                 nzType="primary"
@@ -68,7 +68,7 @@
               >
                 <span nz-icon nzType="search"></span>
               </button>
-            </ng-template>
+            </ng-template> -->
           </nz-form-control>
         </nz-form-item>
         <nz-form-item class="md:col-span-2 xl:col-span-4">
@@ -91,7 +91,7 @@
               {{ 'ADDRESS.SAME_AS_BILLING' | translate }}
             </label>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <app-address-form
               [address]="editingSupplier.billingAddress!"
               [title]="'ADDRESS.BILLING'"
@@ -228,7 +228,7 @@
   <!-- List -->
   <nz-card>
     <div class="flex justify-between mb-2">
-      <h2 class="text-base font-semibold">{{ 'MENU.SUPPLIERS' | translate }}</h2>
+      <h2 class="text-base font-semibold">List of {{ 'MENU.SUPPLIERS' | translate }}</h2>
     </div>
 
     <nz-table
@@ -285,9 +285,11 @@
               <span nz-icon nzType="search"></span>
             </nz-filter-trigger>
           </th>
-          <th class="text-center" nzWidth="80px">{{ 'ACTIVE' | translate }}</th>
+          <th class="text-center" nzWidth="80px" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
           @if (permissionService.canWrite('suppliers')) {
-            <th class="text-center" nzWidth="120px">{{ 'ACTIONS' | translate }}</th>
+            <th class="text-center" nzWidth="120px" nzAlign="center">
+              {{ 'ACTIONS' | translate }}
+            </th>
           }
         </tr>
       </thead>
@@ -296,8 +298,8 @@
           <tr [class.ant-table-row-selected]="editingSupplier.id === s.id">
             <td>{{ s.code }}</td>
             <td>{{ s.name }}</td>
-            <td>{{ s.notes || '-' }}</td>
-            <td class="text-center">
+            <td>{{ s.gstin || '-' }}</td>
+            <td class="text-center" nzAlign="center">
               <nz-switch
                 [ngModel]="s.isActive"
                 (ngModelChange)="toggleActive(s)"
@@ -307,7 +309,7 @@
               ></nz-switch>
             </td>
             @if (permissionService.canWrite('suppliers')) {
-              <td class="text-center">
+              <td class="text-center" nzAlign="center">
                 <div class="flex items-center justify-center gap-2">
                   <button
                     nz-button
@@ -484,4 +486,3 @@
     </button>
   </div>
 </nz-modal>
-

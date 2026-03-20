@@ -156,7 +156,7 @@
   <!-- List -->
   <nz-card>
     <div class="flex justify-between mb-2">
-      <h2 class="text-base font-semibold">{{ 'MENU.USERS' | translate }}</h2>
+      <h2 class="text-base font-semibold">List of {{ 'MENU.USERS' | translate }}</h2>
     </div>
 
     <nz-table
@@ -175,8 +175,10 @@
       (nzQueryParams)="onQueryParamsChange($event)"
     >
       <ng-template #totalTemplate let-total let-range="range">
-        <div style="position: absolute; left: 0;">
-          <span class="text-text-muted text-sm">Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span>
+        <div style="position: absolute; left: 0">
+          <span class="text-text-muted text-sm"
+            >Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span
+          >
         </div>
       </ng-template>
       <thead>
@@ -221,9 +223,11 @@
               <span nz-icon nzType="search"></span>
             </nz-filter-trigger>
           </th>
-          <th class="text-center" nzWidth="80px">{{ 'ACTIVE' | translate }}</th>
+          <th class="text-center" nzWidth="80px" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
           @if (permissionService.canWrite('users')) {
-            <th class="text-center" nzWidth="120px">{{ 'ACTIONS' | translate }}</th>
+            <th class="text-center" nzWidth="120px" nzAlign="center">
+              {{ 'ACTIONS' | translate }}
+            </th>
           }
         </tr>
       </thead>
@@ -249,7 +253,7 @@
                 }
               }
             </td>
-            <td class="text-center">
+            <td class="text-center" nzAlign="center">
               <nz-switch
                 [ngModel]="u.isActive"
                 (ngModelChange)="toggleActive(u)"
@@ -259,7 +263,7 @@
               ></nz-switch>
             </td>
             @if (permissionService.canWrite('users')) {
-              <td class="text-center">
+              <td class="text-center" nzAlign="center">
                 <div class="flex items-center justify-center gap-2">
                   <button
                     nz-button
