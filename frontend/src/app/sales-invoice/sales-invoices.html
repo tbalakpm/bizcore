@@ -105,8 +105,8 @@
           }
         </th>
         <th>Customer</th>
-        <th class="text-right">Total Qty</th>
-        <th (click)="onSort('netAmount')" class="text-right cursor-pointer">
+        <th nzAlign="right">Total Qty</th>
+        <th (click)="onSort('netAmount')" nzAlign="right" class="cursor-pointer">
           Net Amount
           @if (sortColumn() === 'netAmount') {
             <span
@@ -116,7 +116,7 @@
             ></span>
           }
         </th>
-        <th class="text-center">Actions</th>
+        <th nzAlign="center">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -138,7 +138,33 @@
           </td>
           <td>
             <div class="flex items-center justify-center gap-2">
+              <button
+                nz-button
+                nzType="text"
+                nzSize="small"
+                nz-tooltip
+                nzTooltipTitle="Print invoice"
+                style="color: var(--color-text-muted)"
+                (click)="printInvoice(invoice.id)"
+              >
+                <span class="text-accent!" nz-icon nzType="printer" nzTheme="outline"></span>
+              </button>
               @if (!invoice.irn && permissionService.canWrite('sales-invoices')) {
+                <button
+                  nz-button
+                  nzType="text"
+                  nzSize="small"
+                  nz-tooltip
+                  nzTooltipTitle="Generate IRN"
+                  (click)="generateIrn(invoice.id)"
+                >
+                  <span
+                    class="text-yellow-400!"
+                    nz-icon
+                    nzType="file-done"
+                    nzTheme="outline"
+                  ></span>
+                </button>
                 <button
                   [routerLink]="['/sales-invoices', invoice.id, 'edit']"
                   nz-button
@@ -162,33 +188,7 @@
                 >
                   <span nz-icon nzType="delete" nzTheme="outline"></span>
                 </button>
-                <button
-                  nz-button
-                  nzType="text"
-                  nzSize="small"
-                  nz-tooltip
-                  nzTooltipTitle="Generate IRN"
-                  (click)="generateIrn(invoice.id)"
-                >
-                  <span
-                    class="text-yellow-400!"
-                    nz-icon
-                    nzType="file-done"
-                    nzTheme="outline"
-                  ></span>
-                </button>
               }
-              <button
-                nz-button
-                nzType="text"
-                nzSize="small"
-                nz-tooltip
-                nzTooltipTitle="Print invoice"
-                style="color: var(--color-text-muted)"
-                (click)="printInvoice(invoice.id)"
-              >
-                <span class="text-accent!" nz-icon nzType="printer" nzTheme="outline"></span>
-              </button>
             </div>
           </td>
         </tr>

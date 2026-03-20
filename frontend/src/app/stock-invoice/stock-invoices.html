@@ -104,6 +104,18 @@
           </td>
           <td class="td-cell" nzAlign="center">
             <div class="flex items-center justify-center gap-2">
+              <button
+                nz-button
+                nzType="text"
+                nzSize="small"
+                nz-tooltip
+                nzTooltipTitle="Print barcodes"
+                [disabled]="printingInvoiceId === invoice.id"
+                (click)="printBarcodes(invoice.id)"
+              >
+                <span class="text-accent!" nz-icon nzType="barcode" nzTheme="outline"></span>
+                {{ printingInvoiceId === invoice.id ? 'Printing...' : '' }}
+              </button>
               @if (permissionService.canWrite('stock-invoices')) {
                 <button
                   [routerLink]="['/stock-invoices', invoice.id, 'edit']"
@@ -131,18 +143,6 @@
                   <span nz-icon nzType="delete" nzTheme="outline"></span>
                 </button>
               }
-              <button
-                nz-button
-                nzType="text"
-                nzSize="small"
-                nz-tooltip
-                nzTooltipTitle="Print barcodes"
-                [disabled]="printingInvoiceId === invoice.id"
-                (click)="printBarcodes(invoice.id)"
-              >
-                <span class="text-accent!" nz-icon nzType="barcode" nzTheme="outline"></span>
-                {{ printingInvoiceId === invoice.id ? 'Printing...' : '' }}
-              </button>
             </div>
           </td>
         </tr>
