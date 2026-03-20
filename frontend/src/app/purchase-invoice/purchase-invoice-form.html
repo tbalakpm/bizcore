@@ -338,7 +338,7 @@
                 (ngModelChange)="onItemChanged(item)"
                 [name]="'itemPrice' + i"
                 [nzStep]="1"
-                [nzMin]="0.01"
+                [nzMin]="1"
                 [nzPrecision]="2"
                 class="w-full text-right"
               ></nz-input-number>
@@ -367,11 +367,11 @@
                   [(ngModel)]="item.marginType"
                   [name]="'itemMarginType' + i"
                   (ngModelChange)="onMarginChanged(item)"
-                  class="w-[70px]"
+                  class="w-[55px]"
                 >
                   <nz-option nzValue="none" nzLabel="-"></nz-option>
                   <nz-option nzValue="pct" nzLabel="%"></nz-option>
-                  <nz-option nzValue="amount" nzLabel="Amt"></nz-option>
+                  <nz-option nzValue="amount" nzLabel="₹"></nz-option>
                 </nz-select>
                 @if (item.marginType === 'pct') {
                   <nz-input-number
@@ -403,7 +403,7 @@
                 [(ngModel)]="item.sellingPrice"
                 (ngModelChange)="onSellingPriceChanged(item)"
                 [name]="'itemSellingPrice' + i"
-                [nzStep]="0.01"
+                [nzStep]="1"
                 [nzMin]="0"
                 [nzPrecision]="2"
                 class="w-full text-right"
