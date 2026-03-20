@@ -109,8 +109,8 @@ export async function renderPurchaseInvoice(
   sections.renderTotals(pdf, {
     subtotal: Number(invoice.subtotal),
     discountAmount: Number(invoice.discountAmount),
-    taxAmount: Number(invoice.taxAmount ?? 0),
-    taxPct: Number(invoice.taxPct ?? 0),
+    taxAmount: Number(invoice.totalTaxAmount ?? 0),
+    taxPct: 0,
     roundOff: Number(invoice.roundOff ?? 0),
     netAmount: Number(invoice.netAmount ?? 0),
   }, company);

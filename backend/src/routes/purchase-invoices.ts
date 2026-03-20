@@ -187,6 +187,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
             .values({
               productId: product.id,
               gtn: item.gtn,
+              qtyPerUnit: product.qtyPerUnit,
               hsnSac: item.hsnSac || product.hsnSac,
               taxRate: toNumericString(item.taxPct) || product.taxRate,
               buyingPrice: toNumericString(unitPrice) || product.unitPrice,
@@ -208,6 +209,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
               .values({
                 productId: product.id,
                 gtn: generatedGtn,
+                qtyPerUnit: product.qtyPerUnit,
                 hsnSac: item.hsnSac || product.hsnSac,
                 taxRate: toNumericString(item.taxPct) || product.taxRate,
                 buyingPrice: toNumericString(unitPrice) || product.unitPrice,
@@ -263,6 +265,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
               .values({
                 productId: product.id,
                 gtn: generatedGtn,
+                qtyPerUnit: product.qtyPerUnit,
                 hsnSac: item.hsnSac || product.hsnSac,
                 taxRate: toNumericString(item.taxPct) || product.taxRate,
                 buyingPrice: toNumericString(unitPrice) || product.unitPrice,
@@ -338,7 +341,7 @@ purchaseInvoicesRouter.post('/', async (req, res) => {
           discountType: body.discountType,
           discountPct: toNumericString(body.discountPct) ?? '0',
           discountAmount: toNumericString(body.discountAmount) ?? '0',
-          taxPct: toNumericString(body.taxPct) ?? '0',
+          totalTaxAmount: toNumericString(body.taxAmount) ?? '0',
           roundOff: toNumericString(body.roundOff) ?? '0',
         })
         .returning()
@@ -405,7 +408,7 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
           discountType: body.discountType ?? existing.discountType,
           discountPct: toNumericString(body.discountPct) ?? existing.discountPct,
           discountAmount: toNumericString(body.discountAmount) ?? existing.discountAmount,
-          taxPct: toNumericString(body.taxPct) ?? existing.taxPct,
+          totalTaxAmount: toNumericString(body.taxAmount) ?? existing.totalTaxAmount,
           roundOff: toNumericString(body.roundOff) ?? existing.roundOff,
         })
         .where(eq(purchaseInvoices.id, id))
