@@ -117,6 +117,7 @@
           <nz-select
             [(ngModel)]="editingInvoice.supplierId"
             name="supplierId"
+            (ngModelChange)="onSupplierChange()"
             [nzShowSearch]="true"
             nzAllowClear
             nzPlaceHolder="-- Select Supplier --"

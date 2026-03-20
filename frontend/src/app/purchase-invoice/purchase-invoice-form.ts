@@ -293,13 +293,41 @@ export class PurchaseInvoiceForm implements OnInit {
     return product?.gtnGeneration?.toLowerCase() === 'tag';
   }
 
+  onSupplierChange() {
+    const supplier = this.suppliers().find((s) => s.id === this.editingInvoice.supplierId);
+    const isWeaver = supplier?.type === 'weaver';
+
+    for (const item of this.editingInvoice.items) {
+      if (item.productId) {
+        if (isWeaver) {
+          item.taxPct = 0;
+        } else {
+          const product = this.products().find((p) => p.id === item.productId);
+          item.taxPct = Number(product?.taxRate ?? 0);
+        }
+
+        const qty = Number(item.qty || 0);
+        const unitPrice = Number(item.unitPrice || 0);
+        const grossTotal = qty * unitPrice;
+        const amountAfterDiscount = grossTotal - item.discountAmount;
+
+        item.taxAmount = Number((amountAfterDiscount * item.taxPct / 100).toFixed(2));
+        item.lineTotal = Number((amountAfterDiscount + item.taxAmount).toFixed(2));
+      }
+    }
+    this.recalculateAll();
+  }
+
   onProductSelect(item: EditablePurchaseInvoiceItem) {
     const product = this.products().find((p) => p.id === item.productId);
     if (!product) return;
 
+    const supplier = this.suppliers().find((s) => s.id === this.editingInvoice.supplierId);
+    const isWeaver = supplier?.type === 'weaver';
+
     item.unitPrice = Number(product.unitPrice ?? 0);
     item.hsnSac = product.hsnSac;
-    item.taxPct = Number(product.taxRate ?? 0);
+    item.taxPct = isWeaver ? 0 : Number(product.taxRate ?? 0);
     this.onItemChanged(item);
   }
 
@@ -423,6 +451,7 @@ export class PurchaseInvoiceForm implements OnInit {
       next: (created) => {
         this.loadSuppliers();
         this.editingInvoice.supplierId = created.id;
+        this.onSupplierChange();
         this.showNewSupplierForm = false;
         this.supplierSubmitting = false;
         this.newSupplier = { code: '', name: '', gstin: '', billingAddress: {}, shippingAddress: {}, isActive: true };
