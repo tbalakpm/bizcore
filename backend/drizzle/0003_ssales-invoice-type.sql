@@ -1,0 +1,1 @@
+ALTER TABLE `sales_invoices` ADD `type` text(20) DEFAULT 'invoice' NOT NULL;

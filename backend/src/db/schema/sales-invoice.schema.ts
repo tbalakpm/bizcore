@@ -7,6 +7,7 @@ export const salesInvoices = sqliteTable('sales_invoices', {
   id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
   invoiceNumber: text('invoice_number', { length: 25 }).notNull(),
   invoiceDate: text('invoice_date', { length: 25 }).notNull(),
+  type: text('type', { length: 20 }).notNull().default('invoice'), // invoice, estimate
   customerId: integer('customer_id')
     .notNull()
     .references(() => customers.id),

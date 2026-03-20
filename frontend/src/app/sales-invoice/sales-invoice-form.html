@@ -209,6 +209,20 @@
     </div>
 
     <div>
+      <label class="block text-sm font-medium mb-1">Type <span style="color: var(--color-danger)">*</span></label>
+      <nz-select
+        [(ngModel)]="editingInvoice.type"
+        (ngModelChange)="onTypeChange($event)"
+        name="type"
+        [nzDisabled]="!!editingInvoice.irn"
+        class="w-full"
+      >
+        <nz-option nzValue="invoice" nzLabel="Invoice"></nz-option>
+        <nz-option nzValue="estimate" nzLabel="Estimate"></nz-option>
+      </nz-select>
+    </div>
+
+    <div>
       <label class="block text-sm font-medium mb-1"
         >Invoice Date <span style="color: var(--color-danger)">*</span></label
       >

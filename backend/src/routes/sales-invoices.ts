@@ -107,6 +107,10 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
       }
     }
 
+    if (req.query.type) {
+      filters.push(eq(salesInvoices.type, req.query.type as string));
+    }
+
     if (req.query.minAmount) {
       const minAmount = Number(req.query.minAmount);
       if (!Number.isNaN(minAmount)) {
@@ -121,7 +125,7 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
       }
     }
 
-    const sortableFields = ['id', 'invoiceNumber', 'invoiceDate', 'totalQty', 'netAmount'] as const;
+    const sortableFields = ['id', 'invoiceNumber', 'invoiceDate', 'totalQty', 'netAmount', 'type'] as const;
     type SortableField = (typeof sortableFields)[number];
     const isSortableField = (value: string): value is SortableField =>
       (sortableFields as readonly string[]).includes(value);
@@ -152,6 +156,7 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
         id: salesInvoices.id,
         invoiceNumber: salesInvoices.invoiceNumber,
         invoiceDate: salesInvoices.invoiceDate,
+        type: salesInvoices.type,
         customerId: salesInvoices.customerId,
         customerName: customers.name,
         totalQty: salesInvoices.totalQty,
@@ -255,6 +260,7 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
         .values({
           invoiceNumber,
           invoiceDate: normalizeDate(body.invoiceDate),
+          type: body.type || 'invoice',
           customerId: body.customerId!,
           refNumber: body.refNumber,
           refDate: body.refDate ? normalizeDate(body.refDate) : null,
@@ -263,7 +269,7 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
           discountType: body.discountType,
           discountPct: toNumericString(body.discountPct),
           discountAmount: toNumericString(body.discountAmount),
-          taxPct: toNumericString(body.taxPct),
+          totalTaxAmount: toNumericString(body.totalTaxAmount),
           roundOff: toNumericString(body.roundOff) ?? '0',
         })
         .returning()
@@ -348,6 +354,7 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
         .set({
           invoiceNumber: body.invoiceNumber ?? existing.invoiceNumber,
           invoiceDate: body.invoiceDate ?? existing.invoiceDate,
+          type: body.type ?? existing.type,
           customerId: body.customerId ?? existing.customerId,
           refNumber: body.refNumber ?? existing.refNumber,
           refDate: body.refDate ? normalizeDate(body.refDate) : existing.refDate,
@@ -356,7 +363,7 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
           discountType: body.discountType ?? existing.discountType,
           discountPct: toNumericString(body.discountPct) ?? existing.discountPct,
           discountAmount: toNumericString(body.discountAmount) ?? toNumericString(totals.totalDiscount),
-          taxPct: toNumericString(body.taxPct) ?? existing.taxPct,
+          totalTaxAmount: toNumericString(body.totalTaxAmount) ?? existing.totalTaxAmount,
           roundOff: toNumericString(body.roundOff) ?? existing.roundOff,
         })
         .where(eq(salesInvoices.id, id))

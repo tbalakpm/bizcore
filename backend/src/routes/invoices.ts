@@ -45,7 +45,6 @@ invoicesRouter.post('/sales', async (req, res) => {
     discountType,
     discountPct,
     discountAmount,
-    taxPct,
   } = req.body;
 
   if (!customerId) {
@@ -66,7 +65,6 @@ invoicesRouter.post('/sales', async (req, res) => {
       discountType,
       discountPct: discountPct?.toString(),
       discountAmount: discountAmount?.toString(),
-      taxPct: taxPct?.toString(),
     })
     .returning()
     .get();

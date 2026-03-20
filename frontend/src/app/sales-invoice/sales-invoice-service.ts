@@ -30,6 +30,7 @@ export interface SalesInvoice {
   id: number;
   invoiceNumber: string;
   invoiceDate: string;
+  type?: string;
   customerId: number;
   refNumber?: string;
   refDate?: string;
@@ -38,8 +39,7 @@ export interface SalesInvoice {
   discountType?: string;
   discountPct?: number | string;
   discountAmount?: number | string;
-  taxPct?: number | string;
-  taxAmount?: number | string;
+  totalTaxAmount?: number | string;
   roundOff?: number | string;
   netAmount: number;
   
@@ -68,6 +68,7 @@ export type SalesInvoiceQuery = {
   minAmount?: number;
   maxAmount?: number;
   customerId?: number;
+  type?: string;
   sort?: string;
 };
 

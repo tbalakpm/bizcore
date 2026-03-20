@@ -39,6 +39,16 @@
         }
       </nz-select>
 
+      <nz-select
+        formControlName="type"
+        nzAllowClear
+        nzPlaceHolder="Type"
+        style="width: 120px"
+      >
+        <nz-option nzValue="invoice" nzLabel="Invoice"></nz-option>
+        <nz-option nzValue="estimate" nzLabel="Estimate"></nz-option>
+      </nz-select>
+
       <nz-date-picker
         [ngModel]="filterInvoiceDate"
         (ngModelChange)="onInvoiceDateChange($event)"
@@ -105,6 +115,16 @@
           }
         </th>
         <th>Customer</th>
+        <th (click)="onSort('type')" class="cursor-pointer">
+          Type
+          @if (sortColumn() === 'type') {
+            <span
+              nz-icon
+              [nzType]="sortDirection() === 'asc' ? 'caret-up' : 'caret-down'"
+              nzTheme="outline"
+            ></span>
+          }
+        </th>
         <th nzAlign="right">Total Qty</th>
         <th (click)="onSort('netAmount')" nzAlign="right" class="cursor-pointer">
           Net Amount
@@ -132,6 +152,11 @@
           </td>
           <td>{{ invoice.invoiceDate | date: 'mediumDate' }}</td>
           <td>{{ invoice.customerName || '—' }}</td>
+          <td>
+            <nz-tag [nzColor]="invoice.type === 'estimate' ? 'processing' : 'default'">
+              {{ (invoice.type || 'invoice') | titlecase }}
+            </nz-tag>
+          </td>
           <td class="text-right">{{ invoice.totalQty }}</td>
           <td class="text-right font-medium" style="color: var(--color-success)">
             {{ invoice.netAmount | currency: 'INR' }}

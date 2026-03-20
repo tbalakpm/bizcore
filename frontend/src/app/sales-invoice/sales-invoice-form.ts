@@ -51,6 +51,7 @@ type EditableSalesInvoice = {
   id?: number;
   invoiceNumber: string;
   invoiceDate: string;
+  type?: string;
   customerId?: number;
   refNumber?: string;
   refDate?: string;
@@ -178,6 +179,7 @@ export class SalesInvoiceForm implements OnInit {
       id: undefined,
       invoiceNumber: '',
       invoiceDate: new Date().toISOString().slice(0, 10),
+      type: 'invoice',
       roundOff: 0,
       items: [{ qty: 1, unitPrice: 0, taxPct: 0, taxAmount: 0, discountAmount: 0, lineTotal: 0 }],
     };
@@ -248,6 +250,7 @@ export class SalesInvoiceForm implements OnInit {
           id: invoice.id,
           invoiceNumber: invoice.invoiceNumber,
           invoiceDate: invoice.invoiceDate,
+          type: invoice.type || 'invoice',
           customerId: invoice.customerId,
           refNumber: invoice.refNumber,
           refDate: invoice.refDate,
@@ -345,9 +348,28 @@ export class SalesInvoiceForm implements OnInit {
       const product = this.products().find((p) => p.id === inventory.productId);
       if (product) {
         item.unitPrice = inventory.sellingPrice !== undefined && inventory.sellingPrice !== null ? Number(inventory.sellingPrice) : Number(product.unitPrice || 0);
-        item.taxPct = Number(product.taxRate || 0);
+        item.taxPct = this.editingInvoice.type === 'estimate' ? 0 : Number(product.taxRate || 0);
       }
       item.unitsInStock = inventory.unitsInStock;
+      this.calculateLineTotal(item);
+    }
+  }
+
+  onTypeChange(type: string) {
+    this.editingInvoice.type = type;
+    for (const item of this.editingInvoice.items) {
+      if (type === 'estimate') {
+        item.taxPct = 0;
+        item.taxAmount = 0;
+      } else {
+        // Require refetching tax from products
+        if (item.productId) {
+          const product = this.products().find(p => p.id === item.productId);
+          if (product) {
+            item.taxPct = Number(product.taxRate || 0);
+          }
+        }
+      }
       this.calculateLineTotal(item);
     }
   }
@@ -548,13 +570,14 @@ export class SalesInvoiceForm implements OnInit {
     const payload: Partial<SalesInvoice> = {
       invoiceNumber: this.editingInvoice.invoiceNumber,
       invoiceDate: this.editingInvoice.invoiceDate,
+      type: this.editingInvoice.type,
       customerId: this.editingInvoice.customerId,
       refNumber: this.editingInvoice.refNumber,
       refDate: this.editingInvoice.refDate,
       totalQty: this.totalQty,
       subtotal: this.subtotal,
       discountAmount: this.totalDiscount,
-      taxAmount: this.totalTax,
+      totalTaxAmount: this.totalTax,
       roundOff: this.editingInvoice.roundOff,
       netAmount: this.netAmount,
       items: this.editingInvoice.items as SalesInvoiceItem[],
