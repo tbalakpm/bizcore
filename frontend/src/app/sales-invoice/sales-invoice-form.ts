@@ -65,6 +65,9 @@ type EditableSalesInvoice = {
   ackDate?: string;
   signedQrCode?: string;
   roundOff?: number;
+  discountType?: string;
+  discountPct?: number;
+  discountAmount?: number;
   items: EditableSalesInvoiceItem[];
 };
 
@@ -202,7 +205,10 @@ export class SalesInvoiceForm implements OnInit {
       invoiceDate: new Date().toISOString().slice(0, 10),
       type: 'invoice',
       roundOff: 0,
-      items: [{ qty: 1, unitPrice: 0, taxPct: 0, taxAmount: 0, discountAmount: 0, lineTotal: 0 }],
+      discountType: 'none',
+      discountPct: 0,
+      discountAmount: 0,
+      items: [{ qty: 1, unitPrice: 0, discountType: 'none', discountPct: 0, discountAmount: 0, taxPct: 0, taxAmount: 0, lineTotal: 0 }],
     };
   }
 
@@ -280,6 +286,9 @@ export class SalesInvoiceForm implements OnInit {
           ackDate: invoice.ackDate,
           signedQrCode: invoice.signedQrCode,
           roundOff: Number(invoice.roundOff || 0),
+          discountType: invoice.discountType || 'none',
+          discountPct: Number(invoice.discountPct || 0),
+          discountAmount: Number(invoice.discountAmount || 0),
           items: (invoice.items || []).map((item) => ({
             id: item.id,
             inventoryId: item.inventoryId,
@@ -442,6 +451,19 @@ export class SalesInvoiceForm implements OnInit {
     }
   }
 
+  onGlobalDiscountChange() {
+    const type = this.editingInvoice.discountType || 'none';
+    const pct = this.editingInvoice.discountPct || 0;
+    const amt = this.editingInvoice.discountAmount || 0;
+
+    for (const item of this.editingInvoice.items) {
+      item.discountType = type;
+      item.discountPct = pct;
+      item.discountAmount = amt;
+      this.calculateLineTotal(item);
+    }
+  }
+
   calculateLineTotal(item: EditableSalesInvoiceItem) {
     const qty = Number(item.qty || 0);
     let price = Number(item.unitPrice || 0);
@@ -491,7 +513,16 @@ export class SalesInvoiceForm implements OnInit {
   }
 
   addItemRow() {
-    this.editingInvoice.items.push({ qty: 1, unitPrice: 0, taxPct: 0, taxAmount: 0, discountAmount: 0, lineTotal: 0 });
+    this.editingInvoice.items.push({ 
+      qty: 1, 
+      unitPrice: 0, 
+      taxPct: 0, 
+      taxAmount: 0, 
+      discountType: this.editingInvoice.discountType || 'none',
+      discountPct: this.editingInvoice.discountPct || 0,
+      discountAmount: this.editingInvoice.discountAmount || 0, 
+      lineTotal: 0 
+    });
     setTimeout(() => {
       const lastSelect = this.itemRowSelects.last;
       if (lastSelect) {
@@ -658,6 +689,8 @@ export class SalesInvoiceForm implements OnInit {
       refDate: this.editingInvoice.refDate,
       totalQty: this.totalQty,
       subtotal: this.subtotal,
+      discountType: this.editingInvoice.discountType,
+      discountPct: this.editingInvoice.discountPct,
       discountAmount: this.totalDiscount,
       totalTaxAmount: this.totalTax,
       roundOff: this.editingInvoice.roundOff,

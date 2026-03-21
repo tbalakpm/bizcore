@@ -183,6 +183,50 @@
       </nz-form-item>
     </div>
 
+    <nz-divider nzText="Barcode Settings" nzOrientation="left"></nz-divider>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <nz-form-item>
+        <nz-form-label nzFor="barcode_width">Label Width (inches)</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="barcode_width"
+            id="barcode_width"
+            [(ngModel)]="settings['barcode_width']"
+            placeholder="2"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="barcode_height">Label Height (inches)</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="barcode_height"
+            id="barcode_height"
+            [(ngModel)]="settings['barcode_height']"
+            placeholder="1.2"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="barcode_columns">Number of Columns</nz-form-label>
+        <nz-form-control>
+          <nz-input-number
+            name="barcode_columns"
+            id="barcode_columns"
+            [(ngModel)]="settings['barcode_columns']"
+            [nzMin]="1"
+            [nzMax]="20"
+            [nzStep]="1"
+            class="w-full"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
     <div class="mt-6 flex justify-end">
       <button nz-button nzType="primary" type="submit" [nzLoading]="saving">Save Settings</button>
     </div>

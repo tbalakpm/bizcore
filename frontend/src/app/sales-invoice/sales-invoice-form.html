@@ -268,6 +268,49 @@
         class="w-full"
       ></nz-date-picker>
     </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Global Discount</label>
+      <div class="flex gap-1 items-center">
+        <nz-select
+          [(ngModel)]="editingInvoice.discountType"
+          name="globalDiscountType"
+          (ngModelChange)="onGlobalDiscountChange()"
+          [nzDisabled]="!!editingInvoice.irn"
+          class="w-[80px]"
+        >
+          <nz-option nzValue="none" nzLabel="-"></nz-option>
+          <nz-option nzValue="percent" nzLabel="%"></nz-option>
+          <nz-option nzValue="amount" nzLabel="₹"></nz-option>
+        </nz-select>
+        @if (editingInvoice.discountType === 'percent') {
+          <nz-input-number
+            [(ngModel)]="editingInvoice.discountPct"
+            (ngModelChange)="onGlobalDiscountChange()"
+            [nzDisabled]="!!editingInvoice.irn"
+            name="globalDiscountPct"
+            [nzMin]="0"
+            class="flex-1 w-full text-right"
+          ></nz-input-number>
+        } @else if (editingInvoice.discountType === 'amount') {
+          <nz-input-number
+            [(ngModel)]="editingInvoice.discountAmount"
+            (ngModelChange)="onGlobalDiscountChange()"
+            [nzDisabled]="!!editingInvoice.irn"
+            name="globalDiscountAmount"
+            [nzMin]="0"
+            class="flex-1 w-full text-right"
+          ></nz-input-number>
+        } @else {
+          <nz-input-number
+            [ngModel]="0"
+            nzDisabled
+            name="globalDiscountNone"
+            class="flex-1 w-full text-right"
+          ></nz-input-number>
+        }
+      </div>
+    </div>
   </form>
 
   <!-- Items Table -->
@@ -440,7 +483,7 @@
                 @if (item.igstAmount || 0 > 0) {
                   IGST: ₹{{ item.igstAmount | number: '1.2-2' }}
                 } @else {
-                  CGST: ₹{{ item.cgstAmount | number: '1.2-2' }}<br />SGST: ₹{{
+                  CGST: ₹{{ item.cgstAmount | number: '1.2-2' }} - SGST: ₹{{
                     item.sgstAmount | number: '1.2-2'
                   }}
                 }
@@ -484,24 +527,20 @@
           <span class="font-medium text-right">{{ subtotal | number: '1.2-2' }}</span>
         </div>
         <div class="grid grid-cols-2 text-sm">
-          <span class="text-text-muted font-medium">Total Discount</span>
-          <span
-            class="font-medium text-right"
+          <span class="text-text-muted font-medium">(-) Total Discount</span>
+          <span class="font-medium text-right">{{ totalDiscount | number: '1.2-2' }}</span>
+          <!-- <span class="font-medium" *ngIf="totalDiscount <= 0">
             *ngIf="totalDiscount > 0"
             style="color: var(--color-danger)"
-          >
-            - {{ totalDiscount | number: '1.2-2' }}
-          </span>
-          <span class="font-medium" *ngIf="totalDiscount <= 0">
             {{ totalDiscount | number: '1.2-2' }}
-          </span>
+          </span> -->
         </div>
         <div class="grid grid-cols-2 text-sm">
-          <span class="text-text-muted font-medium">Total Tax</span>
+          <span class="text-text-muted font-medium">(+) Total Tax</span>
           <span class="font-medium text-right">{{ totalTax | number: '1.2-2' }}</span>
         </div>
-        <div class="grid grid-cols-2 text-sm">
-          <span class="text-text-muted font-medium">Round Off</span>
+        <div class="grid grid-cols-3 text-sm">
+          <span class="text-text-muted font-medium col-span-2">Round Off</span>
           <nz-input-number
             [(ngModel)]="editingInvoice.roundOff"
             name="roundOff"
@@ -509,7 +548,7 @@
             [nzDisabled]="!!editingInvoice.irn"
           ></nz-input-number>
         </div>
-        <div class="border-t my-1"></div>
+        <div class="border-t border-gray-200 dark:border-gray-600 my-1"></div>
         <div class="flex justify-between items-center">
           <span class="text-base font-bold uppercase tracking-wider">Net Amount</span>
           <span class="text-xl font-bold" style="color: var(--color-success)"

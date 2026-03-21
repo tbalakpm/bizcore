@@ -2,11 +2,14 @@ import { DatePipe, CurrencyPipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import JsBarcode from 'jsbarcode';
 import {
   type PurchaseInvoice,
   type PurchaseInvoiceList,
   PurchaseInvoiceService,
 } from './purchase-invoice-service';
+import { SettingsService } from '../settings/settings.service';
 import { PermissionService } from '../auth/permission.service';
 
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -21,6 +24,12 @@ import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 
+type PrintableBarcodeLabel = {
+  title: string;
+  code: string;
+  subtitle: string;
+};
+
 @Component({
   selector: 'app-purchase-invoices',
   imports: [
@@ -33,6 +42,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 })
 export class PurchaseInvoices implements OnInit {
   private purchaseInvoiceService = inject(PurchaseInvoiceService);
+  private settingsService = inject(SettingsService);
   permissionService = inject(PermissionService);
 
   invoices = signal<PurchaseInvoice[]>([]);
@@ -51,6 +61,7 @@ export class PurchaseInvoices implements OnInit {
   filterInvoiceDate: Date | null = null;
 
   loading = false;
+  printingInvoiceId: number | null = null;
   error: string | null = null;
 
   ngOnInit(): void {
@@ -135,5 +146,170 @@ export class PurchaseInvoices implements OnInit {
   printInvoice(id: number) {
     const url = this.purchaseInvoiceService.getPdfUrl(id);
     window.open(url, '_blank');
+  }
+
+  printBarcodes(invoiceId: number) {
+    this.printingInvoiceId = invoiceId;
+    this.error = null;
+
+    forkJoin({
+      invoice: this.purchaseInvoiceService.getById(invoiceId),
+      settings: this.settingsService.getAllSettings(),
+    }).subscribe({
+      next: ({ invoice, settings }) => {
+        const width = Number(settings.data.find((s) => s.key === 'barcode_width')?.value || 2);
+        const height = Number(settings.data.find((s) => s.key === 'barcode_height')?.value || 1.2);
+        const columns = Number(settings.data.find((s) => s.key === 'barcode_columns')?.value || 1);
+
+        this.openBarcodePrintWindow(this.buildBarcodeLabels(invoice), width, height, columns);
+      },
+      error: (err) => {
+        this.error = err.error?.error || 'Failed to load purchase invoice for barcode printing';
+      },
+      complete: () => {
+        this.printingInvoiceId = null;
+      },
+    });
+  }
+
+  private buildBarcodeLabels(invoice: PurchaseInvoice): PrintableBarcodeLabel[] {
+    const labels: PrintableBarcodeLabel[] = [];
+
+    for (const item of invoice.items ?? []) {
+      const barcodeValue = String(item.gtn ?? item.productCode ?? '').trim();
+      if (!barcodeValue) {
+        continue;
+      }
+
+      const qty = Math.max(1, Math.round(Number(item.qty ?? 1)));
+      const title = String(item.productName ?? item.productCode ?? 'Product');
+      const subtitle = `Rs. ${Number(item.sellingPrice ?? item.unitPrice ?? 0).toFixed(2) ?? '0.00'}`;
+
+      for (let i = 0; i < qty; i += 1) {
+        labels.push({ title, code: barcodeValue, subtitle });
+      }
+    }
+
+    return labels;
+  }
+
+  private openBarcodePrintWindow(labels: PrintableBarcodeLabel[], width: number, height: number, columns: number) {
+    const printWindow = window.open('', '_blank', 'width=1024,height=768');
+    if (!printWindow) {
+      this.error = 'Popup blocked. Please allow popups and try again.';
+      return;
+    }
+
+    const labelsHtml = labels
+      .map((label) => {
+        const barcodeSvg = this.generateBarcodeSvg(label.code);
+        return `<section class="label">
+            <div class="title">${this.escapeHtml(label.title)}</div>
+            <div class="barcode">${barcodeSvg}</div>
+            <div class="code">${this.escapeHtml(label.code)}</div>
+            <div class="subtitle">${this.escapeHtml(label.subtitle)}</div>
+          </section>`;
+      })
+      .join('');
+
+    const isGrid = columns > 1;
+
+    const htmlContent = `<!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Barcode Print</title>
+    <style>
+      @page {
+        ${isGrid ? 'margin: 0;' : `size: ${width}in ${height}in; margin: 0;`}
+      }
+  
+      * {
+        box-sizing: border-box;
+      }
+  
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        ${isGrid ? `display: grid; grid-template-columns: repeat(${columns}, ${width}in); gap: 0; justify-content: start; align-content: start;` : ''}
+      }
+  
+      .label {
+        width: ${width}in;
+        height: ${height}in;
+        padding: 0.1in;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        ${isGrid ? 'page-break-inside: avoid; break-inside: avoid;' : 'page-break-after: always; break-after: page;'}
+      }
+  
+      .title {
+        font-size: 9px;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+  
+      .barcode {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+        margin: 2px 0;
+      }
+      .barcode svg {
+        max-width: 100%;
+        max-height: 100%;
+        display: block;
+      }
+  
+      .code {
+        margin-top: 1px;
+        font-size: 9px;
+        text-align: center;
+        letter-spacing: 0.5px;
+      }
+  
+      .subtitle {
+        font-size: 8px;
+        color: #444;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    </style>
+  </head>
+  <body>${labelsHtml}</body>
+  </html>`;
+
+    printWindow.document.open();
+    printWindow.document.close();
+    printWindow.document.documentElement.innerHTML = htmlContent;
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 100);
+  }
+
+  private generateBarcodeSvg(value: string) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    JsBarcode(svg, value, {
+      format: 'CODE128',
+      displayValue: false,
+      margin: 0,
+      width: 1.5,
+      height: 44,
+    });
+    return svg.outerHTML;
+  }
+
+  private escapeHtml(value: string) {
+    return value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
   }
 }

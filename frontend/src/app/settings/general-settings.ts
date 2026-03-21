@@ -47,6 +47,9 @@ export class GeneralSettings implements OnInit {
     sgst_sharing_rate: null,
     igst_sharing_rate: null,
     invoice_terms: '',
+    barcode_width: '2',
+    barcode_height: '1.2',
+    barcode_columns: 1,
   };
 
   ngOnInit(): void {
@@ -60,7 +63,7 @@ export class GeneralSettings implements OnInit {
         res.data.forEach((s) => {
           if (this.settings[s.key] !== undefined) {
             // parse numbers if applicable
-            if (s.key === 'sgst_sharing_rate' || s.key === 'igst_sharing_rate') {
+            if (s.key === 'sgst_sharing_rate' || s.key === 'igst_sharing_rate' || s.key === 'barcode_columns') {
               this.settings[s.key] = s.value ? Number(s.value) : null;
             } else {
               this.settings[s.key] = s.value;

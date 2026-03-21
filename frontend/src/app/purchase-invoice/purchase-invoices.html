@@ -86,6 +86,16 @@
                   nzType="text"
                   nzSize="small"
                   nz-tooltip
+                  nzTooltipTitle="Print barcodes"
+                  (click)="printBarcodes(invoice.id)"
+                >
+                  <span class="text-accent!" nz-icon nzType="barcode" nzTheme="outline"></span>
+                </button>
+                <button
+                  nz-button
+                  nzType="text"
+                  nzSize="small"
+                  nz-tooltip
                   nzTooltipTitle="Print purchase invoice"
                   (click)="printInvoice(invoice.id)"
                 >
