@@ -13,6 +13,12 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
       </h1>
     </div>
     <div class="flex gap-0 border-b border-border mb-4">
+      <a routerLink="/settings/general"
+         routerLinkActive="border-b-2 border-accent text-accent font-semibold"
+         class="px-4 py-2 text-sm hover:text-accent transition-colors">
+        <span nz-icon nzType="profile" nzTheme="outline" class="mr-1"></span>
+        General
+      </a>
       <a routerLink="/settings/pricing-categories"
          routerLinkActive="border-b-2 border-accent text-accent font-semibold"
          class="px-4 py-2 text-sm hover:text-accent transition-colors">

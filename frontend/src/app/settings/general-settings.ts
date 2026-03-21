@@ -1,0 +1,99 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+
+import { SettingsService } from './settings.service';
+import { forkJoin } from 'rxjs';
+
+@Component({
+  selector: 'app-general-settings',
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzFormModule,
+    NzInputModule,
+    NzButtonModule,
+    NzCardModule,
+    NzDividerModule,
+    NzInputNumberModule,
+  ],
+  templateUrl: './general-settings.html',
+})
+export class GeneralSettings implements OnInit {
+  private settingsService = inject(SettingsService);
+  private message = inject(NzMessageService);
+
+  loading = false;
+  saving = false;
+
+  settings: Record<string, any> = {
+    company_name: '',
+    company_gstin: '',
+    company_address_line1: '',
+    company_city: '',
+    company_state: '',
+    company_postal_code: '',
+    company_phone: '',
+    bank_name: '',
+    bank_account: '',
+    bank_ifsc: '',
+    sgst_sharing_rate: null,
+    igst_sharing_rate: null,
+    invoice_terms: '',
+  };
+
+  ngOnInit(): void {
+    this.loadSettings();
+  }
+
+  loadSettings() {
+    this.loading = true;
+    this.settingsService.getAllSettings().subscribe({
+      next: (res) => {
+        res.data.forEach((s) => {
+          if (this.settings[s.key] !== undefined) {
+            // parse numbers if applicable
+            if (s.key === 'sgst_sharing_rate' || s.key === 'igst_sharing_rate') {
+              this.settings[s.key] = s.value ? Number(s.value) : null;
+            } else {
+              this.settings[s.key] = s.value;
+            }
+          }
+        });
+        this.loading = false;
+      },
+      error: () => {
+        this.message.error('Failed to load settings');
+        this.loading = false;
+      },
+    });
+  }
+
+  save() {
+    this.saving = true;
+    const requests = Object.keys(this.settings).map((key) => {
+      const val = this.settings[key] !== null && this.settings[key] !== undefined 
+        ? String(this.settings[key]) 
+        : '';
+      return this.settingsService.updateSetting(key, val);
+    });
+
+    forkJoin(requests).subscribe({
+      next: () => {
+        this.message.success('Settings saved successfully');
+        this.saving = false;
+      },
+      error: () => {
+        this.message.error('Failed to save settings');
+        this.saving = false;
+      },
+    });
+  }
+}

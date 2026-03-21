@@ -15,6 +15,7 @@ import { PurchaseInvoices } from './purchase-invoice/purchase-invoices';
 import { PurchaseInvoiceForm } from './purchase-invoice/purchase-invoice-form';
 import { Settings } from './settings/settings';
 import { PricingCategories } from './settings/pricing-categories';
+import { GeneralSettings } from './settings/general-settings';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -60,7 +61,8 @@ export const routes: Routes = [
         path: 'settings',
         component: Settings,
         children: [
-          { path: '', redirectTo: 'pricing-categories', pathMatch: 'full' },
+          { path: '', redirectTo: 'general', pathMatch: 'full' },
+          { path: 'general', component: GeneralSettings },
           { path: 'pricing-categories', component: PricingCategories },
         ],
       },

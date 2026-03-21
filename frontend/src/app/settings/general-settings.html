@@ -1,0 +1,190 @@
+<nz-card [nzLoading]="loading">
+  <form nz-form nzLayout="vertical" (ngSubmit)="save()">
+    <nz-divider nzText="Company Profile" nzOrientation="left"></nz-divider>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <nz-form-item>
+        <nz-form-label nzFor="company_name">Company Name</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="company_name"
+            id="company_name"
+            [(ngModel)]="settings['company_name']"
+            placeholder="Acme Traders"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="company_gstin">Company GSTIN</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="company_gstin"
+            id="company_gstin"
+            [(ngModel)]="settings['company_gstin']"
+            placeholder="33AABCT1332L1ZQ"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="company_address_line1">Address</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="company_address_line1"
+            id="company_address_line1"
+            [(ngModel)]="settings['company_address_line1']"
+            placeholder="12, Gandhi Road"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="company_city">City</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="company_city"
+            id="company_city"
+            [(ngModel)]="settings['company_city']"
+            placeholder="Chennai"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="company_state">State</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="company_state"
+            id="company_state"
+            [(ngModel)]="settings['company_state']"
+            placeholder="Tamil Nadu"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="company_postal_code">Postal Code</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="company_postal_code"
+            id="company_postal_code"
+            [(ngModel)]="settings['company_postal_code']"
+            placeholder="600001"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="company_phone">Phone</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="company_phone"
+            id="company_phone"
+            [(ngModel)]="settings['company_phone']"
+            placeholder="9876543210"
+          />
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+    <nz-divider nzText="Bank Details" nzOrientation="left"></nz-divider>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <nz-form-item>
+        <nz-form-label nzFor="bank_name">Bank Name</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="bank_name"
+            id="bank_name"
+            [(ngModel)]="settings['bank_name']"
+            placeholder="HDFC Bank"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="bank_account">Bank Account</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="bank_account"
+            id="bank_account"
+            [(ngModel)]="settings['bank_account']"
+            placeholder="5020012345678"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="bank_ifsc">Bank IFSC</nz-form-label>
+        <nz-form-control>
+          <input
+            nz-input
+            name="bank_ifsc"
+            id="bank_ifsc"
+            [(ngModel)]="settings['bank_ifsc']"
+            placeholder="HDFC0001234"
+          />
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+    <nz-divider nzText="Invoice Settings" nzOrientation="left"></nz-divider>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <nz-form-item>
+        <nz-form-label nzFor="sgst_sharing_rate">SGST Sharing Rate (%)</nz-form-label>
+        <nz-form-control>
+          <nz-input-number
+            name="sgst_sharing_rate"
+            id="sgst_sharing_rate"
+            [(ngModel)]="settings['sgst_sharing_rate']"
+            [nzMin]="0"
+            [nzMax]="100"
+            [nzStep]="1"
+            class="w-full"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="igst_sharing_rate">IGST Sharing Rate (%)</nz-form-label>
+        <nz-form-control>
+          <nz-input-number
+            name="igst_sharing_rate"
+            id="igst_sharing_rate"
+            [(ngModel)]="settings['igst_sharing_rate']"
+            [nzMin]="0"
+            [nzMax]="100"
+            [nzStep]="1"
+            class="w-full"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item class="md:col-span-2">
+        <nz-form-label nzFor="invoice_terms">Invoice Terms</nz-form-label>
+        <nz-form-control>
+          <textarea
+            nz-input
+            name="invoice_terms"
+            id="invoice_terms"
+            [(ngModel)]="settings['invoice_terms']"
+            rows="3"
+            placeholder="Goods once sold will not be taken back."
+          ></textarea>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+    <div class="mt-6 flex justify-end">
+      <button nz-button nzType="primary" type="submit" [nzLoading]="saving">Save Settings</button>
+    </div>
+  </form>
+</nz-card>
