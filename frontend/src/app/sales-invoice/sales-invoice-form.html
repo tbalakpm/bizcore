@@ -216,7 +216,9 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1">Type <span style="color: var(--color-danger)">*</span></label>
+      <label class="block text-sm font-medium mb-1"
+        >Type <span style="color: var(--color-danger)">*</span></label
+      >
       <nz-select
         [(ngModel)]="editingInvoice.type"
         (ngModelChange)="onTypeChange($event)"
@@ -429,8 +431,21 @@
               }
             </div>
           </td>
-          <td class="text-right text-text-muted">
-            {{ item.taxPct || 0 }}% (₹{{ item.taxAmount || 0 | number: '1.2-2' }})
+          <td class="text-right text-text-muted text-xs">
+            <div class="text-sm">
+              {{ item.taxPct || 0 }}% (₹{{ item.taxAmount || 0 | number: '1.2-2' }})
+            </div>
+            @if (item.taxAmount || 0 > 0) {
+              <div class="opacity-80 mt-0.5">
+                @if (item.igstAmount || 0 > 0) {
+                  IGST: ₹{{ item.igstAmount | number: '1.2-2' }}
+                } @else {
+                  CGST: ₹{{ item.cgstAmount | number: '1.2-2' }}<br />SGST: ₹{{
+                    item.sgstAmount | number: '1.2-2'
+                  }}
+                }
+              </div>
+            }
           </td>
           <td class="text-right font-medium">
             {{ item.lineTotal | number: '1.2-2' }}

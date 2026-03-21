@@ -12,6 +12,13 @@ import { toNumericString, toPositiveNumber } from '../utils/number.util';
 export const salesInvoicesRouter = express.Router();
 
 const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, items: Partial<SalesInvoiceItemModel>[]) => {
+  const invoice = await tx.select().from(salesInvoices).where(eq(salesInvoices.id, salesInvoiceId)).get();
+  const customer = invoice ? await tx.select().from(customers).where(eq(customers.id, invoice.customerId)).get() : null;
+  const settingRows = await tx.select().from(settings).all();
+  const s = Object.fromEntries(settingRows.map(r => [r.key, r.value]));
+  const companyGstin = s['company_gstin'] || '';
+  const customerGstin = customer?.gstin || '';
+  const isInterState = companyGstin && customerGstin && companyGstin.substring(0, 2) !== customerGstin.substring(0, 2);
   let totalQty = 0;
   let subtotal = 0;
   let totalTax = 0;
@@ -37,11 +44,11 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
       .from(inventories)
       .where(eq(inventories.id, inventoryId))
       .get();
-      
+
     if (!inventory) {
       throw new Error(`Inventory stock not found for inventoryId=${inventoryId}`);
     }
-    
+
     if ((inventory.unitsInStock ?? 0) < qty) {
       throw new Error(`Insufficient stock for inventoryId=${inventoryId}`);
     }
@@ -52,6 +59,15 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
       .set({ unitsInStock: updatedUnitsInStock })
       .where(eq(inventories.id, inventory.id))
       .run();
+
+    const taxAmountValue = toPositiveNumber(item.taxAmount, 0);
+    let sgst = 0, cgst = 0, igst = 0;
+    if (isInterState) {
+      igst = taxAmountValue;
+    } else {
+      sgst = taxAmountValue / 2;
+      cgst = taxAmountValue / 2;
+    }
 
     await tx
       .insert(salesInvoiceItems)
@@ -64,12 +80,15 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
         discountPct: toNumericString(item.discountPct),
         discountAmount: toNumericString(item.discountAmount),
         taxPct: toNumericString(item.taxPct),
+        sgstAmount: toNumericString(sgst),
+        cgstAmount: toNumericString(cgst),
+        igstAmount: toNumericString(igst),
       })
       .run();
 
     totalQty += qty;
     subtotal += (qty * unitPrice);
-    totalTax += toPositiveNumber(item.taxAmount, 0);
+    totalTax += taxAmountValue;
     totalDiscount += toPositiveNumber(item.discountAmount, 0);
   }
 
@@ -165,18 +184,18 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
       })
       .from(salesInvoices)
       .leftJoin(customers, eq(customers.id, salesInvoices.customerId));
-      
+
     const whereCondition = filters.length > 0 ? and(...filters) : undefined;
     const query = whereCondition ? baseQuery.where(whereCondition) : baseQuery;
 
     const totalResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(salesInvoices);
     const filteredCount = whereCondition
       ? (
-          await db
-            .select({ count: sql<number>`cast(count(*) as integer)` })
-            .from(salesInvoices)
-            .where(whereCondition)
-        )[0].count
+        await db
+          .select({ count: sql<number>`cast(count(*) as integer)` })
+          .from(salesInvoices)
+          .where(whereCondition)
+      )[0].count
       : totalResult[0].count;
 
     const data = await query
@@ -219,6 +238,9 @@ salesInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
         discountAmount: salesInvoiceItems.discountAmount,
         taxPct: salesInvoiceItems.taxPct,
         taxAmount: salesInvoiceItems.taxAmount,
+        sgstAmount: salesInvoiceItems.sgstAmount,
+        cgstAmount: salesInvoiceItems.cgstAmount,
+        igstAmount: salesInvoiceItems.igstAmount,
         lineTotal: salesInvoiceItems.lineTotal,
         productId: inventories.productId,
         productCode: products.code,
@@ -249,13 +271,13 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
     if (items.length === 0) {
       return res.status(400).json({ error: 'At least one item is required' });
     }
-    
+
     if (!body.customerId) {
-        return res.status(400).json({ error: 'Customer is required for a sales invoice'});
+      return res.status(400).json({ error: 'Customer is required for a sales invoice' });
     }
 
     const created = await db.transaction(async (tx) => {
-      const invoiceNumber = body.invoiceNumber || (await serialNumberService.generateInvoiceNumber('salesInvoice', tx));
+      const invoiceNumber = body.invoiceNumber || (await serialNumberService.generateInvoiceNumber(body.type === 'estimate' ? 'salesEstimate' : 'salesInvoice', tx));
       const insertedInvoice = await tx
         .insert(salesInvoices)
         .values({
@@ -323,26 +345,26 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
         .from(salesInvoiceItems)
         .where(eq(salesInvoiceItems.salesInvoiceId, id))
         .all();
-        
+
       if (existingItems.length > 0) {
         // Find corresponding inventory to refund the stock to. 
         for (const item of existingItems) {
-           const inventory = await tx
-              .select()
-              .from(inventories)
-              .where(eq(inventories.id, item.inventoryId))
-              .get();
-              
-           if (inventory) {
-               const qtyToReturn = Number(item.qty ?? 0);
-               const restoredStock = (inventory.unitsInStock ?? 0) + qtyToReturn;
-               
-               await tx
-                 .update(inventories)
-                 .set({ unitsInStock: restoredStock })
-                 .where(eq(inventories.id, inventory.id))
-                 .run();
-           }
+          const inventory = await tx
+            .select()
+            .from(inventories)
+            .where(eq(inventories.id, item.inventoryId))
+            .get();
+
+          if (inventory) {
+            const qtyToReturn = Number(item.qty ?? 0);
+            const restoredStock = (inventory.unitsInStock ?? 0) + qtyToReturn;
+
+            await tx
+              .update(inventories)
+              .set({ unitsInStock: restoredStock })
+              .where(eq(inventories.id, inventory.id))
+              .run();
+          }
         }
 
         await tx.delete(salesInvoiceItems).where(eq(salesInvoiceItems.salesInvoiceId, id)).run();
@@ -398,26 +420,26 @@ salesInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
       }
 
       const items = await tx.select().from(salesInvoiceItems).where(eq(salesInvoiceItems.salesInvoiceId, id)).all();
-      
+
       // Refund the inventory
       if (items.length > 0) {
         for (const item of items) {
-           const inventory = await tx
-              .select()
-              .from(inventories)
-              .where(eq(inventories.id, item.inventoryId))
-              .get();
-              
-           if (inventory) {
-               const qtyToReturn = Number(item.qty ?? 0);
-               const restoredStock = (inventory.unitsInStock ?? 0) + qtyToReturn;
-               
-               await tx
-                 .update(inventories)
-                 .set({ unitsInStock: restoredStock })
-                 .where(eq(inventories.id, inventory.id))
-                 .run();
-           }
+          const inventory = await tx
+            .select()
+            .from(inventories)
+            .where(eq(inventories.id, item.inventoryId))
+            .get();
+
+          if (inventory) {
+            const qtyToReturn = Number(item.qty ?? 0);
+            const restoredStock = (inventory.unitsInStock ?? 0) + qtyToReturn;
+
+            await tx
+              .update(inventories)
+              .set({ unitsInStock: restoredStock })
+              .where(eq(inventories.id, inventory.id))
+              .run();
+          }
         }
       }
 
@@ -446,49 +468,49 @@ salesInvoicesRouter.post('/:id/generate-irn', async (req: Request, res: Response
     if (!existing) {
       return res.status(404).json({ error: 'Sales invoice not found' });
     }
-    
+
     // According to Indian Gov E-Invoicing Rules, an invoice cannot generate multiple IRNs.
     if (existing.irn) {
-        return res.status(400).json({ error: 'Invoice already possesses an IRN.' });
+      return res.status(400).json({ error: 'Invoice already possesses an IRN.' });
     }
 
     // Mock IRN generation (normally involves calling NIC IRP portal with a JSON payload)
     // Here we generate a realistic-looking 64-char hex hash
     const inputString = existing.customerId + '-' + existing.invoiceNumber + '-' + existing.invoiceDate + '-' + Date.now();
     const irn = crypto.createHash('sha256').update(inputString).digest('hex');
-    
+
     // Mock 15 digit Ack No
     const ackNo = Math.floor(100000000000000 + Math.random() * 900000000000000).toString();
-    
+
     const ackDate = new Date().toISOString();
-    
+
     // Fetch seller GSTIN from settings
     const settingRows = await db.select().from(settings).all();
     const s = Object.fromEntries(settingRows.map(r => [r.key, r.value]));
 
     // Mock Signed QR payload (usually a signed JWT-like string)
     const qrPayload = JSON.stringify({
-       SellerGstin: s['company_gstin'] || '07AAGFF2194N1Z1',
-       BuyerGstin: '27AADCB2230M1Z2',
-       DocNo: existing.invoiceNumber,
-       DocTyp: 'INV',
-       DocDt: existing.invoiceDate,
-       TotInvVal: existing.netAmount,
-       ItemCnt: existing.totalQty,
-       MainHsnCode: '8517',
-       Irn: irn
+      SellerGstin: s['company_gstin'] || '07AAGFF2194N1Z1',
+      BuyerGstin: '27AADCB2230M1Z2',
+      DocNo: existing.invoiceNumber,
+      DocTyp: 'INV',
+      DocDt: existing.invoiceDate,
+      TotInvVal: existing.netAmount,
+      ItemCnt: existing.totalQty,
+      MainHsnCode: '8517',
+      Irn: irn
     });
-    
+
     // Base64 encode it for the QR code payload
     const signedQrCode = Buffer.from(qrPayload).toString('base64');
 
     await db
       .update(salesInvoices)
       .set({
-         irn,
-         ackNo,
-         ackDate,
-         signedQrCode
+        irn,
+        ackNo,
+        ackDate,
+        signedQrCode
       })
       .where(eq(salesInvoices.id, id))
       .run();

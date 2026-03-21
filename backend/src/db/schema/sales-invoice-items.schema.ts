@@ -20,6 +20,9 @@ export const salesInvoiceItems = sqliteTable('sales_invoice_items', {
   taxAmount: numeric('tax_amount').generatedAlwaysAs(
     (): SQL => sql`(ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))`
   ),
+  sgstAmount: numeric('sgst_amount').notNull().default('0.00'),
+  cgstAmount: numeric('cgst_amount').notNull().default('0.00'),
+  igstAmount: numeric('igst_amount').notNull().default('0.00'),
   lineTotal: numeric('line_total').generatedAlwaysAs(
     (): SQL => sql`(ROUND((qty * unit_price - discount_amount) + tax_amount, 2))`
   )

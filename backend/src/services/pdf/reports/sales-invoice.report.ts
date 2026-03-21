@@ -57,7 +57,7 @@ export async function renderSalesInvoice(
   onNewPage();
 
   sections.renderReportMeta(pdf, {
-    title: 'TAX INVOICE',
+    title: invoice.type === 'invoice' ? 'TAX INVOICE' : 'ESTIMATE',
     number: invoice.invoiceNumber,
     date: invoice.invoiceDate,
     extraMeta: invoice.refNumber ? [{ label: 'Ref No', value: invoice.refNumber }] : [],

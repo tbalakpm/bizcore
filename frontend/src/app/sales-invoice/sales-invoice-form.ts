@@ -11,6 +11,7 @@ import { type Customer, CustomerService } from '../customer/customer-service';
 import { type SalesInvoiceItem, SalesInvoiceService, SalesInvoice } from './sales-invoice-service';
 import { type Inventory, InventoryService } from '../inventory/inventory-service';
 import { PricingCategoryService, ProductMargin } from '../settings/pricing-category-service';
+import { SettingsService } from '../settings/settings.service';
 
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSelectComponent } from 'ng-zorro-antd/select';
@@ -40,6 +41,9 @@ type EditableSalesInvoiceItem = {
   discountAmount?: number;
   taxPct?: number;
   taxAmount?: number;
+  sgstAmount?: number;
+  cgstAmount?: number;
+  igstAmount?: number;
   lineTotal: number;
 
   // Track original state for stock validation
@@ -81,6 +85,7 @@ export class SalesInvoiceForm implements OnInit {
   private customerService = inject(CustomerService);
   private inventoryService = inject(InventoryService);
   private pricingCategoryService = inject(PricingCategoryService);
+  private settingsService = inject(SettingsService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NzSelectComponent>;
@@ -102,6 +107,8 @@ export class SalesInvoiceForm implements OnInit {
   inventoryOffset = 0;
   inventoryLimit = 50;
   inventoryTotal = 0;
+
+  companyGstin: string = '';
 
   editingInvoice: EditableSalesInvoice = this.defaultInvoice();
 
@@ -160,6 +167,14 @@ export class SalesInvoiceForm implements OnInit {
     this.loadCustomers();
     this.loadInventories();
     this.setupInventorySearch();
+
+    this.settingsService.getSetting('company_gstin').subscribe({
+      next: (setting) => {
+        this.companyGstin = setting.value || '';
+        this.recalculateAllTaxes();
+      },
+      error: () => {}
+    });
 
     // Initialize date from default invoice
     this.invoiceDateValue = this.editingInvoice.invoiceDate
@@ -308,6 +323,8 @@ export class SalesInvoiceForm implements OnInit {
         // Load pricing category for the selected customer
         if (invoice.customerId) {
           this.onCustomerChange(invoice.customerId);
+        } else {
+          this.recalculateAllTaxes();
         }
       },
       error: () => {
@@ -397,6 +414,13 @@ export class SalesInvoiceForm implements OnInit {
         error: () => {},
       });
     }
+    
+    // Recalculate taxes based on possible new customer GSTIN
+    this.recalculateAllTaxes();
+  }
+
+  recalculateAllTaxes() {
+    this.editingInvoice.items.forEach(item => this.calculateLineTotal(item));
   }
 
   onTypeChange(type: string) {
@@ -440,6 +464,20 @@ export class SalesInvoiceForm implements OnInit {
       taxAmt = afterDiscount * (Number(item.taxPct) / 100);
     }
     item.taxAmount = taxAmt;
+
+    const customer = this.customers().find(c => c.id === this.editingInvoice.customerId);
+    const customerGstin = customer?.gstin || '';
+    const isInterState = this.companyGstin && customerGstin && this.companyGstin.substring(0, 2) !== customerGstin.substring(0, 2);
+
+    if (isInterState) {
+      item.igstAmount = taxAmt;
+      item.cgstAmount = 0;
+      item.sgstAmount = 0;
+    } else {
+      item.igstAmount = 0;
+      item.cgstAmount = taxAmt / 2;
+      item.sgstAmount = taxAmt / 2;
+    }
 
     item.lineTotal = Number((afterDiscount + taxAmt).toFixed(2));
   }

@@ -18,6 +18,9 @@ export interface SalesInvoiceItem {
   discountAmount?: number | string;
   taxPct?: number | string;
   taxAmount?: number | string;
+  sgstAmount?: number | string;
+  cgstAmount?: number | string;
+  igstAmount?: number | string;
   lineTotal: number;
   
   // Joined fields from db

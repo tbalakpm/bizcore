@@ -14,6 +14,11 @@
     <div class="flex flex-wrap items-center grow gap-2">
       <span class="text-xs font-semibold uppercase tracking-wide text-text-muted">Filter</span>
 
+      <nz-select formControlName="type" nzAllowClear nzPlaceHolder="Type" style="width: 120px">
+        <nz-option nzValue="invoice" nzLabel="Invoice"></nz-option>
+        <nz-option nzValue="estimate" nzLabel="Estimate"></nz-option>
+      </nz-select>
+
       <input
         nz-input
         type="text"
@@ -37,16 +42,6 @@
             <div class="text-xs text-text-muted">{{ c.code }}</div>
           </nz-option>
         }
-      </nz-select>
-
-      <nz-select
-        formControlName="type"
-        nzAllowClear
-        nzPlaceHolder="Type"
-        style="width: 120px"
-      >
-        <nz-option nzValue="invoice" nzLabel="Invoice"></nz-option>
-        <nz-option nzValue="estimate" nzLabel="Estimate"></nz-option>
       </nz-select>
 
       <nz-date-picker
@@ -154,7 +149,7 @@
           <td>{{ invoice.customerName || '—' }}</td>
           <td>
             <nz-tag [nzColor]="invoice.type === 'estimate' ? 'processing' : 'default'">
-              {{ (invoice.type || 'invoice') | titlecase }}
+              {{ invoice.type || 'invoice' | titlecase }}
             </nz-tag>
           </td>
           <td class="text-right">{{ invoice.totalQty }}</td>
@@ -226,14 +221,24 @@
     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
       <div class="flex items-center gap-2">
         <span class="text-sm text-text-muted">Rows</span>
-        <nz-select [(ngModel)]="pageLimit" (ngModelChange)="onPageLimitChange()" style="width: 80px">
+        <nz-select
+          [(ngModel)]="pageLimit"
+          (ngModelChange)="onPageLimitChange()"
+          style="width: 80px"
+        >
           <nz-option [nzValue]="10" nzLabel="10"></nz-option>
           <nz-option [nzValue]="25" nzLabel="25"></nz-option>
           <nz-option [nzValue]="50" nzLabel="50"></nz-option>
         </nz-select>
       </div>
       <span class="text-sm text-text-muted">
-        Showing {{ pagination().total === 0 ? 0 : (pagination().page - 1) * pagination().limit + 1 }}-{{ pagination().page * pagination().limit > pagination().total ? pagination().total : pagination().page * pagination().limit }} of {{ pagination().total }} items
+        Showing
+        {{ pagination().total === 0 ? 0 : (pagination().page - 1) * pagination().limit + 1 }}-{{
+          pagination().page * pagination().limit > pagination().total
+            ? pagination().total
+            : pagination().page * pagination().limit
+        }}
+        of {{ pagination().total }} items
       </span>
     </div>
     <nz-pagination

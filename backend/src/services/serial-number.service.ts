@@ -10,6 +10,7 @@ import {
 const SERIAL_KEYS = {
   stockInvoice: 'stock_invoice',
   salesInvoice: 'sales_invoice',
+  salesEstimate: 'sales_estimate',
   purchaseInvoice: 'purchase_invoice',
 } as const;
 
@@ -18,6 +19,7 @@ type InvoiceSerialType = keyof typeof SERIAL_KEYS;
 const defaultSerialConfig: Record<string, SerialSequenceConfig> = {
   [SERIAL_KEYS.stockInvoice]: { prefix: 'STK-', length: 10, start: 1 },
   [SERIAL_KEYS.salesInvoice]: { prefix: 'INV-', length: 10, start: 1 },
+  [SERIAL_KEYS.salesEstimate]: { prefix: 'EST-', length: 10, start: 1 },
   [SERIAL_KEYS.purchaseInvoice]: { prefix: 'PUR-', length: 10, start: 1 },
 };
 
