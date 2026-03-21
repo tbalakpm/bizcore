@@ -65,6 +65,23 @@
           </div>
           <div class="col-span-12 md:col-span-6 xl:col-span-3">
             <nz-form-item>
+              <nz-form-label>Pricing Category</nz-form-label>
+              <nz-form-control>
+                <nz-select
+                  [(ngModel)]="editingCustomer.pricingCategoryId"
+                  name="newCustomerPricingCategory"
+                  nzPlaceHolder="Select pricing category"
+                  nzAllowClear
+                >
+                  @for (pc of pricingCategories(); track pc.id) {
+                    <nz-option [nzValue]="pc.id" [nzLabel]="pc.name"></nz-option>
+                  }
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div class="col-span-12 md:col-span-6 xl:col-span-3">
+            <nz-form-item>
               <nz-form-label>{{ 'GSTIN' | translate }}</nz-form-label>
               <nz-form-control>
                 <!-- <nz-input-group [nzSuffix]="suffixIconButton"> -->

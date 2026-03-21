@@ -23,6 +23,7 @@ import { stockInvoicesRouter } from "./routes/stock-invoices";
 import { salesInvoicesRouter } from "./routes/sales-invoices";
 import { purchaseInvoicesRouter } from "./routes/purchase-invoices";
 import { gstRouter } from "./routes/gst";
+import { pricingCategoriesRouter } from "./routes/pricing-categories";
 
 
 export async function app() {
@@ -60,6 +61,7 @@ export async function app() {
   app.use("/api/auth", authRouter);
   app.use("/api/users", authRequired, requireRole("admin"), usersRouter);
   app.use("/api/categories", authRequired, categoriesRouter);
+  app.use("/api/pricing-categories", authRequired, pricingCategoriesRouter);
   app.use("/api/products", authRequired, productsRouter);
   app.use("/api/customers", authRequired, customersRouter);
   app.use("/api/suppliers", authRequired, suppliersRouter);

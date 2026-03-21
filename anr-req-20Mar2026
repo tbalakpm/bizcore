@@ -7,22 +7,31 @@
 
 3. PRICING CATEGORY FOR CUSTOMER					WIP
 ------------------------------------------------
-4. ASSEMBLY SETUP (Dhoti+Shirt) (Saree + Blouse)	YTS
+4. DEBIT NOTE										YTS
+   CREDIT NOTE
 ------------------------------------------------
-5. ACCOUNT MASTERS
+5. ASSEMBLY SETUP (Dhoti+Shirt) (Saree + Blouse)	YTS
 ------------------------------------------------
-6. JOURNAL ENTRIES
+6. ACCOUNT MASTERS									YTS
 ------------------------------------------------
-7. REPORTS
+7. JOURNAL ENTRIES									YTS
+------------------------------------------------
+8. REPORTS											YTS
 	PURCHASE
 	SALES
 	STOCK
 	--------------------------------------------
-8.	DAYBOOK
+9.	DAYBOOK											YTS
 	LEDGER
 	--------------------------------------------
-9.	SUDNRY DEBTORS
+10. MANUFACTURING									YTS
+	REPORTS
+------------------------------------------------
+11.	SUDNRY DEBTORS									YTS
 	SUNDRY CREDITORS
 	--------------------------------------------
-10.	TRIAL BALANCE
+12.	TRIAL BALANCE									YTS
 	--------------------------------------------
+
+A) TAX SPLIT INTO SGST, CGST, IGST
+B) ADD DESCRIPTION IN STOCK, PURCHASE, SALES STORE IT IN INVENTORIES

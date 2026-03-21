@@ -1,0 +1,186 @@
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+  <h1 class="text-xl font-semibold flex items-center gap-2">
+    <span nz-icon nzType="percentage" nzTheme="outline" class="text-2xl"></span>
+    Pricing Categories
+  </h1>
+</div>
+
+@if (error) {
+  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
+}
+
+<div class="grid grid-cols-1 gap-4">
+  <!-- Add / Edit form -->
+  <nz-card>
+    <h2 class="text-base font-semibold mb-2">{{ editing ? 'Edit' : 'Add' }} Pricing Category</h2>
+    <form nz-form (ngSubmit)="editing ? saveEdit() : add()" nzLayout="vertical">
+      <div class="grid grid-cols-12 gap-2">
+        <div class="col-span-12 md:col-span-2">
+          <nz-form-item>
+            <nz-form-label>Code</nz-form-label>
+            <nz-form-control>
+              <input nz-input type="text" [(ngModel)]="editForm.code" name="catCode" placeholder="e.g. RETAIL" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div class="col-span-12 md:col-span-4">
+          <nz-form-item>
+            <nz-form-label>Name</nz-form-label>
+            <nz-form-control>
+              <input nz-input type="text" [(ngModel)]="editForm.name" name="catName" placeholder="Category name" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div class="col-span-12 md:col-span-4">
+          <nz-form-item>
+            <nz-form-label>Description</nz-form-label>
+            <nz-form-control>
+              <input nz-input type="text" [(ngModel)]="editForm.description" name="catDesc" placeholder="Optional description" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div class="flex col-span-full items-end justify-end gap-2 mt-2">
+          @if (editing) {
+            <button nz-button nzType="primary" type="submit">
+              <span nz-icon nzType="save" nzTheme="outline"></span> Save
+            </button>
+            <button nz-button nzType="default" type="button" (click)="cancelEdit()">Cancel</button>
+          } @else {
+            <button nz-button nzType="primary" type="submit">
+              <span nz-icon nzType="plus" nzTheme="outline"></span> Add Category
+            </button>
+          }
+        </div>
+      </div>
+    </form>
+  </nz-card>
+
+  <!-- List -->
+  <nz-card>
+    <h2 class="text-base font-semibold mb-3">Pricing Categories</h2>
+    <nz-table
+      [nzData]="categories()"
+      [nzLoading]="loading"
+      nzSize="small"
+      [nzBordered]="true"
+      [nzFrontPagination]="false"
+      [nzTotal]="total"
+      [nzPageIndex]="pageIndex"
+      [nzPageSize]="pageSize"
+      [nzShowSizeChanger]="true"
+      [nzPageSizeOptions]="[10, 20, 50]"
+      (nzQueryParams)="onPageChange($event)"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th nzWidth="80px" nzAlign="center">Active</th>
+          <th nzWidth="160px" nzAlign="center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cat of categories(); track cat.id) {
+          <tr>
+            <td>{{ cat.code }}</td>
+            <td>{{ cat.name }}</td>
+            <td>{{ cat.description || '-' }}</td>
+            <td nzAlign="center">
+              <nz-switch [ngModel]="cat.isActive" (ngModelChange)="toggleActive(cat)" nzSize="small"></nz-switch>
+            </td>
+            <td nzAlign="center">
+              <div class="flex items-center justify-center gap-1">
+                <button nz-button nzType="link" nzSize="small" nz-tooltip
+                  [nzTooltipTitle]="expandedCategoryId === cat.id ? 'Hide Margins' : 'Configure Product Margins'"
+                  style="color: var(--color-accent)"
+                  (click)="toggleProductMargins(cat)">
+                  <span nz-icon nzType="percentage" nzTheme="outline"></span>
+                </button>
+                <button nz-button nzType="link" nzSize="small" nz-tooltip nzTooltipTitle="Edit"
+                  style="color: var(--color-accent)"
+                  (click)="startEdit(cat)">
+                  <span nz-icon nzType="edit" nzTheme="outline"></span>
+                </button>
+                <button nz-button nzType="link" nzDanger nzSize="small"
+                  nz-popconfirm nzPopconfirmTitle="Delete this pricing category?"
+                  (nzOnConfirm)="deleteCategory(cat)" nz-tooltip nzTooltipTitle="Delete">
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                </button>
+              </div>
+            </td>
+          </tr>
+          @if (expandedCategoryId === cat.id) {
+            <tr>
+              <td colspan="5" class="p-0">
+                <div class="p-4 bg-surface-alt rounded-b-md border-t border-border">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold text-sm">
+                      Product Margins for <span class="text-accent">{{ cat.name }}</span>
+                    </h3>
+                    <button nz-button nzType="primary" nzSize="small" (click)="saveProductMargins()" [nzLoading]="marginsLoading">
+                      <span nz-icon nzType="save" nzTheme="outline"></span> Save Margins
+                    </button>
+                  </div>
+                  @if (marginsLoading) {
+                    <div class="text-center text-text-muted py-4">Loading products...</div>
+                  } @else {
+                    <nz-table [nzData]="productMargins" nzSize="small" [nzBordered]="true" [nzFrontPagination]="true" [nzPageSize]="10">
+                      <thead>
+                        <tr>
+                          <th>Product Code</th>
+                          <th>Product Name</th>
+                          <th nzWidth="160px">Margin Type</th>
+                          <th nzWidth="140px">Margin Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (margin of productMargins; track margin.productId) {
+                          <tr>
+                            <td>{{ margin.productCode }}</td>
+                            <td>{{ margin.productName }}</td>
+                            <td>
+                              <nz-select [(ngModel)]="margin.marginType" [ngModelOptions]="{standalone: true}" class="w-full">
+                                @for (mt of marginTypes; track mt.value) {
+                                  <nz-option [nzValue]="mt.value" [nzLabel]="mt.label"></nz-option>
+                                }
+                              </nz-select>
+                            </td>
+                            <td>
+                              @if (margin.marginType === 'percent') {
+                                <nz-input-number
+                                  [(ngModel)]="margin.marginPct"
+                                  [ngModelOptions]="{standalone: true}"
+                                  [nzMin]="0" [nzMax]="100" [nzStep]="0.5"
+                                  [nzFormatter]="pctFormatter"
+                                  class="w-full" />
+                              } @else if (margin.marginType === 'amount') {
+                                <nz-input-number
+                                  [(ngModel)]="margin.marginAmount"
+                                  [ngModelOptions]="{standalone: true}"
+                                  [nzMin]="0" [nzStep]="1"
+                                  [nzFormatter]="amtFormatter"
+                                  class="w-full" />
+                              } @else {
+                                <span class="text-text-muted text-sm">–</span>
+                              }
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </nz-table>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        }
+        @if (!categories().length && !loading) {
+          <tr>
+            <td colspan="5" class="text-center text-text-muted">No pricing categories yet</td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>

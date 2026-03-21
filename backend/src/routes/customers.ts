@@ -2,7 +2,7 @@ import { and, eq, like, sql, type SQL, getTableColumns } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/sqlite-core';
 import express, { type Request, type Response } from 'express';
 
-import { customers, db, addresses } from '../db';
+import { customers, db, addresses, pricingCategories } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 
 export const customersRouter = express.Router();
@@ -78,10 +78,12 @@ customersRouter.get('/', async (req: Request, res: Response) => {
         ...getTableColumns(customers),
         billingAddress: billingAddress,
         shippingAddress: shippingAddress,
+        pricingCategoryName: pricingCategories.name,
       })
       .from(customers)
       .leftJoin(billingAddress, eq(customers.billingAddressId, billingAddress.id))
-      .leftJoin(shippingAddress, eq(customers.shippingAddressId, shippingAddress.id));
+      .leftJoin(shippingAddress, eq(customers.shippingAddressId, shippingAddress.id))
+      .leftJoin(pricingCategories, eq(customers.pricingCategoryId, pricingCategories.id));
 
     const query = filters.length > 0 ? baseQuery.where(and(...filters)) : baseQuery;
 
@@ -129,10 +131,12 @@ customersRouter.get('/:id', async (req: Request, res: Response) => {
       ...getTableColumns(customers),
       billingAddress: billingAddress,
       shippingAddress: shippingAddress,
+      pricingCategoryName: pricingCategories.name,
     })
     .from(customers)
     .leftJoin(billingAddress, eq(customers.billingAddressId, billingAddress.id))
     .leftJoin(shippingAddress, eq(customers.shippingAddressId, shippingAddress.id))
+    .leftJoin(pricingCategories, eq(customers.pricingCategoryId, pricingCategories.id))
     .where(eq(customers.id, id))
     .get();
 
@@ -146,7 +150,7 @@ customersRouter.get('/:id', async (req: Request, res: Response) => {
 });
 
 customersRouter.post('/', async (req, res) => {
-  const { code, name, type, notes, isActive, gstin, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
+  const { code, name, type, notes, isActive, gstin, pricingCategoryId, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
 
   if (!name) return res.status(400).json({ error: 'Name is required' });
   if (!code) return res.status(400).json({ error: 'Code is required' });
@@ -173,6 +177,7 @@ customersRouter.post('/', async (req, res) => {
           name,
           type: type || 'retail',
           gstin,
+          pricingCategoryId: pricingCategoryId ? Number(pricingCategoryId) : null,
           billingAddressId,
           shippingAddressId,
           notes,
@@ -200,7 +205,7 @@ customersRouter.put('/:id', async (req, res) => {
       error: req.i18n?.t('customer.notFound') || 'Customer not found',
     });
 
-  const { code, name, type, notes, isActive, gstin, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
+  const { code, name, type, notes, isActive, gstin, pricingCategoryId, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
 
   try {
     const updatedCustomer = await db.transaction(async (tx) => {
@@ -225,6 +230,10 @@ customersRouter.put('/:id', async (req, res) => {
         }
       }
 
+      const newPricingCategoryId = pricingCategoryId !== undefined
+        ? (pricingCategoryId ? Number(pricingCategoryId) : null)
+        : existingCustomer.pricingCategoryId;
+
       await tx
         .update(customers)
         .set({
@@ -232,6 +241,7 @@ customersRouter.put('/:id', async (req, res) => {
           name: name ?? existingCustomer.name,
           type: type ?? existingCustomer.type,
           gstin: gstin ?? existingCustomer.gstin,
+          pricingCategoryId: newPricingCategoryId,
           billingAddressId: bAddrId,
           shippingAddressId: sAddrId,
           notes: notes ?? existingCustomer.notes,
@@ -240,7 +250,7 @@ customersRouter.put('/:id', async (req, res) => {
         .where(eq(customers.id, id))
         .run();
 
-      return { ...existingCustomer, code, name, type, gstin, notes, isActive, billingAddressId: bAddrId, shippingAddressId: sAddrId };
+      return { ...existingCustomer, code, name, type, gstin, pricingCategoryId: newPricingCategoryId, notes, isActive, billingAddressId: bAddrId, shippingAddressId: sAddrId };
     });
 
     res.json(updatedCustomer);

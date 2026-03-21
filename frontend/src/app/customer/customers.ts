@@ -6,6 +6,7 @@ import { type Customer, type Address, CustomerList, CustomerService } from './cu
 import { AddressForm } from '../shared/components/address-form';
 import { PermissionService } from '../auth/permission.service';
 import { GstService } from '../shared/services/gst.service';
+import { PricingCategoryService, PricingCategory } from '../settings/pricing-category-service';
 
 
 import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
@@ -39,7 +40,10 @@ export class Customers implements OnInit {
   private customerService = inject(CustomerService);
   private gstService = inject(GstService);
   private modalService = inject(NzModalService);
+  private pricingCategoryService = inject(PricingCategoryService);
   permissionService = inject(PermissionService);
+
+  pricingCategories = signal<PricingCategory[]>([]);
 
 
 
@@ -67,6 +71,7 @@ export class Customers implements OnInit {
     name: '',
     type: 'retail',
     gstin: '',
+    pricingCategoryId: undefined,
     billingAddress: {},
     shippingAddress: {},
     notes: '',
@@ -85,6 +90,14 @@ export class Customers implements OnInit {
 
   ngOnInit(): void {
     this.loadCustomers();
+    this.loadPricingCategories();
+  }
+
+  loadPricingCategories() {
+    this.pricingCategoryService.getAll({ isActive: true }).subscribe({
+      next: (res) => this.pricingCategories.set(res.data),
+      error: () => {},
+    });
   }
 
   loadCustomers() {
@@ -218,6 +231,7 @@ export class Customers implements OnInit {
       name: '',
       type: 'retail',
       gstin: '',
+      pricingCategoryId: undefined,
       billingAddress: {},
       shippingAddress: {},
       notes: '',
@@ -233,6 +247,7 @@ export class Customers implements OnInit {
       this.editingCustomer.name = res.name;
       this.editingCustomer.type = res.type;
       this.editingCustomer.gstin = res.gstin;
+      this.editingCustomer.pricingCategoryId = res.pricingCategoryId;
       this.editingCustomer.billingAddress = res.billingAddress || {};
       this.editingCustomer.shippingAddress = res.shippingAddress || {};
       this.editingCustomer.notes = res.notes;

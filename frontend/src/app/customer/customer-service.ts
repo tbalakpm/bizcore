@@ -29,6 +29,8 @@ export interface Customer {
   name: string;
   type?: string;
   gstin?: string;
+  pricingCategoryId?: number;
+  pricingCategoryName?: string;
   billingAddressId?: number;
   shippingAddressId?: number;
   billingAddress?: Address;

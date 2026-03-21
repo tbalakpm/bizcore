@@ -13,6 +13,8 @@ import { SalesInvoiceForm } from './sales-invoice/sales-invoice-form';
 import { Suppliers } from './supplier/suppliers';
 import { PurchaseInvoices } from './purchase-invoice/purchase-invoices';
 import { PurchaseInvoiceForm } from './purchase-invoice/purchase-invoice-form';
+import { Settings } from './settings/settings';
+import { PricingCategories } from './settings/pricing-categories';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -54,6 +56,14 @@ export const routes: Routes = [
         ],
       },
       { path: 'users', component: Users, data: { module: 'users' } },
+      {
+        path: 'settings',
+        component: Settings,
+        children: [
+          { path: '', redirectTo: 'pricing-categories', pathMatch: 'full' },
+          { path: 'pricing-categories', component: PricingCategories },
+        ],
+      },
       // { path: 'customers', component: Entries },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

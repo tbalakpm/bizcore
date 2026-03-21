@@ -154,7 +154,8 @@
 
       @if (!showNewCustomerForm) {
         <nz-select
-          [(ngModel)]="editingInvoice.customerId"
+          [ngModel]="editingInvoice.customerId"
+          (ngModelChange)="onCustomerChange($event)"
           name="customerId"
           [nzShowSearch]="true"
           nzAllowClear
@@ -178,6 +179,12 @@
             </nz-option>
           }
         </nz-select>
+        @if (selectedPricingCategoryName) {
+          <div class="flex items-center gap-1 mt-1">
+            <span class="text-xs text-text-muted">Pricing Category:</span>
+            <nz-tag [nzColor]="'blue'" class="text-xs">{{ selectedPricingCategoryName }}</nz-tag>
+          </div>
+        }
         <ng-template #addCustomerTpl>
           @if (!editingInvoice.irn) {
             <div class="px-2 py-1 border-t border-surface-muted">

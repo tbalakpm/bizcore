@@ -10,6 +10,7 @@ import { type Product, ProductService } from '../product/product-service';
 import { type Customer, CustomerService } from '../customer/customer-service';
 import { type SalesInvoiceItem, SalesInvoiceService, SalesInvoice } from './sales-invoice-service';
 import { type Inventory, InventoryService } from '../inventory/inventory-service';
+import { PricingCategoryService, ProductMargin } from '../settings/pricing-category-service';
 
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSelectComponent } from 'ng-zorro-antd/select';
@@ -79,6 +80,7 @@ export class SalesInvoiceForm implements OnInit {
   private productService = inject(ProductService);
   private customerService = inject(CustomerService);
   private inventoryService = inject(InventoryService);
+  private pricingCategoryService = inject(PricingCategoryService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NzSelectComponent>;
@@ -87,6 +89,10 @@ export class SalesInvoiceForm implements OnInit {
   customers = signal<Customer[]>([]);
   inventories = signal<Inventory[]>([]);
   originalInventories = signal<Inventory[]>([]);
+
+  // Pricing category for selected customer
+  selectedPricingCategoryName: string | null = null;
+  pricingCategoryMargins: ProductMargin[] = [];
 
   // Inventory Search & Lazy Loading
   inventoryInput$ = new Subject<string>();
@@ -298,6 +304,11 @@ export class SalesInvoiceForm implements OnInit {
         this.originalInventories.set(loadedOriginalInvs);
 
         this.loading = false;
+
+        // Load pricing category for the selected customer
+        if (invoice.customerId) {
+          this.onCustomerChange(invoice.customerId);
+        }
       },
       error: () => {
         this.error = 'Failed to load invoice';
@@ -347,11 +358,44 @@ export class SalesInvoiceForm implements OnInit {
 
       const product = this.products().find((p) => p.id === inventory.productId);
       if (product) {
-        item.unitPrice = inventory.sellingPrice !== undefined && inventory.sellingPrice !== null ? Number(inventory.sellingPrice) : Number(product.unitPrice || 0);
+        // Base price: use inventory's sellingPrice or product unitPrice
+        let basePrice = inventory.sellingPrice !== undefined && inventory.sellingPrice !== null
+          ? Number(inventory.sellingPrice)
+          : Number(product.unitPrice || 0);
+
+        // Apply pricing category margin if configured
+        const margin = this.pricingCategoryMargins.find(m => m.productId === product.id);
+        if (margin && margin.marginType !== 'none') {
+          if (margin.marginType === 'percent') {
+            basePrice = basePrice + basePrice * (Number(margin.marginPct) / 100);
+          } else if (margin.marginType === 'amount') {
+            basePrice = basePrice + Number(margin.marginAmount);
+          }
+          basePrice = Math.round(basePrice * 100) / 100;
+        }
+
+        item.unitPrice = basePrice;
         item.taxPct = this.editingInvoice.type === 'estimate' ? 0 : Number(product.taxRate || 0);
       }
       item.unitsInStock = inventory.unitsInStock;
       this.calculateLineTotal(item);
+    }
+  }
+
+  onCustomerChange(customerId: number | undefined) {
+    this.editingInvoice.customerId = customerId;
+    this.selectedPricingCategoryName = null;
+    this.pricingCategoryMargins = [];
+
+    if (!customerId) return;
+
+    const customer = this.customers().find(c => c.id === customerId);
+    if (customer?.pricingCategoryId) {
+      this.selectedPricingCategoryName = customer.pricingCategoryName || null;
+      this.pricingCategoryService.getProducts(customer.pricingCategoryId).subscribe({
+        next: (margins) => { this.pricingCategoryMargins = margins; },
+        error: () => {},
+      });
     }
   }
 

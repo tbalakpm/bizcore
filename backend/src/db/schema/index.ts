@@ -8,6 +8,10 @@ export { inventories } from './inventory.schema';
 export { settings } from './settings.schema';
 export { serialNumbers } from './serial-number.schema';
 export { productSerialNumbers } from './product-serial-number.schema';
+export { pricingCategories } from './pricing-category.schema';
+export type { PricingCategory, NewPricingCategory } from './pricing-category.schema';
+export { pricingCategoryProducts } from './pricing-category-product.schema';
+export type { PricingCategoryProduct, NewPricingCategoryProduct } from './pricing-category-product.schema';
 
 export { stockInvoices } from './stock-invoice.schema';
 export { stockInvoiceItems } from './stock-invoice-items.schema';
