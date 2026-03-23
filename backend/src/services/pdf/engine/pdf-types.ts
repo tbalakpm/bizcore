@@ -29,7 +29,7 @@ export interface Address {
 
 export interface TableColumn {
   header: string;
-  width?: number; // pt - if omitted, engine auto-sizes
+  width?: number | 'auto' | '*'; // pt - if omitted, engine auto-sizes
   minWidth?: number; // default: 28
   maxWidth?: number; // default: 240
   align?: 'left' | 'right' | 'center';

@@ -133,13 +133,13 @@ export async function renderSalesInvoice(
   sections.renderRule(pdf);
 
   const columns: TableColumn[] = [
-    { header: '#', key: 'index', align: 'right', minWidth: 34, maxWidth: 34 },
-    { header: 'Product', key: 'productName', align: 'left' },
-    { header: 'HSN/SAC', key: 'hsnSac', align: 'left', maxWidth: 70 },
-    { header: 'Qty', key: 'qty', align: 'right', maxWidth: 50, format: (v) => Number(v).toFixed(2) },
-    { header: 'Price', key: 'unitPrice', align: 'right', maxWidth: 75, format: (v) => Number(v).toFixed(2) },
-    { header: 'Tax', key: 'taxPctAndAmount', align: 'right', maxWidth: 90 },
-    { header: 'Total', key: 'lineTotal', align: 'right', maxWidth: 80, format: (v) => Number(v).toFixed(2) },
+    { header: '#', key: 'index', align: 'right', width: 'auto' },
+    { header: 'Product', key: 'productName', align: 'left', width: '*' },
+    { header: 'HSN/SAC', key: 'hsnSac', align: 'left', width: 'auto' },
+    { header: 'Qty', key: 'qty', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
+    { header: 'Price', key: 'unitPrice', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
+    { header: 'Tax', key: 'taxPctAndAmount', align: 'right', width: 'auto' },
+    { header: 'Total', key: 'lineTotal', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
   ];
 
   sections.renderItemsTable(pdf, columns, formattedItems);

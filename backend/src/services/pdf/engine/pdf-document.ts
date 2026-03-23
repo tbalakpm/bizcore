@@ -15,14 +15,14 @@ const fonts = {
 export class PdfDocument {
   private res: Response;
   public docDefinition: TDocumentDefinitions;
-  
+
   readonly marginLeft = 40;
-  readonly marginRight = 40;
-  readonly marginTop = 40;
-  readonly marginBottom = 40;
+  readonly marginRight = 30;
+  readonly marginTop = 30;
+  readonly marginBottom = 100;
   readonly pageWidth = 595.28; // A4 width in pt
   readonly pageHeight = 841.89; // A4 height in pt
-  readonly usableWidth = 595.28 - 40 - 40;
+  readonly usableWidth = 595.28 - 40 - 30;
 
   constructor(res: Response) {
     this.res = res;
@@ -53,7 +53,7 @@ export class PdfDocument {
   setHeader(header: any): void {
     this.docDefinition.header = header;
   }
-  
+
   setFooter(footer: any): void {
     this.docDefinition.footer = footer;
   }

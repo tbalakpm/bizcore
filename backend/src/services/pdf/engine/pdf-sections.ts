@@ -209,8 +209,8 @@ export function renderItemsTable(
 
   const tableWidths = columns.map(col => {
     if (col.width) return col.width;
-    if (col.key === 'index' || col.header === 'Qty' || col.header === 'Rate' || col.header === 'Tax%') return 'auto';
-    if (col.key === 'productName' || col.key === 'hsnSac' || col.key === 'gtn') return '*';
+    if (col.key === 'index' || col.key === 'hsnSac' || col.key === 'gtn' || col.header === 'Qty' || col.header === 'Rate' || col.header === 'Tax%') return 'auto';
+    if (col.key === 'productName') return '*';
     return 'auto';
   });
 
@@ -383,7 +383,7 @@ export function renderTotals(
     unbreakable: true, // Keep totals block together
     columns: [
       { width: '*', stack: hsnBlock ? [hsnBlock] : [] },
-      { width: 220, stack: totalsStack }
+      { width: 205, stack: totalsStack }
     ],
     margin: [0, 10, 0, 20]
   });
@@ -391,49 +391,52 @@ export function renderTotals(
 
 // --- Section 7: Footer ---
 export function renderFooter(pdf: PdfDocument, company: CompanyInfo): void {
-  pdf.addContent({
-    unbreakable: true, // Keep footer contents together
-    stack: [
-      {
-        canvas: [{ type: 'line', x1: 0, y1: 0, x2: pdf.usableWidth, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
-        margin: [0, 0, 0, 10]
-      },
-      {
-        columns: [
-          // Column 1: Bank Info
-          {
-            width: '*',
-            fontSize: 8,
-            stack: [
-              { text: 'Bank Details:', bold: true, margin: [0, 0, 0, 2] },
-              { text: `Bank: ${company.bankName || ''}` },
-              { text: `A/c: ${company.bankAccount || ''}` },
-              { text: `IFSC: ${company.bankIfsc || ''}` }
-            ]
-          },
-          // Column 2: Terms
-          {
-            width: '*',
-            fontSize: 8,
-            stack: [
-              { text: 'Terms & Conditions:', bold: true, margin: [0, 0, 0, 2] },
-              { text: company.invoiceTerms || '' }
-            ]
-          },
-          // Column 3: Signatory
-          {
-            width: '*',
-            fontSize: 8,
-            alignment: 'right',
-            stack: [
-              { text: `For ${company.name}`, bold: true, margin: [0, 0, 0, 30] },
-              { text: 'Authorised Signatory' }
-            ]
-          }
-        ]
-      }
-    ],
-    margin: [0, 20, 0, 0]
+  pdf.setFooter(function (currentPage: number, pageCount: number) {
+    if (currentPage !== pageCount) return null;
+
+    return {
+      stack: [
+        {
+          canvas: [{ type: 'line', x1: 0, y1: 0, x2: pdf.usableWidth, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
+          margin: [0, 0, 0, 10]
+        },
+        {
+          columns: [
+            // Column 1: Bank Info
+            {
+              width: '*',
+              fontSize: 8,
+              stack: [
+                { text: 'Bank Details:', bold: true, margin: [0, 0, 0, 2] },
+                { text: `Bank: ${company.bankName || ''}` },
+                { text: `A/c: ${company.bankAccount || ''}` },
+                { text: `IFSC: ${company.bankIfsc || ''}` }
+              ]
+            },
+            // Column 2: Terms
+            {
+              width: '*',
+              fontSize: 8,
+              stack: [
+                { text: 'Terms & Conditions:', bold: true, margin: [0, 0, 0, 2] },
+                { text: company.invoiceTerms || '' }
+              ]
+            },
+            // Column 3: Signatory
+            {
+              width: '*',
+              fontSize: 8,
+              alignment: 'right',
+              stack: [
+                { text: `For ${company.name}`, bold: true, margin: [0, 0, 0, 30] },
+                { text: 'Authorised Signatory' }
+              ]
+            }
+          ]
+        }
+      ],
+      margin: [pdf.marginLeft, 20, pdf.marginRight, 0]
+    };
   });
 }
 
