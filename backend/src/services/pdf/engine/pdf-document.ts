@@ -1,51 +1,73 @@
-import PDFDocument from 'pdfkit';
+const PdfPrinter = require('pdfmake/js/printer').default;
+import type { TDocumentDefinitions } from 'pdfmake/interfaces';
 import type { Response } from 'express';
 
+// Fonts definition for PdfPrinter - using standard PDF fonts
+const fonts = {
+  Helvetica: {
+    normal: 'Helvetica',
+    bold: 'Helvetica-Bold',
+    italics: 'Helvetica-Oblique',
+    bolditalics: 'Helvetica-BoldOblique'
+  }
+};
+
 export class PdfDocument {
-  private doc: PDFKit.PDFDocument;
-  public y: number;
+  private res: Response;
+  public docDefinition: TDocumentDefinitions;
+  
   readonly marginLeft = 40;
   readonly marginRight = 40;
   readonly marginTop = 40;
-  readonly marginBottom = 60;
+  readonly marginBottom = 40;
   readonly pageWidth = 595.28; // A4 width in pt
   readonly pageHeight = 841.89; // A4 height in pt
-  readonly usableWidth: number;
+  readonly usableWidth = 595.28 - 40 - 40;
 
   constructor(res: Response) {
-    this.doc = new PDFDocument({ margin: 20, size: 'A4' });
-    this.doc.pipe(res);
-    this.y = this.marginTop;
-    this.usableWidth = this.pageWidth - this.marginLeft - this.marginRight;
+    this.res = res;
+    this.docDefinition = {
+      content: [],
+      pageSize: 'A4',
+      pageMargins: [this.marginLeft, this.marginTop, this.marginRight, this.marginBottom],
+      defaultStyle: {
+        font: 'Helvetica',
+        fontSize: 9,
+        color: '#000000',
+      },
+    };
   }
 
   /**
-   * Advance current Y position.
-   * Automatically adds a new page if the bottom margin is reached.
-   * @param height Height to advance
-   * @param onNewPage Optional callback called when a new page is added (useful for re-rendering headers)
+   * Add a pdfmake element to the document content.
    */
-  advance(height: number, onNewPage?: () => void): void {
-    if (this.y + height > this.pageHeight - this.marginBottom) {
-      this.doc.addPage();
-      this.y = this.marginTop;
-      onNewPage?.();
+  addContent(element: any): void {
+    if (Array.isArray(this.docDefinition.content)) {
+      this.docDefinition.content.push(element);
     }
-    this.y += height;
-  }
-
-  syncY(): void {
-    this.y = this.doc.y;
-  }
-
-  end(): void {
-    this.doc.end();
   }
 
   /**
-   * Access the underlying PDFKit instance for direct drawing
+   * Set headers, footers, etc.
    */
-  get raw(): PDFKit.PDFDocument {
-    return this.doc;
+  setHeader(header: any): void {
+    this.docDefinition.header = header;
+  }
+  
+  setFooter(footer: any): void {
+    this.docDefinition.footer = footer;
+  }
+
+  /**
+   * Generate the PDF and pipe it to the response.
+   */
+  async end(): Promise<void> {
+    const URLResolver = require('pdfmake/js/URLResolver').default;
+    const virtualfs = require('pdfmake/js/virtual-fs').default;
+    const printer = new PdfPrinter(fonts, virtualfs, new URLResolver(virtualfs));
+
+    const pdfDoc = await printer.createPdfKitDocument(this.docDefinition);
+    pdfDoc.pipe(this.res);
+    pdfDoc.end();
   }
 }

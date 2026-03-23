@@ -51,11 +51,7 @@ export async function renderPurchaseInvoice(
   // 4. Start Rendering
   const pdf = new PdfDocument(res);
 
-  const onNewPage = () => {
-    sections.renderCompanyHeader(pdf, company);
-  };
-
-  onNewPage();
+  sections.renderCompanyHeader(pdf, company);
 
   sections.renderReportMeta(pdf, {
     title: 'PURCHASE INVOICE',
@@ -103,7 +99,7 @@ export async function renderPurchaseInvoice(
     { header: 'Total', key: 'lineTotal', align: 'right', maxWidth: 80, format: (v) => Number(v).toFixed(2) },
   ];
 
-  sections.renderItemsTable(pdf, columns, items, onNewPage);
+  sections.renderItemsTable(pdf, columns, items);
 
   // Calculate totals if not in main invoice (or use main invoice if accurate)
   sections.renderTotals(pdf, {
@@ -117,5 +113,5 @@ export async function renderPurchaseInvoice(
 
   sections.renderFooter(pdf, company);
 
-  pdf.end();
+  await pdf.end();
 }

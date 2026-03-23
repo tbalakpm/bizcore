@@ -12,7 +12,7 @@ import { toNumericString, toPositiveNumber } from '../utils/number.util';
 import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
 
 // barcode printing support
-import PDFDocument from 'pdfkit';
+const PdfPrinter = require('pdfmake/js/printer').default;
 import bwipjs from 'bwip-js';
 
 // model used for building labels
@@ -464,14 +464,31 @@ stockInvoicesRouter.get('/:id/barcodes/pdf', async (req: Request, res: Response)
       return res.status(404).json({ error: 'No barcode data available for this invoice' });
     }
 
-    res.setHeader('Content-Type', 'application/pdf');
-    const doc = new PDFDocument({ margin: 40, size: 'A4' });
-    doc.pipe(res);
+    const fonts = {
+      Helvetica: {
+        normal: 'Helvetica',
+        bold: 'Helvetica-Bold',
+        italics: 'Helvetica-Oblique',
+        bolditalics: 'Helvetica-BoldOblique'
+      }
+    };
+    const URLResolver = require('pdfmake/js/URLResolver').default;
+    const virtualfs = require('pdfmake/js/virtual-fs').default;
+    const printer = new PdfPrinter(fonts, virtualfs, new URLResolver(virtualfs));
+    const content: any[] = [];
 
     for (let i = 0; i < labels.length; i++) {
       const label = labels[i];
-      doc.fontSize(12).font('Helvetica-Bold').text(label.title, { align: 'center' });
-      // generate barcode image buffer
+      const pageBreak = i < labels.length - 1 ? 'after' : undefined;
+
+      content.push({
+        text: label.title,
+        fontSize: 12,
+        bold: true,
+        alignment: 'center',
+        margin: [0, 0, 0, 10]
+      });
+
       try {
         const png: Buffer = await bwipjs.toBuffer({
           bcid: 'code128',
@@ -479,20 +496,52 @@ stockInvoicesRouter.get('/:id/barcodes/pdf', async (req: Request, res: Response)
           scale: 3,
           includetext: false,
         });
-        doc.image(png, { align: 'center', width: 200 });
+        const b64 = png.toString('base64');
+        content.push({
+          image: `data:image/png;base64,${b64}`,
+          width: 200,
+          alignment: 'center',
+          margin: [0, 0, 0, 10]
+        });
       } catch (err) {
         console.error('barcode generation failed', err);
         // fall back to text
-        doc.fontSize(10).text(label.code, { align: 'center' });
+        content.push({
+          text: label.code,
+          fontSize: 10,
+          alignment: 'center',
+          margin: [0, 0, 0, 10]
+        });
       }
-      doc.fontSize(10).text(label.code, { align: 'center' });
-      doc.fontSize(9).text(label.subtitle, { align: 'center' });
-      if (i < labels.length - 1) {
-        doc.addPage();
-      }
+
+      content.push({
+        text: label.code,
+        fontSize: 10,
+        alignment: 'center',
+        margin: [0, 0, 0, 5]
+      });
+
+      content.push({
+        text: label.subtitle,
+        fontSize: 9,
+        alignment: 'center',
+        pageBreak: pageBreak
+      });
     }
 
-    doc.end();
+    const docDefinition = {
+      content,
+      pageSize: 'A4',
+      pageMargins: [40, 40, 40, 40],
+      defaultStyle: {
+        font: 'Helvetica'
+      }
+    };
+
+    res.setHeader('Content-Type', 'application/pdf');
+    const pdfDoc = await printer.createPdfKitDocument(docDefinition);
+    pdfDoc.pipe(res);
+    pdfDoc.end();
   } catch (error) {
     console.error('Failed to generate barcode PDF', error);
     return res.status(500).json({ error: 'Failed to generate barcode PDF' });

@@ -4,52 +4,92 @@ import bwipjs from 'bwip-js';
 
 // --- Section 1: Company Header ---
 export function renderCompanyHeader(pdf: PdfDocument, company: CompanyInfo): void {
-  const doc = pdf.raw;
-  doc.fontSize(18).font('Helvetica-Bold').text(company.name.toUpperCase(), pdf.marginLeft, pdf.y, { align: 'center', width: pdf.usableWidth });
-  pdf.y += 22;
-
   const addrLines = [
     company.addressLine1,
     [company.city, company.state, company.postalCode].filter(Boolean).join(' '),
   ].filter(Boolean);
-
-  doc.fontSize(9).font('Helvetica').text(addrLines.join(', '), pdf.marginLeft, pdf.y, { align: 'center', width: pdf.usableWidth });
-  pdf.y += 12;
 
   const contactLines = [
     company.gstin ? `GSTIN: ${company.gstin}` : null,
     company.phone ? `Phone: ${company.phone}` : null,
   ].filter(Boolean);
 
-  doc.text(contactLines.join('  |  '), pdf.marginLeft, pdf.y, { align: 'center', width: pdf.usableWidth });
-  pdf.y += 15;
+  pdf.addContent([
+    {
+      text: company.name.toUpperCase(),
+      style: 'companyName',
+      alignment: 'center',
+      margin: [0, 0, 0, 5]
+    },
+    {
+      text: addrLines.join(', '),
+      alignment: 'center',
+      margin: [0, 0, 0, 2]
+    },
+    {
+      text: contactLines.join('  |  '),
+      alignment: 'center',
+      margin: [0, 0, 0, 5]
+    },
+    {
+      canvas: [{ type: 'line', x1: 0, y1: 0, x2: pdf.usableWidth, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
+      margin: [0, 5, 0, 10]
+    }
+  ]);
 
-  doc.moveTo(pdf.marginLeft, pdf.y).lineTo(pdf.pageWidth - pdf.marginRight, pdf.y).stroke('#CCCCCC');
-  pdf.y += 15;
+  if (!pdf.docDefinition.styles) {
+    pdf.docDefinition.styles = {};
+  }
+  pdf.docDefinition.styles.companyName = { fontSize: 18, bold: true };
 }
 
 // --- Section 2: Report Meta ---
 export function renderReportMeta(pdf: PdfDocument, meta: ReportMeta): void {
-  const doc = pdf.raw;
-  doc.fontSize(14).font('Helvetica-Bold').text(meta.title, pdf.marginLeft, pdf.y);
-
-  const metaX = pdf.pageWidth - pdf.marginRight - 150;
-  doc.fontSize(9).font('Helvetica-Bold').text('Number:', metaX, pdf.y);
-  doc.font('Helvetica').text(meta.number, metaX + 50, pdf.y);
-  pdf.y += 12;
-
-  doc.font('Helvetica-Bold').text('Date:', metaX, pdf.y);
-  doc.font('Helvetica').text(meta.date, metaX + 50, pdf.y);
-  pdf.y += 12;
+  const rightMeta: any[] = [
+    {
+      columns: [
+        { text: 'Number:', bold: true, width: 60 },
+        { text: meta.number, width: '*' }
+      ],
+      margin: [0, 0, 0, 2]
+    },
+    {
+      columns: [
+        { text: 'Date:', bold: true, width: 60 },
+        { text: meta.date, width: '*' }
+      ],
+      margin: [0, 0, 0, 2]
+    }
+  ];
 
   if (meta.extraMeta) {
     for (const extra of meta.extraMeta) {
-      doc.font('Helvetica-Bold').text(`${extra.label}:`, metaX, pdf.y);
-      doc.font('Helvetica').text(extra.value, metaX + 50, pdf.y);
-      pdf.y += 12;
+      rightMeta.push({
+        columns: [
+          { text: `${extra.label}:`, bold: true, width: 60 },
+          { text: extra.value, width: '*' }
+        ],
+        margin: [0, 0, 0, 2]
+      });
     }
   }
-  pdf.y += 5;
+
+  pdf.addContent({
+    columns: [
+      {
+        text: meta.title,
+        fontSize: 14,
+        bold: true,
+        width: '*'
+      },
+      {
+        stack: rightMeta,
+        width: 180,
+        fontSize: 9
+      }
+    ],
+    margin: [0, 0, 0, 10]
+  });
 }
 
 // --- Section 3: E-Invoice Block ---
@@ -61,11 +101,11 @@ export async function renderEInvoiceBlock(
   signedQrCode?: string | null,
 ): Promise<void> {
   if (!irn) return;
-  const doc = pdf.raw;
 
-  doc.fontSize(8).font('Helvetica-Bold').text('IRN:', pdf.marginLeft, pdf.y);
-  doc.font('Helvetica').text(irn, pdf.marginLeft + 30, pdf.y, { width: 300 });
-  const irnHeight = doc.heightOfString(irn, { width: 300 });
+  const row1Columns: any[] = [
+    { text: 'IRN:', bold: true, width: 30 },
+    { text: irn, width: 300 }
+  ];
 
   if (signedQrCode) {
     try {
@@ -76,18 +116,36 @@ export async function renderEInvoiceBlock(
         height: 65,
         width: 65,
       });
-      doc.image(qrPng, pdf.pageWidth - pdf.marginRight - 65, pdf.y - 10, { width: 65 });
+      const b64 = qrPng.toString('base64');
+      row1Columns.push({
+        image: `data:image/png;base64,${b64}`,
+        width: 65,
+        alignment: 'right'
+      });
     } catch (e) {
       console.error('QR rendering failed', e);
     }
   }
 
-  pdf.y += irnHeight + 5;
-  doc.font('Helvetica-Bold').text('Ack No:', pdf.marginLeft, pdf.y);
-  doc.font('Helvetica').text(ackNo || '', pdf.marginLeft + 40, pdf.y);
-  doc.font('Helvetica-Bold').text('Ack Date:', pdf.marginLeft + 150, pdf.y);
-  doc.font('Helvetica').text(ackDate || '', pdf.marginLeft + 200, pdf.y);
-  pdf.y += 15;
+  const row2Columns = [
+    { text: 'Ack No:', bold: true, width: 40 },
+    { text: ackNo || '', width: 'auto', margin: [0, 0, 20, 0] },
+    { text: 'Ack Date:', bold: true, width: 50 },
+    { text: ackDate || '', width: 'auto' }
+  ];
+
+  pdf.addContent([
+    {
+      columns: row1Columns,
+      fontSize: 8,
+      margin: [0, 0, 0, 5]
+    },
+    {
+      columns: row2Columns,
+      fontSize: 8,
+      margin: [0, 0, 0, 10]
+    }
+  ]);
 }
 
 // --- Section 4: Address Block ---
@@ -98,10 +156,6 @@ export function renderAddressBlock(
   leftLabel = 'BILL TO',
   rightLabel = 'SHIP TO',
 ): void {
-  const doc = pdf.raw;
-  const addrY = pdf.y;
-  const colWidth = 250;
-
   const formatAddr = (addr: Address) => {
     const lines = [
       addr.name,
@@ -113,95 +167,29 @@ export function renderAddressBlock(
     return lines.join('\n');
   };
 
-  doc.fontSize(9).font('Helvetica-Bold').text(leftLabel, pdf.marginLeft, addrY);
-  doc.font('Helvetica').text(formatAddr(left), pdf.marginLeft, addrY + 12, { width: colWidth });
+  const columns: any[] = [
+    {
+      stack: [
+        { text: leftLabel, bold: true, margin: [0, 0, 0, 5] },
+        { text: formatAddr(left) }
+      ],
+      width: '*'
+    }
+  ];
 
   if (right) {
-    doc.font('Helvetica-Bold').text(rightLabel, pdf.pageWidth - pdf.marginRight - colWidth, addrY);
-    doc.font('Helvetica').text(formatAddr(right), pdf.pageWidth - pdf.marginRight - colWidth, addrY + 12, { width: colWidth });
-  }
-
-  pdf.y = Math.max(doc.y, pdf.y) + 15;
-}
-
-const CHAR_WIDTH = 6.5; 
-const H_PADDING = 14; 
-const ROW_HEIGHT = 20;
-const EDGE_PADDING = 8;
-
-function drawCell(
-  pdf: PdfDocument,
-  col: TableColumn,
-  value: string,
-  x: number,
-  y: number,
-  rowHeight: number,
-  font = 'Helvetica',
-  fontSize = 9
-): void {
-  const pl = col.paddingLeft ?? 0;
-  const pr = col.paddingRight ?? 0;
-  const textX = x + pl;
-  const textWidth = (col.width ?? 0) - pl - pr;
-
-  pdf.raw
-    .fontSize(fontSize)
-    .font(font)
-    .text(value, textX, y + (rowHeight - fontSize) / 2, {
-      width: textWidth,
-      align: col.align ?? 'left',
-      lineBreak: false,
-      ellipsis: true,
+    columns.push({
+      stack: [
+        { text: rightLabel, bold: true, margin: [0, 0, 0, 5] },
+        { text: formatAddr(right) }
+      ],
+      width: '*'
     });
-}
-
-function measureColumns(
-  columns: TableColumn[],
-  rows: Record<string, any>[],
-  usableWidth: number,
-): TableColumn[] {
-  const natural = columns.map((col) => {
-    const headerLen = col.header.length;
-    const maxRowLen = rows.reduce((max, row) => {
-      const value = col.key === 'index' ? (rows.indexOf(row) + 1).toString() : row[col.key];
-      const valStr = col.format ? col.format(value) : (value?.toString() ?? '');
-      return Math.max(max, valStr.length);
-    }, 0);
-    const raw = Math.ceil(Math.max(headerLen, maxRowLen) * CHAR_WIDTH) + H_PADDING;
-    const max = col.maxWidth ?? 240;
-    return Math.min(max, raw);
-  });
-
-  const total = natural.reduce((a, b) => a + b, 0);
-  const scale = total > usableWidth ? usableWidth / total : 1;
-
-  const scaled = columns.map((col, i) => {
-    const s = Math.floor(natural[i] * scale);
-    const min = col.minWidth ?? 28;
-    return Math.max(min, s);
-  });
-
-  let currentTotal = scaled.reduce((a, b) => a + b, 0);
-  let diff = usableWidth - currentTotal;
-  if (diff > 0) {
-    const flexIdx = columns.findIndex(c => !c.maxWidth);
-    if (flexIdx !== -1) scaled[flexIdx] += diff;
-    else scaled[scaled.length - 1] += diff;
   }
 
-  return columns.map((col, i) => {
-    const isFirst = i === 0;
-    const isLast = i === columns.length - 1;
-
-    const extraLeft = isFirst && col.align !== 'left' ? EDGE_PADDING : 0;
-    const extraRight = isLast && col.align !== 'right' ? EDGE_PADDING : 0;
-
-    return {
-      ...col,
-      width: scaled[i],
-      paddingLeft: (H_PADDING / 2) + extraLeft,
-      paddingRight: (H_PADDING / 2) + extraRight,
-    };
+  pdf.addContent({
+    columns,
+    margin: [0, 0, 0, 15]
   });
 }
 
@@ -209,159 +197,250 @@ function measureColumns(
 export function renderItemsTable(
   pdf: PdfDocument,
   columns: TableColumn[],
-  rows: any[],
-  onNewPage: () => void,
+  rows: any[]
 ): void {
-  const doc = pdf.raw;
-  const sized = measureColumns(columns, rows, pdf.usableWidth);
+  const tableHeader = columns.map(col => ({
+    text: col.header,
+    bold: true,
+    fillColor: '#CCCCCC',
+    alignment: col.align || 'left',
+    margin: [2, 4, 2, 4]
+  }));
 
-  const drawHeader = (y: number) => {
-    doc.rect(pdf.marginLeft, y, pdf.usableWidth, 20).fill('#CCCCCC');
-    doc.fillColor('#000000');
-    let currentX = pdf.marginLeft;
-    for (const col of sized) {
-      drawCell(pdf, col, col.header, currentX, y, 20, 'Helvetica-Bold');
-      currentX += col.width!;
-    }
-    return y + 25;
-  };
+  const tableWidths = columns.map(col => {
+    if (col.width) return col.width;
+    if (col.key === 'index' || col.header === 'Qty' || col.header === 'Rate' || col.header === 'Tax%') return 'auto';
+    if (col.key === 'productName' || col.key === 'hsnSac' || col.key === 'gtn') return '*';
+    return 'auto';
+  });
 
-  pdf.y = drawHeader(pdf.y);
-
-  rows.forEach((row, index) => {
-    if (pdf.y + ROW_HEIGHT > pdf.pageHeight - pdf.marginBottom) {
-      pdf.raw.addPage();
-      pdf.y = pdf.marginTop;
-      onNewPage();
-      pdf.y = drawHeader(pdf.y);
-    }
-
-    if (index % 2 === 1) {
-      doc.rect(pdf.marginLeft, pdf.y - 2, pdf.usableWidth, ROW_HEIGHT).fill('#F7F7F7');
-    }
-
-    doc.fillColor('#000000');
-    let currentX = pdf.marginLeft;
-    for (const col of sized) {
+  const tableBodyItems = rows.map((row, index) => {
+    const isOdd = index % 2 === 1;
+    return columns.map(col => {
       const value = col.key === 'index' ? (index + 1).toString() : row[col.key];
       const displayValue = col.format ? col.format(value) : (value?.toString() ?? '');
-      drawCell(pdf, col, displayValue, currentX, pdf.y, ROW_HEIGHT);
-      currentX += col.width!;
-    }
-    pdf.y += ROW_HEIGHT;
+      return {
+        text: displayValue,
+        alignment: col.align || 'left',
+        fillColor: isOdd ? '#F7F7F7' : null,
+        margin: [2, 4, 2, 4]
+      };
+    });
   });
-  pdf.y += 10;
+
+  pdf.addContent({
+    table: {
+      headerRows: 1,
+      widths: tableWidths,
+      body: [
+        tableHeader,
+        ...tableBodyItems
+      ]
+    },
+    layout: {
+      defaultBorder: false,
+      hLineWidth: function (i: number, node: any) {
+        return (i === 0 || i === node.table.body.length) ? 0 : 0.5;
+      },
+      vLineWidth: function () {
+        return 0;
+      },
+      hLineColor: function () {
+        return '#EEEEEE';
+      },
+      paddingLeft: function () { return 2; },
+      paddingRight: function () { return 2; },
+      paddingTop: function () { return 2; },
+      paddingBottom: function () { return 2; },
+    },
+    margin: [0, 0, 0, 10]
+  });
 }
 
 // --- Section 6: Totals Block ---
 export function renderTotals(
   pdf: PdfDocument,
   totals: {
-    subtotal: number;
-    discountAmount: number;
-    taxAmount: number;
-    taxPct: number;
+    subtotal?: number;
+    discountAmount?: number;
+    taxableAmount?: number;
+    taxAmount?: number;
+    taxPct?: number;
+    cgstAmount?: number;
+    sgstAmount?: number;
+    igstAmount?: number;
     roundOff: number;
     netAmount: number;
   },
   company: CompanyInfo,
+  hsnSummary?: Array<{
+    hsnSac: string;
+    taxableValue: number;
+    taxPct: number;
+    cgstAmount: number;
+    sgstAmount: number;
+    igstAmount: number;
+  }>
 ): void {
-  const doc = pdf.raw;
-  const RIGHT_LABEL_X = 340;
-  const RIGHT_VALUE_X = pdf.marginLeft + pdf.usableWidth;
-  const LINE_H = 15;
-
-  // Check if totals + footer fit on current page; if not, start new page
-  const estimatedHeight = 120; // approx height of totals + footer block
-  if (pdf.y + estimatedHeight > pdf.pageHeight - pdf.marginBottom) {
-    doc.addPage();
-    pdf.y = pdf.marginTop;
-  }
-
-  pdf.y += 8; // gap after table
-
   const fmt = (v: number) => v.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  // Helper row drawer
-  const drawRow = (label: string, value: string, bold = false) => {
-    const size = bold ? 10 : 9;
-    const font = bold ? 'Helvetica-Bold' : 'Helvetica';
-    doc.fontSize(size).font(font).fillColor('#000000');
-    doc.text(label, RIGHT_LABEL_X, pdf.y, { width: 120, align: 'right' });
-    doc.text(value, RIGHT_VALUE_X - 80, pdf.y, { width: 80, align: 'right' });
-    pdf.y += LINE_H;
-  };
+  let hsnBlock: any = null;
+  if (hsnSummary && hsnSummary.length > 0) {
+    const isIgst = totals.igstAmount! > 0;
+    const headerRow = [
+      { text: 'HSN/SAC', bold: true },
+      { text: 'Taxable', bold: true, alignment: 'right' }
+    ];
 
-  drawRow('Subtotal:', fmt(totals.subtotal));
+    if (isIgst) {
+      headerRow.push({ text: 'IGST', bold: true, alignment: 'right' });
+    } else {
+      headerRow.push({ text: 'CGST', bold: true, alignment: 'right' });
+      headerRow.push({ text: 'SGST', bold: true, alignment: 'right' });
+    }
 
-  if (totals.discountAmount > 0) {
-    drawRow('Discount:', `- ${fmt(totals.discountAmount)}`);
+    const hsnBody = hsnSummary.map(hsn => {
+      const row = [
+        { text: hsn.hsnSac || '' },
+        { text: fmt(hsn.taxableValue), alignment: 'right' }
+      ];
+      if (isIgst) {
+        row.push({ text: `${Number(hsn.taxPct).toFixed(1)}% ${fmt(hsn.igstAmount)}`, alignment: 'right' });
+      } else {
+        row.push({ text: `${(Number(hsn.taxPct) / 2).toFixed(1)}% ${fmt(hsn.cgstAmount)}`, alignment: 'right' });
+        row.push({ text: `${(Number(hsn.taxPct) / 2).toFixed(1)}% ${fmt(hsn.sgstAmount)}`, alignment: 'right' });
+      }
+      return row;
+    });
+
+    hsnBlock = {
+      table: {
+        headerRows: 1,
+        widths: isIgst ? ['auto', 'auto', 'auto'] : ['auto', 'auto', 'auto', 'auto'],
+        body: [headerRow, ...hsnBody]
+      },
+      layout: 'lightHorizontalLines',
+      fontSize: 8,
+      margin: [0, 0, 10, 0]
+    };
   }
 
-  const taxableAmount = totals.subtotal - totals.discountAmount;
-  drawRow('Taxable Amount:', fmt(taxableAmount));
+  const totalsStack: any[] = [];
+  const pushTotal = (label: string, value: string, bold = false) => {
+    totalsStack.push({
+      columns: [
+        { text: label, width: 120, alignment: 'right', bold },
+        { text: value, width: 80, alignment: 'right', bold }
+      ],
+      margin: [0, 2, 0, 2]
+    });
+  };
 
-  // CGST / SGST split
-  const isIgst = company.igstSharingRate === 100;
-  if (isIgst) {
-    drawRow(`IGST (${totals.taxPct}%):`, fmt(totals.taxAmount));
+  if (totals.taxableAmount !== undefined) {
+    pushTotal('Taxable Amount:', fmt(totals.taxableAmount));
+    if (totals.igstAmount && totals.igstAmount > 0) {
+      pushTotal('IGST:', fmt(totals.igstAmount));
+    } else {
+      pushTotal('CGST:', fmt(totals.cgstAmount || 0));
+      pushTotal('SGST:', fmt(totals.sgstAmount || 0));
+    }
   } else {
-    const halfTax = totals.taxPct / 2;
-    const halfAmt = totals.taxAmount / 2;
-    drawRow(`CGST (${halfTax}%):`, fmt(halfAmt));
-    drawRow(`SGST (${halfTax}%):`, fmt(halfAmt));
+    pushTotal('Subtotal:', fmt(totals.subtotal || 0));
+    if (totals.discountAmount && totals.discountAmount > 0) {
+      pushTotal('Discount:', `- ${fmt(totals.discountAmount)}`);
+    }
+
+    const tAmt = (totals.subtotal || 0) - (totals.discountAmount || 0);
+    pushTotal('Taxable Amount:', fmt(tAmt));
+
+    if (totals.taxAmount && totals.taxAmount > 0) {
+      const halfTax = (totals.taxPct || 0) / 2;
+      const halfAmt = (totals.taxAmount || 0) / 2;
+      pushTotal(`CGST (${halfTax}%):`, fmt(halfAmt));
+      pushTotal(`SGST (${halfTax}%):`, fmt(halfAmt));
+    }
   }
 
   if (Math.abs(totals.roundOff) > 0.001) {
-    drawRow('Round Off:', fmt(totals.roundOff));
+    pushTotal('Round Off:', fmt(totals.roundOff));
   }
 
-  doc.moveTo(RIGHT_LABEL_X, pdf.y).lineTo(RIGHT_VALUE_X, pdf.y).lineWidth(0.5).stroke('#CCCCCC');
-  pdf.y += 5;
+  totalsStack.push({
+    canvas: [{ type: 'line', x1: 0, y1: 0, x2: 200, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
+    margin: [0, 5, 0, 5],
+    alignment: 'right'
+  });
 
-  drawRow('NET AMOUNT:', fmt(totals.netAmount), true);
+  totalsStack.push({
+    columns: [
+      { text: 'NET AMOUNT:', width: 120, alignment: 'right', bold: true },
+      { text: fmt(totals.netAmount), width: 80, alignment: 'right', bold: true }
+    ],
+    margin: [0, 2, 0, 2]
+  });
+
+  pdf.addContent({
+    unbreakable: true, // Keep totals block together
+    columns: [
+      { width: '*', stack: hsnBlock ? [hsnBlock] : [] },
+      { width: 220, stack: totalsStack }
+    ],
+    margin: [0, 10, 0, 20]
+  });
 }
 
 // --- Section 7: Footer ---
 export function renderFooter(pdf: PdfDocument, company: CompanyInfo): void {
-  const doc = pdf.raw;
-  const FOOTER_HEIGHT = 80;
-
-  // Push footer to a fixed position near bottom if possible
-  const footerY = Math.max(
-    pdf.y + 20,
-    pdf.pageHeight - pdf.marginBottom - FOOTER_HEIGHT,
-  );
-
-  pdf.y = footerY;
-
-  doc.moveTo(pdf.marginLeft, pdf.y).lineTo(pdf.marginLeft + pdf.usableWidth, pdf.y).lineWidth(0.5).stroke('#CCCCCC');
-  pdf.y += 10;
-
-  const startY = pdf.y;
-  const colWidth = pdf.usableWidth / 3;
-
-  // Column 1: Bank Info
-  doc.fontSize(8).font('Helvetica-Bold').text('Bank Details:', pdf.marginLeft, startY);
-  doc.font('Helvetica');
-  doc.text(`Bank: ${company.bankName || ''}`, pdf.marginLeft, startY + 12);
-  doc.text(`A/c: ${company.bankAccount || ''}`, pdf.marginLeft, startY + 24);
-  doc.text(`IFSC: ${company.bankIfsc || ''}`, pdf.marginLeft, startY + 36);
-
-  // Column 2: Terms
-  if (company.invoiceTerms) {
-    doc.fontSize(8).font('Helvetica-Bold').text('Terms & Conditions:', pdf.marginLeft + colWidth, startY);
-    doc.font('Helvetica').text(company.invoiceTerms, pdf.marginLeft + colWidth, startY + 12, { width: colWidth - 10 });
-  }
-
-  // Column 3: Signatory
-  const signatoryX = pdf.pageWidth - pdf.marginRight - colWidth;
-  doc.fontSize(8).font('Helvetica-Bold').text(`For ${company.name}`, signatoryX, startY, { align: 'right', width: colWidth });
-  doc.text('Authorised Signatory', signatoryX, startY + 50, { align: 'right', width: colWidth });
+  pdf.addContent({
+    unbreakable: true, // Keep footer contents together
+    stack: [
+      {
+        canvas: [{ type: 'line', x1: 0, y1: 0, x2: pdf.usableWidth, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
+        margin: [0, 0, 0, 10]
+      },
+      {
+        columns: [
+          // Column 1: Bank Info
+          {
+            width: '*',
+            fontSize: 8,
+            stack: [
+              { text: 'Bank Details:', bold: true, margin: [0, 0, 0, 2] },
+              { text: `Bank: ${company.bankName || ''}` },
+              { text: `A/c: ${company.bankAccount || ''}` },
+              { text: `IFSC: ${company.bankIfsc || ''}` }
+            ]
+          },
+          // Column 2: Terms
+          {
+            width: '*',
+            fontSize: 8,
+            stack: [
+              { text: 'Terms & Conditions:', bold: true, margin: [0, 0, 0, 2] },
+              { text: company.invoiceTerms || '' }
+            ]
+          },
+          // Column 3: Signatory
+          {
+            width: '*',
+            fontSize: 8,
+            alignment: 'right',
+            stack: [
+              { text: `For ${company.name}`, bold: true, margin: [0, 0, 0, 30] },
+              { text: 'Authorised Signatory' }
+            ]
+          }
+        ]
+      }
+    ],
+    margin: [0, 20, 0, 0]
+  });
 }
 
 // --- Section 8: Rule ---
 export function renderRule(pdf: PdfDocument): void {
-  pdf.raw.moveTo(pdf.marginLeft, pdf.y).lineTo(pdf.pageWidth - pdf.marginRight, pdf.y).stroke('#CCCCCC');
-  pdf.y += 10;
+  pdf.addContent({
+    canvas: [{ type: 'line', x1: 0, y1: 0, x2: pdf.usableWidth, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
+    margin: [0, 5, 0, 10]
+  });
 }
