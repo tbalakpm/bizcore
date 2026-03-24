@@ -17,12 +17,12 @@ export class PdfDocument {
   public docDefinition: TDocumentDefinitions;
 
   readonly marginLeft = 40;
-  readonly marginRight = 30;
-  readonly marginTop = 30;
-  readonly marginBottom = 100;
+  readonly marginRight = 40;
+  readonly marginTop = 40;
+  readonly marginBottom = 80;
   readonly pageWidth = 595.28; // A4 width in pt
   readonly pageHeight = 841.89; // A4 height in pt
-  readonly usableWidth = 595.28 - 40 - 30;
+  readonly usableWidth = 595.28 - 40 - 40;
 
   constructor(res: Response) {
     this.res = res;

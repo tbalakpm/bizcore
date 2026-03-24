@@ -1,3 +1,4 @@
+import { text } from 'node:stream/consumers';
 import type { PdfDocument } from './pdf-document';
 import type { CompanyInfo, ReportMeta, Address, TableColumn } from './pdf-types';
 import bwipjs from 'bwip-js';
@@ -84,7 +85,7 @@ export function renderReportMeta(pdf: PdfDocument, meta: ReportMeta): void {
       },
       {
         stack: rightMeta,
-        width: 180,
+        width: 130,
         fontSize: 9
       }
     ],
@@ -209,8 +210,8 @@ export function renderItemsTable(
 
   const tableWidths = columns.map(col => {
     if (col.width) return col.width;
-    if (col.key === 'index' || col.key === 'hsnSac' || col.key === 'gtn' || col.header === 'Qty' || col.header === 'Rate' || col.header === 'Tax%') return 'auto';
-    if (col.key === 'productName') return '*';
+    // if (col.key === 'index' || col.key === 'hsnSac' || col.key === 'gtn' || col.header === 'Qty' || col.header === 'Rate' || col.header === 'Tax%') return 'auto';
+    // if (col.key === 'productName') return '*';
     return 'auto';
   });
 
@@ -305,10 +306,10 @@ export function renderTotals(
         { text: fmt(hsn.taxableValue), alignment: 'right' }
       ];
       if (isIgst) {
-        row.push({ text: `${Number(hsn.taxPct).toFixed(1)}% ${fmt(hsn.igstAmount)}`, alignment: 'right' });
+        row.push({ text: `${Number(hsn.taxPct).toFixed(1)}% - ${fmt(hsn.igstAmount)}`, alignment: 'right' });
       } else {
-        row.push({ text: `${(Number(hsn.taxPct) / 2).toFixed(1)}% ${fmt(hsn.cgstAmount)}`, alignment: 'right' });
-        row.push({ text: `${(Number(hsn.taxPct) / 2).toFixed(1)}% ${fmt(hsn.sgstAmount)}`, alignment: 'right' });
+        row.push({ text: `${(Number(hsn.taxPct) / 2).toFixed(1)}% - ${fmt(hsn.cgstAmount)}`, alignment: 'right' });
+        row.push({ text: `${(Number(hsn.taxPct) / 2).toFixed(1)}% - ${fmt(hsn.sgstAmount)}`, alignment: 'right' });
       }
       return row;
     });
@@ -319,7 +320,7 @@ export function renderTotals(
         widths: isIgst ? ['auto', 'auto', 'auto'] : ['auto', 'auto', 'auto', 'auto'],
         body: [headerRow, ...hsnBody]
       },
-      layout: 'lightHorizontalLines',
+      // layout: 'lightHorizontalLines',
       fontSize: 8,
       margin: [0, 0, 10, 0]
     };
@@ -392,7 +393,26 @@ export function renderTotals(
 // --- Section 7: Footer ---
 export function renderFooter(pdf: PdfDocument, company: CompanyInfo): void {
   pdf.setFooter(function (currentPage: number, pageCount: number) {
-    if (currentPage !== pageCount) return null;
+    const pageNumberBlock = {
+      // absolutePosition: { x: 0, y: pdf.pageHeight - 25 },
+      columns: [
+        {
+          width: '*',
+          fontSize: 8,
+          alignment: 'center',
+          stack: [
+            { text: '', margin: [0, 0, 0, 20] },
+            {
+              text: `Page ${currentPage} of ${pageCount}`, margin: [0, 0, 0, 20]
+            }]
+        }
+      ]
+    };
+
+    if (currentPage !== pageCount) {
+      return pageNumberBlock;
+      // return null;
+    }
 
     return {
       stack: [
@@ -408,9 +428,9 @@ export function renderFooter(pdf: PdfDocument, company: CompanyInfo): void {
               fontSize: 8,
               stack: [
                 { text: 'Bank Details:', bold: true, margin: [0, 0, 0, 2] },
-                { text: `Bank: ${company.bankName || ''}` },
-                { text: `A/c: ${company.bankAccount || ''}` },
-                { text: `IFSC: ${company.bankIfsc || ''}` }
+                { text: `Bank: ${company.bankName || ''}`, margin: [0, 0, 0, 2] },
+                { text: `A/c: ${company.bankAccount || ''}`, margin: [0, 0, 0, 2] },
+                { text: `IFSC: ${company.bankIfsc || ''}`, margin: [0, 0, 0, 2] }
               ]
             },
             // Column 2: Terms
@@ -419,7 +439,9 @@ export function renderFooter(pdf: PdfDocument, company: CompanyInfo): void {
               fontSize: 8,
               stack: [
                 { text: 'Terms & Conditions:', bold: true, margin: [0, 0, 0, 2] },
-                { text: company.invoiceTerms || '' }
+                { text: company.invoiceTerms || '', margin: [0, 0, 0, 2] },
+                { text: '', margin: [0, 0, 0, 11] },
+                { text: `Page ${currentPage} of ${pageCount}`, alignment: 'center' }
               ]
             },
             // Column 3: Signatory
@@ -433,7 +455,8 @@ export function renderFooter(pdf: PdfDocument, company: CompanyInfo): void {
               ]
             }
           ]
-        }
+        },
+        // pageNumberBlock
       ],
       margin: [pdf.marginLeft, 20, pdf.marginRight, 0]
     };

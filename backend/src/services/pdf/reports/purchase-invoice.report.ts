@@ -88,15 +88,15 @@ export async function renderPurchaseInvoice(
   sections.renderRule(pdf);
 
   const columns: TableColumn[] = [
-    { header: '#', key: 'index', align: 'right', minWidth: 34, maxWidth: 34 },
-    { header: 'Product', key: 'productName', align: 'left' },
-    { header: 'HSN/SAC', key: 'hsnSac', align: 'left', maxWidth: 70 },
-    { header: 'GTN', key: 'gtn', align: 'left', maxWidth: 90 },
-    { header: 'Qty', key: 'qty', align: 'right', maxWidth: 50, format: (v) => Number(v).toFixed(2) },
-    { header: 'Rate', key: 'unitPrice', align: 'right', maxWidth: 75, format: (v) => Number(v).toFixed(2) },
-    { header: 'Tax%', key: 'taxPct', align: 'right', maxWidth: 45, format: (v) => Number(v).toFixed(2) },
-    { header: 'Tax Amt', key: 'taxAmount', align: 'right', maxWidth: 70, format: (v) => Number(v).toFixed(2) },
-    { header: 'Total', key: 'lineTotal', align: 'right', maxWidth: 80, format: (v) => Number(v).toFixed(2) },
+    { header: '#', key: 'index', align: 'right', width: 'auto' },
+    { header: 'Product', key: 'productName', align: 'left', width: '*' },
+    { header: 'HSN/SAC', key: 'hsnSac', align: 'left', width: 'auto' },
+    { header: 'GTN', key: 'gtn', align: 'left', width: 'auto' },
+    { header: 'Qty', key: 'qty', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
+    { header: 'Rate', key: 'unitPrice', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
+    { header: 'Tax%', key: 'taxPct', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
+    { header: 'Tax Amt', key: 'taxAmount', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
+    { header: 'Total', key: 'lineTotal', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
   ];
 
   sections.renderItemsTable(pdf, columns, items);
