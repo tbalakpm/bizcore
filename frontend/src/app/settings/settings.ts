@@ -14,14 +14,23 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     </div>
     <div class="flex gap-0 border-b border-border mb-4">
       <a routerLink="/settings/general"
-         routerLinkActive="border-b-2 border-accent text-accent font-semibold"
-         class="px-4 py-2 text-sm hover:text-accent transition-colors">
+         routerLinkActive="active-tab"
+         style="color: var(--color-text)"
+         class="px-4 py-2 text-sm transition-colors tab-link">
         <span nz-icon nzType="profile" nzTheme="outline" class="mr-1"></span>
         General
       </a>
+      <a routerLink="/settings/serial"
+         routerLinkActive="active-tab"
+         style="color: var(--color-text)"
+         class="px-4 py-2 text-sm transition-colors tab-link">
+        <span nz-icon nzType="number" nzTheme="outline" class="mr-1"></span>
+        Serial Settings
+      </a>
       <a routerLink="/settings/pricing-categories"
-         routerLinkActive="border-b-2 border-accent text-accent font-semibold"
-         class="px-4 py-2 text-sm hover:text-accent transition-colors">
+         routerLinkActive="active-tab"
+         style="color: var(--color-text)"
+         class="px-4 py-2 text-sm transition-colors tab-link">
         <span nz-icon nzType="percentage" nzTheme="outline" class="mr-1"></span>
         Pricing Categories
       </a>
@@ -29,4 +38,4 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     <router-outlet></router-outlet>
   `,
 })
-export class Settings {}
+export class Settings { }

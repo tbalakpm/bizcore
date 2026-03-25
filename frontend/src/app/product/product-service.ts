@@ -19,6 +19,7 @@ export interface Product {
   gtnPrefix?: string;
   gtnStartPos?: number;
   gtnLength?: number;
+  useGlobal?: boolean;
   // unitsInStock?: number;
   categoryName?: string;
   isActive: boolean;

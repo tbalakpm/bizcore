@@ -1,0 +1,53 @@
+<nz-card [nzLoading]="loading">
+  <form nz-form nzLayout="vertical" (ngSubmit)="save()">
+    <nz-divider nzText="Serial Settings" nzOrientation="left"></nz-divider>
+    @for (config of invoiceConfigs; track config.key) {
+      <div class="mb-2 font-medium text-text-muted">{{ config.label }}</div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <nz-form-item>
+          <nz-form-label [nzFor]="'prefix_' + config.key">Prefix</nz-form-label>
+          <nz-form-control>
+            <input
+              nz-input
+              [name]="'prefix_' + config.key"
+              [id]="'prefix_' + config.key"
+              [(ngModel)]="config.prefix"
+              placeholder="INV-"
+            />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzFor]="'current_' + config.key">Current Number</nz-form-label>
+          <nz-form-control>
+            <nz-input-number
+              [name]="'current_' + config.key"
+              [id]="'current_' + config.key"
+              [(ngModel)]="config.current"
+              [nzMin]="1"
+              [nzStep]="1"
+              class="w-full"
+            ></nz-input-number>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzFor]="'length_' + config.key">Number Length</nz-form-label>
+          <nz-form-control>
+            <nz-input-number
+              [name]="'length_' + config.key"
+              [id]="'length_' + config.key"
+              [(ngModel)]="config.length"
+              [nzMin]="1"
+              [nzMax]="20"
+              [nzStep]="1"
+              class="w-full"
+            ></nz-input-number>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    }
+
+    <div class="mt-6 flex justify-end">
+      <button nz-button nzType="primary" type="submit" [nzLoading]="saving">Save Settings</button>
+    </div>
+  </form>
+</nz-card>

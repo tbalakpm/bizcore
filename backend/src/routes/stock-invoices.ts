@@ -8,7 +8,7 @@ import { ProductSerialMode, productSerialNumberService } from '../services/produ
 import type { DbTransaction } from '../shared/serial-number.shared';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 import { normalizeDate } from '../utils/date.util';
-import { toNumericString, toPositiveNumber } from '../utils/number.util';
+import { toNumericString, toPositiveNumber, toNumber, toOptionalNumber } from '../utils/number.util';
 import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
 
 // barcode printing support
@@ -64,10 +64,10 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
             gtn: item.gtn,
             qtyPerUnit: product.qtyPerUnit,
             hsnSac: item.hsnSac ?? product.hsnSac,
-            taxRate: toNumericString(item.taxRate) ?? product.taxRate,
-            buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
-            sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : product.unitPrice,
-            unitsInStock: qty,
+            taxRate: toNumber(item.taxRate) ?? product.taxRate,
+            buyingPrice: toNumber(unitPrice) ?? product.unitPrice,
+            sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : product.unitPrice,
+            unitsInStock: toNumber(qty),
             location: item.location,
           })
           .returning({ id: inventories.id })
@@ -76,14 +76,14 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
         await tx
           .insert(stockInvoiceItems)
           .values({
-            stockInvoiceId,
-            inventoryId: createdInventory.id,
-            qty: toNumericString(qty),
-            unitPrice: toNumericString(unitPrice),
-            marginType: item.marginType ?? 'none',
-            marginPct: toNumericString(item.marginPct) ?? '0',
-            marginAmount: toNumericString(item.marginAmount) ?? '0',
-            sellingPrice: toNumericString(item.sellingPrice) ?? '0',
+            stockInvoiceId: stockInvoiceId as any,
+            inventoryId: createdInventory.id as any,
+            qty: toNumber(qty),
+            unitPrice: toNumber(unitPrice),
+            marginType: (item.marginType ?? 'none') as any,
+            marginPct: toNumber(item.marginPct) ?? 0,
+            marginAmount: toNumber(item.marginAmount) ?? 0,
+            sellingPrice: toNumber(item.sellingPrice) ?? 0,
           })
           .run();
       } else {
@@ -93,7 +93,7 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
         if (genType === 'TAG') {
           // TAG: Each quantity gets a distinct inventory row with qty 1
           for (let i = 0; i < qty; i++) {
-            const generatedGtn = await productSerialNumberService.generateTagNumber(product.id, product.gtnMode as ProductSerialMode, tx);
+            const generatedGtn = await productSerialNumberService.generateGtn(product.id, tx);
             const createdInventory = await tx
               .insert(inventories)
               .values({
@@ -101,9 +101,9 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
                 gtn: generatedGtn,
                 qtyPerUnit: product.qtyPerUnit,
                 hsnSac: item.hsnSac ?? product.hsnSac,
-                taxRate: toNumericString(item.taxRate) ?? product.taxRate,
-                buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
-                sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : product.unitPrice,
+                taxRate: toNumber(item.taxRate) ?? product.taxRate,
+                buyingPrice: toNumber(unitPrice) ?? product.unitPrice,
+                sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : product.unitPrice,
                 unitsInStock: 1,
                 location: item.location,
               })
@@ -113,27 +113,20 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
             await tx
               .insert(stockInvoiceItems)
               .values({
-                stockInvoiceId,
-                inventoryId: createdInventory.id,
-                qty: '1',
-                unitPrice: toNumericString(unitPrice),
-                marginType: item.marginType ?? 'none',
-                marginPct: toNumericString(item.marginPct) ?? '0',
-                marginAmount: toNumericString(item.marginAmount) ?? '0',
-                sellingPrice: toNumericString(item.sellingPrice) ?? '0',
+                stockInvoiceId: stockInvoiceId as any,
+                inventoryId: createdInventory.id as any,
+                qty: 1,
+                unitPrice: toNumber(unitPrice),
+                marginType: (item.marginType ?? 'none') as any,
+                marginPct: toNumber(item.marginPct) ?? 0,
+                marginAmount: toNumber(item.marginAmount) ?? 0,
+                sellingPrice: toNumber(item.sellingPrice) ?? 0,
               })
               .run();
           }
         } else {
-          // CODE or BATCH or anything else: 1 row for the full quantity
-          let generatedGtn: string | undefined = undefined;
-          if (genType === 'BATCH') {
-            generatedGtn = await productSerialNumberService.generateBatchNumber(product.id, product.gtnMode as ProductSerialMode, tx);
-          } else if (genType === 'CODE') {
-            generatedGtn = product.code;
-          } else if (shouldGenerateGtn(product.gtnGeneration)) {
-            generatedGtn = generateGtn(product.code);
-          }
+          // CODE or BATCH or others: 1 row for the full quantity
+          const generatedGtn = await productSerialNumberService.generateGtn(product.id, tx);
 
           const createdInventory = await tx
             .insert(inventories)
@@ -142,10 +135,10 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
               gtn: generatedGtn,
               qtyPerUnit: product.qtyPerUnit,
               hsnSac: item.hsnSac ?? product.hsnSac,
-              taxRate: toNumericString(item.taxRate) ?? product.taxRate,
-              buyingPrice: toNumericString(unitPrice) ?? product.unitPrice,
-              sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : product.unitPrice,
-              unitsInStock: qty,
+              taxRate: toNumber(item.taxRate) ?? product.taxRate,
+              buyingPrice: toNumber(unitPrice) ?? product.unitPrice,
+              sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : product.unitPrice,
+              unitsInStock: toNumber(qty),
               location: item.location,
             })
             .returning({ id: inventories.id })
@@ -154,14 +147,14 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
           await tx
             .insert(stockInvoiceItems)
             .values({
-              stockInvoiceId,
-              inventoryId: createdInventory.id,
-              qty: toNumericString(qty),
-              unitPrice: toNumericString(unitPrice),
-              marginType: item.marginType ?? 'none',
-              marginPct: toNumericString(item.marginPct) ?? '0',
-              marginAmount: toNumericString(item.marginAmount) ?? '0',
-              sellingPrice: toNumericString(item.sellingPrice) ?? '0',
+              stockInvoiceId: stockInvoiceId as any,
+              inventoryId: createdInventory.id as any,
+              qty: toNumber(qty),
+              unitPrice: toNumber(unitPrice),
+              marginType: (item.marginType ?? 'none') as any,
+              marginPct: toNumber(item.marginPct) ?? 0,
+              marginAmount: toNumber(item.marginAmount) ?? 0,
+              sellingPrice: toNumber(item.sellingPrice) ?? 0,
             })
             .run();
         }
@@ -176,7 +169,7 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
       const updatedUnitsInStock = (inventory.unitsInStock ?? 0) + qty;
       const updatingPayload: any = { unitsInStock: updatedUnitsInStock };
       if (item.sellingPrice !== undefined) {
-        updatingPayload.sellingPrice = toNumericString(item.sellingPrice);
+        updatingPayload.sellingPrice = toNumber(item.sellingPrice);
       }
 
       await tx
@@ -188,14 +181,14 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
       await tx
         .insert(stockInvoiceItems)
         .values({
-          stockInvoiceId,
-          inventoryId: inventory.id,
-          qty: toNumericString(qty),
-          unitPrice: toNumericString(unitPrice),
-          marginType: item.marginType ?? 'none',
-          marginPct: toNumericString(item.marginPct) ?? '0',
-          marginAmount: toNumericString(item.marginAmount) ?? '0',
-          sellingPrice: toNumericString(item.sellingPrice) ?? '0',
+          stockInvoiceId: stockInvoiceId as any,
+          inventoryId: inventory.id as any,
+          qty: toNumber(qty),
+          unitPrice: toNumber(unitPrice),
+          marginType: (item.marginType ?? 'none') as any,
+          marginPct: toNumber(item.marginPct) ?? 0,
+          marginAmount: toNumber(item.marginAmount) ?? 0,
+          sellingPrice: toNumber(item.sellingPrice) ?? 0,
         })
         .run();
     }
@@ -306,7 +299,7 @@ const buildBarcodeLabels = (invoice: {
     lineTotal?: string | number | null;
     gtn?: string | null;
     hsnSac?: string | null;
-    taxRate?: string | null;
+    taxRate?: string | number | null;
     productCode?: string;
     productName?: string
   }>;
@@ -413,7 +406,7 @@ stockInvoicesRouter.get('/:id/barcodes', async (req: Request, res: Response) => 
       .where(eq(stockInvoiceItems.stockInvoiceId, id))
       .all();
 
-    const labels = buildBarcodeLabels({ items });
+    const labels = buildBarcodeLabels({ items: items as any });
     return res.json({ labels });
   } catch (error) {
     console.error('Failed to fetch barcode labels', error);
@@ -459,7 +452,7 @@ stockInvoicesRouter.get('/:id/barcodes/pdf', async (req: Request, res: Response)
       .where(eq(stockInvoiceItems.stockInvoiceId, id))
       .all();
 
-    const labels = buildBarcodeLabels({ items });
+    const labels = buildBarcodeLabels({ items: items as any });
     if (labels.length === 0) {
       return res.status(404).json({ error: 'No barcode data available for this invoice' });
     }
@@ -564,8 +557,8 @@ stockInvoicesRouter.post('/', async (req: Request, res: Response) => {
         .values({
           invoiceNumber,
           invoiceDate: normalizeDate(body.invoiceDate),
-          totalQty: toNumericString(body.totalQty) ?? '0',
-          totalAmount: toNumericString(body.totalAmount) ?? '0',
+          totalQty: toNumber(body.totalQty),
+          totalAmount: toNumber(body.totalAmount),
         })
         .returning()
         .get();
@@ -575,8 +568,8 @@ stockInvoicesRouter.post('/', async (req: Request, res: Response) => {
       await tx
         .update(stockInvoices)
         .set({
-          totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
-          totalAmount: toNumericString(body.totalAmount) ?? toNumericString(totals.totalAmount),
+          totalQty: toNumber(body.totalQty) ?? totals.totalQty,
+          totalAmount: toNumber(body.totalAmount) ?? totals.totalAmount,
         })
         .where(eq(stockInvoices.id, insertedInvoice.id))
         .run();
@@ -647,8 +640,8 @@ stockInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
         .set({
           invoiceNumber: body.invoiceNumber ?? existing.invoiceNumber,
           invoiceDate: body.invoiceDate ?? existing.invoiceDate,
-          totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
-          totalAmount: toNumericString(body.totalAmount) ?? toNumericString(totals.totalAmount),
+          totalQty: toNumber(body.totalQty) ?? totals.totalQty,
+          totalAmount: toNumber(body.totalAmount) ?? totals.totalAmount,
         })
         .where(eq(stockInvoices.id, id))
         .run();

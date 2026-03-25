@@ -164,3 +164,22 @@ body {
     width: 16rem;
   }
 }
+
+/* ============================================================
+   SETTINGS TABS
+   ============================================================ */
+.tab-link {
+  color: var(--color-text);
+  border-bottom: 2px solid transparent;
+}
+
+.tab-link:hover {
+  color: var(--color-accent);
+}
+
+.tab-link.active-tab {
+  color: var(--color-accent) !important;
+  border-bottom: 2px solid var(--color-accent);
+  font-weight: 600;
+}
+

@@ -27,4 +27,12 @@ export class SettingsService {
   updateSetting(key: string, value: string): Observable<AppSetting> {
     return this.http.put<AppSetting>(`${this.apiUrl}/${key}`, { value });
   }
+
+  getInvoiceConfigs(): Observable<{ data: any[] }> {
+    return this.http.get<{ data: any[] }>(`${environment.apiUrl}/serial-numbers/invoice-configs`);
+  }
+
+  updateInvoiceConfig(key: string, data: any): Observable<any> {
+    return this.http.put<any>(`${environment.apiUrl}/serial-numbers/invoice-configs/${key}`, data);
+  }
 }

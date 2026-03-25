@@ -19,7 +19,13 @@
           <nz-form-item>
             <nz-form-label>Code</nz-form-label>
             <nz-form-control>
-              <input nz-input type="text" [(ngModel)]="editForm.code" name="catCode" placeholder="e.g. RETAIL" />
+              <input
+                nz-input
+                type="text"
+                [(ngModel)]="editForm.code"
+                name="catCode"
+                placeholder="e.g. RETAIL"
+              />
             </nz-form-control>
           </nz-form-item>
         </div>
@@ -27,7 +33,13 @@
           <nz-form-item>
             <nz-form-label>Name</nz-form-label>
             <nz-form-control>
-              <input nz-input type="text" [(ngModel)]="editForm.name" name="catName" placeholder="Category name" />
+              <input
+                nz-input
+                type="text"
+                [(ngModel)]="editForm.name"
+                name="catName"
+                placeholder="Category name"
+              />
             </nz-form-control>
           </nz-form-item>
         </div>
@@ -35,7 +47,13 @@
           <nz-form-item>
             <nz-form-label>Description</nz-form-label>
             <nz-form-control>
-              <input nz-input type="text" [(ngModel)]="editForm.description" name="catDesc" placeholder="Optional description" />
+              <input
+                nz-input
+                type="text"
+                [(ngModel)]="editForm.description"
+                name="catDesc"
+                placeholder="Optional description"
+              />
             </nz-form-control>
           </nz-form-item>
         </div>
@@ -87,24 +105,49 @@
             <td>{{ cat.name }}</td>
             <td>{{ cat.description || '-' }}</td>
             <td nzAlign="center">
-              <nz-switch [ngModel]="cat.isActive" (ngModelChange)="toggleActive(cat)" nzSize="small"></nz-switch>
+              <nz-switch
+                [ngModel]="cat.isActive"
+                (ngModelChange)="toggleActive(cat)"
+                nzSize="small"
+              ></nz-switch>
             </td>
             <td nzAlign="center">
               <div class="flex items-center justify-center gap-1">
-                <button nz-button nzType="link" nzSize="small" nz-tooltip
-                  [nzTooltipTitle]="expandedCategoryId === cat.id ? 'Hide Margins' : 'Configure Product Margins'"
+                <button
+                  nz-button
+                  nzType="link"
+                  nzSize="small"
+                  nz-tooltip
+                  [nzTooltipTitle]="
+                    expandedCategoryId === cat.id ? 'Hide Margins' : 'Configure Product Margins'
+                  "
                   style="color: var(--color-accent)"
-                  (click)="toggleProductMargins(cat)">
+                  (click)="toggleProductMargins(cat)"
+                >
                   <span nz-icon nzType="percentage" nzTheme="outline"></span>
                 </button>
-                <button nz-button nzType="link" nzSize="small" nz-tooltip nzTooltipTitle="Edit"
+                <button
+                  nz-button
+                  nzType="link"
+                  nzSize="small"
+                  nz-tooltip
+                  nzTooltipTitle="Edit"
                   style="color: var(--color-accent)"
-                  (click)="startEdit(cat)">
+                  (click)="startEdit(cat)"
+                >
                   <span nz-icon nzType="edit" nzTheme="outline"></span>
                 </button>
-                <button nz-button nzType="link" nzDanger nzSize="small"
-                  nz-popconfirm nzPopconfirmTitle="Delete this pricing category?"
-                  (nzOnConfirm)="deleteCategory(cat)" nz-tooltip nzTooltipTitle="Delete">
+                <button
+                  nz-button
+                  nzType="link"
+                  nzDanger
+                  nzSize="small"
+                  nz-popconfirm
+                  nzPopconfirmTitle="Delete this pricing category?"
+                  (nzOnConfirm)="deleteCategory(cat)"
+                  nz-tooltip
+                  nzTooltipTitle="Delete"
+                >
                   <span nz-icon nzType="delete" nzTheme="outline"></span>
                 </button>
               </div>
@@ -118,14 +161,26 @@
                     <h3 class="font-semibold text-sm">
                       Product Margins for <span class="text-accent">{{ cat.name }}</span>
                     </h3>
-                    <button nz-button nzType="primary" nzSize="small" (click)="saveProductMargins()" [nzLoading]="marginsLoading">
+                    <button
+                      nz-button
+                      nzType="primary"
+                      nzSize="small"
+                      (click)="saveProductMargins()"
+                      [nzLoading]="marginsLoading"
+                    >
                       <span nz-icon nzType="save" nzTheme="outline"></span> Save Margins
                     </button>
                   </div>
                   @if (marginsLoading) {
                     <div class="text-center text-text-muted py-4">Loading products...</div>
                   } @else {
-                    <nz-table [nzData]="productMargins" nzSize="small" [nzBordered]="true" [nzFrontPagination]="true" [nzPageSize]="10">
+                    <nz-table
+                      [nzData]="productMargins"
+                      nzSize="small"
+                      [nzBordered]="true"
+                      [nzFrontPagination]="true"
+                      [nzPageSize]="10"
+                    >
                       <thead>
                         <tr>
                           <th>Product Code</th>
@@ -140,7 +195,11 @@
                             <td>{{ margin.productCode }}</td>
                             <td>{{ margin.productName }}</td>
                             <td>
-                              <nz-select [(ngModel)]="margin.marginType" [ngModelOptions]="{standalone: true}" class="w-full">
+                              <nz-select
+                                [(ngModel)]="margin.marginType"
+                                [ngModelOptions]="{ standalone: true }"
+                                class="w-full"
+                              >
                                 @for (mt of marginTypes; track mt.value) {
                                   <nz-option [nzValue]="mt.value" [nzLabel]="mt.label"></nz-option>
                                 }
@@ -150,17 +209,22 @@
                               @if (margin.marginType === 'percent') {
                                 <nz-input-number
                                   [(ngModel)]="margin.marginPct"
-                                  [ngModelOptions]="{standalone: true}"
-                                  [nzMin]="0" [nzMax]="100" [nzStep]="0.5"
+                                  [ngModelOptions]="{ standalone: true }"
+                                  [nzMin]="0"
+                                  [nzMax]="100"
+                                  [nzStep]="0.5"
                                   [nzFormatter]="pctFormatter"
-                                  class="w-full" />
+                                  class="w-full"
+                                />
                               } @else if (margin.marginType === 'amount') {
                                 <nz-input-number
                                   [(ngModel)]="margin.marginAmount"
-                                  [ngModelOptions]="{standalone: true}"
-                                  [nzMin]="0" [nzStep]="1"
+                                  [ngModelOptions]="{ standalone: true }"
+                                  [nzMin]="0"
+                                  [nzStep]="1"
                                   [nzFormatter]="amtFormatter"
-                                  class="w-full" />
+                                  class="w-full"
+                                />
                               } @else {
                                 <span class="text-text-muted text-sm">–</span>
                               }
@@ -174,11 +238,6 @@
               </td>
             </tr>
           }
-        }
-        @if (!categories().length && !loading) {
-          <tr>
-            <td colspan="5" class="text-center text-text-muted">No pricing categories yet</td>
-          </tr>
         }
       </tbody>
     </nz-table>

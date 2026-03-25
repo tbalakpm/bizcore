@@ -227,6 +227,52 @@
       </nz-form-item>
     </div>
 
+    <nz-divider nzText="Goods Tracking Number (GTN) Settings" nzOrientation="left"></nz-divider>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <nz-form-item>
+        <nz-form-label nzFor="use_global_gtn">Use Global GTN</nz-form-label>
+        <nz-form-control>
+          <nz-switch
+            name="use_global_gtn"
+            id="use_global_gtn"
+            [(ngModel)]="settings['use_global_gtn']"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="gtn_mode">GTN Mode</nz-form-label>
+        <nz-form-control>
+          <nz-select
+            name="gtn_mode"
+            id="gtn_mode"
+            [(ngModel)]="settings['gtn_mode']"
+            class="w-full"
+          >
+            <nz-option nzValue="auto" nzLabel="Auto"></nz-option>
+            <nz-option nzValue="manual" nzLabel="Manual"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="gtn_generation">GTN Generation</nz-form-label>
+        <nz-form-control>
+          <nz-select
+            name="gtn_generation"
+            id="gtn_generation"
+            [(ngModel)]="settings['gtn_generation']"
+            class="w-full"
+          >
+            <nz-option nzValue="code" nzLabel="Code"></nz-option>
+            <nz-option nzValue="batch" nzLabel="Batch"></nz-option>
+            <nz-option nzValue="tag" nzLabel="Tag"></nz-option>
+            <nz-option nzValue="manual" nzLabel="Manual"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
     <div class="mt-6 flex justify-end">
       <button nz-button nzType="primary" type="submit" [nzLoading]="saving">Save Settings</button>
     </div>

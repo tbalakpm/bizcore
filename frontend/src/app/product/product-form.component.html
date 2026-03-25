@@ -124,10 +124,18 @@
     <!-- GTN Setup -->
 
     <div class="flex flex-col col-span-full">
-      <h3 class="border-t border-surface-muted mt-2 mb-2 pt-4 font-medium">
-        Goods Tracking Number (GTN) Setup
-      </h3>
-      <div class="grid grid-cols-5 gap-2">
+      <div class="flex items-center gap-2 mt-2 mb-2 pt-4 border-t border-surface-muted">
+        <h3 class="font-medium m-0">
+          Goods Tracking Number (GTN) Setup
+        </h3>
+        <div class="flex items-center gap-2 ml-4">
+          <nz-switch [(ngModel)]="product.useGlobal" name="productUseGlobal"></nz-switch>
+          <span class="text-xs text-text-muted">Use Global Settings</span>
+        </div>
+      </div>
+
+      @if (!product.useGlobal) {
+        <div class="grid grid-cols-5 gap-2">
         <nz-form-item>
           <nz-form-label
             >GTN Mode
@@ -221,7 +229,8 @@
           <!-- </div> -->
         }
       </div>
-    </div>
+    }
+  </div>
 
     <!-- Actions -->
     <div class="flex col-span-full justify-end gap-3">

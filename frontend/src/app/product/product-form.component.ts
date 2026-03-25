@@ -13,13 +13,15 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
 
 @Component({
   selector: 'app-product-form',
   imports: [
     FormsModule, CommonModule, TranslatePipe,
     NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
-    NzAlertModule, NzIconModule, NzInputNumberModule, NzTooltipModule
+    NzAlertModule, NzIconModule, NzInputNumberModule, NzTooltipModule,
+    NzSwitchModule
   ],
   templateUrl: './product-form.component.html',
 })
@@ -80,7 +82,12 @@ export class ProductFormComponent implements OnInit, OnChanges {
       : this.productService.create(this.product);
 
     request$.subscribe({
-      next: (res) => this.saved.emit(res),
+      next: (res) => {
+        if (!this.productId) {
+          this.product = this.blankProduct();
+        }
+        this.saved.emit(res);
+      },
       error: (err) => {
         this.error = err.error?.error || 'Failed to save product';
       },
@@ -108,6 +115,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
       gtnPrefix: undefined,
       gtnStartPos: 1,
       gtnLength: 10,
+      useGlobal: true,
       isActive: true,
     };
   }

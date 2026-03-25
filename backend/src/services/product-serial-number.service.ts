@@ -1,5 +1,6 @@
 import { asc, eq, sql } from 'drizzle-orm';
-import { db, productSerialNumbers, products } from '../db';
+import { db, productSerialNumbers, products, settings } from '../db';
+import { serialNumberService } from './serial-number.service';
 import {
   type DbTransaction,
   formatSerialNumber,
@@ -42,6 +43,52 @@ const requiresCounter = (mode: ProductSerialMode, serialType: ProductSerialType)
 export const productSerialNumberService = {
   modes: MODES,
   serialTypes: SERIAL_TYPES,
+
+  generateGtn: async (productId: number, tx: DbTransaction): Promise<string> => {
+    const product = await tx.select().from(products).where(eq(products.id, productId)).get();
+    if (!product) throw new Error(`Product not found: ${productId}`);
+
+    let useGlobal = product.useGlobal;
+    let gtnMode = product.gtnMode;
+    let gtnGeneration = product.gtnGeneration;
+
+    if (useGlobal) {
+      const globalSettings = await tx.select().from(settings).all();
+      const settingsMap = new Map(globalSettings.map(s => [s.key, s.value]));
+
+      const globalUseGtn = settingsMap.get('use_global_gtn');
+      if (globalUseGtn === 'false') return '';
+
+      gtnMode = (settingsMap.get('gtn_mode') || 'auto') as ProductSerialMode;
+      gtnGeneration = (settingsMap.get('gtn_generation') || 'code') as ProductSerialType;
+    }
+
+    if (gtnMode === 'manual') return '';
+
+    const genType = (gtnGeneration || 'code').toLowerCase();
+
+    if (genType === 'code') {
+      return product.code;
+    }
+
+    if (genType === 'batch' || genType === 'tag') {
+      if (useGlobal) {
+        // Use global sequence 'gtn' from serial_numbers table
+        return await serialNumberService.generateNextNumberInTransaction('gtn', tx);
+      } else {
+        // Use product specific sequence from product_serial_numbers table
+        return await productSerialNumberService.generateInTransaction({
+          productId,
+          mode: gtnMode as ProductSerialMode,
+          serialType: genType as ProductSerialType,
+          tx: tx,
+          date: new Date()
+        });
+      }
+    }
+
+    return '';
+  },
 
   generate: async ({
     productId,

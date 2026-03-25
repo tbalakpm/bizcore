@@ -35,13 +35,17 @@ export const products = sqliteTable(
       .notNull()
       .default(0.00),
 
-    gtnMode: text('gtn_mode', { length: 25 })
+    useGlobal: integer('use_global', { mode: 'boolean' })
       .notNull()
-      .default('auto'), // auto (default), manual
+      .default(true), // true - use global settings from gtn key of serial_numbers table, false - use product specific settings
 
-    gtnGeneration: text('gtn_generation', { length: 25 })
+    gtnMode: text('gtn_mode', { length: 25, enum: ['global', 'auto', 'manual'] })
       .notNull()
-      .default('code'),  // code (default), batch, tag, manual
+      .default('global'), // global (default), auto, manual
+
+    gtnGeneration: text('gtn_generation', { length: 25, enum: ['global', 'code', 'batch', 'tag', 'manual'] })
+      .notNull()
+      .default('global'),  // global (default), code, batch, tag, manual
 
     ...auditFields
   },
@@ -52,9 +56,9 @@ export const products = sqliteTable(
 
     index('products_category_id_idx').on(t.categoryId),
 
-    check('gtn_mode_must_be_in_list', sql`${t.gtnMode} IN ('auto','manual')`),
+    // check('gtn_mode_must_be_in_list', sql`${t.gtnMode} IN ('auto','manual')`),
 
-    check('gtn_generation_must_be_in_list', sql`${t.gtnGeneration} IN ('code','batch','tag','manual')`)
+    // check('gtn_generation_must_be_in_list', sql`${t.gtnGeneration} IN ('code','batch','tag','manual')`)
   ]
 );
 

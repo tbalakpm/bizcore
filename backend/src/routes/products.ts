@@ -138,6 +138,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
         taxRate: products.taxRate,
         gtnMode: products.gtnMode,
         gtnGeneration: products.gtnGeneration,
+        useGlobal: products.useGlobal,
         //unitsInStock: products.unitsInStock,
         isActive: products.isActive,
         createdAt: products.createdAt,
@@ -227,6 +228,7 @@ productsRouter.post('/', async (req, res) => {
     gtnPrefix,
     gtnStartPos,
     gtnLength,
+    useGlobal,
     isActive,
   } = req.body;
 
@@ -248,6 +250,7 @@ productsRouter.post('/', async (req, res) => {
         taxRate: taxRate?.toString(),
         gtnMode,
         gtnGeneration,
+        useGlobal: useGlobal !== false,
         isActive: isActive !== false,
       })
       .returning()
@@ -291,6 +294,7 @@ productsRouter.put('/:id', async (req, res) => {
     gtnPrefix,
     gtnStartPos,
     gtnLength,
+    useGlobal,
     isActive,
   } = req.body;
 
@@ -307,6 +311,7 @@ productsRouter.put('/:id', async (req, res) => {
   if (taxRate !== undefined) product.taxRate = taxRate?.toString();
   if (gtnMode !== undefined) product.gtnMode = gtnMode;
   if (gtnGeneration !== undefined) product.gtnGeneration = gtnGeneration;
+  if (useGlobal !== undefined) product.useGlobal = useGlobal;
   if (typeof isActive === 'boolean') product.isActive = isActive;
 
   await db
@@ -322,6 +327,7 @@ productsRouter.put('/:id', async (req, res) => {
       taxRate: product.taxRate,
       gtnMode: product.gtnMode,
       gtnGeneration: product.gtnGeneration,
+      useGlobal: product.useGlobal,
       isActive: product.isActive,
     })
     .where(eq(products.id, id))

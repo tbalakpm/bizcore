@@ -11,6 +11,8 @@ import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 
 import { SettingsService } from './settings.service';
 import { forkJoin } from 'rxjs';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
   selector: 'app-general-settings',
@@ -23,6 +25,8 @@ import { forkJoin } from 'rxjs';
     NzCardModule,
     NzDividerModule,
     NzInputNumberModule,
+    NzSwitchModule,
+    NzSelectModule
   ],
   templateUrl: './general-settings.html',
 })
@@ -44,12 +48,15 @@ export class GeneralSettings implements OnInit {
     bank_name: '',
     bank_account: '',
     bank_ifsc: '',
-    sgst_sharing_rate: null,
-    igst_sharing_rate: null,
+    sgst_sharing_rate: 50,
+    igst_sharing_rate: 100,
     invoice_terms: '',
     barcode_width: '2',
     barcode_height: '1.2',
     barcode_columns: 1,
+    use_global_gtn: true,
+    gtn_mode: 'auto', // auto, manual
+    gtn_generation: 'tag', // code, batch, tag, manual
   };
 
   ngOnInit(): void {
@@ -70,6 +77,7 @@ export class GeneralSettings implements OnInit {
             }
           }
         });
+
         this.loading = false;
       },
       error: () => {
@@ -81,9 +89,9 @@ export class GeneralSettings implements OnInit {
 
   save() {
     this.saving = true;
-    const requests = Object.keys(this.settings).map((key) => {
-      const val = this.settings[key] !== null && this.settings[key] !== undefined 
-        ? String(this.settings[key]) 
+    const requests: any[] = Object.keys(this.settings).map((key) => {
+      const val = this.settings[key] !== null && this.settings[key] !== undefined
+        ? String(this.settings[key])
         : '';
       return this.settingsService.updateSetting(key, val);
     });

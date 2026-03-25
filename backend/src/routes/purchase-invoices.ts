@@ -3,7 +3,7 @@ import express, { type Request, type Response } from 'express';
 
 import { db, purchaseInvoices, purchaseInvoiceItems, suppliers, products, inventories } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
-import { toNumericString, toPositiveNumber } from '../utils/number.util';
+import { toNumericString, toPositiveNumber, toNumber, toOptionalNumber } from '../utils/number.util';
 import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
 import { ProductSerialMode, productSerialNumberService } from '../services/product-serial-number.service';
 import { serialNumberService } from '../services/serial-number.service';
@@ -177,7 +177,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
         if (inv) {
           const updateData: any = { unitsInStock: (inv.unitsInStock || 0) + qty };
           if (item.sellingPrice !== undefined && item.sellingPrice !== null) {
-              updateData.sellingPrice = toNumericString(item.sellingPrice);
+              updateData.sellingPrice = toNumber(item.sellingPrice);
           }
           await tx.update(inventories).set(updateData).where(eq(inventories.id, inv.id)).run();
           inventoryId = inv.id;
@@ -185,15 +185,15 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
           const newInv = await tx
             .insert(inventories)
             .values({
-              productId: product.id,
-              gtn: item.gtn,
-              qtyPerUnit: product.qtyPerUnit,
-              hsnSac: item.hsnSac || product.hsnSac,
-              taxRate: toNumericString(item.taxPct) || product.taxRate,
-              buyingPrice: toNumericString(unitPrice) || product.unitPrice,
-              sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : undefined,
-              unitsInStock: qty,
-            })
+                productId: product.id,
+                gtn: item.gtn,
+                qtyPerUnit: product.qtyPerUnit,
+                hsnSac: item.hsnSac || product.hsnSac,
+                taxRate: toNumber(item.taxPct) || product.taxRate,
+                buyingPrice: toNumber(unitPrice) || product.unitPrice,
+                sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : undefined,
+                unitsInStock: toNumber(qty),
+              })
             .returning({ id: inventories.id })
             .get();
           inventoryId = newInv.id;
@@ -203,7 +203,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
         const genType = (product.gtnGeneration || 'CODE').toUpperCase();
         if (genType === 'TAG') {
           for (let i = 0; i < qty; i++) {
-            const generatedGtn = await productSerialNumberService.generateTagNumber(product.id, product.gtnMode as ProductSerialMode, tx);
+            const generatedGtn = await productSerialNumberService.generateGtn(product.id, tx);
             const inv = await tx
               .insert(inventories)
               .values({
@@ -211,9 +211,9 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
                 gtn: generatedGtn,
                 qtyPerUnit: product.qtyPerUnit,
                 hsnSac: item.hsnSac || product.hsnSac,
-                taxRate: toNumericString(item.taxPct) || product.taxRate,
-                buyingPrice: toNumericString(unitPrice) || product.unitPrice,
-                sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : undefined,
+                taxRate: toNumber(item.taxPct) || product.taxRate,
+                buyingPrice: toNumber(unitPrice) || product.unitPrice,
+                sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : undefined,
                 unitsInStock: 1,
               })
               .returning({ id: inventories.id })
@@ -222,28 +222,21 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
             await tx.insert(purchaseInvoiceItems).values({
               purchaseInvoiceId,
               inventoryId: inv.id,
-              qty: '1',
-              unitPrice: toNumericString(unitPrice),
+              qty: 1,
+              unitPrice: toNumber(unitPrice),
               discountType: item.discountType,
-              discountPct: toNumericString(item.discountPct),
-              discountAmount: toNumericString(item.discountAmount),
-              taxPct: toNumericString(item.taxPct),
+              discountPct: toNumber(item.discountPct),
+              discountAmount: toNumber(item.discountAmount),
+              taxPct: toNumber(item.taxPct),
               marginType: item.marginType || 'none',
-              marginPct: toNumericString(item.marginPct) || '0',
-              marginAmount: toNumericString(item.marginAmount) || '0.00',
-              sellingPrice: toNumericString(item.sellingPrice) || '0.00',
+              marginPct: toNumber(item.marginPct) || 0,
+              marginAmount: toNumber(item.marginAmount) || 0,
+              sellingPrice: toNumber(item.sellingPrice) || 0,
             }).run();
           }
           inventoryId = -1; // Marker that we handled insertion
         } else {
-          let generatedGtn: string | undefined = undefined;
-          if (genType === 'BATCH') {
-            generatedGtn = await productSerialNumberService.generateBatchNumber(product.id, product.gtnMode as ProductSerialMode, tx);
-          } else if (genType === 'CODE') {
-            generatedGtn = product.code;
-          } else if (shouldGenerateGtn(product.gtnGeneration)) {
-            generatedGtn = generateGtn(product.code);
-          }
+          const generatedGtn = await productSerialNumberService.generateGtn(product.id, tx);
 
           let inv;
           if (generatedGtn) {
@@ -255,7 +248,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
           if (inv) {
             const updateData: any = { unitsInStock: (inv.unitsInStock || 0) + qty };
             if (item.sellingPrice !== undefined && item.sellingPrice !== null) {
-                updateData.sellingPrice = toNumericString(item.sellingPrice);
+              updateData.sellingPrice = toNumber(item.sellingPrice);
             }
             await tx.update(inventories).set(updateData).where(eq(inventories.id, inv.id)).run();
             inventoryId = inv.id;
@@ -267,10 +260,10 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
                 gtn: generatedGtn,
                 qtyPerUnit: product.qtyPerUnit,
                 hsnSac: item.hsnSac || product.hsnSac,
-                taxRate: toNumericString(item.taxPct) || product.taxRate,
-                buyingPrice: toNumericString(unitPrice) || product.unitPrice,
-                sellingPrice: item.sellingPrice ? toNumericString(item.sellingPrice) : undefined,
-                unitsInStock: qty,
+                taxRate: toNumber(item.taxPct) || product.taxRate,
+                buyingPrice: toNumber(unitPrice) || product.unitPrice,
+                sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : undefined,
+                unitsInStock: toNumber(qty),
               })
               .returning({ id: inventories.id })
               .get();
@@ -296,16 +289,16 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
       await tx.insert(purchaseInvoiceItems).values({
         purchaseInvoiceId,
         inventoryId,
-        qty: toNumericString(qty),
-        unitPrice: toNumericString(unitPrice),
+        qty: toNumber(qty),
+        unitPrice: toNumber(unitPrice),
         discountType: item.discountType,
-        discountPct: toNumericString(item.discountPct),
-        discountAmount: toNumericString(item.discountAmount),
-        taxPct: toNumericString(item.taxPct),
+        discountPct: toNumber(item.discountPct),
+        discountAmount: toNumber(item.discountAmount),
+        taxPct: toNumber(item.taxPct),
         marginType: item.marginType || 'none',
-        marginPct: toNumericString(item.marginPct) || '0',
-        marginAmount: toNumericString(item.marginAmount) || '0.00',
-        sellingPrice: toNumericString(item.sellingPrice) || '0.00',
+        marginPct: toNumber(item.marginPct) || 0,
+        marginAmount: toNumber(item.marginAmount) || 0,
+        sellingPrice: toNumber(item.sellingPrice) || 0,
       }).run();
     }
 
@@ -336,13 +329,13 @@ purchaseInvoicesRouter.post('/', async (req, res) => {
           supplierId: body.supplierId,
           refNumber: body.refNumber,
           refDate: body.refDate,
-          subtotal: toNumericString(body.subtotal) ?? '0',
-          totalQty: toNumericString(body.totalQty) ?? '0',
+          subtotal: toNumber(body.subtotal),
+          totalQty: toNumber(body.totalQty),
           discountType: body.discountType,
-          discountPct: toNumericString(body.discountPct) ?? '0',
-          discountAmount: toNumericString(body.discountAmount) ?? '0',
-          totalTaxAmount: toNumericString(body.taxAmount) ?? '0',
-          roundOff: toNumericString(body.roundOff) ?? '0',
+          discountPct: toNumber(body.discountPct),
+          discountAmount: toNumber(body.discountAmount),
+          totalTaxAmount: toNumber(body.taxAmount),
+          roundOff: toNumber(body.roundOff),
         })
         .returning()
         .get();
@@ -403,13 +396,13 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
           supplierId: body.supplierId ?? existing.supplierId,
           refNumber: body.refNumber ?? existing.refNumber,
           refDate: body.refDate ?? existing.refDate,
-          subtotal: toNumericString(body.subtotal) ?? existing.subtotal,
-          totalQty: toNumericString(body.totalQty) ?? existing.totalQty,
+          subtotal: toNumber(body.subtotal) ?? existing.subtotal,
+          totalQty: toNumber(body.totalQty) ?? existing.totalQty,
           discountType: body.discountType ?? existing.discountType,
-          discountPct: toNumericString(body.discountPct) ?? existing.discountPct,
-          discountAmount: toNumericString(body.discountAmount) ?? existing.discountAmount,
-          totalTaxAmount: toNumericString(body.taxAmount) ?? existing.totalTaxAmount,
-          roundOff: toNumericString(body.roundOff) ?? existing.roundOff,
+          discountPct: toNumber(body.discountPct) ?? existing.discountPct,
+          discountAmount: toNumber(body.discountAmount) ?? existing.discountAmount,
+          totalTaxAmount: toNumber(body.taxAmount) ?? existing.totalTaxAmount,
+          roundOff: toNumber(body.roundOff) ?? existing.roundOff,
         })
         .where(eq(purchaseInvoices.id, id))
         .run();
@@ -421,8 +414,8 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
       await tx
         .update(purchaseInvoices)
         .set({
-          totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
-          subtotal: toNumericString(body.subtotal) ?? toNumericString(totals.subtotal),
+          totalQty: toNumber(body.totalQty) || totals.totalQty,
+          subtotal: toNumber(body.subtotal) || totals.subtotal,
         })
         .where(eq(purchaseInvoices.id, id))
         .run();
