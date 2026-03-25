@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6a49cf11-7c4d-43e6-b8bf-08e5be75a93e",
+  "id": "3765aaa0-fce2-4d7d-b73c-28c2cb58416e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "addresses": {
@@ -449,7 +449,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "''"
+          "default": "'1'"
         },
         "hsn_sac": {
           "name": "hsn_sac",
@@ -2340,14 +2340,14 @@
         },
         "direction": {
           "name": "direction",
-          "type": "text",
+          "type": "text(10)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "type": {
           "name": "type",
-          "type": "text",
+          "type": "text(25)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -2368,7 +2368,22 @@
           "default": "(CURRENT_TIMESTAMP)"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "inventory_logs_product_id_idx": {
+          "name": "inventory_logs_product_id_idx",
+          "columns": [
+            "product_id"
+          ],
+          "isUnique": false
+        },
+        "inventory_logs_gtn_idx": {
+          "name": "inventory_logs_gtn_idx",
+          "columns": [
+            "gtn"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "inventory_logs_product_id_products_id_fk": {
           "name": "inventory_logs_product_id_products_id_fk",
@@ -2421,7 +2436,22 @@
           "default": 1
         }
       },
-      "indexes": {},
+      "indexes": {
+        "product_bundles_bundle_product_id_idx": {
+          "name": "product_bundles_bundle_product_id_idx",
+          "columns": [
+            "bundle_product_id"
+          ],
+          "isUnique": false
+        },
+        "product_bundles_product_id_idx": {
+          "name": "product_bundles_product_id_idx",
+          "columns": [
+            "product_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "product_bundles_bundle_product_id_products_id_fk": {
           "name": "product_bundles_bundle_product_id_products_id_fk",

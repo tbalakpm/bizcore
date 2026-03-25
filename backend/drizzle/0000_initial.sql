@@ -62,7 +62,7 @@ CREATE TABLE `inventories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`product_id` integer NOT NULL,
 	`gtn` text(25) DEFAULT '' NOT NULL,
-	`qty_per_unit` text(25) DEFAULT '' NOT NULL,
+	`qty_per_unit` text(25) DEFAULT '1' NOT NULL,
 	`hsn_sac` text(25) DEFAULT '' NOT NULL,
 	`tax_rate` real DEFAULT 0 NOT NULL,
 	`buying_price` real DEFAULT 0 NOT NULL,
@@ -325,13 +325,15 @@ CREATE TABLE `inventory_logs` (
 	`product_id` integer NOT NULL,
 	`gtn` text(25) DEFAULT '' NOT NULL,
 	`change_qty` real DEFAULT 0 NOT NULL,
-	`direction` text NOT NULL,
-	`type` text NOT NULL,
+	`direction` text(10) NOT NULL,
+	`type` text(25) NOT NULL,
 	`ref_id` integer NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE INDEX `inventory_logs_product_id_idx` ON `inventory_logs` (`product_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `inventory_logs_gtn_idx` ON `inventory_logs` (`gtn`);--> statement-breakpoint
 CREATE TABLE `product_bundles` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`bundle_product_id` integer NOT NULL,
@@ -340,3 +342,6 @@ CREATE TABLE `product_bundles` (
 	FOREIGN KEY (`bundle_product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
+--> statement-breakpoint
+CREATE INDEX `product_bundles_bundle_product_id_idx` ON `product_bundles` (`bundle_product_id`);--> statement-breakpoint
+CREATE INDEX `product_bundles_product_id_idx` ON `product_bundles` (`product_id`);
