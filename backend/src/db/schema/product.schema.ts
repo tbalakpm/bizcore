@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { integer, sqliteTable, text, numeric, uniqueIndex, check, index } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text, real, uniqueIndex, check, index } from 'drizzle-orm/sqlite-core';
 
 import { categories } from './category.schema';
 import { auditFields, keyFields } from './base';
@@ -8,26 +8,52 @@ export const products = sqliteTable(
   'products',
   {
     ...keyFields,
+
     description: text('description', { length: 255 }),
+
     categoryId: integer('category_id')
       .notNull()
       .references(() => categories.id),
-    qtyPerUnit: text('qty_per_unit', { length: 25 }),
-    unitPrice: numeric('unit_price'),
-    hsnSac: text('hsn_sac', { length: 25 }),
-    taxRate: numeric('tax_rate'),
-    gtnMode: text('gtn_mode', { length: 25 }).notNull().default('auto'), // auto (default), manual
-    gtnGeneration: text('gtn_generation', { length: 25 }).notNull().default('code'),  // code (default), batch, tag, manual
-    // gtnPrefix: text('gtn_prefix', { length: 50 }).notNull().default(''),
-    // gtnCurrent: integer('gtn_current').notNull().default(1),
-    // gtnLength: integer('gtn_length').notNull().default(10),
+
+    productType: text("product_type", { length: 25, enum: ["simple", "bundle"] })
+      .notNull()
+      .default('simple'),
+
+    qtyPerUnit: text('qty_per_unit', { length: 25 })
+      .notNull()
+      .default('1'),
+
+    unitPrice: real('unit_price')
+      .notNull()
+      .default(0.00),
+
+    hsnSac: text('hsn_sac', { length: 25 })
+      .notNull()
+      .default(''),
+
+    taxRate: real('tax_rate')
+      .notNull()
+      .default(0.00),
+
+    gtnMode: text('gtn_mode', { length: 25 })
+      .notNull()
+      .default('auto'), // auto (default), manual
+
+    gtnGeneration: text('gtn_generation', { length: 25 })
+      .notNull()
+      .default('code'),  // code (default), batch, tag, manual
+
     ...auditFields
   },
   (t) => [
     uniqueIndex('products_code_unique').on(t.code),
+
     uniqueIndex('products_name_unique').on(t.name),
+
     index('products_category_id_idx').on(t.categoryId),
+
     check('gtn_mode_must_be_in_list', sql`${t.gtnMode} IN ('auto','manual')`),
+
     check('gtn_generation_must_be_in_list', sql`${t.gtnGeneration} IN ('code','batch','tag','manual')`)
   ]
 );

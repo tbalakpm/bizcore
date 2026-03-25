@@ -158,6 +158,27 @@
           </td>
           <td>
             <div class="flex items-center justify-end gap-2">
+              @if (
+                invoice.type === 'invoice' &&
+                !invoice.irn &&
+                permissionService.canWrite('sales-invoices')
+              ) {
+                <button
+                  nz-button
+                  nzType="text"
+                  nzSize="small"
+                  nz-tooltip
+                  nzTooltipTitle="Generate IRN"
+                  (click)="generateIrn(invoice.id)"
+                >
+                  <span
+                    class="text-yellow-400!"
+                    nz-icon
+                    nzType="file-done"
+                    nzTheme="outline"
+                  ></span>
+                </button>
+              }
               <button
                 nz-button
                 nzType="text"
@@ -170,23 +191,6 @@
                 <span class="text-accent!" nz-icon nzType="printer" nzTheme="outline"></span>
               </button>
               @if (!invoice.irn && permissionService.canWrite('sales-invoices')) {
-                @if (invoice.type === 'invoice') {
-                  <button
-                    nz-button
-                    nzType="text"
-                    nzSize="small"
-                    nz-tooltip
-                    nzTooltipTitle="Generate IRN"
-                    (click)="generateIrn(invoice.id)"
-                  >
-                    <span
-                      class="text-yellow-400!"
-                      nz-icon
-                      nzType="file-done"
-                      nzTheme="outline"
-                    ></span>
-                  </button>
-                }
                 <button
                   [routerLink]="['/sales-invoices', invoice.id, 'edit']"
                   nz-button

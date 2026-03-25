@@ -32,7 +32,7 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
     }
 
     const unitPrice = toPositiveNumber(item.unitPrice, 0);
-    const lineTotal = toPositiveNumber(item.lineTotal, Number((qty * unitPrice).toFixed(2)));
+    // const lineTotal = toPositiveNumber(item.lineTotal, Number((qty * unitPrice).toFixed(2)));
 
     const inventoryId = item.inventoryId;
     if (!inventoryId) {
@@ -181,6 +181,7 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
         totalQty: salesInvoices.totalQty,
         roundOff: salesInvoices.roundOff,
         netAmount: salesInvoices.netAmount,
+        irn: salesInvoices.irn
       })
       .from(salesInvoices)
       .leftJoin(customers, eq(customers.id, salesInvoices.customerId));

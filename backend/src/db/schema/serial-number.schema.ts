@@ -1,11 +1,24 @@
 import { integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const serialNumbers = sqliteTable('serial_numbers', {
-  id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
-  key: text('key', { length: 25 }).notNull(),
-  prefix: text('prefix', { length: 10 }).notNull().default(''),
-  current: integer('current').notNull().default(1),
-  length: integer('length').notNull().default(10),
+  id: integer('id')
+    .primaryKey({ autoIncrement: true })
+    .notNull(),
+
+  key: text('key', { length: 25 })
+    .notNull(),
+
+  prefix: text('prefix', { length: 10 })
+    .notNull()
+    .default(''),
+
+  current: integer('current')
+    .notNull()
+    .default(1),
+
+  length: integer('length')
+    .notNull()
+    .default(10),
 }, (t) => [
   uniqueIndex('serial_numbers_key_unique').on(t.key)
 ]);

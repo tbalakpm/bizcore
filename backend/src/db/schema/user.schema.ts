@@ -11,17 +11,31 @@ import { auditFields } from "./base";
 export const users = sqliteTable(
   "users",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
-    username: text("username", { length: 20 }).notNull(),
-    passwordHash: text("password_hash", { length: 255 }).notNull(),
+    id: integer("id")
+      .primaryKey({ autoIncrement: true })
+      .notNull(),
+
+    username: text("username", { length: 20 })
+      .notNull(),
+
+    passwordHash: text("password_hash", { length: 255 })
+      .notNull(),
+
     firstName: text("first_name", { length: 50 }),
+
     lastName: text("last_name", { length: 50 }),
-    role: text("role", { length: 20 }).notNull().default("user"),
+
+    role: text("role", { length: 20 })
+      .notNull()
+      .default("user"),
+
     permissions: text("permissions").default("{}"),
+
     ...auditFields,
   },
   (t) => [
     uniqueIndex("users_username_unique").on(t.username),
+
     check(
       "role_must_be_in_list",
       sql`${t.role} IN ('user', 'salesperson', 'manager', 'admin')`,

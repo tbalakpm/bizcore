@@ -5,11 +5,14 @@ export const pricingCategories = sqliteTable(
   'pricing_categories',
   {
     ...keyFields,
+
     description: text('description', { length: 255 }),
+
     ...auditFields,
   },
   (t) => [
     uniqueIndex('pricing_categories_code_unique').on(t.code),
+
     uniqueIndex('pricing_categories_name_unique').on(t.name),
   ]
 );

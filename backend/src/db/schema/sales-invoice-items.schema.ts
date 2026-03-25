@@ -1,33 +1,61 @@
 import { SQL, sql } from 'drizzle-orm';
-import { index, integer, numeric, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { salesInvoices } from './sales-invoice.schema';
 import { inventories } from './inventory.schema';
 
 export const salesInvoiceItems = sqliteTable('sales_invoice_items', {
-  id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
+  id: integer('id')
+    .primaryKey({ autoIncrement: true })
+    .notNull(),
+
   salesInvoiceId: integer('sales_invoice_id')
     .references(() => salesInvoices.id)
     .notNull(),
+
   inventoryId: integer('inventory_id')
     .references(() => inventories.id)
     .notNull(),
-  qty: numeric('qty').notNull().default('0.000'),
-  unitPrice: numeric('unit_price').notNull().default('0.00'),
-  discountType: text('discount_type', { length: 10 }).notNull().default('none'), // none, percent, amount
-  discountPct: numeric('discount_pct').notNull().default('0.00'),
-  discountAmount: numeric('discount_amount').notNull().default('0.00'),
-  taxPct: numeric('tax_pct').notNull().default('0.00'),
-  taxAmount: numeric('tax_amount').generatedAlwaysAs(
+
+  qty: real('qty')
+    .notNull()
+    .default(0.000),
+
+  unitPrice: real('unit_price')
+    .notNull()
+    .default(0.00),
+
+  discountType: text('discount_type', { length: 10, enum: ['none', 'percent', 'amount'] })
+    .notNull()
+    .default('none'), // none, percent, amount
+
+  discountPct: real('discount_pct')
+    .notNull()
+    .default(0.00),
+
+  discountAmount: real('discount_amount')
+    .notNull()
+    .default(0.00),
+
+  taxPct: real('tax_pct')
+    .notNull()
+    .default(0.00),
+
+  taxAmount: real('tax_amount').generatedAlwaysAs(
     (): SQL => sql`(ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))`
   ),
-  sgstAmount: numeric('sgst_amount').notNull().default('0.00'),
-  cgstAmount: numeric('cgst_amount').notNull().default('0.00'),
-  igstAmount: numeric('igst_amount').notNull().default('0.00'),
-  lineTotal: numeric('line_total').generatedAlwaysAs(
+
+  sgstAmount: real('sgst_amount').notNull().default(0.00),
+
+  cgstAmount: real('cgst_amount').notNull().default(0.00),
+
+  igstAmount: real('igst_amount').notNull().default(0.00),
+
+  lineTotal: real('line_total').generatedAlwaysAs(
     (): SQL => sql`(ROUND((qty * unit_price - discount_amount) + tax_amount, 2))`
   )
 }, (t) => [
   index('sales_invoice_items_sales_invoice_id_idx').on(t.salesInvoiceId),
+
   index('sales_invoice_items_inventory_id_idx').on(t.inventoryId)
 ]);
 

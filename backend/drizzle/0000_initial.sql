@@ -39,12 +39,14 @@ CREATE TABLE `customers` (
 	`name` text(50) NOT NULL,
 	`type` text(25) DEFAULT 'retail' NOT NULL,
 	`gstin` text(25),
+	`pricing_category_id` integer,
 	`billing_address_id` integer,
 	`shipping_address_id` integer,
 	`notes` text(255),
 	`is_active` integer DEFAULT true NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+	FOREIGN KEY (`pricing_category_id`) REFERENCES `pricing_categories`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`billing_address_id`) REFERENCES `addresses`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`shipping_address_id`) REFERENCES `addresses`(`id`) ON UPDATE no action ON DELETE no action,
 	CONSTRAINT "type_must_be_in_list" CHECK("customers"."type" IN ('retail','wholesale'))
@@ -55,25 +57,53 @@ CREATE UNIQUE INDEX `customers_name_unique` ON `customers` (`name`);--> statemen
 CREATE INDEX `customers_billing_address_id_idx` ON `customers` (`billing_address_id`);--> statement-breakpoint
 CREATE INDEX `customers_shipping_address_id_idx` ON `customers` (`shipping_address_id`);--> statement-breakpoint
 CREATE INDEX `cusotomers_gstin_idx` ON `customers` (`gstin`);--> statement-breakpoint
+CREATE INDEX `customers_pricing_category_id_idx` ON `customers` (`pricing_category_id`);--> statement-breakpoint
 CREATE TABLE `inventories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`product_id` integer NOT NULL,
-	`gtn` text(25),
-	`qty_per_unit` text(25),
-	`hsn_sac` text(25),
-	`tax_rate` numeric,
-	`buying_price` numeric,
-	`selling_price` numeric,
-	`units_in_stock` integer,
-	`location` text(255),
+	`gtn` text(25) DEFAULT '' NOT NULL,
+	`qty_per_unit` text(25) DEFAULT '' NOT NULL,
+	`hsn_sac` text(25) DEFAULT '' NOT NULL,
+	`tax_rate` real DEFAULT 0 NOT NULL,
+	`buying_price` real DEFAULT 0 NOT NULL,
+	`selling_price` real DEFAULT 0 NOT NULL,
+	`units_in_stock` integer DEFAULT 0 NOT NULL,
+	`location` text(255) DEFAULT '' NOT NULL,
+	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `inventories_gtn_unique` ON `inventories` (`gtn`);--> statement-breakpoint
 CREATE INDEX `inventories_product_id_idx` ON `inventories` (`product_id`);--> statement-breakpoint
+CREATE TABLE `pricing_categories` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`code` text(20) NOT NULL,
+	`name` text(50) NOT NULL,
+	`description` text(255),
+	`is_active` integer DEFAULT true NOT NULL,
+	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `pricing_categories_code_unique` ON `pricing_categories` (`code`);--> statement-breakpoint
+CREATE UNIQUE INDEX `pricing_categories_name_unique` ON `pricing_categories` (`name`);--> statement-breakpoint
+CREATE TABLE `pricing_category_products` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`pricing_category_id` integer NOT NULL,
+	`product_id` integer NOT NULL,
+	`margin_type` text(25) DEFAULT 'none' NOT NULL,
+	`margin_pct` real DEFAULT 0 NOT NULL,
+	`margin_amount` real DEFAULT 0 NOT NULL,
+	FOREIGN KEY (`pricing_category_id`) REFERENCES `pricing_categories`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE INDEX `pcp_pricing_category_id_idx` ON `pricing_category_products` (`pricing_category_id`);--> statement-breakpoint
+CREATE INDEX `pcp_product_id_idx` ON `pricing_category_products` (`product_id`);--> statement-breakpoint
 CREATE TABLE `product_serial_numbers` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`product_id` integer,
+	`product_id` integer NOT NULL,
 	`prefix` text(50) DEFAULT '' NOT NULL,
 	`current` integer DEFAULT 1 NOT NULL,
 	`length` integer DEFAULT 10 NOT NULL,
@@ -87,10 +117,11 @@ CREATE TABLE `products` (
 	`name` text(50) NOT NULL,
 	`description` text(255),
 	`category_id` integer NOT NULL,
-	`qty_per_unit` text(25),
-	`unit_price` numeric,
-	`hsn_sac` text(25),
-	`tax_rate` numeric,
+	`product_type` text(25) DEFAULT 'simple' NOT NULL,
+	`qty_per_unit` text(25) DEFAULT '1' NOT NULL,
+	`unit_price` real DEFAULT 0 NOT NULL,
+	`hsn_sac` text(25) DEFAULT '' NOT NULL,
+	`tax_rate` real DEFAULT 0 NOT NULL,
 	`gtn_mode` text(25) DEFAULT 'auto' NOT NULL,
 	`gtn_generation` text(25) DEFAULT 'code' NOT NULL,
 	`is_active` integer DEFAULT true NOT NULL,
@@ -108,18 +139,18 @@ CREATE TABLE `purchase_invoice_items` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`purchase_invoice_id` integer NOT NULL,
 	`inventory_id` integer NOT NULL,
-	`qty` numeric DEFAULT '0.000' NOT NULL,
-	`unit_price` numeric DEFAULT '0.00' NOT NULL,
+	`qty` real DEFAULT 0 NOT NULL,
+	`unit_price` real DEFAULT 0 NOT NULL,
 	`discount_type` text(10) DEFAULT 'none' NOT NULL,
-	`discount_pct` numeric DEFAULT '0.00' NOT NULL,
-	`discount_amount` numeric DEFAULT '0.00' NOT NULL,
-	`tax_pct` numeric DEFAULT '0.00' NOT NULL,
-	`tax_amount` numeric GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))) VIRTUAL,
-	`line_total` numeric GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) + tax_amount, 2))) VIRTUAL,
+	`discount_pct` real DEFAULT 0 NOT NULL,
+	`discount_amount` real DEFAULT 0 NOT NULL,
+	`tax_pct` real DEFAULT 0 NOT NULL,
+	`tax_amount` real GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))) VIRTUAL,
+	`line_total` real GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) + tax_amount, 2))) VIRTUAL,
 	`margin_type` text(25) DEFAULT 'none' NOT NULL,
-	`margin_pct` numeric DEFAULT '0' NOT NULL,
-	`margin_amount` numeric DEFAULT '0.00' NOT NULL,
-	`selling_price` numeric DEFAULT '0.00' NOT NULL,
+	`margin_pct` real DEFAULT 0 NOT NULL,
+	`margin_amount` real DEFAULT 0 NOT NULL,
+	`selling_price` real DEFAULT 0 NOT NULL,
 	FOREIGN KEY (`purchase_invoice_id`) REFERENCES `purchase_invoices`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`inventory_id`) REFERENCES `inventories`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -133,14 +164,14 @@ CREATE TABLE `purchase_invoices` (
 	`supplier_id` integer NOT NULL,
 	`ref_number` text(25),
 	`ref_date` text(25),
-	`total_qty` numeric DEFAULT '0.000' NOT NULL,
-	`subtotal` numeric DEFAULT '0.00' NOT NULL,
+	`total_qty` real DEFAULT 0 NOT NULL,
+	`subtotal` real DEFAULT 0 NOT NULL,
 	`discount_type` text(20) DEFAULT 'none' NOT NULL,
-	`discount_pct` numeric DEFAULT '0.00' NOT NULL,
-	`discount_amount` numeric DEFAULT '0.00' NOT NULL,
-	`total_tax_amount` numeric DEFAULT '0.00' NOT NULL,
-	`round_off` numeric DEFAULT '0.00' NOT NULL,
-	`net_amount` numeric GENERATED ALWAYS AS ((ROUND(subtotal - discount_amount + total_tax_amount + round_off, 2))) VIRTUAL,
+	`discount_pct` real DEFAULT 0 NOT NULL,
+	`discount_amount` real DEFAULT 0 NOT NULL,
+	`total_tax_amount` real DEFAULT 0 NOT NULL,
+	`round_off` real DEFAULT 0 NOT NULL,
+	`net_amount` real GENERATED ALWAYS AS ((ROUND(subtotal - discount_amount + total_tax_amount + round_off, 2))) VIRTUAL,
 	FOREIGN KEY (`supplier_id`) REFERENCES `suppliers`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -152,14 +183,17 @@ CREATE TABLE `sales_invoice_items` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`sales_invoice_id` integer NOT NULL,
 	`inventory_id` integer NOT NULL,
-	`qty` numeric DEFAULT '0.000' NOT NULL,
-	`unit_price` numeric DEFAULT '0.00' NOT NULL,
+	`qty` real DEFAULT 0 NOT NULL,
+	`unit_price` real DEFAULT 0 NOT NULL,
 	`discount_type` text(10) DEFAULT 'none' NOT NULL,
-	`discount_pct` numeric DEFAULT '0.00' NOT NULL,
-	`discount_amount` numeric DEFAULT '0.00' NOT NULL,
-	`tax_pct` numeric DEFAULT '0.00' NOT NULL,
-	`tax_amount` numeric GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))) VIRTUAL,
-	`line_total` numeric GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) + tax_amount, 2))) VIRTUAL,
+	`discount_pct` real DEFAULT 0 NOT NULL,
+	`discount_amount` real DEFAULT 0 NOT NULL,
+	`tax_pct` real DEFAULT 0 NOT NULL,
+	`tax_amount` real GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))) VIRTUAL,
+	`sgst_amount` real DEFAULT 0 NOT NULL,
+	`cgst_amount` real DEFAULT 0 NOT NULL,
+	`igst_amount` real DEFAULT 0 NOT NULL,
+	`line_total` real GENERATED ALWAYS AS ((ROUND((qty * unit_price - discount_amount) + tax_amount, 2))) VIRTUAL,
 	FOREIGN KEY (`sales_invoice_id`) REFERENCES `sales_invoices`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`inventory_id`) REFERENCES `inventories`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -170,18 +204,18 @@ CREATE TABLE `sales_invoices` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`invoice_number` text(25) NOT NULL,
 	`invoice_date` text(25) NOT NULL,
+	`type` text(20) DEFAULT 'invoice' NOT NULL,
 	`customer_id` integer NOT NULL,
 	`ref_number` text(25),
 	`ref_date` text(25),
-	`total_qty` numeric DEFAULT '0.000' NOT NULL,
-	`subtotal` numeric DEFAULT '0.00' NOT NULL,
+	`total_qty` real DEFAULT 0 NOT NULL,
+	`subtotal` real DEFAULT 0 NOT NULL,
 	`discount_type` text(20) DEFAULT 'none' NOT NULL,
-	`discount_pct` numeric DEFAULT '0.00' NOT NULL,
-	`discount_amount` numeric DEFAULT '0.00' NOT NULL,
-	`tax_pct` numeric DEFAULT '0.00' NOT NULL,
-	`tax_amount` numeric GENERATED ALWAYS AS ((ROUND((subtotal - discount_amount) * tax_pct / 100, 2))) VIRTUAL,
-	`round_off` numeric DEFAULT '0.00' NOT NULL,
-	`net_amount` numeric GENERATED ALWAYS AS ((ROUND(subtotal - discount_amount + tax_amount + round_off, 2))) VIRTUAL,
+	`discount_pct` real DEFAULT 0 NOT NULL,
+	`discount_amount` real DEFAULT 0 NOT NULL,
+	`total_tax_amount` real DEFAULT 0 NOT NULL,
+	`round_off` real DEFAULT 0 NOT NULL,
+	`net_amount` real GENERATED ALWAYS AS ((ROUND(subtotal - discount_amount + total_tax_amount + round_off, 2))) VIRTUAL,
 	`irn` text(64),
 	`ack_no` text(20),
 	`ack_date` text(50),
@@ -215,13 +249,13 @@ CREATE TABLE `stock_invoice_items` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`stock_invoice_id` integer NOT NULL,
 	`inventory_id` integer NOT NULL,
-	`qty` numeric DEFAULT '1' NOT NULL,
-	`unit_price` numeric DEFAULT '0.00' NOT NULL,
-	`line_total` numeric GENERATED ALWAYS AS ((ROUND(qty * unit_price, 2))) VIRTUAL,
+	`qty` real DEFAULT 1 NOT NULL,
+	`unit_price` real DEFAULT 0 NOT NULL,
+	`line_total` real GENERATED ALWAYS AS ((ROUND(qty * unit_price, 2))) VIRTUAL,
 	`margin_type` text(25) DEFAULT 'none' NOT NULL,
-	`margin_pct` numeric DEFAULT '0' NOT NULL,
-	`margin_amount` numeric DEFAULT '0.00' NOT NULL,
-	`selling_price` numeric DEFAULT '0.00' NOT NULL,
+	`margin_pct` real DEFAULT 0 NOT NULL,
+	`margin_amount` real DEFAULT 0 NOT NULL,
+	`selling_price` real DEFAULT 0 NOT NULL,
 	FOREIGN KEY (`stock_invoice_id`) REFERENCES `stock_invoices`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`inventory_id`) REFERENCES `inventories`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -232,8 +266,8 @@ CREATE TABLE `stock_invoices` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`invoice_number` text(20) NOT NULL,
 	`invoice_date` text(20) NOT NULL,
-	`total_qty` numeric DEFAULT '0.000' NOT NULL,
-	`total_amount` numeric DEFAULT '0.00' NOT NULL
+	`total_qty` real DEFAULT 0 NOT NULL,
+	`total_amount` real DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `stock_invoices_invoice_number_unique` ON `stock_invoices` (`invoice_number`);--> statement-breakpoint
@@ -254,6 +288,7 @@ CREATE TABLE `suppliers` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text(20) NOT NULL,
 	`name` text(50) NOT NULL,
+	`type` text DEFAULT 'supplier' NOT NULL,
 	`gstin` text(25),
 	`billing_address_id` integer,
 	`shipping_address_id` integer,
@@ -284,4 +319,24 @@ CREATE TABLE `users` (
 	CONSTRAINT "role_must_be_in_list" CHECK("users"."role" IN ('user', 'salesperson', 'manager', 'admin'))
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);
+CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);--> statement-breakpoint
+CREATE TABLE `inventory_logs` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`product_id` integer NOT NULL,
+	`gtn` text(25) DEFAULT '' NOT NULL,
+	`change_qty` real DEFAULT 0 NOT NULL,
+	`direction` text NOT NULL,
+	`type` text NOT NULL,
+	`ref_id` integer NOT NULL,
+	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `product_bundles` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`bundle_product_id` integer NOT NULL,
+	`product_id` integer NOT NULL,
+	`quantity` integer DEFAULT 1 NOT NULL,
+	FOREIGN KEY (`bundle_product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
+);

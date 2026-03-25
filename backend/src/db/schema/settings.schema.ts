@@ -2,9 +2,16 @@ import { integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core
 
 // This table can be used to store application-wide settings or configurations. Each setting has a unique key and a corresponding value.
 export const settings = sqliteTable('settings', {
-  id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
-  key: text('key', { length: 50 }).notNull(),
-  value: text('value', { length: 255 }).notNull().default('')
+  id: integer('id')
+    .primaryKey({ autoIncrement: true })
+    .notNull(),
+
+  key: text('key', { length: 50 })
+    .notNull(),
+
+  value: text('value', { length: 255 })
+    .notNull()
+    .default('')
 }, (t) => [
   uniqueIndex('settings_key_unique').on(t.key)
 ]);
