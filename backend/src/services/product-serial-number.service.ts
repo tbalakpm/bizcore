@@ -17,7 +17,8 @@ const MODES = {
 const SERIAL_TYPES = {
   code: 'code',
   batch: 'batch',
-  tag: 'tag'
+  tag: 'tag',
+  manual: 'manual'
 } as const;
 
 export type ProductSerialMode = (typeof MODES)[keyof typeof MODES];
@@ -44,7 +45,7 @@ export const productSerialNumberService = {
   modes: MODES,
   serialTypes: SERIAL_TYPES,
 
-  generateGtn: async (productId: number, tx: DbTransaction): Promise<string> => {
+  resolveGtnConfiguration: async (productId: number, tx: DbTransaction): Promise<{ mode: ProductSerialMode, generation: ProductSerialType }> => {
     const product = await tx.select().from(products).where(eq(products.id, productId)).get();
     if (!product) throw new Error(`Product not found: ${productId}`);
 
@@ -57,29 +58,49 @@ export const productSerialNumberService = {
       const settingsMap = new Map(globalSettings.map(s => [s.key, s.value]));
 
       const globalUseGtn = settingsMap.get('use_global_gtn');
-      if (globalUseGtn === 'false') return '';
+      if (globalUseGtn === 'false') {
+        return { mode: 'manual', generation: 'manual' };
+      }
 
       gtnMode = (settingsMap.get('gtn_mode') || 'auto') as ProductSerialMode;
       gtnGeneration = (settingsMap.get('gtn_generation') || 'code') as ProductSerialType;
     }
 
-    if (gtnMode === 'manual') return '';
+    // Map 'global' value to actual defaults if necessary, though the logic above should have handled it if useGlobal is true.
+    // However, if useGlobal is false but the product fields are still 'global' (unlikely but possible), we should handle it.
+    if (gtnMode === 'global') gtnMode = 'auto';
+    if (gtnGeneration === 'global') gtnGeneration = 'code';
 
-    const genType = (gtnGeneration || 'code').toLowerCase();
+    return {
+      mode: gtnMode as ProductSerialMode,
+      generation: gtnGeneration as ProductSerialType
+    };
+  },
+
+  generateGtn: async (productId: number, tx: DbTransaction): Promise<string> => {
+    const config = await productSerialNumberService.resolveGtnConfiguration(productId, tx);
+
+    if (config.mode === 'manual') return '';
+
+    const genType = config.generation.toLowerCase();
 
     if (genType === 'code') {
-      return product.code;
+      const product = await tx.select().from(products).where(eq(products.id, productId)).get();
+      return product?.code || '';
     }
 
     if (genType === 'batch' || genType === 'tag') {
-      if (useGlobal) {
+      const product = await tx.select().from(products).where(eq(products.id, productId)).get();
+      if (!product) throw new Error(`Product not found: ${productId}`);
+
+      if (product.useGlobal) {
         // Use global sequence 'gtn' from serial_numbers table
         return await serialNumberService.generateNextNumberInTransaction('gtn', tx);
       } else {
         // Use product specific sequence from product_serial_numbers table
         return await productSerialNumberService.generateInTransaction({
           productId,
-          mode: gtnMode as ProductSerialMode,
+          mode: config.mode,
           serialType: genType as ProductSerialType,
           tx: tx,
           date: new Date()

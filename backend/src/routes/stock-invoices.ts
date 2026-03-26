@@ -88,7 +88,8 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
           .run();
       } else {
         // Auto GTN Generation logic
-        const genType = (product.gtnGeneration || 'CODE').toUpperCase();
+        const gtnConfig = await productSerialNumberService.resolveGtnConfiguration(product.id, tx);
+        const genType = gtnConfig.generation.toUpperCase();
 
         if (genType === 'TAG') {
           // TAG: Each quantity gets a distinct inventory row with qty 1

@@ -318,11 +318,17 @@ export function renderTotals(
       table: {
         headerRows: 1,
         widths: isIgst ? ['auto', 'auto', 'auto'] : ['auto', 'auto', 'auto', 'auto'],
-        body: [headerRow, ...hsnBody]
+        body: [headerRow, ...hsnBody],
+        lineWidth: 0.5,
+        lineColor: '#CCCCCC'
       },
       // layout: 'lightHorizontalLines',
+      layout: {
+        lineWidth: 0.5,
+        lineColor: '#CCCCCC'
+      },
       fontSize: 8,
-      margin: [0, 0, 10, 0]
+      margin: [0, 0, 10, 0],
     };
   }
 

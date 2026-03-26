@@ -200,7 +200,8 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
         }
       } else {
         // Auto GTN
-        const genType = (product.gtnGeneration || 'CODE').toUpperCase();
+        const gtnConfig = await productSerialNumberService.resolveGtnConfiguration(product.id, tx);
+        const genType = gtnConfig.generation.toUpperCase();
         if (genType === 'TAG') {
           for (let i = 0; i < qty; i++) {
             const generatedGtn = await productSerialNumberService.generateGtn(product.id, tx);
