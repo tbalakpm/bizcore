@@ -177,7 +177,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
         if (inv) {
           const updateData: any = { unitsInStock: (inv.unitsInStock || 0) + qty };
           if (item.sellingPrice !== undefined && item.sellingPrice !== null) {
-              updateData.sellingPrice = toNumber(item.sellingPrice);
+            updateData.sellingPrice = toNumber(item.sellingPrice);
           }
           await tx.update(inventories).set(updateData).where(eq(inventories.id, inv.id)).run();
           inventoryId = inv.id;
@@ -185,15 +185,15 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
           const newInv = await tx
             .insert(inventories)
             .values({
-                productId: product.id,
-                gtn: item.gtn,
-                qtyPerUnit: product.qtyPerUnit,
-                hsnSac: item.hsnSac || product.hsnSac,
-                taxRate: toNumber(item.taxPct) || product.taxRate,
-                buyingPrice: toNumber(unitPrice) || product.unitPrice,
-                sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : undefined,
-                unitsInStock: toNumber(qty),
-              })
+              productId: product.id,
+              gtn: item.gtn,
+              qtyPerUnit: product.qtyPerUnit,
+              hsnSac: item.hsnSac || product.hsnSac,
+              taxRate: toNumber(item.taxPct) || product.taxRate,
+              buyingPrice: toNumber(unitPrice) || product.unitPrice,
+              sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : undefined,
+              unitsInStock: toNumber(qty),
+            })
             .returning({ id: inventories.id })
             .get();
           inventoryId = newInv.id;
@@ -276,7 +276,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
       if (existing) {
         const updateData: any = { unitsInStock: (existing.unitsInStock || 0) + qty };
         if (item.sellingPrice !== undefined && item.sellingPrice !== null) {
-            updateData.sellingPrice = toNumericString(item.sellingPrice);
+          updateData.sellingPrice = toNumericString(item.sellingPrice);
         }
         await tx.update(inventories)
           .set(updateData)
@@ -347,8 +347,8 @@ purchaseInvoicesRouter.post('/', async (req, res) => {
       await tx
         .update(purchaseInvoices)
         .set({
-          totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
-          subtotal: toNumericString(body.subtotal) ?? toNumericString(totals.subtotal),
+          totalQty: toNumber(body.totalQty) ?? toNumber(totals.totalQty),
+          subtotal: toNumber(body.subtotal) ?? toNumber(totals.subtotal),
         })
         .where(eq(purchaseInvoices.id, invoice.id))
         .run();

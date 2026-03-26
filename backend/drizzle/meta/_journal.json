@@ -8,6 +8,13 @@
       "when": 1774409470924,
       "tag": "0000_initial",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1774444756475,
+      "tag": "0001_global-gtn-settings",
+      "breakpoints": true
     }
   ]
 }

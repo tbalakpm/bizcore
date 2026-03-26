@@ -7,7 +7,7 @@ import { serialNumberService } from '../services/serial-number.service';
 import type { DbTransaction } from '../shared/serial-number.shared';
 import { normalizeDate } from '../utils/date.util';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
-import { toNumericString, toPositiveNumber } from '../utils/number.util';
+import { toPositiveNumber, toNumber } from '../utils/number.util';
 
 export const salesInvoicesRouter = express.Router();
 
@@ -74,15 +74,15 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
       .values({
         salesInvoiceId,
         inventoryId,
-        qty: toNumericString(qty),
-        unitPrice: toNumericString(unitPrice),
+        qty: toNumber(qty),
+        unitPrice: toNumber(unitPrice),
         discountType: item.discountType,
-        discountPct: toNumericString(item.discountPct),
-        discountAmount: toNumericString(item.discountAmount),
-        taxPct: toNumericString(item.taxPct),
-        sgstAmount: toNumericString(sgst),
-        cgstAmount: toNumericString(cgst),
-        igstAmount: toNumericString(igst),
+        discountPct: toNumber(item.discountPct),
+        discountAmount: toNumber(item.discountAmount),
+        taxPct: toNumber(item.taxPct),
+        sgstAmount: toNumber(sgst),
+        cgstAmount: toNumber(cgst),
+        igstAmount: toNumber(igst),
       })
       .run();
 
@@ -127,7 +127,7 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
     }
 
     if (req.query.type) {
-      filters.push(eq(salesInvoices.type, req.query.type as string));
+      filters.push(eq(salesInvoices.type, req.query.type as any));
     }
 
     if (req.query.minAmount) {
@@ -288,13 +288,13 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
           customerId: body.customerId!,
           refNumber: body.refNumber,
           refDate: body.refDate ? normalizeDate(body.refDate) : null,
-          totalQty: toNumericString(body.totalQty) ?? '0',
-          subtotal: toNumericString(body.subtotal) ?? '0',
+          totalQty: toNumber(body.totalQty) ?? 0,
+          subtotal: toNumber(body.subtotal) ?? 0,
           discountType: body.discountType,
-          discountPct: toNumericString(body.discountPct),
-          discountAmount: toNumericString(body.discountAmount),
-          totalTaxAmount: toNumericString(body.totalTaxAmount),
-          roundOff: toNumericString(body.roundOff) ?? '0',
+          discountPct: toNumber(body.discountPct),
+          discountAmount: toNumber(body.discountAmount),
+          totalTaxAmount: toNumber(body.totalTaxAmount),
+          roundOff: toNumber(body.roundOff) ?? 0,
         })
         .returning()
         .get();
@@ -305,9 +305,9 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
       await tx
         .update(salesInvoices)
         .set({
-          totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
-          subtotal: toNumericString(body.subtotal) ?? toNumericString(totals.subtotal),
-          discountAmount: toNumericString(body.discountAmount) ?? toNumericString(totals.totalDiscount),
+          totalQty: toNumber(body.totalQty) ?? toNumber(totals.totalQty),
+          subtotal: toNumber(body.subtotal) ?? toNumber(totals.subtotal),
+          discountAmount: toNumber(body.discountAmount) ?? toNumber(totals.totalDiscount),
         })
         .where(eq(salesInvoices.id, insertedInvoice.id))
         .run();
@@ -382,13 +382,13 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
           customerId: body.customerId ?? existing.customerId,
           refNumber: body.refNumber ?? existing.refNumber,
           refDate: body.refDate ? normalizeDate(body.refDate) : existing.refDate,
-          totalQty: toNumericString(body.totalQty) ?? toNumericString(totals.totalQty),
-          subtotal: toNumericString(body.subtotal) ?? toNumericString(totals.subtotal),
+          totalQty: toNumber(body.totalQty) ?? toNumber(totals.totalQty),
+          subtotal: toNumber(body.subtotal) ?? toNumber(totals.subtotal),
           discountType: body.discountType ?? existing.discountType,
-          discountPct: toNumericString(body.discountPct) ?? existing.discountPct,
-          discountAmount: toNumericString(body.discountAmount) ?? toNumericString(totals.totalDiscount),
-          totalTaxAmount: toNumericString(body.totalTaxAmount) ?? existing.totalTaxAmount,
-          roundOff: toNumericString(body.roundOff) ?? existing.roundOff,
+          discountPct: toNumber(body.discountPct) ?? existing.discountPct,
+          discountAmount: toNumber(body.discountAmount) ?? toNumber(totals.totalDiscount),
+          totalTaxAmount: toNumber(body.totalTaxAmount) ?? existing.totalTaxAmount,
+          roundOff: toNumber(body.roundOff) ?? existing.roundOff,
         })
         .where(eq(salesInvoices.id, id))
         .run();

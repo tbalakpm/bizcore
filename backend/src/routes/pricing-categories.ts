@@ -4,6 +4,7 @@ import express, { type Request, type Response } from 'express';
 import { db } from '../db';
 import { pricingCategories, pricingCategoryProducts, products } from '../db/schema';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
+import { toNumber } from '../utils/number.util';
 
 export const pricingCategoriesRouter = express.Router();
 
@@ -18,11 +19,11 @@ pricingCategoriesRouter.get('/', async (req: Request, res: Response) => {
 
     const pagination = hasPaginationQuery
       ? parsePagination({
-          limit: req.query.limit as string | undefined,
-          offset: req.query.offset as string | undefined,
-          page: req.query.page as string | undefined,
-          pageNum: req.query.pageNum as string | undefined,
-        })
+        limit: req.query.limit as string | undefined,
+        offset: req.query.offset as string | undefined,
+        page: req.query.page as string | undefined,
+        pageNum: req.query.pageNum as string | undefined,
+      })
       : undefined;
 
     const filters: SQL[] = [];
@@ -67,11 +68,11 @@ pricingCategoriesRouter.get('/', async (req: Request, res: Response) => {
     const whereCondition = filters.length > 0 ? and(...filters) : undefined;
     const filteredCount = whereCondition
       ? (
-          await db
-            .select({ count: sql<number>`cast(count(*) as integer)` })
-            .from(pricingCategories)
-            .where(whereCondition)
-        )[0].count
+        await db
+          .select({ count: sql<number>`cast(count(*) as integer)` })
+          .from(pricingCategories)
+          .where(whereCondition)
+      )[0].count
       : countResult[0].count;
 
     const orderedQuery = query.orderBy(...orderBy);
@@ -193,15 +194,15 @@ pricingCategoriesRouter.put('/:id/products', async (req: Request, res: Response)
   await db.delete(pricingCategoryProducts).where(eq(pricingCategoryProducts.pricingCategoryId, pricingCategoryId)).run();
 
   if (items.length > 0) {
-    await db.insert(pricingCategoryProducts).values(
+    await (db.insert(pricingCategoryProducts).values(
       items.map((item) => ({
         pricingCategoryId,
         productId: item.productId,
-        marginType: item.marginType || 'none',
-        marginPct: item.marginPct || '0',
-        marginAmount: item.marginAmount || '0.00',
+        marginType: (item.marginType || 'none') as any,
+        marginPct: toNumber(item.marginPct) || 0,
+        marginAmount: toNumber(item.marginAmount) || 0.00,
       }))
-    ).run();
+    ) as any).run();
   }
 
   res.json({ success: true });

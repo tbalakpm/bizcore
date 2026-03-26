@@ -125,9 +125,7 @@
 
     <div class="flex flex-col col-span-full">
       <div class="flex items-center gap-2 mt-2 mb-2 pt-4 border-t border-surface-muted">
-        <h3 class="font-medium m-0">
-          Goods Tracking Number (GTN) Setup
-        </h3>
+        <h3 class="font-medium m-0">Goods Tracking Number (GTN) Setup</h3>
         <div class="flex items-center gap-2 ml-4">
           <nz-switch [(ngModel)]="product.useGlobal" name="productUseGlobal"></nz-switch>
           <span class="text-xs text-text-muted">Use Global Settings</span>
@@ -136,101 +134,103 @@
 
       @if (!product.useGlobal) {
         <div class="grid grid-cols-5 gap-2">
-        <nz-form-item>
-          <nz-form-label
-            >GTN Mode
-            <nz-icon
-              nz-tooltip
-              [nzTooltipTitle]="
-                product.gtnMode === 'manual'
-                  ? 'GTN will be entered manually during transactions.'
-                  : 'GTN will be auto-generated based on the method below.'
-              "
-              nzType="info-circle"
-              nzTheme="outline"
-              class="ml-2"
-          /></nz-form-label>
-          <nz-form-control>
-            <nz-select [(ngModel)]="product.gtnMode" name="productGtnMode">
-              <nz-option nzValue="auto" nzLabel="Auto (System Generated)"></nz-option>
-              <nz-option nzValue="manual" nzLabel="Manual (User Provided)"></nz-option>
-            </nz-select>
-          </nz-form-control>
-          <!-- <span class="text-xs text-text-muted mt-1 mb-0!">
+          <nz-form-item>
+            <nz-form-label
+              >GTN Mode
+              <nz-icon
+                nz-tooltip
+                [nzTooltipTitle]="
+                  product.gtnMode === 'manual'
+                    ? 'GTN will be entered manually during transactions.'
+                    : 'GTN will be auto-generated based on the method below.'
+                "
+                nzType="info-circle"
+                nzTheme="outline"
+                class="ml-2"
+            /></nz-form-label>
+            <nz-form-control>
+              <nz-select [(ngModel)]="product.gtnMode" name="productGtnMode">
+                <!-- <nz-option nzValue="global" nzLabel="Global Settings"></nz-option> -->
+                <nz-option nzValue="auto" nzLabel="Auto (System Generated)"></nz-option>
+                <nz-option nzValue="manual" nzLabel="Manual (User Provided)"></nz-option>
+              </nz-select>
+            </nz-form-control>
+            <!-- <span class="text-xs text-text-muted mt-1 mb-0!">
             @if (product.gtnMode === 'manual') {
               GTN will be entered manually during transactions.
             } @else {
               GTN will be auto-generated based on the method below.
             }
           </span> -->
-        </nz-form-item>
-        <!-- </div> -->
+          </nz-form-item>
+          <!-- </div> -->
 
-        @if (!product.gtnMode || product.gtnMode === 'auto') {
-          <!-- <div class="col-span-12 md:col-span-6"> -->
-          <nz-form-item>
-            <nz-form-label>GTN Generation</nz-form-label>
-            <nz-form-control>
-              <nz-select [(ngModel)]="product.gtnGeneration" name="productGtnGeneration">
-                <nz-option nzValue="code" nzLabel="Product Code (default)"></nz-option>
-                <nz-option nzValue="batch" nzLabel="Batch Level (same GTN per lot)"></nz-option>
-                <nz-option nzValue="tag" nzLabel="Tag Level (unique GTN per item)"></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-          <!-- </div> -->
-        }
+          @if (!product.gtnMode || product.gtnMode === 'auto') {
+            <!-- <div class="col-span-12 md:col-span-6"> -->
+            <nz-form-item>
+              <nz-form-label>GTN Generation</nz-form-label>
+              <nz-form-control>
+                <nz-select [(ngModel)]="product.gtnGeneration" name="productGtnGeneration">
+                  <!-- <nz-option nzValue="global" nzLabel="Global Settings"></nz-option> -->
+                  <nz-option nzValue="code" nzLabel="Product Code (default)"></nz-option>
+                  <nz-option nzValue="batch" nzLabel="Batch Level (same GTN per lot)"></nz-option>
+                  <nz-option nzValue="tag" nzLabel="Tag Level (unique GTN per item)"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+            <!-- </div> -->
+          }
 
-        @if (
-          product.gtnMode !== 'manual' &&
-          (product.gtnGeneration === 'batch' || product.gtnGeneration === 'tag')
-        ) {
-          <!-- <div class="col-span-12 md:col-span-4"> -->
-          <nz-form-item>
-            <nz-form-label>Batch/Tag Prefix</nz-form-label>
-            <nz-form-control>
-              <input
-                nz-input
-                type="text"
-                [(ngModel)]="product.gtnPrefix"
-                name="productGtnPrefix"
-                placeholder="e.g. BATCH- or TAG-"
-              />
-            </nz-form-control>
-          </nz-form-item>
-          <!-- </div> -->
-          <!-- <div class="col-span-12 md:col-span-4"> -->
-          <nz-form-item>
-            <nz-form-label>Start Sequence</nz-form-label>
-            <nz-form-control>
-              <nz-input-number
-                [(ngModel)]="product.gtnStartPos"
-                name="productGtnStartPos"
-                [nzStep]="1"
-                nzPlaceHolder="1"
-                class="w-full"
-              ></nz-input-number>
-            </nz-form-control>
-          </nz-form-item>
-          <!-- </div> -->
-          <!-- <div class="col-span-12 md:col-span-4"> -->
-          <nz-form-item>
-            <nz-form-label>GTN Length</nz-form-label>
-            <nz-form-control>
-              <nz-input-number
-                [(ngModel)]="product.gtnLength"
-                name="productGtnLength"
-                [nzStep]="1"
-                nzPlaceHolder="10"
-                class="w-full"
-              ></nz-input-number>
-            </nz-form-control>
-          </nz-form-item>
-          <!-- </div> -->
-        }
-      </div>
-    }
-  </div>
+          @if (
+            product.gtnMode !== 'manual' &&
+            (product.gtnGeneration === 'batch' || product.gtnGeneration === 'tag')
+          ) {
+            <!-- <div class="col-span-12 md:col-span-4"> -->
+            <nz-form-item>
+              <nz-form-label>Batch/Tag Prefix</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  type="text"
+                  [(ngModel)]="product.gtnPrefix"
+                  name="productGtnPrefix"
+                  placeholder="e.g. BATCH- or TAG-"
+                />
+              </nz-form-control>
+            </nz-form-item>
+            <!-- </div> -->
+            <!-- <div class="col-span-12 md:col-span-4"> -->
+            <nz-form-item>
+              <nz-form-label>Start Sequence</nz-form-label>
+              <nz-form-control>
+                <nz-input-number
+                  [(ngModel)]="product.gtnStartPos"
+                  name="productGtnStartPos"
+                  [nzStep]="1"
+                  nzPlaceHolder="1"
+                  class="w-full"
+                ></nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+            <!-- </div> -->
+            <!-- <div class="col-span-12 md:col-span-4"> -->
+            <nz-form-item>
+              <nz-form-label>GTN Length</nz-form-label>
+              <nz-form-control>
+                <nz-input-number
+                  [(ngModel)]="product.gtnLength"
+                  name="productGtnLength"
+                  [nzStep]="1"
+                  nzPlaceHolder="10"
+                  class="w-full"
+                ></nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+            <!-- </div> -->
+          }
+        </div>
+      }
+    </div>
 
     <!-- Actions -->
     <div class="flex col-span-full justify-end gap-3">

@@ -121,16 +121,20 @@
               <div class="flex flex-row gap-1">
                 @if (p.gtnMode === 'manual') {
                   <nz-tag nzColor="warning">Manual</nz-tag>
-                } @else {
+                } @else if (p.gtnMode === 'auto') {
                   <nz-tag nzColor="success">Auto</nz-tag>
+                } @else {
+                  <nz-tag nzColor="default">Global</nz-tag>
                 }
                 @if (p.gtnMode !== 'manual') {
                   @if (p.gtnGeneration === 'batch') {
                     <nz-tag nzColor="processing">Batch</nz-tag>
                   } @else if (p.gtnGeneration === 'tag') {
                     <nz-tag nzColor="purple">Tag</nz-tag>
-                  } @else {
+                  } @else if (p.gtnGeneration === 'code') {
                     <nz-tag nzColor="success">Code</nz-tag>
+                  } @else {
+                    <nz-tag nzColor="default">Global</nz-tag>
                   }
                 }
               </div>
