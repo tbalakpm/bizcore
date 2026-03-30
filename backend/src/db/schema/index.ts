@@ -27,3 +27,6 @@ export { purchaseInvoiceItems } from './purchase-invoice-items.schema';
 
 export { supplierBanks } from './supplier-bank.schema';
 export type { SupplierBank, NewSupplierBank } from './supplier-bank.schema';
+
+export { productBundles } from './product-bundles.schema';
+export type { ProductBundle } from './product-bundles.schema';

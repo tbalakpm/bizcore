@@ -55,6 +55,7 @@
     "NO_USERS_YET": "No users yet"
   },
   "ADDRESS": {
+    "TITLE": "Address",
     "BILLING": "Billing Address",
     "SHIPPING": "Shipping Address",
     "LINE1": "Address Line 1",

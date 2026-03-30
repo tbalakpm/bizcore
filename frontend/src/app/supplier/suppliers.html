@@ -49,7 +49,11 @@
         <nz-form-item>
           <nz-form-label>{{ 'TYPE' | translate }}</nz-form-label>
           <nz-form-control>
-            <nz-select [(ngModel)]="editingSupplier.type" name="newSupplierType" nzPlaceHolder="Select type">
+            <nz-select
+              [(ngModel)]="editingSupplier.type"
+              name="newSupplierType"
+              nzPlaceHolder="Select type"
+            >
               <nz-option nzValue="supplier" [nzLabel]="'Supplier'"></nz-option>
               <nz-option nzValue="weaver" [nzLabel]="'Weaver'"></nz-option>
             </nz-select>
@@ -95,27 +99,27 @@
 
         <!-- Addresses -->
         <div class="col-span-full">
-          <div class="flex items-center gap-2 mb-2">
+          <!-- <div class="flex items-center gap-2 mb-2">
             <label nz-checkbox [(ngModel)]="sameAsBilling" name="sameAsBilling">
               {{ 'ADDRESS.SAME_AS_BILLING' | translate }}
             </label>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <app-address-form
-              [address]="editingSupplier.billingAddress!"
-              [title]="'ADDRESS.BILLING'"
-              [isExpandable]="true"
-              [isOpen]="false"
-            ></app-address-form>
-            @if (!sameAsBilling) {
+          </div> -->
+          <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> -->
+          <app-address-form
+            [address]="editingSupplier.billingAddress!"
+            [title]="'ADDRESS.TITLE'"
+            [isExpandable]="true"
+            [isOpen]="false"
+          ></app-address-form>
+          <!-- @if (!sameAsBilling) {
               <app-address-form
                 [address]="editingSupplier.shippingAddress!"
                 [title]="'ADDRESS.SHIPPING'"
                 [isExpandable]="true"
                 [isOpen]="false"
               ></app-address-form>
-            }
-          </div>
+            } -->
+          <!-- </div> -->
         </div>
 
         <!-- Bank Accounts -->

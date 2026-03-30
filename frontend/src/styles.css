@@ -183,3 +183,6 @@ body {
   font-weight: 600;
 }
 
+.ant-switch-checked {
+  background-color: var(--color-primary);
+}

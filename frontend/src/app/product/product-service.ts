@@ -23,6 +23,13 @@ export interface Product {
   // unitsInStock?: number;
   categoryName?: string;
   isActive: boolean;
+  productType?: 'simple' | 'bundle';
+  bundleItems?: {
+    id?: number;
+    productId: number;
+    quantity: number;
+    productName?: string; // For display
+  }[];
 }
 
 export interface ProductList {

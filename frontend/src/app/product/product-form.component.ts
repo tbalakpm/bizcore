@@ -14,6 +14,8 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { NzTableModule } from 'ng-zorro-antd/table';
 
 @Component({
   selector: 'app-product-form',
@@ -21,7 +23,7 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
     FormsModule, CommonModule, TranslatePipe,
     NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
     NzAlertModule, NzIconModule, NzInputNumberModule, NzTooltipModule,
-    NzSwitchModule
+    NzSwitchModule, NzRadioModule, NzTableModule
   ],
   templateUrl: './product-form.component.html',
 })
@@ -41,11 +43,13 @@ export class ProductFormComponent implements OnInit, OnChanges {
   categories = signal<Category[]>([]);
   loading = false;
   error: string | null = null;
+  productList = signal<Product[]>([]);
 
   product: Partial<Product> = this.blankProduct();
 
   ngOnInit(): void {
     this.categoryService.getAll().subscribe((res) => this.categories.set(res.data));
+    this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
     this.loadProduct();
   }
 
@@ -98,6 +102,19 @@ export class ProductFormComponent implements OnInit, OnChanges {
     this.product = this.blankProduct();
     this.cancelled.emit();
   }
+  
+  addBundleItem(): void {
+    if (!this.product.bundleItems) {
+      this.product.bundleItems = [];
+    }
+    this.product.bundleItems = [...this.product.bundleItems, { productId: 0, quantity: 1 }];
+  }
+
+  removeBundleItem(index: number): void {
+    if (this.product.bundleItems) {
+      this.product.bundleItems = this.product.bundleItems.filter((_, i) => i !== index);
+    }
+  }
 
   private blankProduct(): Partial<Product> {
     return {
@@ -117,6 +134,8 @@ export class ProductFormComponent implements OnInit, OnChanges {
       gtnLength: 10,
       useGlobal: true,
       isActive: true,
+      productType: 'simple',
+      bundleItems: [],
     };
   }
 }

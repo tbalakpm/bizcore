@@ -319,13 +319,33 @@ export function renderTotals(
         headerRows: 1,
         widths: isIgst ? ['auto', 'auto', 'auto'] : ['auto', 'auto', 'auto', 'auto'],
         body: [headerRow, ...hsnBody],
-        lineWidth: 0.5,
-        lineColor: '#CCCCCC'
+        // lineWidth: 0.5,
+        // lineColor: '#CCCCCC'
+        // borderColor: ['#ff00ff', '#00ffff', '#ff00ff', '#00ffff']
       },
       // layout: 'lightHorizontalLines',
       layout: {
-        lineWidth: 0.5,
-        lineColor: '#CCCCCC'
+        hLineWidth: function (i: number, node: any) {
+          return 0.5; //(i === 0 || i === node.table.body.length) ? 0 : 0.5;
+        },
+        vLineWidth: function () {
+          return 0;
+        },
+        hLineColor: function () {
+          return '#CCCCCC';
+        },
+        // paddingLeft: function () {
+        //   return 2;
+        // },
+        // paddingRight: function () {
+        //   return 2;
+        // },
+        // paddingTop: function () {
+        //   return 2;
+        // },
+        // paddingBottom: function () {
+        //   return 2;
+        // }
       },
       fontSize: 8,
       margin: [0, 0, 10, 0],

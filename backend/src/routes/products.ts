@@ -1,7 +1,7 @@
 import { and, eq, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
-import { categories, db, products, productSerialNumbers } from '../db';
+import { categories, db, products, productSerialNumbers, productBundles } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 
 export const productsRouter = express.Router();
@@ -141,6 +141,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
         useGlobal: products.useGlobal,
         //unitsInStock: products.unitsInStock,
         isActive: products.isActive,
+        productType: products.productType,
         createdAt: products.createdAt,
         updatedAt: products.updatedAt,
       })
@@ -205,11 +206,25 @@ productsRouter.get('/:id', async (req, res) => {
   // Also fetch serial number config so the frontend can pre-populate gtnPrefix/gtnStartPos/gtnLength
   const serial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).get();
 
+  // Fetch bundle items if productType is 'bundle'
+  let bundleItems: { id: number; productId: number; quantity: number }[] = [];
+  if (product.productType === 'bundle') {
+    bundleItems = await db.select({
+      id: productBundles.id,
+      productId: productBundles.productId,
+      quantity: productBundles.quantity,
+    })
+      .from(productBundles)
+      .where(eq(productBundles.bundleProductId, id))
+      .all();
+  }
+
   res.json({
     ...product,
     gtnPrefix: serial?.prefix ?? '',
     gtnStartPos: serial?.current ?? 1,
     gtnLength: serial?.length ?? 10,
+    bundleItems,
   });
 });
 
@@ -230,6 +245,8 @@ productsRouter.post('/', async (req, res) => {
     gtnLength,
     useGlobal,
     isActive,
+    productType,
+    bundleItems, // Array of { productId, quantity }
   } = req.body;
 
   if (!code) return res.status(400).json({ error: 'Code is required' });
@@ -248,13 +265,24 @@ productsRouter.post('/', async (req, res) => {
         unitPrice: unitPrice?.toString(),
         hsnSac,
         taxRate: taxRate?.toString(),
-        gtnMode,
-        gtnGeneration,
+        gtnMode: gtnMode as any,
+        gtnGeneration: gtnGeneration as any,
+        productType: (productType || 'simple') as any,
         useGlobal: useGlobal !== false,
         isActive: isActive !== false,
       })
       .returning()
       .get();
+
+    if (product.productType === 'bundle' && Array.isArray(bundleItems)) {
+      for (const item of bundleItems) {
+        await db.insert(productBundles).values({
+          bundleProductId: product.id,
+          productId: item.productId,
+          quantity: item.quantity,
+        }).run();
+      }
+    }
 
     if (gtnMode !== 'manual' && (gtnGeneration === 'batch' || gtnGeneration === 'tag')) {
       // Ensure starting pos is valid
@@ -296,6 +324,8 @@ productsRouter.put('/:id', async (req, res) => {
     gtnLength,
     useGlobal,
     isActive,
+    productType,
+    bundleItems,
   } = req.body;
 
   const product = await db.select().from(products).where(eq(products.id, id)).get();
@@ -313,6 +343,7 @@ productsRouter.put('/:id', async (req, res) => {
   if (gtnGeneration !== undefined) product.gtnGeneration = gtnGeneration;
   if (useGlobal !== undefined) product.useGlobal = useGlobal;
   if (typeof isActive === 'boolean') product.isActive = isActive;
+  if (productType) product.productType = productType;
 
   await db
     .update(products)
@@ -325,13 +356,29 @@ productsRouter.put('/:id', async (req, res) => {
       unitPrice: product.unitPrice,
       hsnSac: product.hsnSac,
       taxRate: product.taxRate,
-      gtnMode: product.gtnMode,
-      gtnGeneration: product.gtnGeneration,
+      gtnMode: product.gtnMode as any,
+      gtnGeneration: product.gtnGeneration as any,
+      productType: product.productType as any,
       useGlobal: product.useGlobal,
       isActive: product.isActive,
     })
     .where(eq(products.id, id))
     .run();
+
+  if (product.productType === 'bundle' && Array.isArray(bundleItems)) {
+    // Delete existing items and re-insert
+    await db.delete(productBundles).where(eq(productBundles.bundleProductId, id)).run();
+    for (const item of bundleItems) {
+      await db.insert(productBundles).values({
+        bundleProductId: id,
+        productId: item.productId,
+        quantity: item.quantity,
+      }).run();
+    }
+  } else if (product.productType === 'simple') {
+    // If switched to simple, remove bundle items
+    await db.delete(productBundles).where(eq(productBundles.bundleProductId, id)).run();
+  }
 
   if (product.gtnMode !== 'manual' && (product.gtnGeneration === 'batch' || product.gtnGeneration === 'tag')) {
     // Ensure starting pos is valid

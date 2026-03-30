@@ -78,29 +78,29 @@
               class="mb-2"
             />
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
-              <div class="flex items-center gap-2 mb-1 col-span-full ml-2">
+            <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3"> -->
+            <!-- <div class="flex items-center gap-2 mb-1 col-span-full ml-2">
                 <label nz-checkbox [(ngModel)]="sameAsBilling" name="sameAsBilling">
                   Shipping Address same as Billing Address
                 </label>
-              </div>
-              <app-address-form
-                [address]="newSupplier.billingAddress!"
-                [title]="'ADDRESS.BILLING'"
-                [isExpandable]="true"
-                [isOpen]="false"
-              ></app-address-form>
-              @if (!sameAsBilling) {
+              </div> -->
+            <app-address-form
+              [address]="newSupplier.billingAddress!"
+              [title]="'ADDRESS.TITLE'"
+              [isExpandable]="true"
+              [isOpen]="false"
+            ></app-address-form>
+            <!-- @if (!sameAsBilling) {
                 <app-address-form
                   [address]="newSupplier.shippingAddress!"
                   [title]="'ADDRESS.SHIPPING'"
                   [isExpandable]="true"
                   [isOpen]="false"
                 ></app-address-form>
-              }
-            </div>
+              } -->
+            <!-- </div> -->
 
-            <div class="flex justify-end">
+            <div class="flex justify-end mt-4">
               <button
                 nz-button
                 nzType="primary"

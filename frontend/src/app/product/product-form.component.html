@@ -4,6 +4,17 @@
 
 <form nz-form (ngSubmit)="onSubmit()" nzLayout="vertical">
   <div class="grid grid-cols-4 gap-2">
+    <div class="col-span-4">
+      <nz-form-item>
+        <nz-form-label>Product Type</nz-form-label>
+        <nz-form-control>
+          <nz-radio-group [(ngModel)]="product.productType" name="productType">
+            <label nz-radio nzValue="simple">Simple</label>
+            <label nz-radio nzValue="bundle">Bundle</label>
+          </nz-radio-group>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
     <div class="col-span-4 md:col-span-2 lg:col-span-1">
       <nz-form-item>
         <nz-form-label>{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</nz-form-label>
@@ -120,6 +131,68 @@
         </nz-form-control>
       </nz-form-item>
     </div>
+
+    <!-- Bundle Items Section -->
+    @if (product.productType === 'bundle') {
+      <div class="col-span-4 mt-4">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-medium m-0">Bundle Items</h3>
+          <button nz-button nzType="dashed" type="button" (click)="addBundleItem()">
+            <nz-icon nzType="plus" /> Add Item
+          </button>
+        </div>
+        <nz-table #bundleTable [nzData]="product.bundleItems || []" nzSize="small" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th nzWidth="120px">Quantity</th>
+              <th nzWidth="60px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of product.bundleItems; track $index) {
+              <tr>
+                <td>
+                  <nz-select
+                    [(ngModel)]="item.productId"
+                    [name]="'bundleProduct' + $index"
+                    nzPlaceHolder="Select product"
+                    nzShowSearch
+                    class="w-full"
+                  >
+                    @for (p of productList(); track p.id) {
+                      @if (p.id !== productId) {
+                        <nz-option [nzValue]="p.id" [nzLabel]="p.name"></nz-option>
+                      }
+                    }
+                  </nz-select>
+                </td>
+                <td>
+                  <nz-input-number
+                    [(ngModel)]="item.quantity"
+                    [name]="'bundleQty' + $index"
+                    [nzMin]="1"
+                    [nzStep]="1"
+                    class="w-full"
+                  ></nz-input-number>
+                </td>
+                <td class="text-center">
+                  <button
+                    nz-button
+                    nzType="text"
+                    nzDanger
+                    type="button"
+                    (click)="removeBundleItem($index)"
+                  >
+                    <nz-icon nzType="delete" />
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </div>
+    }
 
     <!-- GTN Setup -->
 
