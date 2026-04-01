@@ -132,15 +132,16 @@ export async function renderSalesInvoice(
 
   sections.renderRule(pdf);
 
+  const isEstimate = invoice.type === 'estimate';
   const columns: TableColumn[] = [
     { header: '#', key: 'index', align: 'right', width: 'auto' },
     { header: 'Product', key: 'productName', align: 'left', width: '*' },
     { header: 'HSN/SAC', key: 'hsnSac', align: 'left', width: 'auto' },
     { header: 'Qty', key: 'qty', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
     { header: 'Price', key: 'unitPrice', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
-    { header: 'Tax', key: 'taxPctAndAmount', align: 'right', width: 'auto' },
+    ...(isEstimate ? [] : [{ header: 'Tax', key: 'taxPctAndAmount', align: 'right' as const, width: 'auto' as const }]),
     { header: 'Total', key: 'lineTotal', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
-  ];
+  ] as TableColumn[];
 
   sections.renderItemsTable(pdf, columns, formattedItems);
 
@@ -155,7 +156,8 @@ export async function renderSalesInvoice(
       netAmount: Number(invoice.netAmount ?? 0),
     },
     company,
-    hsnSummary
+    hsnSummary,
+    isEstimate
   );
 
   sections.renderFooter(pdf, company);

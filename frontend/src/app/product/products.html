@@ -98,7 +98,7 @@
               <span nz-icon nzType="search"></span>
             </nz-filter-trigger>
           </th>
-          <th nzColumnKey="unitPrice" nzShowSort [nzSortFn]="true">Tax Rate</th>
+          <th nzColumnKey="unitPrice" nzShowSort [nzSortFn]="true" nzAlign="right">Tax Rate</th>
           <th nzColumnKey="productType" nzShowSort [nzSortFn]="true">Type</th>
           <th>GTN</th>
           <th class="text-center" nzWidth="80px" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
@@ -117,7 +117,7 @@
             <td>{{ p.description }}</td>
             <td>{{ p.categoryName || '-' }}</td>
             <td>{{ p.hsnSac || '-' }}</td>
-            <td>{{ p.taxRate ?? '-' }}</td>
+            <td class="text-right">{{ p.taxRate ? `${p.taxRate}%` : '-' }}</td>
             <td>
               @if (p.productType === 'bundle') {
                 <nz-tag nzColor="blue">Bundle</nz-tag>

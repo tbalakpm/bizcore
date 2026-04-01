@@ -281,12 +281,13 @@ export function renderTotals(
     cgstAmount: number;
     sgstAmount: number;
     igstAmount: number;
-  }>
+  }>,
+  isEstimate?: boolean
 ): void {
   const fmt = (v: number) => v.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   let hsnBlock: any = null;
-  if (hsnSummary && hsnSummary.length > 0) {
+  if (!isEstimate && hsnSummary && hsnSummary.length > 0) {
     const isIgst = totals.igstAmount! > 0;
     const headerRow = [
       { text: 'HSN/SAC', bold: true },
@@ -363,7 +364,7 @@ export function renderTotals(
     });
   };
 
-  if (totals.taxableAmount !== undefined) {
+  if (!isEstimate && totals.taxableAmount !== undefined) {
     pushTotal('Taxable Amount:', fmt(totals.taxableAmount));
     if (totals.igstAmount && totals.igstAmount > 0) {
       pushTotal('IGST:', fmt(totals.igstAmount));
@@ -371,7 +372,7 @@ export function renderTotals(
       pushTotal('CGST:', fmt(totals.cgstAmount || 0));
       pushTotal('SGST:', fmt(totals.sgstAmount || 0));
     }
-  } else {
+  } else if (!isEstimate) {
     pushTotal('Subtotal:', fmt(totals.subtotal || 0));
     if (totals.discountAmount && totals.discountAmount > 0) {
       pushTotal('Discount:', `- ${fmt(totals.discountAmount)}`);
