@@ -24,10 +24,17 @@ if (config.isDevelopment) {
     path: logDir
   });
 
-  const prettyStream = require('pino-pretty')({
+  const consolePrettyStream = require('pino-pretty')({
     colorize: true,
     translateTime: 'SYS:standard',
     ignore: 'pid,hostname',
+  });
+
+  const filePrettyStream = require('pino-pretty')({
+    colorize: false,
+    translateTime: 'SYS:standard',
+    ignore: 'pid,hostname',
+    destination: fileStream
   });
 
   loggerInstance = pino(
@@ -37,8 +44,8 @@ if (config.isDevelopment) {
       base: null,
     },
     pino.multistream([
-      { stream: prettyStream },
-      { stream: fileStream }
+      { stream: consolePrettyStream },
+      { stream: filePrettyStream }
     ])
   );
 } else {
