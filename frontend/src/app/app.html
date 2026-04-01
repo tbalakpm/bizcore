@@ -123,23 +123,7 @@
               [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SALES' | translate) : ''"
               nzTooltipPlacement="right"
             >
-              <svg
-                class="w-5 h-5 shrink-0"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11"
-                />
-              </svg>
+              <span nz-icon nzType="shopping-cart" nzTheme="outline" class="text-xl"></span>
               <span
                 class="truncate whitespace-nowrap transition-opacity duration-300"
                 [class.opacity-0]="isSidebarCollapsed()"
@@ -159,23 +143,7 @@
               [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.PURCHASE' | translate) : ''"
               nzTooltipPlacement="right"
             >
-              <svg
-                class="w-5 h-5 shrink-0"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 4.5-2-2m2 2-2 2m2-2H11"
-                />
-              </svg>
+              <span nz-icon nzType="audit" nzTheme="outline" class="text-xl"></span>
               <span
                 class="truncate whitespace-nowrap transition-opacity duration-300"
                 [class.opacity-0]="isSidebarCollapsed()"
@@ -255,23 +223,7 @@
               [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.CUSTOMERS' | translate) : ''"
               nzTooltipPlacement="right"
             >
-              <svg
-                class="w-5 h-5 shrink-0"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-                />
-              </svg>
+              <span nz-icon nzType="team" nzTheme="outline" class="text-xl"></span>
               <span
                 class="truncate whitespace-nowrap transition-opacity duration-300"
                 [class.opacity-0]="isSidebarCollapsed()"
@@ -291,7 +243,7 @@
               [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SUPPLIERS' | translate) : ''"
               nzTooltipPlacement="right"
             >
-              <svg
+              <!-- <svg
                 class="w-5 h-5 shrink-0"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
@@ -307,7 +259,8 @@
                   stroke-width="2"
                   d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
                 />
-              </svg>
+              </svg> -->
+              <span nz-icon nzType="bank" nzTheme="outline" class="text-xl"></span>
               <span
                 class="truncate whitespace-nowrap transition-opacity duration-300"
                 [class.opacity-0]="isSidebarCollapsed()"
@@ -413,30 +366,7 @@
             [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SETTINGS' | translate) : ''"
             nzTooltipPlacement="right"
           >
-            <svg
-              class="w-5 h-5 shrink-0"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535 1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.707.536.535a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H20a1 1 0 0 0 1-1Z"
-              />
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-              />
-            </svg>
+            <span nz-icon nzType="setting" nzTheme="outline" class="text-xl"></span>
             <span
               class="truncate whitespace-nowrap transition-opacity duration-300"
               [class.opacity-0]="isSidebarCollapsed()"
@@ -486,23 +416,7 @@
             [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SALES_REPORT' | translate) : ''"
             nzTooltipPlacement="right"
           >
-            <svg
-              class="w-5 h-5 shrink-0"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10"
-              />
-            </svg>
+            <span nz-icon nzType="line-chart" nzTheme="outline" class="text-xl"></span>
             <span
               class="truncate whitespace-nowrap transition-opacity duration-300"
               [class.opacity-0]="isSidebarCollapsed()"
@@ -519,23 +433,7 @@
             [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.STOCK_REPORT' | translate) : ''"
             nzTooltipPlacement="right"
           >
-            <svg
-              class="w-5 h-5 shrink-0"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10"
-              />
-            </svg>
+            <span nz-icon nzType="bar-chart" nzTheme="outline" class="text-xl"></span>
             <span
               class="truncate whitespace-nowrap transition-opacity duration-300"
               [class.opacity-0]="isSidebarCollapsed()"
@@ -552,23 +450,7 @@
             [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.TAX_OUTPUT' | translate) : ''"
             nzTooltipPlacement="right"
           >
-            <svg
-              class="w-5 h-5 shrink-0"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m14 9.466V19a1 1 0 0 1-1 1h-2m-9.053-9.5H8.5m2.053 3.5H8.5m10.533-3.5h-10m10.053 3.5h-10"
-              />
-            </svg>
+            <span nz-icon nzType="file-done" nzTheme="outline" class="text-xl"></span>
             <span
               class="truncate whitespace-nowrap transition-opacity duration-300"
               [class.opacity-0]="isSidebarCollapsed()"
