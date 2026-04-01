@@ -34,17 +34,59 @@
         nzPlaceHolder="Invoice date"
       ></nz-date-picker>
 
+      <nz-select
+        [(ngModel)]="filters.supplierId"
+        [ngModelOptions]="{ standalone: true }"
+        nzPlaceHolder="All Suppliers"
+        nzAllowClear
+        nzShowSearch
+        style="min-width: 180px"
+      >
+        @for (s of suppliers(); track s.id) {
+          <nz-option [nzValue]="s.id" [nzLabel]="s.name"></nz-option>
+        }
+      </nz-select>
+
+      <nz-input-number
+        [(ngModel)]="filters.minAmount"
+        [ngModelOptions]="{ standalone: true }"
+        nzPlaceHolder="Min Amount"
+        [nzMin]="0"
+        style="width: 130px"
+      ></nz-input-number>
+
+      <nz-input-number
+        [(ngModel)]="filters.maxAmount"
+        [ngModelOptions]="{ standalone: true }"
+        nzPlaceHolder="Max Amount"
+        [nzMin]="0"
+        style="width: 130px"
+      ></nz-input-number>
+
       <button nz-button nzType="primary" (click)="applyFilters()">Apply</button>
+      <button
+        nz-button
+        nzType="default"
+        nz-tooltip
+        nzTooltipTitle="Clear all filters"
+        (click)="clearFilters()"
+      >
+        <span nz-icon nzType="filter" nzTheme="outline"></span> Clear
+      </button>
     </div>
-    <div class="flex flex-col sm:flex-row sm:items-center gap-2 border-l pl-2">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2 border-l pl-2" style="border-color: var(--color-border)">
       <span class="text-xs font-semibold uppercase tracking-wide text-text-muted">Sort</span>
-      <nz-select [(ngModel)]="sortValue" (ngModelChange)="onSortChange()" style="min-width: 180px">
+      <nz-select [(ngModel)]="sortValue" (ngModelChange)="onSortChange()" style="min-width: 200px">
         <nz-option nzValue="id:desc" nzLabel="Newest"></nz-option>
         <nz-option nzValue="id:asc" nzLabel="Oldest"></nz-option>
         <nz-option nzValue="invoiceNumber:asc" nzLabel="Invoice Number A-Z"></nz-option>
         <nz-option nzValue="invoiceNumber:desc" nzLabel="Invoice Number Z-A"></nz-option>
         <nz-option nzValue="invoiceDate:asc" nzLabel="Date Asc"></nz-option>
         <nz-option nzValue="invoiceDate:desc" nzLabel="Date Desc"></nz-option>
+        <nz-option nzValue="supplierName:asc" nzLabel="Supplier A-Z"></nz-option>
+        <nz-option nzValue="supplierName:desc" nzLabel="Supplier Z-A"></nz-option>
+        <nz-option nzValue="netAmount:asc" nzLabel="Amount Low-High"></nz-option>
+        <nz-option nzValue="netAmount:desc" nzLabel="Amount High-Low"></nz-option>
       </nz-select>
     </div>
   </div>

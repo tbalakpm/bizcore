@@ -144,7 +144,7 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
       }
     }
 
-    const sortableFields = ['id', 'invoiceNumber', 'invoiceDate', 'totalQty', 'netAmount', 'type'] as const;
+    const sortableFields = ['id', 'invoiceNumber', 'invoiceDate', 'totalQty', 'netAmount', 'type', 'customerName'] as const;
     type SortableField = (typeof sortableFields)[number];
     const isSortableField = (value: string): value is SortableField =>
       (sortableFields as readonly string[]).includes(value);
@@ -159,9 +159,13 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
           continue;
         }
 
-        const column = salesInvoices[field];
-        if (column) {
-          orderBy.push(dir(column));
+        if (field === 'customerName') {
+          orderBy.push(dir(sql`${customers.name} COLLATE NOCASE`));
+        } else {
+          const column = salesInvoices[field as keyof typeof salesInvoices];
+          if (column) {
+            orderBy.push(dir(column as any));
+          }
         }
       }
     }

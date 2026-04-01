@@ -51,6 +51,15 @@
       ></nz-input-number>
 
       <button nz-button nzType="primary" (click)="applyFilters()">Apply</button>
+      <button
+        nz-button
+        nzType="default"
+        nz-tooltip
+        nzTooltipTitle="Clear all filters"
+        (click)="clearFilters()"
+      >
+        <span nz-icon nzType="filter" nzTheme="outline"></span> Clear
+      </button>
     </div>
     <div
       class="flex flex-col sm:flex-row sm:items-center gap-2 border-l pl-2"

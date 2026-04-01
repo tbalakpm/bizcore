@@ -4,16 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import JsBarcode from 'jsbarcode';
-import {
-  type PurchaseInvoice,
-  type PurchaseInvoiceList,
-  PurchaseInvoiceService,
-} from './purchase-invoice-service';
+import { type PurchaseInvoice, type PurchaseInvoiceList, PurchaseInvoiceService } from './purchase-invoice-service';
 import { SettingsService } from '../settings/settings.service';
 import { PermissionService } from '../auth/permission.service';
+import { SupplierService, Supplier } from '../supplier/supplier-service';
 
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -34,7 +32,7 @@ type PrintableBarcodeLabel = {
   selector: 'app-purchase-invoices',
   imports: [
     DatePipe, CurrencyPipe, FormsModule, RouterLink,
-    NzTableModule, NzInputModule, NzDatePickerModule, NzSelectModule,
+    NzTableModule, NzInputModule, NzInputNumberModule, NzDatePickerModule, NzSelectModule,
     NzButtonModule, NzIconModule, NzPaginationModule, NzTooltipModule,
     NzPopconfirmModule, NzCardModule, NzAlertModule,
   ],
@@ -43,14 +41,19 @@ type PrintableBarcodeLabel = {
 export class PurchaseInvoices implements OnInit {
   private purchaseInvoiceService = inject(PurchaseInvoiceService);
   private settingsService = inject(SettingsService);
+  private supplierService = inject(SupplierService);
   permissionService = inject(PermissionService);
 
-  invoices = signal<PurchaseInvoice[]>([]);
+  invoices = signal<any[]>([]);
+  suppliers = signal<Supplier[]>([]);
   pagination = signal({ limit: 10, offset: 0, total: 0, page: 1, totalPages: 0 });
 
   filters = {
     invoiceNumber: '',
     invoiceDate: '',
+    supplierId: null as number | null,
+    minAmount: null as number | null,
+    maxAmount: null as number | null,
     limit: 10,
     page: 1,
     sortField: 'id',
@@ -65,7 +68,14 @@ export class PurchaseInvoices implements OnInit {
   error: string | null = null;
 
   ngOnInit(): void {
+    this.loadSuppliers();
     this.loadInvoices();
+  }
+
+  loadSuppliers() {
+    this.supplierService.getAll({ limit: 1000 }).subscribe((res) => {
+      this.suppliers.set(res.data);
+    });
   }
 
   get sortValue() {
@@ -88,6 +98,9 @@ export class PurchaseInvoices implements OnInit {
         limit: this.filters.limit,
         invoiceNumber: this.filters.invoiceNumber,
         invoiceDate: this.filters.invoiceDate,
+        supplierId: this.filters.supplierId ?? undefined,
+        minAmount: this.filters.minAmount ?? undefined,
+        maxAmount: this.filters.maxAmount ?? undefined,
         sort: this.sortValue,
       })
       .subscribe({
@@ -106,6 +119,16 @@ export class PurchaseInvoices implements OnInit {
   applyFilters() {
     this.filters.page = 1;
     this.loadInvoices();
+  }
+
+  clearFilters() {
+    this.filters.invoiceNumber = '';
+    this.filters.invoiceDate = '';
+    this.filters.supplierId = null;
+    this.filters.minAmount = null;
+    this.filters.maxAmount = null;
+    this.filterInvoiceDate = null;
+    this.applyFilters();
   }
 
   onInvoiceDateChange(date: Date | null) {

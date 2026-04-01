@@ -66,6 +66,7 @@
         style="width: 130px"
       ></nz-input-number>
 
+      <button nz-button nzType="primary" (click)="applyFilters()">Apply</button>
       <button
         nz-button
         nzType="default"
@@ -75,6 +76,23 @@
       >
         <span nz-icon nzType="filter" nzTheme="outline"></span> Clear
       </button>
+    </div>
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2 border-l pl-2" style="border-color: var(--color-border)">
+      <span class="text-xs font-semibold uppercase tracking-wide text-text-muted">Sort</span>
+      <nz-select [ngModel]="sortValue()" (ngModelChange)="onSortChange($event)" [ngModelOptions]="{standalone: true}" style="min-width: 200px">
+        <nz-option nzValue="id:desc" nzLabel="Newest"></nz-option>
+        <nz-option nzValue="id:asc" nzLabel="Oldest"></nz-option>
+        <nz-option nzValue="invoiceNumber:asc" nzLabel="Invoice Number A-Z"></nz-option>
+        <nz-option nzValue="invoiceNumber:desc" nzLabel="Invoice Number Z-A"></nz-option>
+        <nz-option nzValue="invoiceDate:asc" nzLabel="Date Asc"></nz-option>
+        <nz-option nzValue="invoiceDate:desc" nzLabel="Date Desc"></nz-option>
+        <nz-option nzValue="type:asc" nzLabel="Type Asc"></nz-option>
+        <nz-option nzValue="type:desc" nzLabel="Type Desc"></nz-option>
+        <nz-option nzValue="customerName:asc" nzLabel="Customer Asc"></nz-option>
+        <nz-option nzValue="customerName:desc" nzLabel="Customer Desc"></nz-option>
+        <nz-option nzValue="netAmount:asc" nzLabel="Amount Low-High"></nz-option>
+        <nz-option nzValue="netAmount:desc" nzLabel="Amount High-Low"></nz-option>
+      </nz-select>
     </div>
   </div>
 
@@ -89,48 +107,12 @@
   >
     <thead>
       <tr>
-        <th (click)="onSort('invoiceNumber')" class="cursor-pointer">
-          Invoice #
-          @if (sortColumn() === 'invoiceNumber') {
-            <span
-              nz-icon
-              [nzType]="sortDirection() === 'asc' ? 'caret-up' : 'caret-down'"
-              nzTheme="outline"
-            ></span>
-          }
-        </th>
-        <th (click)="onSort('invoiceDate')" class="cursor-pointer">
-          Date
-          @if (sortColumn() === 'invoiceDate') {
-            <span
-              nz-icon
-              [nzType]="sortDirection() === 'asc' ? 'caret-up' : 'caret-down'"
-              nzTheme="outline"
-            ></span>
-          }
-        </th>
+        <th>Invoice #</th>
+        <th>Date</th>
         <th>Customer</th>
-        <th (click)="onSort('type')" class="cursor-pointer">
-          Type
-          @if (sortColumn() === 'type') {
-            <span
-              nz-icon
-              [nzType]="sortDirection() === 'asc' ? 'caret-up' : 'caret-down'"
-              nzTheme="outline"
-            ></span>
-          }
-        </th>
+        <th>Type</th>
         <th nzAlign="right">Total Qty</th>
-        <th (click)="onSort('netAmount')" nzAlign="right" class="cursor-pointer">
-          Net Amount
-          @if (sortColumn() === 'netAmount') {
-            <span
-              nz-icon
-              [nzType]="sortDirection() === 'asc' ? 'caret-up' : 'caret-down'"
-              nzTheme="outline"
-            ></span>
-          }
-        </th>
+        <th nzAlign="right">Net Amount</th>
         <th nzAlign="center" nzWidth="120px">Actions</th>
       </tr>
     </thead>

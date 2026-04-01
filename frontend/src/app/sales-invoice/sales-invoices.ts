@@ -46,8 +46,7 @@ export class SalesInvoices implements OnInit {
   filterForm: FormGroup;
   private filterSubject = new Subject<void>();
 
-  sortColumn = signal<string>('id');
-  sortDirection = signal<'asc' | 'desc'>('desc');
+  sortValue = signal<string>('id:desc');
   pageLimit = 10;
   loading = false;
 
@@ -87,7 +86,7 @@ export class SalesInvoices implements OnInit {
 
   loadInvoices(page: number = 1) {
     const filters = this.filterForm.value;
-    const sort = `${this.sortColumn()}:${this.sortDirection()}`;
+    const sort = this.sortValue();
     this.loading = true;
 
     this.service
@@ -110,13 +109,8 @@ export class SalesInvoices implements OnInit {
       });
   }
 
-  onSort(column: string) {
-    if (this.sortColumn() === column) {
-      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
-    } else {
-      this.sortColumn.set(column);
-      this.sortDirection.set('asc');
-    }
+  onSortChange(value: string) {
+    this.sortValue.set(value);
     this.loadInvoices(1);
   }
 
@@ -126,6 +120,10 @@ export class SalesInvoices implements OnInit {
 
   onPageLimitChange() {
     this.pagination.update(p => ({ ...p, limit: this.pageLimit }));
+    this.loadInvoices(1);
+  }
+
+  applyFilters() {
     this.loadInvoices(1);
   }
 

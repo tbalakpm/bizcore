@@ -32,7 +32,7 @@ purchaseInvoicesRouter.get('/', async (req: Request, res: Response) => {
     // Build filters dynamically
     const filters: SQL[] = [];
     const filterableFields = ['invoiceNumber', 'refNumber'] as const;
-    const sortableFields = ['id', 'invoiceNumber', 'invoiceDate', 'refNumber', 'subtotal', 'totalQty', 'netAmount'] as const;
+    const sortableFields = ['id', 'invoiceNumber', 'invoiceDate', 'refNumber', 'subtotal', 'totalQty', 'netAmount', 'supplierName'] as const;
     type SortableField = (typeof sortableFields)[number];
     const isSortableField = (value: string): value is SortableField =>
       (sortableFields as readonly string[]).includes(value);
@@ -50,6 +50,14 @@ purchaseInvoicesRouter.get('/', async (req: Request, res: Response) => {
       filters.push(eq(purchaseInvoices.supplierId, parseInt(req.query.supplierId as string, 10)));
     }
 
+    if (req.query.minAmount) {
+      filters.push(sql`${purchaseInvoices.netAmount} >= ${toNumber(req.query.minAmount)}`);
+    }
+
+    if (req.query.maxAmount) {
+      filters.push(sql`${purchaseInvoices.netAmount} <= ${toNumber(req.query.maxAmount)}`);
+    }
+
     // Build sort dynamically
     const orderBy: SQL[] = [];
     if (req.query.sort) {
@@ -63,9 +71,13 @@ purchaseInvoicesRouter.get('/', async (req: Request, res: Response) => {
           continue;
         }
 
-        const column = purchaseInvoices[field];
-        if (column) {
-          orderBy.push(dir(column));
+        if (field === 'supplierName') {
+          orderBy.push(dir(suppliers.name));
+        } else {
+          const column = purchaseInvoices[field as keyof typeof purchaseInvoices];
+          if (column) {
+            orderBy.push(dir(column as any));
+          }
         }
       }
     } else {

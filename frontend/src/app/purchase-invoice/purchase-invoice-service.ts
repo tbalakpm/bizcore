@@ -60,6 +60,8 @@ export type PurchaseInvoiceQuery = {
   invoiceNumber?: string;
   invoiceDate?: string;
   supplierId?: number;
+  minAmount?: number;
+  maxAmount?: number;
   sort?: string;
 };
 
