@@ -1,5 +1,6 @@
 import path from "node:path";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import express, { type Request, type Response } from "express";
 import { i18nMiddleware } from "./middleware/i18n";
 import { requestContextMiddleware } from "./middleware/request-id.middleware";
@@ -42,8 +43,10 @@ export async function app() {
       origin: config.corsOrigins,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization", "Accept-Language"],
+      credentials: true,
     }),
   );
+  app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(requestContextMiddleware);

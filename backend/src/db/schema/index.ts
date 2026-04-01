@@ -1,4 +1,6 @@
 export { users } from './user.schema';
+export { refreshTokens } from './refresh-token.schema';
+export type { RefreshToken, NewRefreshToken } from './refresh-token.schema';
 export { categories } from './category.schema';
 export { products } from './product.schema';
 export { customers } from './customer.schema';

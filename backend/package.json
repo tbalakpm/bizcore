@@ -19,6 +19,7 @@
     "@libsql/client": "^0.17.0",
     "bcryptjs": "^2.4.3",
     "bwip-js": "^2.0.11",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/bwip-js": "^3.2.3",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",

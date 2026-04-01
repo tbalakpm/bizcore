@@ -27,3 +27,6 @@ P - Person (People)
 // "postbuild": "xcopy src\\static dist\\static /E /I" // For Windows
 
 > turso dev --db-file <db-filename>
+
+Production grade secret generation
+> openssl rand -hex 3
