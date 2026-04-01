@@ -92,8 +92,22 @@
 }
 
 /* ============================================================
-   NG-ZORRO FIXES
+   NG-ZORRO FIXES & SCROLLBARS
    ============================================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
 .ant-btn > span,
 .ant-btn > .anticon {
   display: inline-flex !important;
