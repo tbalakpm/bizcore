@@ -3,9 +3,9 @@ import { LogService } from '../core/logger/logger.service';
 
 export function logger(req: Request, res: Response, next: NextFunction): void {
   try {
-    const url = (Array.isArray(req.url) ? req.url.join(', ') : req.url).padEnd(60, ' ').slice(0, 60);
+    const url = (Array.isArray(req.url) ? req.url.join(', ') : req.url);
     const startTime = Date.now();
-    const method = req.method.padEnd(6, ' ');
+    const method = req.method;
     const ip = req.ip || 'unknown';
 
     // Hook into response to capture size and timing
