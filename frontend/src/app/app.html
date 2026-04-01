@@ -82,9 +82,12 @@
           <!-- Dashboard -->
           <a
             routerLink="/dashboard"
-            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
             [routerLinkActiveOptions]="{ exact: true }"
-            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+            nz-tooltip
+            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.DASHBOARD' | translate) : ''"
+            nzTooltipPlacement="right"
           >
             <span
               nz-icon
@@ -114,11 +117,14 @@
           @if (permissions.canRead('sales-invoices')) {
             <a
               routerLink="/sales-invoices"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SALES' | translate) : ''"
+              nzTooltipPlacement="right"
             >
               <svg
-                class="w-6 h-6 shrink-0"
+                class="w-5 h-5 shrink-0"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -138,7 +144,7 @@
                 class="truncate whitespace-nowrap transition-opacity duration-300"
                 [class.opacity-0]="isSidebarCollapsed()"
                 [class.w-0]="isSidebarCollapsed()"
-                >Sales</span
+                >{{ 'MENU.SALES' | translate }}</span
               ></a
             >
           }
@@ -147,11 +153,14 @@
           @if (permissions.canRead('purchase-invoices')) {
             <a
               routerLink="/purchase-invoices"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.PURCHASE' | translate) : ''"
+              nzTooltipPlacement="right"
             >
               <svg
-                class="w-6 h-6 shrink-0"
+                class="w-5 h-5 shrink-0"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -171,7 +180,7 @@
                 class="truncate whitespace-nowrap transition-opacity duration-300"
                 [class.opacity-0]="isSidebarCollapsed()"
                 [class.w-0]="isSidebarCollapsed()"
-                >Purchase</span
+                >{{ 'MENU.PURCHASE' | translate }}</span
               ></a
             >
           }
@@ -180,8 +189,11 @@
           @if (permissions.canRead('stock-invoices')) {
             <a
               routerLink="/stock-invoices"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.OPENING_STOCK' | translate) : ''"
+              nzTooltipPlacement="right"
             >
               <span
                 nz-icon
@@ -194,7 +206,7 @@
                 class="truncate whitespace-nowrap transition-opacity duration-300"
                 [class.opacity-0]="isSidebarCollapsed()"
                 [class.w-0]="isSidebarCollapsed()"
-                >Opening Stock</span
+                >{{ 'MENU.OPENING_STOCK' | translate }}</span
               ></a
             >
           }
@@ -211,8 +223,11 @@
           @if (permissions.canRead('products')) {
             <a
               routerLink="/products"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.PRODUCTS' | translate) : ''"
+              nzTooltipPlacement="right"
             >
               <span
                 nz-icon
@@ -234,11 +249,14 @@
           @if (permissions.canRead('customers')) {
             <a
               routerLink="/customers"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.CUSTOMERS' | translate) : ''"
+              nzTooltipPlacement="right"
             >
               <svg
-                class="w-6 h-6 shrink-0"
+                class="w-5 h-5 shrink-0"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -267,11 +285,14 @@
           @if (permissions.canRead('suppliers')) {
             <a
               routerLink="/suppliers"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SUPPLIERS' | translate) : ''"
+              nzTooltipPlacement="right"
             >
               <svg
-                class="w-6 h-6 shrink-0"
+                class="w-5 h-5 shrink-0"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -300,8 +321,11 @@
           @if (permissions.canRead('categories')) {
             <a
               routerLink="/categories"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.CATEGORIES' | translate) : ''"
+              nzTooltipPlacement="right"
             >
               <span
                 nz-icon
@@ -323,8 +347,11 @@
           @if (permissions.canRead('users')) {
             <a
               routerLink="/users"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.USERS' | translate) : ''"
+              nzTooltipPlacement="right"
             >
               <span
                 nz-icon
@@ -346,9 +373,12 @@
           <!-- Reports -->
           <button
             (click)="switchMenu('reports')"
-            class="w-full flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden justify-between gap-2 text-left transition-colors"
+            class="w-full flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden justify-between gap-3 text-left transition-colors relative"
+            nz-tooltip
+            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.REPORTS' | translate) : ''"
+            nzTooltipPlacement="right"
           >
-            <span class="flex items-center overflow-hidden gap-2">
+            <span class="flex items-center overflow-hidden gap-3">
               <span
                 nz-icon
                 nzType="fund"
@@ -360,27 +390,31 @@
                 class="truncate whitespace-nowrap transition-opacity duration-300"
                 [class.opacity-0]="isSidebarCollapsed()"
                 [class.w-0]="isSidebarCollapsed()"
-                >Reports</span
+                >{{ 'MENU.REPORTS' | translate }}</span
               >
-              <span
-                nz-icon
-                nzType="right"
-                nzTheme="outline"
-                class="text-chrome-muted"
-                style="font-size: 14px"
-              ></span>
             </span>
+            <span
+              nz-icon
+              nzType="right"
+              nzTheme="outline"
+              class="text-chrome-muted transition-opacity duration-300 shrink-0"
+              style="font-size: 14px"
+              [class.opacity-0]="isSidebarCollapsed()"
+            ></span>
           </button>
 
           <hr class="border-chrome-border my-2" />
           <!-- Settings -->
           <a
             routerLink="/settings"
-            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 transition-colors"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+            nz-tooltip
+            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SETTINGS' | translate) : ''"
+            nzTooltipPlacement="right"
           >
             <svg
-              class="w-6 h-6 shrink-0"
+              class="w-5 h-5 shrink-0"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -407,29 +441,32 @@
               class="truncate whitespace-nowrap transition-opacity duration-300"
               [class.opacity-0]="isSidebarCollapsed()"
               [class.w-0]="isSidebarCollapsed()"
-              >Settings</span
+              >{{ 'MENU.SETTINGS' | translate }}</span
             ></a
           >
         }
 
         @if (currentMenu() === 'reports') {
-          <div class="mt-2 mb-4">
+          <div class="mt-2 mb-2 px-1">
             <button
               (click)="switchMenu('main')"
-              class="flex items-center gap-2 overflow-hidden text-sm text-chrome-muted hover:text-chrome-text-bright transition-colors cursor-pointer px-2 py-1 rounded hover:bg-chrome-hover"
+              class="w-full flex px-3 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative text-chrome-muted hover:text-chrome-text-bright"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.BACK_TO_MENU' | translate) : ''"
+              nzTooltipPlacement="right"
             >
               <span
                 nz-icon
                 nzType="arrow-left"
                 nzTheme="outline"
                 class="shrink-0"
-                style="font-size: 14px"
+                style="font-size: 20px"
               ></span>
               <span
                 class="truncate whitespace-nowrap transition-opacity duration-300"
                 [class.opacity-0]="isSidebarCollapsed()"
                 [class.w-0]="isSidebarCollapsed()"
-                >Back to Menu</span
+                >{{ 'MENU.BACK_TO_MENU' | translate }}</span
               >
             </button>
           </div>
@@ -443,11 +480,14 @@
 
           <a
             routerLink="/reports/sales"
-            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-chrome-muted transition-colors"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+            nz-tooltip
+            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SALES_REPORT' | translate) : ''"
+            nzTooltipPlacement="right"
           >
             <svg
-              class="w-6 h-6 shrink-0"
+              class="w-5 h-5 shrink-0"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -467,17 +507,20 @@
               class="truncate whitespace-nowrap transition-opacity duration-300"
               [class.opacity-0]="isSidebarCollapsed()"
               [class.w-0]="isSidebarCollapsed()"
-              >Sales Report</span
+              >{{ 'MENU.SALES_REPORT' | translate }}</span
             >
           </a>
 
           <a
             routerLink="/reports/stock"
-            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-chrome-muted transition-colors"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+            nz-tooltip
+            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.STOCK_REPORT' | translate) : ''"
+            nzTooltipPlacement="right"
           >
             <svg
-              class="w-6 h-6 shrink-0"
+              class="w-5 h-5 shrink-0"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -497,17 +540,20 @@
               class="truncate whitespace-nowrap transition-opacity duration-300"
               [class.opacity-0]="isSidebarCollapsed()"
               [class.w-0]="isSidebarCollapsed()"
-              >Stock Report</span
+              >{{ 'MENU.STOCK_REPORT' | translate }}</span
             >
           </a>
 
           <a
             routerLink="/reports/tax"
-            routerLinkActive="bg-chrome-hover font-semibold border-l-3 border-accent"
-            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-2 ml-2 border-l-2 border-transparent hover:border-chrome-muted transition-colors"
+            routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+            nz-tooltip
+            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.TAX_OUTPUT' | translate) : ''"
+            nzTooltipPlacement="right"
           >
             <svg
-              class="w-6 h-6 shrink-0"
+              class="w-5 h-5 shrink-0"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -527,7 +573,7 @@
               class="truncate whitespace-nowrap transition-opacity duration-300"
               [class.opacity-0]="isSidebarCollapsed()"
               [class.w-0]="isSidebarCollapsed()"
-              >Tax Output</span
+              >{{ 'MENU.TAX_OUTPUT' | translate }}</span
             >
           </a>
         }

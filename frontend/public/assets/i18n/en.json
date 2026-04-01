@@ -22,7 +22,16 @@
     "USERS": "Users",
     "CUSTOMERS": "Customers",
     "SUPPLIERS": "Suppliers",
-    "LOGOUT": "Logout"
+    "LOGOUT": "Logout",
+    "SALES": "Sales",
+    "PURCHASE": "Purchase",
+    "OPENING_STOCK": "Opening Stock",
+    "REPORTS": "Reports",
+    "SETTINGS": "Settings",
+    "BACK_TO_MENU": "Back to Menu",
+    "SALES_REPORT": "Sales Report",
+    "STOCK_REPORT": "Stock Report",
+    "TAX_OUTPUT": "Tax Output"
   },
   "LOGIN": {
     "TITLE": "Login",
