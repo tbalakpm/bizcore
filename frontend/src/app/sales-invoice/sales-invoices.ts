@@ -1,4 +1,4 @@
-import { DatePipe, CurrencyPipe, TitleCasePipe } from '@angular/common';
+import { CommonModule, DatePipe, CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -25,7 +25,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 @Component({
   selector: 'app-sales-invoices',
   imports: [
-    ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, TitleCasePipe, RouterLink,
+    CommonModule, ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, TitleCasePipe, RouterLink,
     NzTableModule, NzSelectModule, NzInputModule, NzDatePickerModule,
     NzInputNumberModule, NzButtonModule, NzIconModule, NzTagModule,
     NzPaginationModule, NzTooltipModule, NzPopconfirmModule, NzCardModule, NzAlertModule,
@@ -125,6 +125,11 @@ export class SalesInvoices implements OnInit {
 
   applyFilters() {
     this.loadInvoices(1);
+  }
+
+  get hasFilters(): boolean {
+    const v = this.filterForm.value;
+    return !!(v.invoiceNumber || v.invoiceDate || v.customerId || v.minAmount || v.maxAmount || v.type);
   }
 
   onClearFilters() {

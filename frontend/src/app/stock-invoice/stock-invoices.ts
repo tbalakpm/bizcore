@@ -121,6 +121,10 @@ export class StockInvoices implements OnInit {
     this.loadInvoices();
   }
 
+  get hasFilters(): boolean {
+    return !!(this.filters.invoiceNumber || this.filters.invoiceDate || this.filters.minAmount || this.filters.maxAmount);
+  }
+
   clearFilters() {
     this.filters.invoiceNumber = '';
     this.filters.invoiceDate = '';

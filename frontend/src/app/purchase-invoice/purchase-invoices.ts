@@ -1,4 +1,4 @@
-import { DatePipe, CurrencyPipe } from '@angular/common';
+import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -31,7 +31,7 @@ type PrintableBarcodeLabel = {
 @Component({
   selector: 'app-purchase-invoices',
   imports: [
-    DatePipe, CurrencyPipe, FormsModule, RouterLink,
+    CommonModule, DatePipe, CurrencyPipe, FormsModule, RouterLink,
     NzTableModule, NzInputModule, NzInputNumberModule, NzDatePickerModule, NzSelectModule,
     NzButtonModule, NzIconModule, NzPaginationModule, NzTooltipModule,
     NzPopconfirmModule, NzCardModule, NzAlertModule,
@@ -119,6 +119,10 @@ export class PurchaseInvoices implements OnInit {
   applyFilters() {
     this.filters.page = 1;
     this.loadInvoices();
+  }
+
+  get hasFilters(): boolean {
+    return !!(this.filters.invoiceNumber || this.filters.invoiceDate || this.filters.supplierId || this.filters.minAmount || this.filters.maxAmount);
   }
 
   clearFilters() {
