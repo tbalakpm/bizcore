@@ -3,6 +3,8 @@ import express, { type Request, type Response } from 'express';
 
 import { categories, db, products, productSerialNumbers, productBundles } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
+import { LogService } from '../core/logger/logger.service';
+import { auditLog } from '../core/logger/audit.service';
 
 export const productsRouter = express.Router();
 
@@ -174,6 +176,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
       ? await orderedQuery.limit(pagination.limit).offset(pagination.offset).all()
       : await orderedQuery.all();
 
+    LogService.info('Fetched products list', { count: result.length, total: filteredCount });
     res.json({
       data: result,
       pagination: pagination
@@ -187,7 +190,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
         },
     });
   } catch (error) {
-    console.error('Failed to fetch products');
+    LogService.error('Failed to fetch products', error);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
@@ -200,9 +203,11 @@ productsRouter.get('/:id', async (req, res) => {
 
   const product = await db.select().from(products).where(eq(products.id, id)).get();
   if (!product) {
+    LogService.warn('Product not found', { productId: id });
     return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
   }
 
+  LogService.info('Fetched product details', { productId: id, productName: product.name });
   // Also fetch serial number config so the frontend can pre-populate gtnPrefix/gtnStartPos/gtnLength
   const serial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).get();
 
@@ -297,9 +302,22 @@ productsRouter.post('/', async (req, res) => {
       }).run();
     }
 
+    const finalSerial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, product.id)).get();
+    const finalBundle = await db.select().from(productBundles).where(eq(productBundles.bundleProductId, product.id)).all();
+
+    const fullProduct = { ...product, serial: finalSerial, bundleItems: finalBundle };
+
+    await auditLog({
+      action: 'CREATE_PRODUCT',
+      entity: 'PRODUCT',
+      entityId: product.id,
+      newValue: fullProduct,
+    });
+
+    LogService.info('Product created successfully', { productId: product.id, productName: product.name });
     res.status(201).json(product);
   } catch (err) {
-    console.error(err);
+    LogService.error('Failed to create product', err, { code, name });
     res.status(400).json({
       error: req.i18n?.t('product.exists') || 'Product already exists',
     });
@@ -331,89 +349,114 @@ productsRouter.put('/:id', async (req, res) => {
   const product = await db.select().from(products).where(eq(products.id, id)).get();
   if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
 
-  if (code) product.code = code;
-  if (name) product.name = name;
-  if (description) product.description = description;
-  if (categoryId) product.categoryId = categoryId;
-  if (qtyPerUnit) product.qtyPerUnit = qtyPerUnit;
-  if (unitPrice) product.unitPrice = unitPrice?.toString();
-  if (hsnSac !== undefined) product.hsnSac = hsnSac;
-  if (taxRate !== undefined) product.taxRate = taxRate?.toString();
-  if (gtnMode !== undefined) product.gtnMode = gtnMode;
-  if (gtnGeneration !== undefined) product.gtnGeneration = gtnGeneration;
-  if (useGlobal !== undefined) product.useGlobal = useGlobal;
-  if (typeof isActive === 'boolean') product.isActive = isActive;
-  if (productType) product.productType = productType;
+  try {
+    const oldSerial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).get();
+    const oldBundle = await db.select().from(productBundles).where(eq(productBundles.bundleProductId, id)).all();
+    const oldProduct = { ...product, serial: oldSerial, bundleItems: oldBundle };
 
-  await db
-    .update(products)
-    .set({
-      code: product.code,
-      name: product.name,
-      description: product.description,
-      categoryId: product.categoryId,
-      qtyPerUnit: product.qtyPerUnit,
-      unitPrice: product.unitPrice,
-      hsnSac: product.hsnSac,
-      taxRate: product.taxRate,
-      gtnMode: product.gtnMode as any,
-      gtnGeneration: product.gtnGeneration as any,
-      productType: product.productType as any,
-      useGlobal: product.useGlobal,
-      isActive: product.isActive,
-    })
-    .where(eq(products.id, id))
-    .run();
+    // Update product entity
+    const updateData: any = {};
+    if (code) updateData.code = code;
+    if (name) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (categoryId) updateData.categoryId = categoryId;
+    if (qtyPerUnit !== undefined) updateData.qtyPerUnit = qtyPerUnit;
+    if (unitPrice !== undefined) updateData.unitPrice = unitPrice?.toString();
+    if (hsnSac !== undefined) updateData.hsnSac = hsnSac;
+    if (taxRate !== undefined) updateData.taxRate = taxRate?.toString();
+    if (gtnMode !== undefined) updateData.gtnMode = gtnMode;
+    if (gtnGeneration !== undefined) updateData.gtnGeneration = gtnGeneration;
+    if (useGlobal !== undefined) updateData.useGlobal = useGlobal;
+    if (typeof isActive === 'boolean') updateData.isActive = isActive;
+    if (productType) updateData.productType = productType;
 
-  if (product.productType === 'bundle' && Array.isArray(bundleItems)) {
-    // Delete existing items and re-insert
-    await db.delete(productBundles).where(eq(productBundles.bundleProductId, id)).run();
-    for (const item of bundleItems) {
-      await db.insert(productBundles).values({
-        bundleProductId: id,
-        productId: item.productId,
-        quantity: item.quantity,
-      }).run();
+    await db
+      .update(products)
+      .set(updateData)
+      .where(eq(products.id, id))
+      .run();
+
+    if ((productType || product.productType) === 'bundle' && Array.isArray(bundleItems)) {
+      await db.delete(productBundles).where(eq(productBundles.bundleProductId, id)).run();
+      for (const item of bundleItems) {
+        await db.insert(productBundles).values({
+          bundleProductId: id,
+          productId: item.productId,
+          quantity: item.quantity,
+        }).run();
+      }
+    } else if ((productType || product.productType) === 'simple') {
+      await db.delete(productBundles).where(eq(productBundles.bundleProductId, id)).run();
     }
-  } else if (product.productType === 'simple') {
-    // If switched to simple, remove bundle items
-    await db.delete(productBundles).where(eq(productBundles.bundleProductId, id)).run();
-  }
 
-  if (product.gtnMode !== 'manual' && (product.gtnGeneration === 'batch' || product.gtnGeneration === 'tag')) {
-    // Ensure starting pos is valid
-    const nextPos = parseInt(gtnStartPos, 10);
-    const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
+    const currentGtnMode = gtnMode !== undefined ? gtnMode : product.gtnMode;
+    const currentGtnGeneration = gtnGeneration !== undefined ? gtnGeneration : product.gtnGeneration;
 
-    const existingSerial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, product.id)).get();
-    if (existingSerial) {
-      await db.update(productSerialNumbers).set({
-        prefix: gtnPrefix || '',
-        current: startPos,
-        length: parseInt(gtnLength, 10) || 10,
-      }).where(eq(productSerialNumbers.id, existingSerial.id)).run();
+    if (currentGtnMode !== 'manual' && (currentGtnGeneration === 'batch' || currentGtnGeneration === 'tag')) {
+      const nextPos = parseInt(gtnStartPos, 10);
+      const startPos = Number.isNaN(nextPos) ? 1 : nextPos;
+
+      const existingSerial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).get();
+      if (existingSerial) {
+        await db.update(productSerialNumbers).set({
+          prefix: gtnPrefix || '',
+          current: startPos,
+          length: parseInt(gtnLength, 10) || 10,
+        }).where(eq(productSerialNumbers.id, existingSerial.id)).run();
+      } else {
+        await db.insert(productSerialNumbers).values({
+          productId: id,
+          prefix: gtnPrefix || '',
+          current: startPos,
+          length: parseInt(gtnLength, 10) || 10,
+        }).run();
+      }
     } else {
-      await db.insert(productSerialNumbers).values({
-        productId: product.id,
-        prefix: gtnPrefix || '',
-        current: startPos,
-        length: parseInt(gtnLength, 10) || 10,
-      }).run();
+      await db.delete(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).run();
     }
-  } else {
-    // Clean up serial number row if switching away from batch/tag
-    await db.delete(productSerialNumbers).where(eq(productSerialNumbers.productId, product.id)).run();
-  }
 
-  res.json(product);
+    const updatedProductEntity = await db.select().from(products).where(eq(products.id, id)).get();
+    const updatedSerial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).get();
+    const updatedBundle = await db.select().from(productBundles).where(eq(productBundles.bundleProductId, id)).all();
+    const updatedProduct = { ...updatedProductEntity, serial: updatedSerial, bundleItems: updatedBundle };
+
+    await auditLog({
+      action: 'UPDATE_PRODUCT',
+      entity: 'PRODUCT',
+      entityId: id,
+      oldValue: oldProduct,
+      newValue: updatedProduct,
+    });
+
+    LogService.info('Product updated successfully', { productId: id, productName: updatedProductEntity?.name });
+    res.json(updatedProductEntity);
+  } catch (err) {
+    LogService.error('Failed to update product', err, { productId: id });
+    res.status(400).json({ error: 'Failed to update product' });
+  }
 });
 
 productsRouter.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const product = await db.select({ id: products.id }).from(products).where(eq(products.id, id)).get();
-  if (!product) return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
+  const product = await db.select().from(products).where(eq(products.id, id)).get();
+  if (!product) {
+    LogService.warn('Product not found for deletion', { productId: id });
+    return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
+  }
+
+  const serial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).get();
+  const bundleItems = await db.select().from(productBundles).where(eq(productBundles.bundleProductId, id)).all();
 
   await db.delete(products).where(eq(products.id, id)).run();
+
+  await auditLog({
+    action: 'DELETE_PRODUCT',
+    entity: 'PRODUCT',
+    entityId: id,
+    oldValue: { ...product, serial, bundleItems },
+  });
+
+  LogService.info('Product deleted successfully', { productId: id, productName: product.name });
   res.status(204).send();
 });

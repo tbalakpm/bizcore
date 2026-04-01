@@ -9,6 +9,8 @@ import { ProductSerialMode, productSerialNumberService } from '../services/produ
 import { serialNumberService } from '../services/serial-number.service';
 import type { DbTransaction } from '../shared/serial-number.shared';
 import { renderPurchaseInvoice } from '../services/pdf/reports/purchase-invoice.report';
+import { LogService } from '../core/logger/logger.service';
+import { auditLog } from '../core/logger/audit.service';
 
 export const purchaseInvoicesRouter = express.Router();
 
@@ -110,6 +112,7 @@ purchaseInvoicesRouter.get('/', async (req: Request, res: Response) => {
       ? await orderedQuery.limit(pagination.limit).offset(pagination.offset).all()
       : await orderedQuery.all();
 
+    LogService.info('Fetched purchase invoices list', { count: result.length, total: filteredCount });
     res.json({
       data: result,
       pagination: pagination
@@ -123,7 +126,7 @@ purchaseInvoicesRouter.get('/', async (req: Request, res: Response) => {
         },
     });
   } catch (error) {
-    console.error('Failed to fetch purchase invoices', error);
+    LogService.error('Failed to fetch purchase invoices', error);
     res.status(500).json({ error: 'Failed to fetch purchase invoices' });
   }
 });
@@ -145,9 +148,11 @@ purchaseInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
     .get();
 
   if (!invoice) {
+    LogService.warn('Purchase invoice not found', { purchaseInvoiceId: id });
     return res.status(404).json({ error: 'Purchase invoice not found' });
   }
 
+  LogService.info('Fetched purchase invoice details', { purchaseInvoiceId: id, invoiceNumber: invoice.invoiceNumber });
   const items = await db
     .select({
       ...getTableColumns(purchaseInvoiceItems),
@@ -369,9 +374,27 @@ purchaseInvoicesRouter.post('/', async (req, res) => {
       return tx.select().from(purchaseInvoices).where(eq(purchaseInvoices.id, invoice.id)).get();
     });
 
+    if (!result) {
+      throw new Error('Failed to retrieve created purchase invoice');
+    }
+
+    const itemsWithDetails = await db
+      .select()
+      .from(purchaseInvoiceItems)
+      .where(eq(purchaseInvoiceItems.purchaseInvoiceId, result.id))
+      .all();
+
+    await auditLog({
+      action: 'CREATE_PURCHASE_INVOICE',
+      entity: 'PURCHASE_INVOICE',
+      entityId: result.id,
+      newValue: { ...result, items: itemsWithDetails },
+    });
+
+    LogService.info('Purchase invoice created successfully', { purchaseInvoiceId: result.id, invoiceNumber: result.invoiceNumber });
     res.status(201).json(result);
   } catch (err) {
-    console.error(err);
+    LogService.error('Failed to create purchase invoice', err, { body: req.body });
     res.status(400).json({ error: (err as Error).message || 'Failed to create purchase invoice' });
   }
 });
@@ -382,12 +405,15 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
   const items = body.items ?? [];
 
   try {
-    await db.transaction(async (tx) => {
-      const existing = await tx.select().from(purchaseInvoices).where(eq(purchaseInvoices.id, id)).get();
-      if (!existing) throw new Error('Invoice not found');
+    const oldInvoice = await db.select().from(purchaseInvoices).where(eq(purchaseInvoices.id, id)).get();
+    if (!oldInvoice) {
+      LogService.warn('Purchase invoice not found for update', { purchaseInvoiceId: id });
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+    const oldItems = await db.select().from(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).all();
 
+    await db.transaction(async (tx) => {
       // 1. Reverse stock
-      const oldItems = await tx.select().from(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).all();
       for (const oldItem of oldItems) {
         const inv = await tx.select().from(inventories).where(eq(inventories.id, oldItem.inventoryId)).get();
         if (inv) {
@@ -404,18 +430,18 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
       await tx
         .update(purchaseInvoices)
         .set({
-          invoiceNumber: body.invoiceNumber ?? existing.invoiceNumber,
-          invoiceDate: body.invoiceDate ?? existing.invoiceDate,
-          supplierId: body.supplierId ?? existing.supplierId,
-          refNumber: body.refNumber ?? existing.refNumber,
-          refDate: body.refDate ?? existing.refDate,
-          subtotal: toNumber(body.subtotal) ?? existing.subtotal,
-          totalQty: toNumber(body.totalQty) ?? existing.totalQty,
-          discountType: body.discountType ?? existing.discountType,
-          discountPct: toNumber(body.discountPct) ?? existing.discountPct,
-          discountAmount: toNumber(body.discountAmount) ?? existing.discountAmount,
-          totalTaxAmount: toNumber(body.taxAmount) ?? existing.totalTaxAmount,
-          roundOff: toNumber(body.roundOff) ?? existing.roundOff,
+          invoiceNumber: body.invoiceNumber ?? oldInvoice.invoiceNumber,
+          invoiceDate: body.invoiceDate ?? oldInvoice.invoiceDate,
+          supplierId: body.supplierId ?? oldInvoice.supplierId,
+          refNumber: body.refNumber ?? oldInvoice.refNumber,
+          refDate: body.refDate ?? oldInvoice.refDate,
+          subtotal: toNumber(body.subtotal) ?? oldInvoice.subtotal,
+          totalQty: toNumber(body.totalQty) ?? oldInvoice.totalQty,
+          discountType: body.discountType ?? oldInvoice.discountType,
+          discountPct: toNumber(body.discountPct) ?? oldInvoice.discountPct,
+          discountAmount: toNumber(body.discountAmount) ?? oldInvoice.discountAmount,
+          totalTaxAmount: toNumber(body.taxAmount) ?? oldInvoice.totalTaxAmount,
+          roundOff: toNumber(body.roundOff) ?? oldInvoice.roundOff,
         })
         .where(eq(purchaseInvoices.id, id))
         .run();
@@ -434,9 +460,22 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
         .run();
     });
 
-    res.json({ message: 'Success' });
+    const updatedInvoice = await db.select().from(purchaseInvoices).where(eq(purchaseInvoices.id, id)).get();
+    const updatedItems = await db.select().from(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).all();
+
+    if (updatedInvoice) {
+      await auditLog({
+        action: 'UPDATE_PURCHASE_INVOICE',
+        entity: 'PURCHASE_INVOICE',
+        entityId: id,
+        oldValue: { ...oldInvoice, items: oldItems },
+        newValue: { ...updatedInvoice, items: updatedItems },
+      });
+      LogService.info('Purchase invoice updated successfully', { purchaseInvoiceId: id, invoiceNumber: updatedInvoice.invoiceNumber });
+    }
+    res.json(updatedInvoice);
   } catch (err) {
-    console.error(err);
+    LogService.error('Failed to update purchase invoice', err, { purchaseInvoiceId: id });
     res.status(400).json({ error: (err as Error).message || 'Failed to update' });
   }
 });
@@ -445,10 +484,16 @@ purchaseInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id as string, 10);
 
   try {
+    const oldInvoice = await db.select().from(purchaseInvoices).where(eq(purchaseInvoices.id, id)).get();
+    if (!oldInvoice) {
+      LogService.warn('Purchase invoice not found for deletion', { purchaseInvoiceId: id });
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+    const oldItems = await db.select().from(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).all();
+
     await db.transaction(async (tx) => {
       // Reverse stock
-      const items = await tx.select().from(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).all();
-      for (const item of items) {
+      for (const item of oldItems) {
         const inv = await tx.select().from(inventories).where(eq(inventories.id, item.inventoryId)).get();
         if (inv) {
           await tx.update(inventories)
@@ -460,23 +505,34 @@ purchaseInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
       await tx.delete(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).run();
       await tx.delete(purchaseInvoices).where(eq(purchaseInvoices.id, id)).run();
     });
+
+    await auditLog({
+      action: 'DELETE_PURCHASE_INVOICE',
+      entity: 'PURCHASE_INVOICE',
+      entityId: id,
+      oldValue: { ...oldInvoice, items: oldItems },
+    });
+
+    LogService.info('Purchase invoice deleted successfully', { purchaseInvoiceId: id, invoiceNumber: oldInvoice.invoiceNumber });
     res.status(204).send();
-  } catch (err) {
-    res.status(400).json({ error: 'Failed' });
+  } catch (error) {
+    LogService.error('Failed to delete purchase invoice', error, { purchaseInvoiceId: id });
+    res.status(400).json({ error: 'Failed to delete purchase invoice' });
   }
 });
 
 // PDF Generation Route 
 purchaseInvoicesRouter.get('/:id/pdf', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id as string, 10);
   try {
-    const id = parseInt(req.params.id as string, 10);
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'Invalid purchase invoice ID' });
     }
 
     await renderPurchaseInvoice(id, db, res);
+    LogService.info('Generated purchase invoice PDF', { purchaseInvoiceId: id });
   } catch (error) {
-    console.error('Failed to generate purchase invoice PDF', error);
+    LogService.error('Failed to generate purchase invoice PDF', error, { purchaseInvoiceId: id });
     res.status(500).json({ error: 'Failed to generate PDF' });
   }
 });

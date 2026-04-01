@@ -10,3 +10,10 @@ export const asyncLocalStorage = new AsyncLocalStorage<RequestContext>();
 export function getContext(): Partial<RequestContext> {
   return asyncLocalStorage.getStore() ?? {};
 }
+
+export function setUserId(userId: number): void {
+  const context = asyncLocalStorage.getStore();
+  if (context) {
+    context.userId = userId;
+  }
+}

@@ -5,6 +5,7 @@ import { config } from '../config';
 import { db } from '../db';
 import { users } from '../db';
 import { eq } from 'drizzle-orm';
+import { setUserId } from '../core/logger/request-context';
 
 export async function authRequired(req: Request, res: Response, next: NextFunction) {
   let token: string | undefined;
@@ -40,6 +41,7 @@ export async function authRequired(req: Request, res: Response, next: NextFuncti
     }
 
     req.user = user;
+    setUserId(user.id);
 
     next();
   } catch (err) {

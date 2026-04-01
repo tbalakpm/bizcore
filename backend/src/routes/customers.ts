@@ -4,6 +4,8 @@ import express, { type Request, type Response } from 'express';
 
 import { customers, db, addresses, pricingCategories } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
+import { LogService } from '../core/logger/logger.service';
+import { auditLog } from '../core/logger/audit.service';
 
 export const customersRouter = express.Router();
 
@@ -102,6 +104,7 @@ customersRouter.get('/', async (req: Request, res: Response) => {
       ? await orderedQuery.limit(pagination.limit).offset(pagination.offset).all()
       : await orderedQuery.all();
 
+    LogService.info('Fetched customers list', { count: result.length, total: filteredCount });
     res.json({
       data: result,
       pagination: pagination
@@ -115,7 +118,7 @@ customersRouter.get('/', async (req: Request, res: Response) => {
           },
     });
   } catch (error) {
-    console.error('Failed to fetch customers', error);
+    LogService.error('Failed to fetch customers', error);
     res.status(500).json({ error: 'Failed to fetch customers' });
   }
 });
@@ -141,11 +144,13 @@ customersRouter.get('/:id', async (req: Request, res: Response) => {
     .get();
 
   if (!customer) {
+    LogService.warn('Customer not found', { customerId: id });
     return res.status(404).json({
       error: req.i18n?.t('customer.notFound') || 'Customer not found',
     });
   }
 
+  LogService.info('Fetched customer details', { customerId: id, customerName: customer.name });
   res.json(customer);
 });
 
@@ -187,9 +192,17 @@ customersRouter.post('/', async (req, res) => {
         .get();
     });
 
+    await auditLog({
+      action: 'CREATE_CUSTOMER',
+      entity: 'CUSTOMER',
+      entityId: result.id,
+      newValue: result,
+    });
+
+    LogService.info('Customer created successfully', { customerId: result.id, customerName: result.name });
     res.status(201).json(result);
   } catch (err) {
-    console.error(err);
+    LogService.error('Failed to create customer', err, { code, name });
     res.status(400).json({
       error: req.i18n?.t('customer.exists') || 'Customer already exists or invalid data',
     });
@@ -250,12 +263,22 @@ customersRouter.put('/:id', async (req, res) => {
         .where(eq(customers.id, id))
         .run();
 
-      return { ...existingCustomer, code, name, type, gstin, pricingCategoryId: newPricingCategoryId, notes, isActive, billingAddressId: bAddrId, shippingAddressId: sAddrId };
+      const finalCustomer = await tx.select().from(customers).where(eq(customers.id, id)).get();
+      return finalCustomer;
     });
 
+    await auditLog({
+      action: 'UPDATE_CUSTOMER',
+      entity: 'CUSTOMER',
+      entityId: id,
+      oldValue: existingCustomer,
+      newValue: updatedCustomer,
+    });
+
+    LogService.info('Customer updated successfully', { customerId: id, customerName: updatedCustomer?.name });
     res.json(updatedCustomer);
   } catch (err) {
-    console.error(err);
+    LogService.error('Failed to update customer', err, { customerId: id });
     res.status(400).json({ error: 'Failed to update customer' });
   }
 });
@@ -263,12 +286,23 @@ customersRouter.put('/:id', async (req, res) => {
 customersRouter.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id as string, 10);
 
-  const customer = await db.select({ id: customers.id }).from(customers).where(eq(customers.id, id)).get();
-  if (!customer)
+  const customer = await db.select().from(customers).where(eq(customers.id, id)).get();
+  if (!customer) {
+    LogService.warn('Customer not found for deletion', { customerId: id });
     return res.status(404).json({
       error: req.i18n?.t('customer.notFound') || 'Customer not found',
     });
+  }
 
   await db.delete(customers).where(eq(customers.id, id)).run();
+
+  await auditLog({
+    action: 'DELETE_CUSTOMER',
+    entity: 'CUSTOMER',
+    entityId: id,
+    oldValue: customer,
+  });
+
+  LogService.info('Customer deleted successfully', { customerId: id, customerName: customer.name });
   res.status(204).send();
 });

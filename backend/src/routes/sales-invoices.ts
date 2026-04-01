@@ -8,6 +8,8 @@ import type { DbTransaction } from '../shared/serial-number.shared';
 import { normalizeDate } from '../utils/date.util';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 import { toPositiveNumber, toNumber } from '../utils/number.util';
+import { LogService } from '../core/logger/logger.service';
+import { auditLog } from '../core/logger/audit.service';
 
 export const salesInvoicesRouter = express.Router();
 
@@ -209,12 +211,13 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
       .offset(offset)
       .all();
 
+    LogService.info('Fetched sales invoices list', { count: data.length, total: filteredCount });
     res.json({
       data,
       pagination: toPagination(limit, offset, filteredCount, pageNum),
     });
   } catch (error) {
-    console.error('Failed to fetch sales invoices', error);
+    LogService.error('Failed to fetch sales invoices', error);
     res.status(500).json({ error: 'Failed to fetch sales invoices' });
   }
 });
@@ -228,9 +231,11 @@ salesInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
 
     const invoice = await db.select().from(salesInvoices).where(eq(salesInvoices.id, id)).get();
     if (!invoice) {
+      LogService.warn('Sales invoice not found', { salesInvoiceId: id });
       return res.status(404).json({ error: 'Sales invoice not found' });
     }
 
+    LogService.info('Fetched sales invoice details', { salesInvoiceId: id, invoiceNumber: invoice.invoiceNumber });
     const items = await db
       .select({
         id: salesInvoiceItems.id,
@@ -263,7 +268,7 @@ salesInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
 
     return res.json({ ...invoice, customerName: customer?.name, items });
   } catch (error) {
-    console.error('Failed to fetch sales invoice', error);
+    LogService.error('Failed to fetch sales invoice', error, { salesInvoiceId: req.params.id });
     return res.status(500).json({ error: 'Failed to fetch sales invoice' });
   }
 });
@@ -319,16 +324,34 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
       return tx.select().from(salesInvoices).where(eq(salesInvoices.id, insertedInvoice.id)).get();
     });
 
+    if (!created) {
+      throw new Error('Failed to retrieve created sales invoice');
+    }
+
+    const itemsWithDetails = await db
+      .select()
+      .from(salesInvoiceItems)
+      .where(eq(salesInvoiceItems.salesInvoiceId, created.id))
+      .all();
+
+    await auditLog({
+      action: 'CREATE_SALES_INVOICE',
+      entity: 'SALES_INVOICE',
+      entityId: created.id,
+      newValue: { ...created, items: itemsWithDetails },
+    });
+
+    LogService.info('Sales invoice created successfully', { salesInvoiceId: created.id, invoiceNumber: created.invoiceNumber });
     return res.status(201).json(created);
   } catch (error) {
-    console.error('Failed to create sales invoice', error);
+    LogService.error('Failed to create sales invoice', error, { body: req.body });
     return res.status(400).json({ error: (error as Error).message || 'Failed to create sales invoice' });
   }
 });
 
 salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id as string, 10);
   try {
-    const id = parseInt(req.params.id as string, 10);
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'Invalid sales invoice ID' });
     }
@@ -338,6 +361,9 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
     if (items.length === 0) {
       return res.status(400).json({ error: 'At least one item is required' });
     }
+
+    const oldInvoice = await db.select().from(salesInvoices).where(eq(salesInvoices.id, id)).get();
+    const oldItems = await db.select().from(salesInvoiceItems).where(eq(salesInvoiceItems.salesInvoiceId, id)).all();
 
     const updated = await db.transaction(async (tx) => {
       const existing = await tx.select().from(salesInvoices).where(eq(salesInvoices.id, id)).get();
@@ -400,35 +426,50 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
       return tx.select().from(salesInvoices).where(eq(salesInvoices.id, id)).get();
     });
 
+    if (!updated) {
+      throw new Error('Failed to retrieve updated sales invoice');
+    }
+
+    const itemsWithDetails = await db
+      .select()
+      .from(salesInvoiceItems)
+      .where(eq(salesInvoiceItems.salesInvoiceId, updated.id))
+      .all();
+
+    await auditLog({
+      action: 'UPDATE_SALES_INVOICE',
+      entity: 'SALES_INVOICE',
+      entityId: id,
+      oldValue: { ...oldInvoice, items: oldItems },
+      newValue: { ...updated, items: itemsWithDetails },
+    });
+
+    LogService.info('Sales invoice updated successfully', { salesInvoiceId: id, invoiceNumber: updated.invoiceNumber });
     return res.json(updated);
   } catch (error) {
-    console.error('Failed to update sales invoice', error);
+    LogService.error('Failed to update sales invoice', error, { salesInvoiceId: id });
     return res.status(400).json({ error: (error as Error).message || 'Failed to update sales invoice' });
   }
 });
 
 salesInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id as string, 10);
   try {
-    const id = parseInt(req.params.id as string, 10);
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'Invalid sales invoice ID' });
     }
 
+    const oldInvoice = await db.select().from(salesInvoices).where(eq(salesInvoices.id, id)).get();
+    if (!oldInvoice) {
+      LogService.warn('Sales invoice not found for deletion', { salesInvoiceId: id });
+      return res.status(404).json({ error: 'Sales invoice not found' });
+    }
+    const oldItems = await db.select().from(salesInvoiceItems).where(eq(salesInvoiceItems.salesInvoiceId, id)).all();
+
     await db.transaction(async (tx) => {
-      const existing = await tx
-        .select({ id: salesInvoices.id })
-        .from(salesInvoices)
-        .where(eq(salesInvoices.id, id))
-        .get();
-      if (!existing) {
-        throw new Error('Sales invoice not found');
-      }
-
-      const items = await tx.select().from(salesInvoiceItems).where(eq(salesInvoiceItems.salesInvoiceId, id)).all();
-
       // Refund the inventory
-      if (items.length > 0) {
-        for (const item of items) {
+      if (oldItems.length > 0) {
+        for (const item of oldItems) {
           const inventory = await tx
             .select()
             .from(inventories)
@@ -452,9 +493,17 @@ salesInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
       await tx.delete(salesInvoices).where(eq(salesInvoices.id, id)).run();
     });
 
+    await auditLog({
+      action: 'DELETE_SALES_INVOICE',
+      entity: 'SALES_INVOICE',
+      entityId: id,
+      oldValue: { ...oldInvoice, items: oldItems },
+    });
+
+    LogService.info('Sales invoice deleted successfully', { salesInvoiceId: id, invoiceNumber: oldInvoice.invoiceNumber });
     return res.status(204).send();
   } catch (error) {
-    console.error('Failed to delete sales invoice', error);
+    LogService.error('Failed to delete sales invoice', error, { salesInvoiceId: id });
     return res.status(404).json({ error: (error as Error).message || 'Failed to delete sales invoice' });
   }
 });
@@ -463,8 +512,8 @@ import crypto from 'crypto';
 import bwipjs from 'bwip-js';
 
 salesInvoicesRouter.post('/:id/generate-irn', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id as string, 10);
   try {
-    const id = parseInt(req.params.id as string, 10);
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'Invalid sales invoice ID' });
     }
@@ -522,24 +571,26 @@ salesInvoicesRouter.post('/:id/generate-irn', async (req: Request, res: Response
 
     const updated = await db.select().from(salesInvoices).where(eq(salesInvoices.id, id)).get();
 
+    LogService.info('Generated IRN for sales invoice', { salesInvoiceId: id, irn, invoiceNumber: existing.invoiceNumber });
     return res.json(updated);
   } catch (error) {
-    console.error('Failed to generate IRN', error);
+    LogService.error('Failed to generate IRN', error, { salesInvoiceId: id });
     return res.status(500).json({ error: 'Failed to generate IRN' });
   }
 });
 
 // PDF Generation Route 
 salesInvoicesRouter.get('/:id/pdf', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id as string, 10);
   try {
-    const id = parseInt(req.params.id as string, 10);
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'Invalid sales invoice ID' });
     }
 
     await renderSalesInvoice(id, db, res);
+    LogService.info('Generated sales invoice PDF', { salesInvoiceId: id });
   } catch (error) {
-    console.error('Failed to generate sales invoice PDF', error);
+    LogService.error('Failed to generate sales invoice PDF', error, { salesInvoiceId: id });
     res.status(500).json({ error: 'Failed to generate PDF' });
   }
 });

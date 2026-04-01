@@ -3,6 +3,8 @@ import express, { type Request, type Response } from 'express';
 
 import { categories, db } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
+import { LogService } from '../core/logger/logger.service';
+import { auditLog } from '../core/logger/audit.service';
 
 export const categoriesRouter = express.Router();
 
@@ -91,6 +93,7 @@ categoriesRouter.get('/', async (req: Request, res: Response) => {
       ? await orderedQuery.limit(pagination.limit).offset(pagination.offset).all()
       : await orderedQuery.all();
 
+    LogService.info('Fetched categories list', { count: result.length, total: filteredCount });
     res.json({
       data: result,
       pagination: pagination
@@ -104,7 +107,7 @@ categoriesRouter.get('/', async (req: Request, res: Response) => {
           },
     });
   } catch (error) {
-    console.error('Failed to fetch categories');
+    LogService.error('Failed to fetch categories', error);
     res.status(500).json({ error: 'Failed to fetch categories' });
   }
 });
@@ -116,11 +119,14 @@ categoriesRouter.get('/:id', async (req: Request, res: Response) => {
   }
 
   const category = await db.select().from(categories).where(eq(categories.id, id)).get();
-  if (!category)
+  if (!category) {
+    LogService.warn('Category not found', { categoryId: id });
     return res.status(404).json({
       error: req.i18n?.t('category.notFound') || 'Category not found',
     });
+  }
 
+  LogService.info('Fetched category details', { categoryId: id, categoryName: category.name });
   res.json(category);
 });
 
@@ -142,9 +148,17 @@ categoriesRouter.post('/', async (req, res) => {
       .returning()
       .get();
 
+    await auditLog({
+      action: 'CREATE_CATEGORY',
+      entity: 'CATEGORY',
+      entityId: category.id,
+      newValue: category,
+    });
+
+    LogService.info('Category created successfully', { categoryId: category.id, categoryName: category.name });
     res.status(201).json(category);
   } catch (err) {
-    console.error(err);
+    LogService.error('Failed to create category', err, { code, name });
     res.status(400).json({
       error: req.i18n?.t('category.exists') || 'Category already exists',
     });
@@ -154,41 +168,61 @@ categoriesRouter.post('/', async (req, res) => {
 categoriesRouter.put('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const category = await db.select().from(categories).where(eq(categories.id, id)).get();
-  if (!category)
+  const oldCategory = await db.select().from(categories).where(eq(categories.id, id)).get();
+  if (!oldCategory) {
+    LogService.warn('Category not found for update', { categoryId: id });
     return res.status(404).json({
       error: req.i18n?.t('category.notFound') || 'Category not found',
     });
+  }
 
   const { code, name, description, isActive } = req.body;
-  if (code !== undefined) category.code = code;
-  if (name !== undefined) category.name = name;
-  if (description !== undefined) category.description = description;
-  if (typeof isActive === 'boolean') category.isActive = isActive;
+  const updateData: any = {};
+  if (code !== undefined) updateData.code = code;
+  if (name !== undefined) updateData.name = name;
+  if (description !== undefined) updateData.description = description;
+  if (typeof isActive === 'boolean') updateData.isActive = isActive;
 
   await db
     .update(categories)
-    .set({
-      code: category.code,
-      name: category.name,
-      description: category.description,
-      isActive: category.isActive,
-    })
+    .set(updateData)
     .where(eq(categories.id, id))
     .run();
 
-  res.json(category);
+  const updatedCategory = await db.select().from(categories).where(eq(categories.id, id)).get();
+
+  await auditLog({
+    action: 'UPDATE_CATEGORY',
+    entity: 'CATEGORY',
+    entityId: id,
+    oldValue: oldCategory,
+    newValue: updatedCategory,
+  });
+
+  LogService.info('Category updated successfully', { categoryId: id, categoryName: updatedCategory?.name });
+  res.json(updatedCategory);
 });
 
 categoriesRouter.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const category = await db.select({ id: categories.id }).from(categories).where(eq(categories.id, id)).get();
-  if (!category)
+  const category = await db.select().from(categories).where(eq(categories.id, id)).get();
+  if (!category) {
+    LogService.warn('Category not found for deletion', { categoryId: id });
     return res.status(404).json({
       error: req.i18n?.t('category.notFound') || 'Category not found',
     });
+  }
 
   await db.delete(categories).where(eq(categories.id, id)).run();
+
+  await auditLog({
+    action: 'DELETE_CATEGORY',
+    entity: 'CATEGORY',
+    entityId: id,
+    oldValue: category,
+  });
+
+  LogService.info('Category deleted successfully', { categoryId: id, categoryName: category.name });
   res.status(204).send();
 });

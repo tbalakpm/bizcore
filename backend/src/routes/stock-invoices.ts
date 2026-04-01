@@ -10,6 +10,8 @@ import { parsePagination, resolveSortDirection, toPagination } from '../utils/li
 import { normalizeDate } from '../utils/date.util';
 import { toNumericString, toPositiveNumber, toNumber, toOptionalNumber } from '../utils/number.util';
 import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
+import { LogService } from '../core/logger/logger.service';
+import { auditLog } from '../core/logger/audit.service';
 
 // barcode printing support
 const PdfPrinter = require('pdfmake/js/printer').default;
@@ -282,12 +284,13 @@ stockInvoicesRouter.get('/', async (req: Request, res: Response) => {
       .offset(offset)
       .all();
 
+    LogService.info('Fetched stock invoices list', { count: data.length, total: filteredCount });
     res.json({
       data,
       pagination: toPagination(limit, offset, filteredCount, pageNum),
     });
   } catch (error) {
-    console.error('Failed to fetch stock invoices', error);
+    LogService.error('Failed to fetch stock invoices', error);
     res.status(500).json({ error: 'Failed to fetch stock invoices' });
   }
 });
@@ -371,8 +374,8 @@ stockInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
 
 // return barcode labels (title, code, subtitle) for a stock invoice
 stockInvoicesRouter.get('/:id/barcodes', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id as string, 10);
   try {
-    const id = parseInt(req.params.id as string, 10);
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'Invalid stock invoice ID' });
     }
@@ -408,17 +411,18 @@ stockInvoicesRouter.get('/:id/barcodes', async (req: Request, res: Response) => 
       .all();
 
     const labels = buildBarcodeLabels({ items: items as any });
+    LogService.info('Generated barcode labels (JSON)', { stockInvoiceId: id, labelCount: labels.length });
     return res.json({ labels });
   } catch (error) {
-    console.error('Failed to fetch barcode labels', error);
+    LogService.error('Failed to fetch barcode labels', error, { stockInvoiceId: id });
     return res.status(500).json({ error: 'Failed to fetch barcode labels' });
   }
 });
 
 // generate a PDF of barcode labels
 stockInvoicesRouter.get('/:id/barcodes/pdf', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id as string, 10);
   try {
-    const id = parseInt(req.params.id as string, 10);
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'Invalid stock invoice ID' });
     }
@@ -534,10 +538,11 @@ stockInvoicesRouter.get('/:id/barcodes/pdf', async (req: Request, res: Response)
 
     res.setHeader('Content-Type', 'application/pdf');
     const pdfDoc = await printer.createPdfKitDocument(docDefinition);
+    LogService.info('Generated barcode PDF', { stockInvoiceId: id, labelCount: labels.length });
     pdfDoc.pipe(res);
     pdfDoc.end();
   } catch (error) {
-    console.error('Failed to generate barcode PDF', error);
+    LogService.error('Failed to generate barcode PDF', error, { stockInvoiceId: id });
     return res.status(500).json({ error: 'Failed to generate barcode PDF' });
   }
 });
@@ -578,16 +583,34 @@ stockInvoicesRouter.post('/', async (req: Request, res: Response) => {
       return tx.select().from(stockInvoices).where(eq(stockInvoices.id, insertedInvoice.id)).get();
     });
 
+    if (!created) {
+      throw new Error('Failed to retrieve created invoice');
+    }
+
+    const itemsWithDetails = await db
+      .select()
+      .from(stockInvoiceItems)
+      .where(eq(stockInvoiceItems.stockInvoiceId, created.id))
+      .all();
+
+    await auditLog({
+      action: 'CREATE_STOCK_INVOICE',
+      entity: 'STOCK_INVOICE',
+      entityId: created.id,
+      newValue: { ...created, items: itemsWithDetails },
+    });
+
+    LogService.info('Stock invoice created successfully', { stockInvoiceId: created.id, invoiceNumber: created.invoiceNumber });
     return res.status(201).json(created);
   } catch (error) {
-    console.error('Failed to create stock invoice', error);
+    LogService.error('Failed to create stock invoice', error, { body: req.body });
     return res.status(400).json({ error: (error as Error).message || 'Failed to create stock invoice' });
   }
 });
 
 stockInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id as string, 10);
   try {
-    const id = parseInt(req.params.id as string, 10);
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'Invalid stock invoice ID' });
     }
@@ -650,16 +673,39 @@ stockInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
       return tx.select().from(stockInvoices).where(eq(stockInvoices.id, id)).get();
     });
 
+    if (!updated) {
+      throw new Error('Failed to retrieve updated invoice');
+    }
+
+    // Capture states after transaction for audit log
+    const oldInvoiceState = await db.select().from(stockInvoices).where(eq(stockInvoices.id, id)).get();
+    const oldItemsState = await db.select().from(stockInvoiceItems).where(eq(stockInvoiceItems.stockInvoiceId, id)).all();
+
+    const itemsWithDetails = await db
+      .select()
+      .from(stockInvoiceItems)
+      .where(eq(stockInvoiceItems.stockInvoiceId, updated.id))
+      .all();
+
+    await auditLog({
+      action: 'UPDATE_STOCK_INVOICE',
+      entity: 'STOCK_INVOICE',
+      entityId: id,
+      oldValue: { ...oldInvoiceState, items: oldItemsState },
+      newValue: { ...updated, items: itemsWithDetails },
+    });
+
+    LogService.info('Stock invoice updated successfully', { stockInvoiceId: id, invoiceNumber: updated.invoiceNumber });
     return res.json(updated);
   } catch (error) {
-    console.error('Failed to update stock invoice', error);
+    LogService.error('Failed to update stock invoice', error, { stockInvoiceId: id });
     return res.status(400).json({ error: (error as Error).message || 'Failed to update stock invoice' });
   }
 });
 
 stockInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id as string, 10);
   try {
-    const id = parseInt(req.params.id as string, 10);
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'Invalid stock invoice ID' });
     }
@@ -702,9 +748,10 @@ stockInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
       await tx.delete(stockInvoices).where(eq(stockInvoices.id, id)).run();
     });
 
+    LogService.info('Stock invoice deleted successfully', { stockInvoiceId: id });
     return res.status(204).send();
   } catch (error) {
-    console.error('Failed to delete stock invoice', error);
+    LogService.error('Failed to delete stock invoice', error, { stockInvoiceId: id });
     return res.status(404).json({ error: (error as Error).message || 'Failed to delete stock invoice' });
   }
 });

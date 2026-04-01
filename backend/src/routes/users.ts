@@ -5,6 +5,8 @@ import express, { type Request, type Response } from 'express';
 import { db, users } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 import { isStrongPassword } from '../utils/password.util';
+import { LogService } from '../core/logger/logger.service';
+import { auditLog } from '../core/logger/audit.service';
 
 export const usersRouter = express.Router();
 
@@ -104,6 +106,7 @@ usersRouter.get('/', async (req: Request, res: Response) => {
       ? await orderedQuery.limit(pagination.limit).offset(pagination.offset).all()
       : await orderedQuery.all();
 
+    LogService.info('Fetched users list', { count: result.length, total: filteredCount });
     res.json({
       data: result,
       pagination: pagination
@@ -117,7 +120,7 @@ usersRouter.get('/', async (req: Request, res: Response) => {
           },
     });
   } catch (error) {
-    console.error('Failed to fetch users');
+    LogService.error('Failed to fetch users', error);
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
@@ -129,8 +132,12 @@ usersRouter.get('/:id', async (req, res) => {
   }
 
   const user = await db.select(userPublicSelect).from(users).where(eq(users.id, id)).get();
-  if (!user) return res.status(404).json({ error: req.i18n?.t('user.notFound') });
+  if (!user) {
+    LogService.warn('User not found', { userId: id });
+    return res.status(404).json({ error: req.i18n?.t('user.notFound') });
+  }
 
+  LogService.info('Fetched user details', { userId: id, username: user.username });
   res.json(user);
 });
 
@@ -159,8 +166,17 @@ usersRouter.post('/', async (req, res) => {
       .returning(userPublicSelect)
       .get();
 
+    await auditLog({
+      action: 'CREATE_USER',
+      entity: 'USER',
+      entityId: user.id,
+      newValue: user,
+    });
+
+    LogService.info('User created successfully', { userId: user.id, username: user.username });
     res.status(201).json(user);
   } catch (err) {
+    LogService.warn('Failed to create user - likely already exists', { username });
     res.status(400).json({ error: req.i18n?.t('user.exists') });
   }
 });
@@ -169,39 +185,58 @@ usersRouter.put('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
   const { username, firstName, lastName, role, isActive, permissions } = req.body;
 
-  const user = await db.select(userPublicSelect).from(users).where(eq(users.id, id)).get();
-  if (!user) return res.status(404).json({ error: req.i18n?.t('user.notFound') });
+  const oldUser = await db.select(userPublicSelect).from(users).where(eq(users.id, id)).get();
+  if (!oldUser) {
+    LogService.warn('User not found for update', { userId: id });
+    return res.status(404).json({ error: req.i18n?.t('user.notFound') });
+  }
 
-  if (username) user.username = username;
-  if (firstName) user.firstName = firstName;
-  if (lastName) user.lastName = lastName;
-  if (role) user.role = role;
-  if (typeof isActive === 'boolean') user.isActive = isActive;
-  if (permissions) user.permissions = JSON.stringify(permissions);
+  const updateData: any = {};
+  if (username) updateData.username = username;
+  if (firstName) updateData.firstName = firstName;
+  if (lastName) updateData.lastName = lastName;
+  if (role) updateData.role = role;
+  if (typeof isActive === 'boolean') updateData.isActive = isActive;
+  if (permissions) updateData.permissions = JSON.stringify(permissions);
 
   await db
     .update(users)
-    .set({
-      username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-      isActive: user.isActive,
-      permissions: user.permissions,
-    })
+    .set(updateData)
     .where(eq(users.id, id))
     .run();
 
   const updatedUser = await db.select(userPublicSelect).from(users).where(eq(users.id, id)).get();
+
+  await auditLog({
+    action: 'UPDATE_USER',
+    entity: 'USER',
+    entityId: id,
+    oldValue: oldUser,
+    newValue: updatedUser,
+  });
+
+  LogService.info('User updated successfully', { userId: id, username: updatedUser?.username });
   res.json(updatedUser);
 });
 
 usersRouter.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const user = await db.select({ id: users.id }).from(users).where(eq(users.id, id)).get();
-  if (!user) return res.status(404).json({ error: req.i18n?.t('user.notFound') });
+  const user = await db.select(userPublicSelect).from(users).where(eq(users.id, id)).get();
+  if (!user) {
+    LogService.warn('User not found for deletion', { userId: id });
+    return res.status(404).json({ error: req.i18n?.t('user.notFound') });
+  }
 
   await db.delete(users).where(eq(users.id, id)).run();
+
+  await auditLog({
+    action: 'DELETE_USER',
+    entity: 'USER',
+    entityId: id,
+    oldValue: user,
+  });
+
+  LogService.info('User deleted successfully', { userId: id, username: user.username });
   res.status(204).send();
 });

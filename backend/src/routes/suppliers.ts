@@ -4,6 +4,8 @@ import express, { type Request, type Response } from 'express';
 
 import { suppliers, db, addresses, supplierBanks } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
+import { LogService } from '../core/logger/logger.service';
+import { auditLog } from '../core/logger/audit.service';
 
 export const suppliersRouter = express.Router();
 
@@ -105,6 +107,7 @@ suppliersRouter.get('/', async (req: Request, res: Response) => {
       ? await orderedQuery.limit(pagination.limit).offset(pagination.offset).all()
       : await orderedQuery.all();
 
+    LogService.info('Fetched suppliers list', { count: result.length, total: filteredCount });
     res.json({
       data: result,
       pagination: pagination
@@ -118,7 +121,7 @@ suppliersRouter.get('/', async (req: Request, res: Response) => {
           },
     });
   } catch (error) {
-    console.error('Failed to fetch suppliers', error);
+    LogService.error('Failed to fetch suppliers', error);
     res.status(500).json({ error: 'Failed to fetch suppliers' });
   }
 });
@@ -142,11 +145,13 @@ suppliersRouter.get('/:id', async (req: Request, res: Response) => {
     .get();
 
   if (!supplier) {
+    LogService.warn('Supplier not found', { supplierId: id });
     return res.status(404).json({
       error: req.i18n?.t('supplier.notFound') || 'Supplier not found',
     });
   }
 
+  LogService.info('Fetched supplier details', { supplierId: id, supplierName: supplier.name });
   const bankAccounts = await db.select().from(supplierBanks).where(eq(supplierBanks.supplierId, id)).all();
 
   res.json({ ...supplier, bankAccounts });
@@ -189,21 +194,31 @@ suppliersRouter.post('/', async (req, res) => {
         .get();
 
       const bankAccounts = req.body.bankAccounts;
+      const createdBanks: any[] = [];
       if (Array.isArray(bankAccounts) && bankAccounts.length > 0) {
         for (const bank of bankAccounts) {
-          await tx.insert(supplierBanks).values({
+          const b = await tx.insert(supplierBanks).values({
             ...bank,
             supplierId: supplier.id,
-          }).run();
+          }).returning().get();
+          createdBanks.push(b);
         }
       }
 
-      return supplier;
+      return { ...supplier, bankAccounts: createdBanks };
     });
 
+    await auditLog({
+      action: 'CREATE_SUPPLIER',
+      entity: 'SUPPLIER',
+      entityId: result.id,
+      newValue: result,
+    });
+
+    LogService.info('Supplier created successfully', { supplierId: result.id, supplierName: result.name });
     res.status(201).json(result);
   } catch (err) {
-    console.error(err);
+    LogService.error('Failed to create supplier', err, { code, name });
     res.status(400).json({
       error: req.i18n?.t('supplier.exists') || 'Supplier already exists or invalid data',
     });
@@ -222,6 +237,9 @@ suppliersRouter.put('/:id', async (req, res) => {
   const { code, name, type, notes, isActive, gstin, billingAddress: bAddr, shippingAddress: sAddr } = req.body;
 
   try {
+    const oldBanks = await db.select().from(supplierBanks).where(eq(supplierBanks.supplierId, id)).all();
+    const oldSupplier = { ...existingSupplier, bankAccounts: oldBanks };
+
     const updatedSupplier = await db.transaction(async (tx) => {
       let bAddrId = existingSupplier.billingAddressId;
       let sAddrId = existingSupplier.shippingAddressId;
@@ -261,8 +279,6 @@ suppliersRouter.put('/:id', async (req, res) => {
 
       const bankAccounts = req.body.bankAccounts;
       if (Array.isArray(bankAccounts)) {
-        // Simple strategy: delete existing and re-insert
-        // Better: diff and update/delete/insert
         await tx.delete(supplierBanks).where(eq(supplierBanks.supplierId, id)).run();
         for (const bank of bankAccounts) {
           const { id: bankId, ...bankData } = bank;
@@ -273,12 +289,23 @@ suppliersRouter.put('/:id', async (req, res) => {
         }
       }
 
-      return { ...existingSupplier, code, name, type: type ?? existingSupplier.type, gstin, notes, isActive, billingAddressId: bAddrId, shippingAddressId: sAddrId };
+      const finalSupplier = await tx.select().from(suppliers).where(eq(suppliers.id, id)).get();
+      const finalBanks = await tx.select().from(supplierBanks).where(eq(supplierBanks.supplierId, id)).all();
+      return { ...finalSupplier, bankAccounts: finalBanks };
     });
 
+    await auditLog({
+      action: 'UPDATE_SUPPLIER',
+      entity: 'SUPPLIER',
+      entityId: id,
+      oldValue: oldSupplier,
+      newValue: updatedSupplier,
+    });
+
+    LogService.info('Supplier updated successfully', { supplierId: id, supplierName: updatedSupplier.name });
     res.json(updatedSupplier);
   } catch (err) {
-    console.error(err);
+    LogService.error('Failed to update supplier', err, { supplierId: id });
     res.status(400).json({ error: 'Failed to update supplier' });
   }
 });
@@ -286,12 +313,25 @@ suppliersRouter.put('/:id', async (req, res) => {
 suppliersRouter.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id as string, 10);
 
-  const supplier = await db.select({ id: suppliers.id }).from(suppliers).where(eq(suppliers.id, id)).get();
-  if (!supplier)
+  const supplier = await db.select().from(suppliers).where(eq(suppliers.id, id)).get();
+  if (!supplier) {
+    LogService.warn('Supplier not found for deletion', { supplierId: id });
     return res.status(404).json({
       error: req.i18n?.t('supplier.notFound') || 'Supplier not found',
     });
+  }
+
+  const bankAccounts = await db.select().from(supplierBanks).where(eq(supplierBanks.supplierId, id)).all();
 
   await db.delete(suppliers).where(eq(suppliers.id, id)).run();
+
+  await auditLog({
+    action: 'DELETE_SUPPLIER',
+    entity: 'SUPPLIER',
+    entityId: id,
+    oldValue: { ...supplier, bankAccounts },
+  });
+
+  LogService.info('Supplier deleted successfully', { supplierId: id, supplierName: supplier.name });
   res.status(204).send();
 });
