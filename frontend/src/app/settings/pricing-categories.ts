@@ -78,7 +78,7 @@ export class PricingCategories implements OnInit {
   loadProducts() {
     this.productService.getAll().subscribe({
       next: (res) => this.products.set(res.data),
-      error: () => {},
+      error: () => { },
     });
   }
 
@@ -161,7 +161,7 @@ export class PricingCategories implements OnInit {
             productId: p.id,
             productCode: p.code,
             productName: p.name,
-            marginType: (saved?.marginType || 'none') as 'none' | 'percent' | 'amount',
+            marginType: (saved?.marginType || 'none') as 'none' | 'percent' | 'amount' | 'selling_price',
             marginPct: Number(saved?.marginPct || 0),
             marginAmount: Number(saved?.marginAmount || 0),
           };
@@ -191,8 +191,9 @@ export class PricingCategories implements OnInit {
   get marginTypes() {
     return [
       { value: 'none', label: 'None' },
-      { value: 'percent', label: 'Percentage (%)' },
-      { value: 'amount', label: 'Fixed Amount (₹)' },
+      { value: 'percent', label: 'Markup Percentage (%)' },
+      { value: 'amount', label: 'Markup Amount (₹)' },
+      { value: 'selling_price', label: 'Selling Price (₹)' },
     ];
   }
 }

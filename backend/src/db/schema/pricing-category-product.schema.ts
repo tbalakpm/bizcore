@@ -17,9 +17,9 @@ export const pricingCategoryProducts = sqliteTable(
       .notNull()
       .references(() => products.id, { onDelete: 'cascade' }),
 
-    marginType: text('margin_type', { length: 25, enum: ['none', 'percent', 'amount'] })
+    marginType: text('margin_type', { length: 25, enum: ['none', 'percent', 'amount', 'selling_price'] })
       .notNull()
-      .default('none'), // none, percent, amount
+      .default('none'), // none, percent, amount, selling_price
 
     marginPct: real('margin_pct')
       .notNull()

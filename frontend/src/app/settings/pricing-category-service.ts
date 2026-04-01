@@ -23,7 +23,7 @@ export interface ProductMargin {
   productId: number;
   productCode?: string;
   productName?: string;
-  marginType: 'none' | 'percent' | 'amount';
+  marginType: 'none' | 'percent' | 'amount' | 'selling_price';
   marginPct: number;
   marginAmount: number;
 }

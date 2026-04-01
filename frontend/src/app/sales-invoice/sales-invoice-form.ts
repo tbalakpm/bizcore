@@ -393,9 +393,13 @@ export class SalesInvoiceForm implements OnInit {
         const margin = this.pricingCategoryMargins.find(m => m.productId === product.id);
         if (margin && margin.marginType !== 'none') {
           if (margin.marginType === 'percent') {
-            basePrice = basePrice + basePrice * (Number(margin.marginPct) / 100);
+            const costBasis = Number(inventory.buyingPrice || 0);
+            basePrice = costBasis + costBasis * (Number(margin.marginPct) / 100);
           } else if (margin.marginType === 'amount') {
-            basePrice = basePrice + Number(margin.marginAmount);
+            const costBasis = Number(inventory.buyingPrice || 0);
+            basePrice = costBasis + Number(margin.marginAmount);
+          } else if (margin.marginType === 'selling_price') {
+            basePrice = Number(margin.marginAmount);
           }
           basePrice = Math.round(basePrice * 100) / 100;
         }

@@ -185,8 +185,8 @@
                         <tr>
                           <th>Product Code</th>
                           <th>Product Name</th>
-                          <th nzWidth="160px">Margin Type</th>
-                          <th nzWidth="140px">Margin Value</th>
+                          <th nzWidth="160px" nzAlign="center">Margin Type</th>
+                          <th nzWidth="140px" nzAlign="center">Margin Value</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -211,18 +211,15 @@
                                   [(ngModel)]="margin.marginPct"
                                   [ngModelOptions]="{ standalone: true }"
                                   [nzMin]="0"
-                                  [nzMax]="100"
                                   [nzStep]="0.5"
-                                  [nzFormatter]="pctFormatter"
                                   class="w-full"
                                 />
-                              } @else if (margin.marginType === 'amount') {
+                              } @else if (margin.marginType === 'amount' || margin.marginType === 'selling_price') {
                                 <nz-input-number
                                   [(ngModel)]="margin.marginAmount"
                                   [ngModelOptions]="{ standalone: true }"
                                   [nzMin]="0"
                                   [nzStep]="1"
-                                  [nzFormatter]="amtFormatter"
                                   class="w-full"
                                 />
                               } @else {
