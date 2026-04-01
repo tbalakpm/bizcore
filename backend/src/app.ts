@@ -2,6 +2,8 @@ import path from "node:path";
 import cors from "cors";
 import express, { type Request, type Response } from "express";
 import { i18nMiddleware } from "./middleware/i18n";
+import { requestContextMiddleware } from "./middleware/request-id.middleware";
+import { LogService } from "./core/logger/logger.service";
 
 import { config } from "./config";
 import { initializeDatabase, migrateDatabase } from "./db";
@@ -27,7 +29,7 @@ import { pricingCategoriesRouter } from "./routes/pricing-categories";
 
 
 export async function app() {
-  console.log(`Environment: ${config.environment}`);
+  LogService.info(`Starting BizCore API`, { environment: config.environment });
   await initializeDatabase();
   await createAdminUser();
   if (config.autoMigrateOnStartup) {
@@ -44,6 +46,7 @@ export async function app() {
   );
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(requestContextMiddleware);
   app.use(logger);
   app.use(i18nMiddleware);
 
@@ -57,6 +60,16 @@ export async function app() {
       username: req.user?.username || "",
       lang: req.i18n?.lang || "en",
     });
+  });
+
+  // Frontend log ingestion endpoint
+  app.post("/api/logs", (req: Request, res: Response): void => {
+    const { level, message, data } = req.body as { level: string; message: string; data?: Record<string, unknown> };
+    const safeLevel = ['info', 'warn', 'error', 'debug'].includes(level?.toLowerCase())
+      ? (level.toLowerCase() as 'info' | 'warn' | 'error' | 'debug')
+      : 'info';
+    LogService[safeLevel](message, { source: 'frontend', ...(data ?? {}) });
+    res.sendStatus(200);
   });
   app.use("/api/auth", authRouter);
   app.use("/api/users", authRequired, requireRole("admin"), usersRouter);

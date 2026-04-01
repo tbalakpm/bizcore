@@ -1,6 +1,7 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   type ApplicationConfig,
+  ErrorHandler,
   LOCALE_ID,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
@@ -13,6 +14,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { routes } from './app.routes';
 import { authInterceptor } from './auth/auth-interceptor';
+import { GlobalErrorHandler } from './utils/global-error-handler';
 import * as allIcons from '@ant-design/icons-angular/icons';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { provideNzConfig } from 'ng-zorro-antd/core/config';
@@ -45,5 +47,6 @@ export const appConfig: ApplicationConfig = {
     }),
     { provide: NZ_I18N, useValue: en_US },
     provideCharts(withDefaultRegisterables()),
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ],
 };

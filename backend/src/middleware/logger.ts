@@ -1,15 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
+import { LogService } from '../core/logger/logger.service';
 
-// ANSI color codes
-const colors = {
-  reset: '\x1b[0m',
-  info: '\x1b[36m', // Cyan
-  warn: '\x1b[33m', // Yellow
-  err: '\x1b[31m', // Red
-  gray: '\x1b[90m', // Gray
-};
-
-export function logger(req: Request, res: Response, next: NextFunction) {
+export function logger(req: Request, res: Response, next: NextFunction): void {
   try {
     const url = (Array.isArray(req.url) ? req.url.join(', ') : req.url).padEnd(60, ' ').slice(0, 60);
     const startTime = Date.now();
@@ -23,21 +15,14 @@ export function logger(req: Request, res: Response, next: NextFunction) {
       const timeTaken = Date.now() - startTime;
       const statusCode = res.statusCode;
 
+      const meta = { method: req.method, url: req.url, ip, statusCode, timeTaken, responseSize };
+
       if (statusCode >= 500) {
-        // Log server errors with ERR level
-        console.error(
-          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.err}[ERR ]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(4, ' ')}ms - Size: ${responseSize.toString().padStart(6, ' ')} bytes`,
-        );
-      } else if (statusCode >= 400 && statusCode < 500) {
-        // Log client errors with WARN level
-        console.warn(
-          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.warn}[WARN]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(4, ' ')}ms - Size: ${responseSize.toString().padStart(6, ' ')} bytes`,
-        );
+        LogService.error(`${method} ${url} - ${statusCode} [${timeTaken}ms, ${responseSize}B]`, undefined, meta);
+      } else if (statusCode >= 400) {
+        LogService.warn(`${method} ${url} - ${statusCode} [${timeTaken}ms, ${responseSize}B]`, meta);
       } else {
-        // Log successful requests with INFO level
-        console.log(
-          `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.info}[INFO]${colors.reset} ${method} ${url} (IP: ${ip}) - Status: ${statusCode} - Time: ${timeTaken.toString().padStart(4, ' ')}ms - Size: ${responseSize.toString().padStart(6, ' ')} bytes`,
-        );
+        LogService.info(`${method} ${url} - ${statusCode} [${timeTaken}ms, ${responseSize}B]`, meta);
       }
 
       return originalSend.call(this, data);
@@ -46,10 +31,7 @@ export function logger(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const url = Array.isArray(req.url) ? req.url.join(', ') : req.url;
-    console.log(
-      `${colors.gray}[${new Date().toLocaleTimeString()}]${colors.reset} ${colors.err}[ERR ]${colors.reset} ${req.method} ${url} error occurred.\n`,
-      err,
-    );
+    LogService.error(`${req.method} ${url} – middleware error`, err);
     next();
   }
 }

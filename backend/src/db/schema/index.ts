@@ -30,3 +30,6 @@ export type { SupplierBank, NewSupplierBank } from './supplier-bank.schema';
 
 export { productBundles } from './product-bundles.schema';
 export type { ProductBundle } from './product-bundles.schema';
+
+export { auditLogs } from './audit-log.schema';
+export type { AuditLog, NewAuditLog } from './audit-log.schema';

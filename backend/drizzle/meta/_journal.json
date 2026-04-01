@@ -15,6 +15,13 @@
       "when": 1774444756475,
       "tag": "0001_global-gtn-settings",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1775056105964,
+      "tag": "0002_empty_ares",
+      "breakpoints": true
     }
   ]
 }
