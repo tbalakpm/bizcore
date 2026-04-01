@@ -49,7 +49,6 @@ export class Categories implements OnInit {
   editing: Category | null = null;
 
   ngOnInit(): void {
-    this.loadCategories();
   }
 
   loadCategories() {

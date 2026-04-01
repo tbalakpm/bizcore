@@ -49,7 +49,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.categoryService.getAll().subscribe((res) => this.categories.set(res.data));
-    this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
+    // this.productService.getAll({}).subscribe((res) => this.productList.set(res.data));
     this.loadProduct();
   }
 
@@ -102,7 +102,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
     this.product = this.blankProduct();
     this.cancelled.emit();
   }
-  
+
   addBundleItem(): void {
     if (!this.product.bundleItems) {
       this.product.bundleItems = [];

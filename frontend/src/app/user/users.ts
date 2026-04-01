@@ -77,7 +77,6 @@ export class Users implements OnInit {
   error: string | null = null;
 
   ngOnInit(): void {
-    this.loadUsers();
   }
 
   defaultPermissions(): Record<string, string> {

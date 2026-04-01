@@ -84,7 +84,6 @@ export class Suppliers implements OnInit {
   error: string | null = null;
 
   ngOnInit(): void {
-    this.loadSuppliers();
   }
 
   loadSuppliers() {

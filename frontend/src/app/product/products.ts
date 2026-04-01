@@ -57,7 +57,6 @@ export class Products implements OnInit {
   error: string | null = null;
 
   ngOnInit(): void {
-    this.loadProducts();
   }
 
   loadProducts() {

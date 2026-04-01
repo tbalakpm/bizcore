@@ -89,7 +89,6 @@ export class Customers implements OnInit {
   error: string | null = null;
 
   ngOnInit(): void {
-    this.loadCustomers();
     this.loadPricingCategories();
   }
 

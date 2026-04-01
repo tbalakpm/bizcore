@@ -56,7 +56,6 @@ export class PricingCategories implements OnInit {
   marginsLoading = false;
 
   ngOnInit(): void {
-    this.loadCategories();
     this.loadProducts();
   }
 
