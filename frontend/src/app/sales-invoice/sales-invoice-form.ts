@@ -176,7 +176,7 @@ export class SalesInvoiceForm implements OnInit {
         this.companyGstin = setting.value || '';
         this.recalculateAllTaxes();
       },
-      error: () => {}
+      error: () => { }
     });
 
     // Initialize date from default invoice
@@ -424,10 +424,10 @@ export class SalesInvoiceForm implements OnInit {
       this.selectedPricingCategoryName = customer.pricingCategoryName || null;
       this.pricingCategoryService.getProducts(customer.pricingCategoryId).subscribe({
         next: (margins) => { this.pricingCategoryMargins = margins; },
-        error: () => {},
+        error: () => { },
       });
     }
-    
+
     // Recalculate taxes based on possible new customer GSTIN
     this.recalculateAllTaxes();
   }
@@ -517,15 +517,15 @@ export class SalesInvoiceForm implements OnInit {
   }
 
   addItemRow() {
-    this.editingInvoice.items.push({ 
-      qty: 1, 
-      unitPrice: 0, 
-      taxPct: 0, 
-      taxAmount: 0, 
+    this.editingInvoice.items.push({
+      qty: 1,
+      unitPrice: 0,
+      taxPct: 0,
+      taxAmount: 0,
       discountType: this.editingInvoice.discountType || 'none',
       discountPct: this.editingInvoice.discountPct || 0,
-      discountAmount: this.editingInvoice.discountAmount || 0, 
-      lineTotal: 0 
+      discountAmount: this.editingInvoice.discountAmount || 0,
+      lineTotal: 0
     });
     setTimeout(() => {
       const lastSelect = this.itemRowSelects.last;

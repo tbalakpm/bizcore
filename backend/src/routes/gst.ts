@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import { gstService } from '../services/gst.service';
+import { LogService } from '../core/logger/logger.service';
 
 export const gstRouter = express.Router();
 
@@ -9,7 +10,7 @@ gstRouter.get('/captcha', async (req: Request, res: Response) => {
     const captcha = await gstService.getCaptcha();
     res.json(captcha);
   } catch (error: any) {
-    console.error('Failed to get captcha', error);
+    LogService.error('Failed to get captcha', error);
     res.status(500).json({ error: error.message || 'Failed to get captcha' });
   }
 });
@@ -30,7 +31,7 @@ gstRouter.post('/details', async (req: Request, res: Response) => {
 
     res.json(details);
   } catch (error: any) {
-    console.error('Failed to fetch taxpayer details', error);
+    LogService.error('Failed to fetch taxpayer details', error);
     res.status(400).json({ error: error.message || 'Failed to fetch taxpayer details' });
   }
 });

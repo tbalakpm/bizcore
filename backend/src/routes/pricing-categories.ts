@@ -5,6 +5,7 @@ import { db } from '../db';
 import { pricingCategories, pricingCategoryProducts, products } from '../db/schema';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 import { toNumber } from '../utils/number.util';
+import { LogService } from '../core/logger/logger.service';
 
 export const pricingCategoriesRouter = express.Router();
 
@@ -87,7 +88,7 @@ pricingCategoriesRouter.get('/', async (req: Request, res: Response) => {
         : { limit: result.length, offset: 0, total: filteredCount, page: 1, totalPages: 1 },
     });
   } catch (error) {
-    console.error('Failed to fetch pricing categories', error);
+    LogService.error('Failed to fetch pricing categories', error);
     res.status(500).json({ error: 'Failed to fetch pricing categories' });
   }
 });
@@ -117,7 +118,7 @@ pricingCategoriesRouter.post('/', async (req, res) => {
       .get();
     res.status(201).json(category);
   } catch (err) {
-    console.error(err);
+    LogService.error('Failed to create pricing category', err);
     res.status(400).json({ error: 'Pricing category already exists or invalid data' });
   }
 });

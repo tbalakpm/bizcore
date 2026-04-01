@@ -1,6 +1,7 @@
 import { eq, sql, gt, and } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 import { db, inventories, products } from '../db';
+import { LogService } from '../core/logger/logger.service';
 
 export const inventoriesRouter = express.Router();
 
@@ -65,7 +66,7 @@ inventoriesRouter.get('/', async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error('Failed to fetch inventories', error);
+    LogService.error('Failed to fetch inventories', error);
     res.status(500).json({ error: 'Failed to fetch available stock' });
   }
 });

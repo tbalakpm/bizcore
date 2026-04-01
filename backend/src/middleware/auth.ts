@@ -6,6 +6,7 @@ import { db } from '../db';
 import { users } from '../db';
 import { eq } from 'drizzle-orm';
 import { setUserId } from '../core/logger/request-context';
+import { LogService } from '../core/logger/logger.service';
 
 export async function authRequired(req: Request, res: Response, next: NextFunction) {
   let token: string | undefined;
@@ -46,7 +47,7 @@ export async function authRequired(req: Request, res: Response, next: NextFuncti
     next();
   } catch (err) {
     req.user = undefined;
-    console.error('Auth verification failed');
+    LogService.error('Auth verification failed');
     return res.status(401).json({ error: req.i18n?.t('auth.invalid') });
   }
 }

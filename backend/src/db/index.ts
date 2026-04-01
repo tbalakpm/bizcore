@@ -2,6 +2,7 @@ import { drizzle } from 'drizzle-orm/libsql';
 import { migrate } from 'drizzle-orm/libsql/migrator';
 import { createClient } from '@libsql/client';
 import { config } from '../config';
+import { LogService } from '../core/logger/logger.service';
 
 export * from './schema';
 
@@ -13,7 +14,7 @@ const client = createClient({
 export const db = drizzle(client, { logger: false /*config.isDevelopment*/, casing: 'snake_case' });
 
 export const initializeDatabase = async () => {
-  console.log('Initializing database');
+  LogService.info('Initializing database');
   await db.run(`
     PRAGMA journal_mode=WAL;
     PRAGMA synchronous=NORMAL;
@@ -22,6 +23,6 @@ export const initializeDatabase = async () => {
 };
 
 export const migrateDatabase = async () => {
-  console.log('Migrating database');
+  LogService.info('Migrating database');
   await migrate(db, { migrationsFolder: './drizzle' });
 };

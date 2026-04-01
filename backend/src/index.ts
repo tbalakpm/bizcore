@@ -1,11 +1,13 @@
 import { Server } from 'node:http';
 import { app } from './app';
+import { LogService } from './core/logger/logger.service';
 
 /* ✅ Graceful shutdown */
 const shutdown = (server: Server) => {
-  console.log('🛑 Shutting down...');
+  LogService.info('🛑 Shutting down...');
+
   server.close(() => {
-    console.log('✅ Server closed');
+    LogService.info('✅ Server closed');
     process.exit(0);
   });
 };
@@ -13,12 +15,13 @@ const shutdown = (server: Server) => {
 app()
   .then(({ express, port }) => {
     const server = express.listen(port, () => {
-      console.log(`Server (api) listening on http://localhost:${port}`);
+      LogService.info(`Server (api) listening on http://localhost:${port}`);
     });
 
     process.on('SIGINT', () => shutdown(server)); // Ctrl+C
     process.on('SIGTERM', () => shutdown(server)); // kill
   })
   .catch((err) => {
-    console.error('Failed to start server:', err);
+    LogService.error('Failed to start server:', err);
+    process.exit(1);
   });

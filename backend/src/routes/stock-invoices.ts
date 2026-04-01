@@ -367,7 +367,7 @@ stockInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
 
     return res.json({ ...invoice, items });
   } catch (error) {
-    console.error('Failed to fetch stock invoice', error);
+    LogService.error('Failed to fetch stock invoice', error);
     return res.status(500).json({ error: 'Failed to fetch stock invoice' });
   }
 });
@@ -502,7 +502,7 @@ stockInvoicesRouter.get('/:id/barcodes/pdf', async (req: Request, res: Response)
           margin: [0, 0, 0, 10]
         });
       } catch (err) {
-        console.error('barcode generation failed', err);
+        LogService.error('barcode generation failed', err);
         // fall back to text
         content.push({
           text: label.code,

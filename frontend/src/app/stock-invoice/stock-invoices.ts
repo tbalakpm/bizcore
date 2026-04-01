@@ -219,7 +219,6 @@ export class StockInvoices implements OnInit {
 
   private openBarcodePrintWindow(labels: PrintableBarcodeLabel[], width: number, height: number, columns: number) {
     const printWindow = window.open('', '_blank', 'width=1024,height=768');
-    // console.log('Print window opened:', printWindow?.document.documentElement.innerHTML);
     if (!printWindow) {
       this.error = 'Popup blocked. Please allow popups and try again.';
       return;

@@ -2,6 +2,7 @@ import { text } from 'node:stream/consumers';
 import type { PdfDocument } from './pdf-document';
 import type { CompanyInfo, ReportMeta, Address, TableColumn } from './pdf-types';
 import bwipjs from 'bwip-js';
+import { LogService } from '../../../core/logger/logger.service';
 
 // --- Section 1: Company Header ---
 export function renderCompanyHeader(pdf: PdfDocument, company: CompanyInfo): void {
@@ -124,7 +125,7 @@ export async function renderEInvoiceBlock(
         alignment: 'right'
       });
     } catch (e) {
-      console.error('QR rendering failed', e);
+      LogService.error('QR rendering failed', e);
     }
   }
 

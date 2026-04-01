@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import https from 'node:https';
+import { LogService } from '../core/logger/logger.service';
 
 export interface GstinDetails {
   name: string;
@@ -46,7 +47,7 @@ async function httpRequest(url: string, options: any = {}): Promise<{ body: stri
           try {
             body = JSON.parse(buffer.toString());
           } catch (e) {
-            console.error('Failed to parse JSON response', buffer.toString());
+            LogService.error('Failed to parse JSON response', buffer.toString());
           }
         }
         resolve({
@@ -129,7 +130,7 @@ export class GstService {
         sessionId
       };
     } catch (error: any) {
-      console.error('GST Captcha Error:', error.message);
+      LogService.error('GST Captcha Error:', error.message);
       throw error;
     }
   }
@@ -158,7 +159,7 @@ export class GstService {
     const data = responseData.body as any;
     if (!data || data.status_cd === '0') throw new Error(data?.message || 'Invalid captcha or search failed');
 
-    console.log('GSTIN data', data);
+    LogService.info('GSTIN data', data);
     const addr = data.pradr?.addr || {};
     return {
       gstin: data.gstin || gstin,
