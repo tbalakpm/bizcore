@@ -23,6 +23,11 @@ export class AuthService {
   private http: HttpClient = inject(HttpClient);
   private router = inject(Router);
   private readonly TOKEN_KEY = 'bc_token';
+  private refreshTimer?: any;
+
+  constructor() {
+    this.scheduleAutoLogout(this.token);
+  }
 
   // ─── Token storage (sessionStorage – clears on tab close) ─────────────────
 
@@ -32,16 +37,47 @@ export class AuthService {
   private setToken(token: string): void {
     sessionStorage.setItem(this.TOKEN_KEY, token);
     this.tokenSignal.set(token);
+    this.scheduleAutoLogout(token);
   }
 
   private removeToken(): void {
     sessionStorage.removeItem(this.TOKEN_KEY);
     this.tokenSignal.set(null);
+    this.clearAutoLogout();
   }
 
   get token(): string | null {
     if (typeof window === 'undefined') return null;
     return sessionStorage.getItem(this.TOKEN_KEY);
+  }
+
+  private scheduleAutoLogout(token: string | null): void {
+    this.clearAutoLogout();
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode<DecodedToken>(token);
+      const expiry = decoded.exp * 1000;
+      const delay = expiry - Date.now();
+
+      if (delay > 0) {
+        this.refreshTimer = setTimeout(() => {
+          this.logout();
+        }, delay);
+      } else {
+        // Already expired
+        this.logout();
+      }
+    } catch {
+      this.logout();
+    }
+  }
+
+  private clearAutoLogout(): void {
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = undefined;
+    }
   }
 
   // ─── Decoded token helpers ─────────────────────────────────────────────────
@@ -100,7 +136,7 @@ export class AuthService {
   logout(): void {
     this.http
       .post(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true })
-      .subscribe({ error: () => {} }); // best-effort
+      .subscribe({ error: () => { } }); // best-effort
     this.removeToken();
     this.router.navigateByUrl('/login');
   }
