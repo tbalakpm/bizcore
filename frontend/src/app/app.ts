@@ -6,10 +6,12 @@ import { PermissionService } from './auth/permission.service';
 import { DatePipe } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, DatePipe, NzIconModule, NzTooltipModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, DatePipe, NzIconModule, NzTooltipModule, NzDropDownModule, NzAvatarModule],
   templateUrl: './app.html',
 })
 export class App implements OnDestroy {

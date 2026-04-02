@@ -11,11 +11,19 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
   canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree {
     if (!this.auth.isLoggedIn) return this.router.parseUrl('/login');
+
+    if (this.auth.mustChangePassword && !route.routeConfig?.path?.includes('change-password')) {
+      return this.router.parseUrl('/change-password');
+    }
     return this.checkPermission(route);
   }
 
   canActivateChild(route: ActivatedRouteSnapshot): boolean | UrlTree {
     if (!this.auth.isLoggedIn) return this.router.parseUrl('/login');
+
+    if (this.auth.mustChangePassword && !route.routeConfig?.path?.includes('change-password')) {
+      return this.router.parseUrl('/change-password');
+    }
     return this.checkPermission(route);
   }
 

@@ -1,11 +1,13 @@
 import type { Routes } from '@angular/router';
 import { AuthGuard } from './auth/auth-guard';
 import { Login } from './auth/login';
+import { ChangePassword } from './auth/change-password';
 import { Dashboard } from './dashboard/dashboard';
 import { Categories } from './category/categories';
 import { Products } from './product/products';
 import { Customers } from './customer/customers';
 import { Users } from './user/users';
+import { Profile } from './user/profile';
 import { StockInvoices } from './stock-invoice/stock-invoices';
 import { StockInvoiceForm } from './stock-invoice/stock-invoice-form';
 import { SalesInvoices } from './sales-invoice/sales-invoices';
@@ -20,6 +22,7 @@ import { SerialSettings } from './settings/serial-settings';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
+  { path: 'change-password', component: ChangePassword, canActivate: [AuthGuard] },
   {
     path: '',
     canActivate: [AuthGuard],
@@ -58,6 +61,7 @@ export const routes: Routes = [
         ],
       },
       { path: 'users', component: Users, data: { module: 'users' } },
+      { path: 'profile', component: Profile },
       {
         path: 'settings',
         component: Settings,

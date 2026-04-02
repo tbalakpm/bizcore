@@ -31,6 +31,10 @@ export const users = sqliteTable(
 
     permissions: text("permissions").default("{}"),
 
+    mustChangePassword: integer("must_change_password", { mode: "boolean" })
+      .notNull()
+      .default(true),
+
     ...auditFields,
   },
   (t) => [

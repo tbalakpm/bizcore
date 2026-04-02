@@ -14,6 +14,8 @@ export interface User {
   role: string;
   permissions?: string | Partial<UserPermissions>;
   isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UserList {
@@ -64,5 +66,9 @@ export class UserService {
 
   delete(id: number) {
     return this.http.delete(`${environment.apiUrl}/users/${id}`);
+  }
+
+  resetPassword(id: number, newPassword: string): Observable<unknown> {
+    return this.http.post(`${environment.apiUrl}/users/${id}/reset-password`, { newPassword });
   }
 }

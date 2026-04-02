@@ -4,7 +4,7 @@
     class="flex flex-wrap justify-between items-center gap-2 px-3 md:px-4 py-2 bg-chrome text-chrome-text-bright shadow border-b border-chrome-border"
   >
     <div class="flex items-center justify-center align-middle gap-3">
-      @if (this.auth.isLoggedIn) {
+      @if (this.auth.isLoggedIn && !this.auth.mustChangePassword) {
         <button
           (click)="toggleSidebar()"
           class="w-8 h-8 rounded hover:bg-chrome-hover text-chrome-text transition-colors focus:outline-none cursor-pointer"
@@ -50,21 +50,37 @@
           ></span>
         }
       </button>
-      @if (this.auth.isLoggedIn) {
-        <button
-          (click)="logout()"
-          class="underline text-lg cursor-pointer text-chrome-text-bright hover:text-white transition-colors"
+      @if (this.auth.isLoggedIn && !this.auth.mustChangePassword) {
+        <a
+          nz-dropdown
+          [nzDropdownMenu]="userMenu"
+          class="flex items-center gap-2 cursor-pointer hover:bg-chrome-hover px-2 py-1 rounded transition-colors"
         >
-          <span nz-icon nzType="logout" nzTheme="outline" class="text-chrome-text-bright"></span>
-          {{ 'MENU.LOGOUT' | translate }}
-        </button>
+          <nz-avatar nzIcon="user" nzSize="small" class="bg-accent"></nz-avatar>
+          <span class="text-chrome-text-bright hidden md:inline">{{ auth.decodedToken?.username }}</span>
+          <span nz-icon nzType="down" class="text-xs text-chrome-text opacity-70"></span>
+        </a>
+
+        <nz-dropdown-menu #userMenu="nzDropdownMenu">
+          <ul nz-menu class="min-w-[150px] shadow-lg rounded-md border border-border">
+            <li nz-menu-item routerLink="/profile">
+              <span nz-icon nzType="user" class="mr-2"></span>
+              {{ 'MENU.PROFILE' | translate }}
+            </li>
+            <li nz-menu-divider></li>
+            <li nz-menu-item (click)="logout()" class="text-error">
+              <span nz-icon nzType="logout" class="mr-2"></span>
+              {{ 'MENU.LOGOUT' | translate }}
+            </li>
+          </ul>
+        </nz-dropdown-menu>
       }
     </div>
   </header>
 
   <!-- Sidebar + Content -->
   <div class="app-shell-main flex grow min-h-0">
-    @if (this.auth.isLoggedIn) {
+    @if (this.auth.isLoggedIn && !this.auth.mustChangePassword) {
       <aside
         class="app-shell-sidebar bg-chrome text-chrome-text-bright py-4 flex flex-col relative transition-all duration-300 ease-in-out border-r border-chrome-border space-y-1 overflow-x-hidden"
         [style.width.px]="isSidebarCollapsed() ? 64 : sidebarWidth()"

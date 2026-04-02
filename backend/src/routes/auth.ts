@@ -21,13 +21,14 @@ function hashToken(raw: string): string {
 }
 
 /** Sign a short-lived access JWT */
-function signAccessToken(user: { id: number; username: string; role: string; permissions: string | null }) {
+function signAccessToken(user: { id: number; username: string; role: string; permissions: string | null; mustChangePassword: boolean }) {
   return jwt.sign(
     {
       sub: user.id,
       username: user.username,
       role: user.role,
       permissions: JSON.parse(user.permissions || '{}'),
+      mustChangePassword: user.mustChangePassword,
     },
     config.jwtSecret,
     { expiresIn: config.accessTokenExpirySeconds },
@@ -97,6 +98,7 @@ authRouter.post('/login', rateLimit({ windowMs: 60 * 1000, max: 10 }), async (re
       role: users.role,
       permissions: users.permissions,
       isActive: users.isActive,
+      mustChangePassword: users.mustChangePassword,
     })
     .from(users)
     .where(eq(users.username, username))
@@ -158,6 +160,7 @@ authRouter.post('/refresh', async (req: Request, res: Response) => {
       role: users.role,
       permissions: users.permissions,
       isActive: users.isActive,
+      mustChangePassword: users.mustChangePassword,
     })
     .from(users)
     .where(eq(users.id, record.userId))
@@ -190,4 +193,33 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
 
   clearRefreshCookie(res);
   return res.json({ message: 'Logged out' });
+});
+/** Change password: required if mustChangePassword is true */
+authRouter.post('/change-password', async (req: Request, res: Response) => {
+  const { newPassword } = req.body;
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const token = authHeader.slice(7);
+  try {
+    const payload = jwt.verify(token, config.jwtSecret) as any;
+    const userId = parseInt(payload.sub, 10);
+
+    if (!newPassword || !isStrongPassword(newPassword)) {
+      return res.status(400).json({ error: 'Password must be at least 8 chars with upper, lower and number' });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await db
+      .update(users)
+      .set({ passwordHash, mustChangePassword: false })
+      .where(eq(users.id, userId));
+
+    return res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
 });

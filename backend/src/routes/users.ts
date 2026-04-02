@@ -240,3 +240,34 @@ usersRouter.delete('/:id', async (req, res) => {
   LogService.info('User deleted successfully', { userId: id, username: user.username });
   res.status(204).send();
 });
+
+usersRouter.post('/:id/reset-password', async (req: Request, res: Response) => {
+  const idStr = req.params.id as string;
+  const id = parseInt(idStr, 10);
+  const { newPassword } = req.body;
+
+  if (!newPassword || !isStrongPassword(newPassword)) {
+    return res.status(400).json({ error: 'New password is too weak' });
+  }
+
+  const user = await db.select().from(users).where(eq(users.id, id)).get();
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await db
+    .update(users)
+    .set({ passwordHash, mustChangePassword: true })
+    .where(eq(users.id, id))
+    .run();
+
+  await auditLog({
+    action: 'RESET_PASSWORD',
+    entity: 'USER',
+    entityId: id,
+  });
+
+  LogService.info('User password reset by admin', { userId: id });
+  res.json({ message: 'Password reset successful. User must change it on next login.' });
+});

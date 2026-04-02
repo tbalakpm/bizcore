@@ -32,6 +32,7 @@ export async function authRequired(req: Request, res: Response, next: NextFuncti
         username: users.username,
         role: users.role,
         isActive: users.isActive,
+        mustChangePassword: users.mustChangePassword,
       })
       .from(users)
       .where(eq(users.id, parseInt(payload.sub!, 10)))
@@ -39,6 +40,10 @@ export async function authRequired(req: Request, res: Response, next: NextFuncti
 
     if (!user || !user.isActive) {
       return res.status(401).json({ error: req.i18n?.t('auth.invalid') });
+    }
+
+    if (user.mustChangePassword) {
+      return res.status(403).json({ error: 'Password change required', code: 'MUST_CHANGE_PASSWORD' });
     }
 
     req.user = user;

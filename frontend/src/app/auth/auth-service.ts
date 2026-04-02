@@ -16,6 +16,7 @@ export interface DecodedToken {
   role: string;
   permissions: Partial<UserPermissions>;
   exp: number;
+  mustChangePassword: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -102,6 +103,10 @@ export class AuthService {
     return !!this.tokenSignal();
   }
 
+  get mustChangePassword(): boolean {
+    return this.decodedToken?.mustChangePassword ?? false;
+  }
+
   get currentUserRole(): string | null {
     return this.decodedToken?.role ?? null;
   }
@@ -130,6 +135,13 @@ export class AuthService {
     return this.http
       .post<AuthResponse>(`${environment.apiUrl}/auth/refresh`, {}, { withCredentials: true })
       .pipe(tap((res) => this.setToken(res.token)));
+  }
+
+  /** Change password and reset flag */
+  changePassword(newPassword: string): Observable<unknown> {
+    return this.http
+      .post(`${environment.apiUrl}/auth/change-password`, { newPassword }, { withCredentials: true })
+      .pipe(tap(() => this.logout())); // Force re-login with new password
   }
 
   /** Revoke the refresh token server-side and clear local state */

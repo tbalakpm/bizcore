@@ -291,6 +291,19 @@
                   <button
                     nz-button
                     nzType="link"
+                    nzSize="small"
+                    nz-popconfirm
+                    nzPopconfirmTitle="Reset password to 'Welcome123'?"
+                    (nzOnConfirm)="resetPassword(u.id)"
+                    nz-tooltip
+                    nzTooltipTitle="Reset password"
+                    style="color: var(--color-warning)"
+                  >
+                    <span nz-icon nzType="key" nzTheme="outline"></span>
+                  </button>
+                  <button
+                    nz-button
+                    nzType="link"
                     nzDanger
                     nzSize="small"
                     nz-popconfirm

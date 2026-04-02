@@ -1,0 +1,132 @@
+<div class="max-w-4xl mx-auto space-y-6 p-4">
+  <h1 class="text-2xl font-bold text-text-bright mb-6">{{ 'PROFILE.TITLE' | translate }}</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- User Info & Profile settings -->
+    <div class="space-y-6">
+      <nz-card [nzTitle]="'PROFILE.DETAILS' | translate" class="shadow-sm border-border rounded-lg">
+        <div class="space-y-4">
+          <div class="flex items-center gap-4 mb-4">
+            <div
+              class="w-16 h-16 rounded-full bg-accent flex items-center justify-center text-white text-3xl font-bold"
+            >
+              {{ user()?.username?.substring(0, 1)?.toUpperCase() }}
+            </div>
+            <div>
+              <h2 class="text-xl font-semibold">{{ user()?.username }}</h2>
+              <p class="text-sm text-text-muted">{{ user()?.role }}</p>
+            </div>
+          </div>
+
+          <form nz-form nzLayout="vertical" (ngSubmit)="updateProfile()" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <nz-form-item>
+                <nz-form-label>{{ 'PROFILE.FIRST_NAME' | translate }}</nz-form-label>
+                <nz-form-control>
+                  <input
+                    nz-input
+                    [(ngModel)]="firstName"
+                    name="firstName"
+                    [placeholder]="'PROFILE.FIRST_NAME' | translate"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item>
+                <nz-form-label>{{ 'PROFILE.LAST_NAME' | translate }}</nz-form-label>
+                <nz-form-control>
+                  <input
+                    nz-input
+                    [(ngModel)]="lastName"
+                    name="lastName"
+                    [placeholder]="'PROFILE.LAST_NAME' | translate"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+
+            <button nz-button nzType="primary" class="w-full" [nzLoading]="loading()">
+              {{ 'PROFILE.UPDATE_PROFILE' | translate }}
+            </button>
+          </form>
+
+          <hr class="border-border my-4" />
+
+          <div class="text-xs text-text-muted flex justify-between">
+            <span
+              >{{ 'PROFILE.REGISTERED' | translate }}: {{ user()?.createdAt | date: 'short' }}</span
+            >
+            <span
+              >{{ 'PROFILE.LAST_UPDATE' | translate }}: {{ user()?.updatedAt | date: 'short' }}</span
+            >
+          </div>
+        </div>
+      </nz-card>
+    </div>
+
+    <!-- Security / Change Password -->
+    <div class="space-y-6">
+      <nz-card [nzTitle]="'PROFILE.SECURITY' | translate" class="shadow-sm border-border rounded-lg">
+        <h3 class="font-semibold mb-4">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</h3>
+        <form nz-form nzLayout="vertical" (ngSubmit)="changePassword()" class="space-y-4">
+          <nz-form-item>
+            <nz-form-label>{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-input-group nzPrefixIcon="lock">
+                <input
+                  type="password"
+                  nz-input
+                  [(ngModel)]="currentPassword"
+                  name="currentPassword"
+                  [placeholder]="'PROFILE.CURRENT_PASSWORD' | translate"
+                />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label>{{ 'AUTH.NEW_PASSWORD' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-input-group nzPrefixIcon="lock">
+                <input
+                  type="password"
+                  nz-input
+                  [(ngModel)]="newPassword"
+                  name="newPassword"
+                  [placeholder]="'AUTH.NEW_PASSWORD' | translate"
+                />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label>{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-input-group nzPrefixIcon="check">
+                <input
+                  type="password"
+                  nz-input
+                  [(ngModel)]="confirmPassword"
+                  name="confirmPassword"
+                  [placeholder]="'PROFILE.CONFIRM_PASSWORD' | translate"
+                />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          @if (passwordError()) {
+            <nz-alert nzType="error" [nzMessage]="passwordError()" class="mb-4" nzShowIcon></nz-alert>
+          }
+
+          <button
+            nz-button
+            nzType="primary"
+            class="w-full bg-accent border-none"
+            [nzLoading]="passwordLoading()"
+          >
+            {{ 'PROFILE.CHANGE_PASSWORD' | translate }}
+          </button>
+        </form>
+      </nz-card>
+    </div>
+  </div>
+</div>

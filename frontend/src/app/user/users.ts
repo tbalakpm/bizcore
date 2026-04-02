@@ -22,6 +22,7 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-users',
@@ -38,6 +39,7 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 export class Users implements OnInit {
   private userService = inject(UserService);
   private auth = inject(AuthService);
+  private message = inject(NzMessageService);
   permissionService = inject(PermissionService);
 
   users = signal<User[]>([]);
@@ -182,5 +184,17 @@ export class Users implements OnInit {
 
   deleteUser(id: number) {
     this.userService.delete(id).subscribe(() => this.loadUsers());
+  }
+
+  resetPassword(id: number) {
+    const tempPassword = 'Welcome123';
+    this.userService.resetPassword(id, tempPassword).subscribe({
+      next: () => {
+        this.message.success(`Password reset to: ${tempPassword}. User must change it on login.`);
+      },
+      error: (err) => {
+        this.message.error(err.error?.error || 'Failed to reset password');
+      }
+    });
   }
 }
