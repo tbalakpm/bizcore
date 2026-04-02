@@ -27,6 +27,7 @@ import { salesInvoicesRouter } from "./routes/sales-invoices";
 import { purchaseInvoicesRouter } from "./routes/purchase-invoices";
 import { gstRouter } from "./routes/gst";
 import { pricingCategoriesRouter } from "./routes/pricing-categories";
+import { dashboardRouter } from "./routes/dashboard";
 
 
 export async function app() {
@@ -89,6 +90,7 @@ export async function app() {
   app.use("/api/purchase-invoices", authRequired, purchaseInvoicesRouter);
   app.use("/api/serial-numbers", authRequired, serialNumbersRouter);
   app.use("/api/gst", authRequired, gstRouter);
+  app.use("/api/dashboard", authRequired, dashboardRouter);
 
 
   // Handle any requests that don't match the static files by serving the index.html file

@@ -1,0 +1,14 @@
+Dashboard
+    General:
+        Masters - Count, Active, Inactive
+    Inventory:
+        Sales (Qty, Amount) - Today, This Week, This Month, This Year
+        Purchases (Qty, Amount) - Today, This Week, This Month, This Year
+        Stock (Qty, Cost) - Total Stock, Low Stock, Out of Stock
+        Top 10 - Products (Qty, Sales Amount, Profit Amount), Customers, Suppliers
+        Aging - Stock
+    Financial Accounting:
+        Expenses (Amount) - Today, This Week, This Month, This Year
+        Income (Amount) - Today, This Week, This Month, This Year
+        Profit & Loss - Today, This Week, This Month, This Year
+        Aging - Receivables, Payables

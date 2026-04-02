@@ -3,253 +3,180 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, inject, type OnInit, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { ChartConfiguration, ChartOptions } from 'chart.js';
-import { BaseChartDirective } from 'ng2-charts';
-import { type Entry, EntryService } from '../entry/entry-service';
+// import { BaseChartDirective } from 'ng2-charts';
+// import { type Entry, EntryService } from '../entry/entry-service';
 import { getLocalYYYYMMDD } from '../utils/datefns';
 
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { DashboardService, type DashboardSummary } from './dashboard-service';
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [TranslatePipe, DecimalPipe, BaseChartDirective, DatePipe, NzCardModule, NzTableModule, NzIconModule, NzAlertModule],
+  imports: [TranslatePipe, DecimalPipe, DatePipe, NzCardModule, NzTableModule, NzIconModule, NzAlertModule, BaseChartDirective],
   templateUrl: './dashboard.html',
 })
 export class Dashboard implements OnInit {
-  entryService = inject(EntryService);
+  private dashboardService = inject(DashboardService);
+  today = new Date();
 
-  recentEntries = signal<Entry[]>([]);
-  todayTotalIncome = 0;
-  todayTotalExpenses = 0;
-  monthTotalIncome = 0;
-  monthTotalExpenses = 0;
+  // --- General ---
+  mastersSummary = signal({
+    customers: { total: 0, active: 0 },
+    suppliers: { total: 0, active: 0 },
+    products: { total: 0, active: 0 },
+  });
+
+  // --- Inventory ---
+  salesSummary = signal({
+    today: { count: 0, total: 0, profit: 0 },
+    week: { count: 0, total: 0, profit: 0 },
+    month: { count: 0, total: 0, profit: 0 },
+    year: { count: 0, total: 0, profit: 0 },
+  });
+
+  purchasesSummary = signal({
+    today: { count: 0, total: 0, tax: 0 },
+    week: { count: 0, total: 0, tax: 0 },
+    month: { count: 0, total: 0, tax: 0 },
+    year: { count: 0, total: 0, tax: 0 },
+  });
+
+  stockSummary = signal({
+    total: { qty: 0, cost: 0 },
+    reorderLevel: 0,
+    outOfStock: 0,
+  });
+
+  topProducts = signal<{ name: string; amount: number }[]>([]);
+
+  topCustomers = signal<{ name: string; amount: number }[]>([]);
+
+  topSuppliers = signal<{ name: string; amount: number }[]>([]);
+
+  agingStock = signal<{ range: string; qty: number; value: number }[]>([]);
+
+  // --- Financial Accounting ---
+  expensesSummary = signal({
+    today: 0,
+    week: 0,
+    month: 0,
+    year: 0,
+  });
+
+  incomeSummary = signal({
+    today: 0,
+    week: 0,
+    month: 0,
+    year: 0,
+  });
+
+  profitAndLoss = signal({
+    today: 0,
+    week: 0,
+    month: 0,
+    year: 0,
+  });
+
+  agingReceivables = signal<{ range: string; amount: number }[]>([]);
+
+  agingPayables = signal<{ range: string; amount: number }[]>([]);
+
+  recentActivities = signal<{ id: number; date: string; description: string; amount: number; type: string }[]>([]);
 
   loading = false;
   error: string | null = null;
 
-  // Keep month items for charts
-  private monthEntries = signal<Entry[]>([]);
-  // private monthExpenses = signal<Entry[]>([]);
-  // private monthIncome = signal<Entry[]>([]);
-
   // ---- Chart data ----
-  // Bar: daily totals in month
   dailyChartData: ChartConfiguration<'bar'>['data'] = {
     labels: [],
     datasets: [
-      {
-        data: [],
-        label: 'Daily Income',
-        // Leave colors default or set here if you want
-      },
-      {
-        data: [],
-        label: 'Daily Expenses',
-        // Leave colors default or set here if you want
-      },
+      { data: [], label: 'Daily Income' },
+      { data: [], label: 'Daily Expenses' },
     ],
   };
 
   dailyChartOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-    },
-    scales: {
-      x: {},
-      y: {
-        beginAtZero: true,
-      },
-    },
+    plugins: { legend: { display: false } },
+    scales: { x: {}, y: { beginAtZero: true } },
   };
 
-  // Pie: totals by category
   incomeCategoryChartData: ChartConfiguration<'pie'>['data'] = {
     labels: [],
-    datasets: [
-      {
-        data: [],
-        label: 'Income By Category',
-      },
-      {
-        data: [],
-        label: 'Expenses By Category',
-      },
-    ],
+    datasets: [{ data: [] }],
   };
 
   incomeCategoryChartOptions: ChartOptions<'pie'> = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'right',
-      },
-    },
+    plugins: { legend: { position: 'right' } },
   };
 
   expenseCategoryChartData: ChartConfiguration<'pie'>['data'] = {
     labels: [],
-    datasets: [
-      {
-        data: [],
-        label: 'Income By Category',
-      },
-      {
-        data: [],
-        label: 'Expenses By Category',
-      },
-    ],
+    datasets: [{ data: [] }],
   };
 
   expenseCategoryChartOptions: ChartOptions<'pie'> = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'right',
-      },
-    },
+    plugins: { legend: { position: 'right' } },
   };
 
   ngOnInit(): void {
-    // this.loadDashboard();
+    this.loadDashboard();
   }
 
   private loadDashboard() {
     this.loading = true;
     this.error = null;
 
-    const today = new Date();
-    const todayStr = getLocalYYYYMMDD(today);
-    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-    const monthStartStr = getLocalYYYYMMDD(monthStart);
-    const last7Start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 9);
-    const last7StartStr = getLocalYYYYMMDD(last7Start);
+    this.dashboardService.getSummary().subscribe({
+      next: (summary) => {
+        this.mastersSummary.set(summary.masters as any);
+        this.salesSummary.set(summary.sales as any);
+        this.purchasesSummary.set(summary.purchases as any);
+        this.stockSummary.set(summary.stock as any);
+        this.topProducts.set(summary.topProducts);
+        this.topCustomers.set(summary.topCustomers);
+        this.topSuppliers.set(summary.topSuppliers);
+        this.agingStock.set(summary.aging.stock);
+        this.agingReceivables.set(summary.aging.receivables);
+        this.agingPayables.set(summary.aging.payables);
+        this.incomeSummary.set(summary.finance.income);
+        this.expensesSummary.set(summary.finance.expenses);
+        this.profitAndLoss.set(summary.finance.profit);
+        this.recentActivities.set(summary.recentActivities);
 
-    // Today total expenses
-    this.entryService.getEntries(todayStr, todayStr).subscribe({
-      next: (res) => {
-        this.todayTotalIncome = res.totalIncome;
-        this.todayTotalExpenses = res.totalExpenses;
-      },
-      error: (err) => (this.error = err.error?.error || 'Failed to load today total'),
-    });
-
-    // Month total + chart data
-    this.entryService.getEntries(monthStartStr, todayStr).subscribe({
-      next: (res) => {
-        // const income = res.items.filter((e) => e.register?.category?.type === 'I');
-        // const expenses = res.items.filter((e) => e.register?.category?.type === 'E');
-
-        this.monthEntries.set(res.items);
-        this.monthTotalIncome = res.totalIncome;
-        this.monthTotalExpenses = res.totalExpenses;
-        // this.monthExpenses.set(expenses);
-        // this.monthIncome.set(income);
-        this.buildCharts();
-      },
-      error: (err) => {
-        this.error = err.error?.error || 'Failed to load month total';
-      },
-    });
-
-    // Recent 7 days
-    this.entryService.getEntries(last7StartStr, todayStr).subscribe({
-      next: (res) => {
-        this.recentEntries.set(res.items); //.slice(0, 10)); // limit to 10 items
+        this.buildCharts(summary);
         this.loading = false;
       },
       error: (err) => {
-        this.error = err.error?.error || 'Failed to load recent entries';
+        this.error = err.error?.error || 'Failed to load dashboard data';
         this.loading = false;
       },
     });
   }
 
-  private buildCharts() {
-    this.buildDailyChart();
-    this.buildCategoryChart();
+  private buildCharts(summary: DashboardSummary) {
+    this.buildDailyTrendsChart(summary);
   }
 
-  private buildDailyChart() {
-    // aggregate by date
-    const totalEntriesByDate = new Map<string, number>();
-    const totalIncomeByDate = new Map<string, number>();
-    const totalExpensesByDate = new Map<string, number>();
-
-    for (const e of this.monthEntries()) {
-      const date = e.date; // already yyyy-MM-dd
-      const amount = Number(e.amount || 0);
-
-      totalEntriesByDate.set(date, (totalEntriesByDate.get(date) || 0) + amount);
-      if (e.categoryType === 'I') {
-        totalIncomeByDate.set(date, (totalIncomeByDate.get(date) || 0) + amount);
-      } else if (e.categoryType === 'E') {
-        totalExpensesByDate.set(date, (totalExpensesByDate.get(date) || 0) + amount);
-      }
-    }
-
-    const sortedDates = Array.from(totalEntriesByDate.keys()).sort();
-    const expenseData = sortedDates.map((d) => totalExpensesByDate.get(d) ?? 0);
-    const incomeData = sortedDates.map((d) => totalIncomeByDate.get(d) ?? 0);
+  private buildDailyTrendsChart(summary: DashboardSummary) {
+    const dates = summary.dailyTrends.map((t) => t.date);
+    const incomeData = summary.dailyTrends.map((t) => t.income);
+    const expenseData = summary.dailyTrends.map((t) => t.expenses);
 
     this.dailyChartData = {
-      labels: sortedDates,
+      labels: dates,
       datasets: [
-        {
-          data: incomeData,
-          label: 'Daily Income',
-        },
-        {
-          data: expenseData,
-          label: 'Daily Expenses',
-        },
-      ],
-    };
-  }
-
-  private buildCategoryChart() {
-    // aggregate by category name
-    const incomeByRegister = new Map<string, number>();
-    const expensesByCategory = new Map<string, number>();
-
-    for (const e of this.monthEntries()) {
-      const registerName = e.registerName || 'Uncategorized';
-      const categoryName = e.categoryName || 'Uncategorized';
-      const amount = Number(e.amount || 0);
-
-      if (e.categoryType === 'I') {
-        incomeByRegister.set(registerName, (incomeByRegister.get(registerName) || 0) + amount);
-      } else {
-        expensesByCategory.set(categoryName, (expensesByCategory.get(categoryName) || 0) + amount);
-      }
-    }
-
-    const incomeLabels = Array.from(incomeByRegister.keys());
-    const incomeData = incomeLabels.map((l) => incomeByRegister.get(l) ?? 0);
-
-    const expenseLabels = Array.from(expensesByCategory.keys());
-    const expenseData = expenseLabels.map((l) => expensesByCategory.get(l) ?? 0);
-
-    this.incomeCategoryChartData = {
-      labels: incomeLabels,
-      datasets: [
-        {
-          data: incomeData,
-        },
-      ],
-    };
-
-    this.expenseCategoryChartData = {
-      labels: expenseLabels,
-      datasets: [
-        {
-          data: expenseData,
-        },
+        { data: incomeData, label: 'Daily Income', backgroundColor: '#3b82f6' },
+        { data: expenseData, label: 'Daily Expenses', backgroundColor: '#ef4444' },
       ],
     };
   }

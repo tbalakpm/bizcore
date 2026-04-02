@@ -1,171 +1,459 @@
-<div class="flex flex-col gap-4">
-  <h1 class="text-xl font-semibold flex items-center gap-2">
-    <span nz-icon nzType="dashboard" nzTheme="outline" class="text-2xl"></span>
-    {{ 'MENU.DASHBOARD' | translate }}
-  </h1>
+<div class="flex flex-col gap-6 p-4">
+  <div class="flex justify-between items-center">
+    <h1 class="text-2xl font-bold flex items-center gap-2 m-0">
+      <span nz-icon nzType="dashboard" nzTheme="outline"></span>
+      {{ 'MENU.DASHBOARD' | translate }}
+    </h1>
+    <div class="text-sm text-gray-500">Last updated: {{ today | date: 'medium' }}</div>
+  </div>
 
   @if (error) {
     <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
   }
 
-  <!-- Summary cards -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-    <nz-card>
-      <div class="flex justify-between items-center">
-        <div>
-          <p class="text-xs uppercase" style="color: var(--color-text-muted)">Income - Today</p>
-          <p class="text-2xl font-bold mt-1">{{ todayTotalIncome | number: '1.2-2' }}</p>
-        </div>
-        <span
-          nz-icon
-          nzType="wallet"
-          nzTheme="outline"
-          style="font-size: 24px; color: var(--color-primary)"
-        ></span>
-      </div>
-    </nz-card>
-
-    <nz-card>
-      <div class="flex justify-between items-center">
-        <div>
-          <p class="text-xs uppercase" style="color: var(--color-text-muted)">Expenses - Today</p>
-          <p class="text-2xl font-bold mt-1">{{ todayTotalExpenses | number: '1.2-2' }}</p>
-        </div>
-        <span
-          nz-icon
-          nzType="money-collect"
-          nzTheme="outline"
-          style="font-size: 24px; color: var(--color-primary)"
-        ></span>
-      </div>
-    </nz-card>
-
-    <nz-card>
-      <div class="flex justify-between items-center">
-        <div>
-          <p class="text-xs uppercase" style="color: var(--color-text-muted)">
-            Income - This Month
-          </p>
-          <p class="text-2xl font-bold mt-1">{{ monthTotalIncome | number: '1.2-2' }}</p>
-        </div>
-        <span
-          nz-icon
-          nzType="calendar"
-          nzTheme="outline"
-          style="font-size: 24px; color: var(--color-primary)"
-        ></span>
-      </div>
-    </nz-card>
-
-    <nz-card>
-      <div class="flex justify-between items-center">
-        <div>
-          <p class="text-xs uppercase" style="color: var(--color-text-muted)">
-            Expenses - This Month
-          </p>
-          <p class="text-2xl font-bold mt-1">{{ monthTotalExpenses | number: '1.2-2' }}</p>
-        </div>
-        <span
-          nz-icon
-          nzType="schedule"
-          nzTheme="outline"
-          style="font-size: 24px; color: var(--color-primary)"
-        ></span>
-      </div>
-    </nz-card>
-  </div>
-
-  <!-- Charts row -->
-  <nz-card>
-    <h2 class="text-sm font-semibold mb-2">Daily entries (this month)</h2>
-    <div class="relative h-[250px] mb-6">
-      <canvas baseChart [data]="dailyChartData" [options]="dailyChartOptions" [type]="'bar'">
-      </canvas>
+  <!-- Section: General -->
+  <section>
+    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+      <span nz-icon nzType="appstore" nzTheme="outline"></span>
+      General
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      @for (master of ['Customers', 'Suppliers', 'Products']; track master) {
+        @let data =
+          master === 'Customers'
+            ? mastersSummary().customers
+            : master === 'Suppliers'
+              ? mastersSummary().suppliers
+              : mastersSummary().products;
+        <nz-card [nzTitle]="master" nzSize="small">
+          <div class="flex flex-col gap-1">
+            <div class="flex justify-between">
+              <span class="text-gray-500">Total Count</span>
+              <span class="font-bold">{{ data.total }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-green-600">Active</span>
+              <span>{{ data.active }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-red-600">Inactive</span>
+              <span>{{ data.total - data.active }}</span>
+            </div>
+          </div>
+        </nz-card>
+      }
     </div>
-  </nz-card>
+  </section>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <nz-card>
-      <h2 class="text-sm font-semibold mb-2">Income By Register (this month)</h2>
-      <div class="relative h-[200px] mb-6">
-        <canvas
-          baseChart
-          [data]="incomeCategoryChartData"
-          [options]="incomeCategoryChartOptions"
-          [type]="'pie'"
-        >
-        </canvas>
-      </div>
-    </nz-card>
-
-    <nz-card>
-      <h2 class="text-sm font-semibold mb-2">Expenses By Category (this month)</h2>
-      <div class="relative h-[200px] mb-6">
-        <canvas
-          baseChart
-          [data]="expenseCategoryChartData"
-          [options]="expenseCategoryChartOptions"
-          [type]="'pie'"
-        >
-        </canvas>
-      </div>
-    </nz-card>
-  </div>
-
-  <!-- Recent entries table -->
-  <nz-card>
-    <h2 class="text-base font-semibold mb-2">
-      Recent Entries
-      <span class="text-sm font-normal" style="color: var(--color-text-muted)"
-        >- Quick overview of your last 10 days entries.</span
-      >
+  <!-- Section: Inventory -->
+  <section>
+    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+      <span nz-icon nzType="reconciliation" nzTheme="outline"></span>
+      Inventory
     </h2>
 
-    <nz-table
-      #recentTable
-      [nzData]="recentEntries()"
-      [nzLoading]="loading"
-      nzSize="small"
-      [nzShowPagination]="false"
-      [nzBordered]="true"
-    >
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Register</th>
-          <th>Description</th>
-          <th>Category</th>
-          <th class="text-right">Income</th>
-          <th class="text-right">Expenses</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (e of recentTable.data; track e.id) {
-          <tr>
-            <td>{{ e.date | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ e.registerName || '-' }}</td>
-            <td>{{ e.description }}</td>
-            <td>{{ e.categoryName || '-' }}</td>
-            <td class="text-right">
-              {{ e.categoryType === 'I' ? (e.amount | number: '1.2-2') : '' }}
-            </td>
-            <td class="text-right">
-              {{ e.categoryType === 'E' ? (e.amount | number: '1.2-2') : '' }}
-            </td>
-          </tr>
-        }
-        <!-- @if (!recentEntries().length && !loading) {
-          <tr>
-            <td
-              colspan="6"
-              class="text-center"
-              style="color: var(--color-text-muted); padding: 24px 0"
-            >
-              No entries in the last 7 days.
-            </td>
-          </tr>
-        } -->
-      </tbody>
-    </nz-table>
-  </nz-card>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Sales Summary -->
+      <nz-card nzTitle="Sales Summary" nzSize="small">
+        <nz-table
+          #salesTable
+          [nzData]="['Today', 'This Week', 'This Month', 'This Year']"
+          nzSize="small"
+          [nzShowPagination]="false"
+          [nzBordered]="true"
+        >
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @let sales = salesSummary();
+            <tr>
+              <td>Today</td>
+              <td class="text-right">{{ sales.today.count }}</td>
+              <td class="text-right">{{ sales.today.total | number: '1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>This Week</td>
+              <td class="text-right">{{ sales.week.count }}</td>
+              <td class="text-right">{{ sales.week.total | number: '1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>This Month</td>
+              <td class="text-right">{{ sales.month.count }}</td>
+              <td class="text-right">{{ sales.month.total | number: '1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>This Year</td>
+              <td class="text-right">{{ sales.year.count }}</td>
+              <td class="text-right">{{ sales.year.total | number: '1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-card>
+
+      <!-- Purchases Summary -->
+      <nz-card nzTitle="Purchases Summary" nzSize="small">
+        <nz-table
+          #purchasesTable
+          [nzData]="['Today', 'This Week', 'This Month', 'This Year']"
+          nzSize="small"
+          [nzShowPagination]="false"
+          [nzBordered]="true"
+        >
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @let purchases = purchasesSummary();
+            <tr>
+              <td>Today</td>
+              <td class="text-right">{{ purchases.today.count }}</td>
+              <td class="text-right">{{ purchases.today.total | number: '1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>This Week</td>
+              <td class="text-right">{{ purchases.week.count }}</td>
+              <td class="text-right">{{ purchases.week.total | number: '1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>This Month</td>
+              <td class="text-right">{{ purchases.month.count }}</td>
+              <td class="text-right">{{ purchases.month.total | number: '1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>This Year</td>
+              <td class="text-right">{{ purchases.year.count }}</td>
+              <td class="text-right">{{ purchases.year.total | number: '1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-card>
+    </div>
+
+    <!-- Stock Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+      <nz-card nzSize="small">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-xs uppercase text-gray-500 m-0">Total Stock</p>
+            <p class="text-xl font-bold m-0">
+              {{ stockSummary().total.qty }}
+              <span class="text-sm font-normal text-gray-400"
+                >({{ stockSummary().total.cost | number: '1.0-0' }})</span
+              >
+            </p>
+          </div>
+          <span nz-icon nzType="database" class="text-2xl text-blue-500"></span>
+        </div>
+      </nz-card>
+      <nz-card nzSize="small">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-xs uppercase text-gray-500 m-0">Low Stock</p>
+            <p class="text-xl font-bold m-0 text-orange-500">{{ stockSummary().reorderLevel }}</p>
+          </div>
+          <span nz-icon nzType="warning" class="text-2xl text-orange-500"></span>
+        </div>
+      </nz-card>
+      <nz-card nzSize="small">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-xs uppercase text-gray-500 m-0">Out of Stock</p>
+            <p class="text-xl font-bold m-0 text-red-500">{{ stockSummary().outOfStock }}</p>
+          </div>
+          <span nz-icon nzType="stop" class="text-2xl text-red-500"></span>
+        </div>
+      </nz-card>
+    </div>
+
+    <!-- Top 10 & Aging -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+      <nz-card nzTitle="Top 10 Products" nzSize="small">
+        <nz-table
+          #topProductsTable
+          [nzData]="topProducts()"
+          nzSize="small"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th class="text-right">Sales</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of topProductsTable.data; track p.name) {
+              <tr>
+                <td>{{ p.name }}</td>
+                <td class="text-right">{{ p.amount | number: '1.0-0' }}</td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </nz-card>
+
+      <nz-card nzTitle="Top 10 Customers" nzSize="small">
+        <nz-table
+          #topCustomersTable
+          [nzData]="topCustomers()"
+          nzSize="small"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of topCustomersTable.data; track c.name) {
+              <tr>
+                <td>{{ c.name }}</td>
+                <td class="text-right">{{ c.amount | number: '1.0-0' }}</td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </nz-card>
+
+      <nz-card nzTitle="Top 10 Suppliers" nzSize="small">
+        <nz-table
+          #topSuppliersTable
+          [nzData]="topSuppliers()"
+          nzSize="small"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>Supplier</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of topSuppliersTable.data; track s.name) {
+              <tr>
+                <td>{{ s.name }}</td>
+                <td class="text-right">{{ s.amount | number: '1.0-0' }}</td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </nz-card>
+
+      <nz-card nzTitle="Stock Aging" nzSize="small">
+        <nz-table
+          #agingStockTable
+          [nzData]="agingStock()"
+          nzSize="small"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>Range</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of agingStockTable.data; track a.range) {
+              <tr>
+                <td>{{ a.range }}</td>
+                <td class="text-right">{{ a.qty }}</td>
+                <td class="text-right">{{ a.value | number: '1.0-0' }}</td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </nz-card>
+    </div>
+  </section>
+
+  <!-- Section: Financial Accounting -->
+  <section>
+    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+      <span nz-icon nzType="bank" nzTheme="outline"></span>
+      Financial Accounting
+    </h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <nz-card nzTitle="Expenses" nzSize="small">
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-between">
+            <span>Today</span
+            ><span class="font-bold">{{ expensesSummary().today | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>This Week</span
+            ><span class="font-bold">{{ expensesSummary().week | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-blue-600">
+            <span>This Month</span
+            ><span class="font-bold">{{ expensesSummary().month | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>This Year</span
+            ><span class="font-bold">{{ expensesSummary().year | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </nz-card>
+
+      <nz-card nzTitle="Income" nzSize="small">
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-between">
+            <span>Today</span
+            ><span class="font-bold">{{ incomeSummary().today | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>This Week</span
+            ><span class="font-bold">{{ incomeSummary().week | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-green-600">
+            <span>This Month</span
+            ><span class="font-bold">{{ incomeSummary().month | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>This Year</span
+            ><span class="font-bold">{{ incomeSummary().year | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </nz-card>
+
+      <nz-card nzTitle="Profit & Loss" nzSize="small">
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-between">
+            <span>Today</span
+            ><span class="font-bold" [class.text-red-500]="profitAndLoss().today < 0">{{
+              profitAndLoss().today | number: '1.2-2'
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>This Week</span
+            ><span class="font-bold" [class.text-red-500]="profitAndLoss().week < 0">{{
+              profitAndLoss().week | number: '1.2-2'
+            }}</span>
+          </div>
+          <div class="flex justify-between text-purple-600">
+            <span>This Month</span
+            ><span class="font-bold" [class.text-red-500]="profitAndLoss().month < 0">{{
+              profitAndLoss().month | number: '1.2-2'
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>This Year</span
+            ><span class="font-bold" [class.text-red-500]="profitAndLoss().year < 0">{{
+              profitAndLoss().year | number: '1.2-2'
+            }}</span>
+          </div>
+        </div>
+      </nz-card>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <nz-card nzTitle="Aging - Receivables" nzSize="small">
+        <nz-table
+          #receivablesTable
+          [nzData]="agingReceivables()"
+          nzSize="small"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>Range</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of receivablesTable.data; track a.range) {
+              <tr>
+                <td>{{ a.range }}</td>
+                <td class="text-right font-semibold">{{ a.amount | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </nz-card>
+
+      <nz-card nzTitle="Aging - Payables" nzSize="small">
+        <nz-table
+          #payablesTable
+          [nzData]="agingPayables()"
+          nzSize="small"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>Range</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of payablesTable.data; track a.range) {
+              <tr>
+                <td>{{ a.range }}</td>
+                <td class="text-right font-semibold">{{ a.amount | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </nz-card>
+    </div>
+  </section>
+
+  <!-- Section: Charts & Recent Activity -->
+  <section class="mt-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <nz-card nzTitle="Daily Income vs Expenses (This Month)" nzSize="small">
+        <div class="relative h-[250px]">
+          <canvas
+            baseChart
+            [data]="dailyChartData"
+            [options]="dailyChartOptions"
+            [type]="'bar'"
+          ></canvas>
+        </div>
+      </nz-card>
+
+      <nz-card nzTitle="Recent Activities" nzSize="small">
+        <nz-table
+          #recentTable
+          [nzData]="recentActivities()"
+          [nzLoading]="loading"
+          nzSize="small"
+          [nzShowPagination]="false"
+          [nzBordered]="true"
+        >
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of recentTable.data; track e.id) {
+              <tr>
+                <td>{{ e.date | date: 'dd-MM' }}</td>
+                <td>{{ e.description }}</td>
+                <td
+                  class="text-right"
+                  [class.text-green-600]="e.type === 'I'"
+                  [class.text-red-600]="e.type === 'E'"
+                >
+                  {{ e.amount | number: '1.2-2' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </nz-card>
+    </div>
+  </section>
 </div>
