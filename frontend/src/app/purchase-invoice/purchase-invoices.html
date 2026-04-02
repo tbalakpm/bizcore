@@ -4,10 +4,15 @@
     Purchase Invoices
   </h1>
   @if (permissionService.canWrite('purchase-invoices')) {
-    <a routerLink="/purchase-invoices/new" nz-button nzType="primary">
+    <button
+      routerLink="/purchase-invoices/new"
+      nz-button
+      nzType="primary"
+      class="flex items-center"
+    >
       <span nz-icon nzType="plus" nzTheme="outline"></span>
       New Purchase Invoice
-    </a>
+    </button>
   }
 </div>
 
@@ -86,7 +91,10 @@
         </button>
       </ng-template>
     </div>
-    <div class="flex flex-col sm:flex-row sm:items-center gap-2 border-l pl-2" style="border-color: var(--color-border)">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center gap-2 border-l pl-2"
+      style="border-color: var(--color-border)"
+    >
       <span class="text-xs font-semibold uppercase tracking-wide text-text-muted">Sort</span>
       <nz-select [(ngModel)]="sortValue" (ngModelChange)="onSortChange()" style="min-width: 200px">
         <nz-option nzValue="id:desc" nzLabel="Newest"></nz-option>
