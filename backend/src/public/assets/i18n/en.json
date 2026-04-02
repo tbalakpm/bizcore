@@ -22,7 +22,43 @@
     "USERS": "Users",
     "CUSTOMERS": "Customers",
     "SUPPLIERS": "Suppliers",
-    "LOGOUT": "Logout"
+    "LOGOUT": "Logout",
+    "SALES": "Sales",
+    "PURCHASE": "Purchase",
+    "OPENING_STOCK": "Opening Stock",
+    "REPORTS": "Reports",
+    "SETTINGS": "Settings",
+    "BACK_TO_MENU": "Back to Menu",
+    "SALES_REPORT": "Sales Report",
+    "STOCK_REPORT": "Stock Report",
+    "TAX_OUTPUT": "Tax Output",
+    "PROFILE": "User Profile"
+  },
+  "AUTH": {
+    "CHANGE_PASSWORD": "Change Password",
+    "FIRST_LOGIN_NOTICE": "This is your first login. For security reasons, you must change your default password before proceeding.",
+    "NEW_PASSWORD": "New Password",
+    "CONFIRM_PASSWORD": "Confirm New Password",
+    "ENTER_NEW_PASSWORD": "Enter new password",
+    "RETYPE_NEW_PASSWORD": "Confirm new password",
+    "PASSWORD_REQUIRED": "Password is required",
+    "CONFIRM_PASSWORD_REQUIRED": "Please confirm your password",
+    "SUBMIT": "Change Password"
+  },
+  "PROFILE": {
+    "TITLE": "User Profile",
+    "DETAILS": "Profile Details",
+    "SECURITY": "Security",
+    "FIRST_NAME": "First Name",
+    "LAST_NAME": "Last Name",
+    "UPDATE_PROFILE": "Update Profile",
+    "REGISTERED": "Registered",
+    "LAST_UPDATE": "Last Update",
+    "CHANGE_PASSWORD": "Change Password",
+    "CURRENT_PASSWORD": "Current Password",
+    "CONFIRM_PASSWORD": "Confirm New Password",
+    "SUCCESS_UPDATE": "Profile updated successfully",
+    "SUCCESS_PASSWORD": "Password changed successfully"
   },
   "LOGIN": {
     "TITLE": "Login",
@@ -55,6 +91,7 @@
     "NO_USERS_YET": "No users yet"
   },
   "ADDRESS": {
+    "TITLE": "Address",
     "BILLING": "Billing Address",
     "SHIPPING": "Shipping Address",
     "LINE1": "Address Line 1",
