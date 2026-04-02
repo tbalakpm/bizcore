@@ -1,8 +1,8 @@
 <div class="h-full flex items-center justify-center">
   <nz-card class="w-full max-w-sm">
-    <div class="flex items-center justify-center gap-2 mb-4">
-      <span nz-icon nzType="user" nzTheme="outline" class="text-2xl text-primary"></span>
-      <h1 class="text-2xl font-bold text-center text-text-heading">
+    <div class="flex items-center justify-center gap-2 mb-6">
+      <span nz-icon nzType="user" nzTheme="outline" class="text-3xl text-primary mb-2"></span>
+      <h1 class="text-2xl m-0 p-0 font-bold text-text-heading">
         {{ 'LOGIN.TITLE' | translate }}
       </h1>
     </div>
@@ -29,9 +29,9 @@
         </nz-form-control>
       </nz-form-item>
 
-      <div class="flex col-span-12 justify-end">
-        <button nz-button nzType="primary" type="submit" [disabled]="loading">
-          <!-- <nz-icon nzType="check-circle" nzTheme="outline"></nz-icon> -->
+      <div class="pt-2">
+        <button nz-button nzBlock nzType="primary" type="submit" [disabled]="loading">
+          <span nz-icon [nzType]="loading ? 'loading' : 'login'" nzTheme="outline"></span>
           {{ 'LOGIN.SUBMIT' | translate }}
         </button>
       </div>

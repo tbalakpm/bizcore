@@ -229,9 +229,11 @@
         nzSize="small"
         (click)="onFilterChange('code', ''); filterVisible['code'] = false"
       >
+        <span nz-icon nzType="reload" nzTheme="outline"></span>
         Reset
       </button>
       <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['code'] = false">
+        <span nz-icon nzType="check" nzTheme="outline"></span>
         OK
       </button>
     </div>

@@ -4,8 +4,12 @@
     {{ isEditMode ? 'Edit' : 'Create' }} Opening Stock
   </h1>
   <div class="flex gap-2 items-center">
-    <a routerLink="/stock-invoices" nz-button nzType="default">Back to List</a>
+    <a routerLink="/stock-invoices" nz-button nzType="default">
+      <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+      Back to List
+    </a>
     <button nz-button nzType="primary" (click)="onSubmit()" [disabled]="submitting">
+      <span nz-icon [nzType]="submitting ? 'loading' : 'save'" nzTheme="outline"></span>
       {{ submitting ? 'Saving...' : 'Save Invoice' }}
     </button>
   </div>
@@ -46,6 +50,7 @@
           type="button"
           (click)="showNewProductForm = !showNewProductForm"
         >
+          <span nz-icon [nzType]="showNewProductForm ? 'up' : 'plus'" nzTheme="outline"></span>
           {{ showNewProductForm ? 'Hide Product Form' : 'Create New Product' }}
         </button>
       </div>

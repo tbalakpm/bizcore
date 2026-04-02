@@ -274,7 +274,10 @@
     </div>
 
     <div class="mt-6 flex justify-end">
-      <button nz-button nzType="primary" type="submit" [nzLoading]="saving">Save Settings</button>
+      <button nz-button nzType="primary" type="submit" [nzLoading]="saving">
+        <span nz-icon [nzType]="saving ? 'loading' : 'save'" nzTheme="outline"></span>
+        Save Settings
+      </button>
     </div>
   </form>
 </nz-card>

@@ -5,6 +5,7 @@
   </h1>
   <div class="flex gap-2">
     <a routerLink="/sales-invoices" nz-button nzType="default">
+      <span nz-icon nzType="rollback" nzTheme="outline"></span>
       {{ editingInvoice.irn ? 'Back' : 'Cancel' }}
     </a>
     @if (editingInvoice.id) {
@@ -15,6 +16,7 @@
     }
     @if (!editingInvoice.irn) {
       <button nz-button nzType="primary" (click)="onSubmit()" [disabled]="submitting">
+        <span nz-icon [nzType]="submitting ? 'loading' : 'save'" nzTheme="outline"></span>
         {{ submitting ? 'Saving...' : 'Save Invoice' }}
       </button>
     }
@@ -147,6 +149,7 @@
             (click)="createCustomerInline()"
             [disabled]="customerSubmitting"
           >
+            <span nz-icon [nzType]="customerSubmitting ? 'loading' : 'save'" nzTheme="outline"></span>
             {{ customerSubmitting ? 'Saving...' : 'Save & Select Customer' }}
           </button>
         </nz-card>

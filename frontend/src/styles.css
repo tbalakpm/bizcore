@@ -113,6 +113,14 @@
   display: inline-flex !important;
 }
 
+/* Ensure buttons don't shrink too much while translations load */
+.ant-btn:not(.ant-btn-icon-only) {
+  min-width: 90px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Compact vertical forms */
 .ant-form-vertical .ant-form-item {
   margin-bottom: 8px !important;

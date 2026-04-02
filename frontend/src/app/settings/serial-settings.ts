@@ -8,6 +8,7 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 import { SettingsService } from './settings.service';
 import { forkJoin } from 'rxjs';
@@ -23,6 +24,7 @@ import { forkJoin } from 'rxjs';
     NzCardModule,
     NzDividerModule,
     NzInputNumberModule,
+    NzIconModule,
   ],
   templateUrl: './serial-settings.html',
 })

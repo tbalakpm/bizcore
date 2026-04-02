@@ -231,7 +231,10 @@
             Save
           </button>
           @if (editingSupplier.id) {
-            <button nz-button nzType="default" type="button" (click)="onCancel()">Cancel</button>
+            <button nz-button nzType="default" type="button" (click)="onCancel()">
+              <span nz-icon nzType="rollback" nzTheme="outline"></span>
+              Cancel
+            </button>
           }
         </div>
       </form>
@@ -405,9 +408,11 @@
         nzSize="small"
         (click)="onFilterChange('code', ''); filterVisible['code'] = false"
       >
+        <span nz-icon nzType="reload" nzTheme="outline"></span>
         Reset
       </button>
       <button nz-button nzType="primary" nzSize="small" (click)="filterVisible['code'] = false">
+        <span nz-icon nzType="check" nzTheme="outline"></span>
         OK
       </button>
     </div>

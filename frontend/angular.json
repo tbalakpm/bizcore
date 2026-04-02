@@ -28,9 +28,9 @@
               }
             ],
             "styles": [
+              "src/styles.css",
               "src/styles/ng-zorro-theme.less",
-              { "input": "src/styles/ng-zorro-dark.less", "bundleName": "dark", "inject": false },
-              "src/styles.css"
+              { "input": "src/styles/ng-zorro-dark.less", "bundleName": "dark", "inject": false }
             ]
           },
           "configurations": {

@@ -62,7 +62,10 @@
             <button nz-button nzType="primary" type="submit">
               <span nz-icon nzType="save" nzTheme="outline"></span> Save
             </button>
-            <button nz-button nzType="default" type="button" (click)="cancelEdit()">Cancel</button>
+            <button nz-button nzType="default" type="button" (click)="cancelEdit()">
+              <span nz-icon nzType="rollback" nzTheme="outline"></span>
+              Cancel
+            </button>
           } @else {
             <button nz-button nzType="primary" type="submit">
               <span nz-icon nzType="plus" nzTheme="outline"></span> Add Category

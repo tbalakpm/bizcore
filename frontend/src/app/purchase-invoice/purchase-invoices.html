@@ -4,7 +4,10 @@
     Purchase Invoices
   </h1>
   @if (permissionService.canWrite('purchase-invoices')) {
-    <a routerLink="/purchase-invoices/new" nz-button nzType="primary">New Purchase Invoice</a>
+    <a routerLink="/purchase-invoices/new" nz-button nzType="primary">
+      <span nz-icon nzType="plus" nzTheme="outline"></span>
+      New Purchase Invoice
+    </a>
   }
 </div>
 

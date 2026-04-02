@@ -7,10 +7,15 @@
       @if (this.auth.isLoggedIn) {
         <button
           (click)="toggleSidebar()"
-          class="p-1.5 rounded hover:bg-chrome-hover text-chrome-text transition-colors focus:outline-none"
+          class="w-8 h-8 rounded hover:bg-chrome-hover text-chrome-text transition-colors focus:outline-none cursor-pointer"
           [title]="isSidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
         >
-          <span nz-icon nzType="menu" nzTheme="outline" class="w-5 h-5"></span>
+          <span
+            nz-icon
+            nzType="menu"
+            nzTheme="outline"
+            class="flex items-center justify-center w-[1.15rem] h-[1.15rem]"
+          ></span>
         </button>
       }
       <a routerLink="/" class="flex items-center justify-center align-middle gap-2 shrink-0">
@@ -26,7 +31,7 @@
     <div class="flex gap-4 w-full sm:w-auto justify-end">
       <button
         (click)="toggleTheme()"
-        class="w-8 h-8 flex items-center justify-center border rounded text-xs bg-chrome-hover text-chrome-text border-chrome-active cursor-pointer hover:bg-chrome-active hover:text-chrome-text-bright transition-colors"
+        class="w-8 h-8 border rounded text-xs bg-chrome-hover text-chrome-text border-chrome-active cursor-pointer hover:bg-chrome-active hover:text-chrome-text-bright transition-colors"
         [title]="isDarkTheme() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
       >
         @if (isDarkTheme()) {

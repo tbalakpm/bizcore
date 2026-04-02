@@ -13,6 +13,7 @@ import { SettingsService } from './settings.service';
 import { forkJoin } from 'rxjs';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
   selector: 'app-general-settings',
@@ -26,7 +27,8 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
     NzDividerModule,
     NzInputNumberModule,
     NzSwitchModule,
-    NzSelectModule
+    NzSelectModule,
+    NzIconModule
   ],
   templateUrl: './general-settings.html',
 })

@@ -4,7 +4,10 @@
     Opening Stock
   </h1>
   @if (permissionService.canWrite('stock-invoices')) {
-    <a routerLink="/stock-invoices/new" nz-button nzType="primary">New Opening Stock</a>
+    <a routerLink="/stock-invoices/new" nz-button nzType="primary">
+      <span nz-icon nzType="plus" nzTheme="outline"></span>
+      New Opening Stock
+    </a>
   }
 </div>
 
