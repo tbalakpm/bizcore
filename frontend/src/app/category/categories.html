@@ -12,8 +12,8 @@
   <div
     class="grid gap-4"
     [ngClass]="{
-      'grid-cols-1!': !permissionService.canWrite('categories'),
-      'grid-cols-1 lg:grid-cols-3': permissionService.canWrite('categories'),
+      'grid-cols-1!': !permissionService.canAdd('categories'),
+      'grid-cols-1 lg:grid-cols-3': permissionService.canAdd('categories'),
     }"
   >
     <!-- List -->
@@ -78,7 +78,7 @@
                 </nz-filter-trigger>
               </th>
               <th class="text-center w-16" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
-              @if (permissionService.canWrite('categories')) {
+              @if (permissionService.canEdit('categories') || permissionService.canDelete('categories')) {
                 <th class="text-center w-32" nzAlign="center">{{ 'ACTIONS' | translate }}</th>
               }
             </tr>
@@ -132,7 +132,7 @@
                   >
                   </nz-switch>
                 </td>
-                @if (permissionService.canWrite('categories')) {
+                @if (permissionService.canEdit('categories') || permissionService.canDelete('categories')) {
                   <td class="text-center" nzAlign="center">
                     <div class="flex items-center justify-center gap-2">
                       @if (editing?.id == c.id) {
@@ -166,6 +166,7 @@
                           nzTooltipTitle="Edit category"
                           style="color: var(--color-accent)"
                           (click)="startEdit(c)"
+                          *appHasPermission="'categories:edit'"
                         >
                           <span nz-icon nzType="edit" nzTheme="outline"></span>
                         </button>
@@ -179,6 +180,7 @@
                           nz-popconfirm
                           [nzPopconfirmTitle]="'Delete category &quot;' + c.name + '&quot;?'"
                           (nzOnConfirm)="deleteCategory(c)"
+                          *appHasPermission="'categories:delete'"
                         >
                           <span nz-icon nzType="delete" nzTheme="outline"></span>
                         </button>
@@ -200,7 +202,7 @@
       </nz-card>
     </div>
 
-    @if (permissionService.canWrite('categories')) {
+    @if (permissionService.canAdd('categories')) {
       <!-- Add form -->
       <div class="max-h-max">
         <nz-card>

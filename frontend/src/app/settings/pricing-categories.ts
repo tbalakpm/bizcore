@@ -16,6 +16,8 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { PermissionService } from '../auth/permission.service';
+import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 import { PricingCategoryService, PricingCategory, ProductMargin } from './pricing-category-service';
 import { ProductService, Product } from '../product/product-service';
@@ -28,12 +30,14 @@ import { ProductService, Product } from '../product/product-service';
     NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
     NzCardModule, NzSelectModule, NzTagModule, NzInputNumberModule,
     NzCollapseModule, NzDividerModule,
+    HasPermissionDirective
   ],
   templateUrl: './pricing-categories.html',
 })
 export class PricingCategories implements OnInit {
   private pricingCategoryService = inject(PricingCategoryService);
   private productService = inject(ProductService);
+  public permissionService = inject(PermissionService);
 
   categories = signal<PricingCategory[]>([]);
   products = signal<Product[]>([]);

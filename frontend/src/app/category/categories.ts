@@ -17,9 +17,11 @@ import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
+import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
+
 @Component({
   selector: 'app-categories',
-  imports: [TranslatePipe, FormsModule, CommonModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule],
+  imports: [TranslatePipe, FormsModule, CommonModule, HasPermissionDirective, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {

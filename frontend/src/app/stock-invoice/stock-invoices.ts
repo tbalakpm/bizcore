@@ -11,6 +11,7 @@ import {
 } from './stock-invoice-service';
 import { SettingsService } from '../settings/settings.service';
 import { PermissionService } from '../auth/permission.service';
+import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -37,7 +38,7 @@ type PrintableBarcodeLabel = {
     CommonModule, FormsModule, RouterLink,
     NzTableModule, NzInputModule, NzDatePickerModule, NzSelectModule,
     NzButtonModule, NzIconModule, NzPaginationModule, NzTooltipModule,
-    NzPopconfirmModule, NzCardModule, NzAlertModule, NzInputNumberModule,
+    NzPopconfirmModule, NzCardModule, NzAlertModule, NzInputNumberModule, HasPermissionDirective,
   ],
   templateUrl: './stock-invoices.html',
 })

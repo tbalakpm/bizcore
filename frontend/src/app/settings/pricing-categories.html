@@ -11,8 +11,9 @@
 
 <div class="grid grid-cols-1 gap-4">
   <!-- Add / Edit form -->
-  <nz-card>
-    <h2 class="text-base font-semibold mb-2">{{ editing ? 'Edit' : 'Add' }} Pricing Category</h2>
+  @if ((editing && permissionService.canEdit('settings-pricing-categories')) || (!editing && permissionService.canAdd('settings-pricing-categories'))) {
+    <nz-card>
+      <h2 class="text-base font-semibold mb-2">{{ editing ? 'Edit' : 'Add' }} Pricing Category</h2>
     <form nz-form (ngSubmit)="editing ? saveEdit() : add()" nzLayout="vertical">
       <div class="grid grid-cols-12 gap-2">
         <div class="col-span-12 md:col-span-2">
@@ -74,7 +75,8 @@
         </div>
       </div>
     </form>
-  </nz-card>
+    </nz-card>
+  }
 
   <!-- List -->
   <nz-card>
@@ -98,7 +100,9 @@
           <th>Name</th>
           <th>Description</th>
           <th nzWidth="80px" nzAlign="center">Active</th>
-          <th nzWidth="160px" nzAlign="center">Actions</th>
+          @if (permissionService.canEdit('settings-pricing-categories') || permissionService.canDelete('settings-pricing-categories')) {
+            <th nzWidth="160px" nzAlign="center">Actions</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -112,49 +116,54 @@
                 [ngModel]="cat.isActive"
                 (ngModelChange)="toggleActive(cat)"
                 nzSize="small"
+                [nzDisabled]="!permissionService.canEdit('settings-pricing-categories')"
               ></nz-switch>
             </td>
-            <td nzAlign="center">
-              <div class="flex items-center justify-center gap-1">
-                <button
-                  nz-button
-                  nzType="link"
-                  nzSize="small"
-                  nz-tooltip
-                  [nzTooltipTitle]="
-                    expandedCategoryId === cat.id ? 'Hide Margins' : 'Configure Product Margins'
-                  "
-                  style="color: var(--color-accent)"
-                  (click)="toggleProductMargins(cat)"
-                >
-                  <span nz-icon nzType="percentage" nzTheme="outline"></span>
-                </button>
-                <button
-                  nz-button
-                  nzType="link"
-                  nzSize="small"
-                  nz-tooltip
-                  nzTooltipTitle="Edit"
-                  style="color: var(--color-accent)"
-                  (click)="startEdit(cat)"
-                >
-                  <span nz-icon nzType="edit" nzTheme="outline"></span>
-                </button>
-                <button
-                  nz-button
-                  nzType="link"
-                  nzDanger
-                  nzSize="small"
-                  nz-popconfirm
-                  nzPopconfirmTitle="Delete this pricing category?"
-                  (nzOnConfirm)="deleteCategory(cat)"
-                  nz-tooltip
-                  nzTooltipTitle="Delete"
-                >
-                  <span nz-icon nzType="delete" nzTheme="outline"></span>
-                </button>
-              </div>
-            </td>
+            @if (permissionService.canEdit('settings-pricing-categories') || permissionService.canDelete('settings-pricing-categories')) {
+              <td nzAlign="center">
+                <div class="flex items-center justify-center gap-1">
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    nz-tooltip
+                    [nzTooltipTitle]="
+                      expandedCategoryId === cat.id ? 'Hide Margins' : 'Configure Product Margins'
+                    "
+                    style="color: var(--color-accent)"
+                    (click)="toggleProductMargins(cat)"
+                  >
+                    <span nz-icon nzType="percentage" nzTheme="outline"></span>
+                  </button>
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    nz-tooltip
+                    nzTooltipTitle="Edit"
+                    style="color: var(--color-accent)"
+                    (click)="startEdit(cat)"
+                    *appHasPermission="'settings-pricing-categories:edit'"
+                  >
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                  </button>
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzDanger
+                    nzSize="small"
+                    nz-popconfirm
+                    nzPopconfirmTitle="Delete this pricing category?"
+                    (nzOnConfirm)="deleteCategory(cat)"
+                    nz-tooltip
+                    nzTooltipTitle="Delete"
+                    *appHasPermission="'settings-pricing-categories:delete'"
+                  >
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                </div>
+              </td>
+            }
           </tr>
           @if (expandedCategoryId === cat.id) {
             <tr>
@@ -164,15 +173,17 @@
                     <h3 class="font-semibold text-sm">
                       Product Margins for <span class="text-accent">{{ cat.name }}</span>
                     </h3>
-                    <button
-                      nz-button
-                      nzType="primary"
-                      nzSize="small"
-                      (click)="saveProductMargins()"
-                      [nzLoading]="marginsLoading"
-                    >
-                      <span nz-icon nzType="save" nzTheme="outline"></span> Save Margins
-                    </button>
+                    @if (permissionService.canEdit('settings-pricing-categories')) {
+                      <button
+                        nz-button
+                        nzType="primary"
+                        nzSize="small"
+                        (click)="saveProductMargins()"
+                        [nzLoading]="marginsLoading"
+                      >
+                        <span nz-icon nzType="save" nzTheme="outline"></span> Save Margins
+                      </button>
+                    }
                   </div>
                   @if (marginsLoading) {
                     <div class="text-center text-text-muted py-4">Loading products...</div>
@@ -202,6 +213,7 @@
                                 [(ngModel)]="margin.marginType"
                                 [ngModelOptions]="{ standalone: true }"
                                 class="w-full"
+                                [nzDisabled]="!permissionService.canEdit('settings-pricing-categories')"
                               >
                                 @for (mt of marginTypes; track mt.value) {
                                   <nz-option [nzValue]="mt.value" [nzLabel]="mt.label"></nz-option>
@@ -216,6 +228,7 @@
                                   [nzMin]="0"
                                   [nzStep]="0.5"
                                   class="w-full"
+                                  [nzDisabled]="!permissionService.canEdit('settings-pricing-categories')"
                                 />
                               } @else if (margin.marginType === 'amount' || margin.marginType === 'selling_price') {
                                 <nz-input-number
@@ -224,6 +237,7 @@
                                   [nzMin]="0"
                                   [nzStep]="1"
                                   class="w-full"
+                                  [nzDisabled]="!permissionService.canEdit('settings-pricing-categories')"
                                 />
                               } @else {
                                 <span class="text-text-muted text-sm">–</span>

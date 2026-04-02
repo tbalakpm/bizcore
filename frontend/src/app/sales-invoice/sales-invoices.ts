@@ -7,6 +7,7 @@ import { SalesInvoice, SalesInvoiceService } from './sales-invoice-service';
 import { pagination } from '../models/pagination';
 import { Customer, CustomerService } from '../customer/customer-service';
 import { PermissionService } from '../auth/permission.service';
+import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -28,7 +29,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
     CommonModule, ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, TitleCasePipe, RouterLink,
     NzTableModule, NzSelectModule, NzInputModule, NzDatePickerModule,
     NzInputNumberModule, NzButtonModule, NzIconModule, NzTagModule,
-    NzPaginationModule, NzTooltipModule, NzPopconfirmModule, NzCardModule, NzAlertModule,
+    NzPaginationModule, NzTooltipModule, NzPopconfirmModule, NzCardModule, NzAlertModule, HasPermissionDirective,
   ],
   templateUrl: './sales-invoices.html',
 })

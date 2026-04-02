@@ -14,6 +14,7 @@ import { forkJoin } from 'rxjs';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { PermissionService } from '../auth/permission.service';
 
 @Component({
   selector: 'app-general-settings',
@@ -35,6 +36,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 export class GeneralSettings implements OnInit {
   private settingsService = inject(SettingsService);
   private message = inject(NzMessageService);
+  public permission = inject(PermissionService);
 
   loading = false;
   saving = false;

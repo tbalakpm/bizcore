@@ -10,7 +10,7 @@
 }
 
 <div class="grid grid-cols-1 gap-4">
-  @if (permissionService.canWrite('customers')) {
+  @if ((editingCustomer.id && permissionService.canEdit('customers')) || (!editingCustomer.id && permissionService.canAdd('customers'))) {
     <!-- Add / Edit form -->
     <nz-card>
       <h2 class="text-base font-semibold mb-2">
@@ -238,7 +238,7 @@
           </th>
           <th nzColumnKey="notes" nzShowSort [nzSortFn]="true">{{ 'DESCRIPTION' | translate }}</th>
           <th class="text-center" nzWidth="80px" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
-          @if (permissionService.canWrite('customers')) {
+          @if (permissionService.canEdit('customers') || permissionService.canDelete('customers')) {
             <th class="text-center" nzWidth="120px" nzAlign="center">
               {{ 'ACTIONS' | translate }}
             </th>
@@ -262,7 +262,7 @@
                 [nzTooltipTitle]="c.isActive ? 'Deactivate' : 'Activate'"
               ></nz-switch>
             </td>
-            @if (permissionService.canWrite('customers')) {
+            @if (permissionService.canEdit('customers') || permissionService.canDelete('customers')) {
               <td class="text-center" nzAlign="center">
                 <div class="flex items-center justify-center gap-2">
                   <button
@@ -273,6 +273,7 @@
                     nzTooltipTitle="Edit customer"
                     style="color: var(--color-accent)"
                     (click)="editCustomer(c.id)"
+                    *appHasPermission="'customers:edit'"
                   >
                     <span nz-icon nzType="edit" nzTheme="outline"></span>
                   </button>
@@ -286,6 +287,7 @@
                     (nzOnConfirm)="deleteCustomer(c.id)"
                     nz-tooltip
                     nzTooltipTitle="Delete customer"
+                    *appHasPermission="'customers:delete'"
                   >
                     <span nz-icon nzType="delete" nzTheme="outline"></span>
                   </button>
@@ -297,7 +299,7 @@
         @if (!customers().length && !loading) {
           <tr>
             <td
-              [attr.colspan]="permissionService.canWrite('customers') ? 6 : 5"
+              [attr.colspan]="(permissionService.canEdit('customers') || permissionService.canDelete('customers')) ? 7 : 6"
               class="text-center text-text-muted"
             >
               No customers yet

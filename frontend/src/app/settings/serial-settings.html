@@ -13,6 +13,7 @@
               [id]="'prefix_' + config.key"
               [(ngModel)]="config.prefix"
               placeholder="INV-"
+              [disabled]="!permission.canEdit('settings-serial')"
             />
           </nz-form-control>
         </nz-form-item>
@@ -26,6 +27,7 @@
               [nzMin]="1"
               [nzStep]="1"
               class="w-full"
+              [nzDisabled]="!permission.canEdit('settings-serial')"
             ></nz-input-number>
           </nz-form-control>
         </nz-form-item>
@@ -40,17 +42,20 @@
               [nzMax]="20"
               [nzStep]="1"
               class="w-full"
+              [nzDisabled]="!permission.canEdit('settings-serial')"
             ></nz-input-number>
           </nz-form-control>
         </nz-form-item>
       </div>
     }
 
-    <div class="mt-6 flex justify-end">
-      <button nz-button nzType="primary" type="submit" [nzLoading]="saving">
-        <span nz-icon [nzType]="saving ? 'loading' : 'save'" nzTheme="outline"></span>
-        Save Settings
-      </button>
-    </div>
+    @if (permission.canEdit('settings-serial')) {
+      <div class="mt-6 flex justify-end">
+        <button nz-button nzType="primary" type="submit" [nzLoading]="saving">
+          <span nz-icon [nzType]="saving ? 'loading' : 'save'" nzTheme="outline"></span>
+          Save Settings
+        </button>
+      </div>
+    }
   </form>
 </nz-card>

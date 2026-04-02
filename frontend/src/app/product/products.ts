@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type Product, ProductList, ProductService } from './product-service';
 import { ProductFormComponent } from './product-form.component';
 import { PermissionService } from '../auth/permission.service';
+import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
@@ -23,7 +24,7 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
     CommonModule, TranslatePipe, FormsModule, ProductFormComponent,
     NzTableModule, NzTagModule, NzSwitchModule, NzButtonModule,
     NzIconModule, NzTooltipModule, NzPopconfirmModule, NzAlertModule, NzCardModule,
-    NzDropDownModule,
+    NzDropDownModule, HasPermissionDirective,
   ],
   templateUrl: './products.html',
 })

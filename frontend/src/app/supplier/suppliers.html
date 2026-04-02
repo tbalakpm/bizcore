@@ -10,7 +10,7 @@
 }
 
 <div class="grid grid-cols-1 gap-4">
-  @if (permissionService.canWrite('suppliers')) {
+  @if ((editingSupplier.id && permissionService.canEdit('suppliers')) || (!editingSupplier.id && permissionService.canAdd('suppliers'))) {
     <!-- Add form -->
     <nz-card>
       <h2 class="text-base font-semibold mb-2">
@@ -312,7 +312,7 @@
             </nz-filter-trigger>
           </th>
           <th class="text-center" nzWidth="80px" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
-          @if (permissionService.canWrite('suppliers')) {
+          @if (permissionService.canEdit('suppliers') || permissionService.canDelete('suppliers')) {
             <th class="text-center" nzWidth="120px" nzAlign="center">
               {{ 'ACTIONS' | translate }}
             </th>
@@ -335,7 +335,7 @@
                 [nzTooltipTitle]="s.isActive ? 'Deactivate' : 'Activate'"
               ></nz-switch>
             </td>
-            @if (permissionService.canWrite('suppliers')) {
+            @if (permissionService.canEdit('suppliers') || permissionService.canDelete('suppliers')) {
               <td class="text-center" nzAlign="center">
                 <div class="flex items-center justify-center gap-2">
                   <button
@@ -346,6 +346,7 @@
                     nzTooltipTitle="Edit supplier"
                     style="color: var(--color-accent)"
                     (click)="editSupplier(s.id)"
+                    *appHasPermission="'suppliers:edit'"
                   >
                     <span nz-icon nzType="edit" nzTheme="outline"></span>
                   </button>
@@ -359,6 +360,7 @@
                     (nzOnConfirm)="deleteSupplier(s.id)"
                     nz-tooltip
                     nzTooltipTitle="Delete supplier"
+                    *appHasPermission="'suppliers:delete'"
                   >
                     <span nz-icon nzType="delete" nzTheme="outline"></span>
                   </button>
@@ -370,7 +372,7 @@
         @if (!suppliers().length && !loading) {
           <tr>
             <td
-              [attr.colspan]="permissionService.canWrite('suppliers') ? 6 : 5"
+              [attr.colspan]="(permissionService.canEdit('suppliers') || permissionService.canDelete('suppliers')) ? 6 : 5"
               class="text-center text-text-muted"
             >
               No suppliers yet

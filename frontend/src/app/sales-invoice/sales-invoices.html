@@ -3,7 +3,7 @@
     <span nz-icon nzType="shopping-cart" nzTheme="outline" class="text-2xl"></span>
     Sales Invoices
   </h1>
-  @if (permissionService.canWrite('sales-invoices')) {
+  @if (permissionService.canAdd('sales-invoices')) {
     <button routerLink="/sales-invoices/new" nz-button nzType="primary">
       <span nz-icon nzType="plus" nzTheme="outline"></span>
       New Sales Invoice
@@ -163,7 +163,7 @@
               @if (
                 invoice.type === 'invoice' &&
                 !invoice.irn &&
-                permissionService.canWrite('sales-invoices')
+                permissionService.canEdit('sales-invoices')
               ) {
                 <button
                   nz-button
@@ -189,10 +189,11 @@
                 nzTooltipTitle="Print invoice"
                 style="color: var(--color-text-muted)"
                 (click)="printInvoice(invoice.id)"
+                *appHasPermission="'sales-invoices:print'"
               >
                 <span class="text-accent!" nz-icon nzType="printer" nzTheme="outline"></span>
               </button>
-              @if (!invoice.irn && permissionService.canWrite('sales-invoices')) {
+              @if (!invoice.irn && (permissionService.canEdit('sales-invoices') || permissionService.canDelete('sales-invoices'))) {
                 <button
                   [routerLink]="['/sales-invoices', invoice.id, 'edit']"
                   nz-button
@@ -200,6 +201,7 @@
                   nzSize="small"
                   nz-tooltip
                   nzTooltipTitle="Edit invoice"
+                  *appHasPermission="'sales-invoices:edit'"
                 >
                   <span class="text-accent!" nz-icon nzType="edit" nzTheme="outline"></span>
                 </button>
@@ -213,6 +215,7 @@
                   (nzOnConfirm)="deleteInvoice(invoice.id)"
                   nz-tooltip
                   nzTooltipTitle="Delete invoice"
+                  *appHasPermission="'sales-invoices:delete'"
                 >
                   <span nz-icon nzType="delete" nzTheme="outline"></span>
                 </button>

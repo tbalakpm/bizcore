@@ -7,6 +7,7 @@ import JsBarcode from 'jsbarcode';
 import { type PurchaseInvoice, type PurchaseInvoiceList, PurchaseInvoiceService } from './purchase-invoice-service';
 import { SettingsService } from '../settings/settings.service';
 import { PermissionService } from '../auth/permission.service';
+import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 import { SupplierService, Supplier } from '../supplier/supplier-service';
 
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -34,7 +35,7 @@ type PrintableBarcodeLabel = {
     CommonModule, DatePipe, CurrencyPipe, FormsModule, RouterLink,
     NzTableModule, NzInputModule, NzInputNumberModule, NzDatePickerModule, NzSelectModule,
     NzButtonModule, NzIconModule, NzPaginationModule, NzTooltipModule,
-    NzPopconfirmModule, NzCardModule, NzAlertModule,
+    NzPopconfirmModule, NzCardModule, NzAlertModule, HasPermissionDirective,
   ],
   templateUrl: './purchase-invoices.html',
 })

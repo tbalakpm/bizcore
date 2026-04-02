@@ -3,7 +3,7 @@
     <span nz-icon nzType="inbox" nzTheme="outline" class="text-2xl"></span>
     Opening Stock
   </h1>
-  @if (permissionService.canWrite('stock-invoices')) {
+  @if (permissionService.canAdd('stock-invoices')) {
     <button routerLink="/stock-invoices/new" nz-button nzType="primary">
       <span nz-icon nzType="plus" nzTheme="outline"></span>
       New Opening Stock
@@ -133,11 +133,12 @@
                 nzTooltipTitle="Print barcodes"
                 [disabled]="printingInvoiceId === invoice.id"
                 (click)="printBarcodes(invoice.id)"
+                *appHasPermission="'stock-invoices:print'"
               >
                 <span class="text-accent!" nz-icon nzType="barcode" nzTheme="outline"></span>
                 {{ printingInvoiceId === invoice.id ? 'Printing...' : '' }}
               </button>
-              @if (permissionService.canWrite('stock-invoices')) {
+              @if (permissionService.canEdit('stock-invoices')) {
                 <button
                   [routerLink]="['/stock-invoices', invoice.id, 'edit']"
                   nz-button
@@ -149,7 +150,7 @@
                   <span class="text-accent!" nz-icon nzType="edit" nzTheme="outline"></span>
                 </button>
               }
-              @if (permissionService.canWrite('stock-invoices')) {
+              @if (permissionService.canDelete('stock-invoices')) {
                 <button
                   nz-button
                   nzType="text"

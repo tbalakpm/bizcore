@@ -7,7 +7,10 @@
 
 <div class="grid grid-cols-1 gap-4">
   <!-- Add / Edit form -->
-  @if (permissionService.canWrite('users')) {
+  @if (
+    (editingUser.id && permissionService.canEdit('users')) ||
+    (!editingUser.id && permissionService.canAdd('users'))
+  ) {
     <nz-card>
       <h2 class="text-base font-semibold">
         {{ editingUser.id ? ('EDIT' | translate) : ('ADD' | translate) }}
@@ -82,8 +85,8 @@
 
         @if (isAdmin) {
           <!-- <div class="mt-5 pt-4 border-t" style="border-color: var(--color-border)"> -->
-          <div class="flex items-center gap-2 mb-3">
-            <span nz-icon nzType="safety-certificate" nzTheme="outline" class="text-lg"></span>
+          <div class="flex items-center gap-2 mt-3">
+            <span nz-icon nzType="safety-certificate" nzTheme="outline" class="text-lg mb-1"></span>
             <h3 class="text-base font-semibold">Module Permissions</h3>
           </div>
           <nz-table
@@ -95,35 +98,56 @@
             <thead>
               <tr>
                 <th>Module</th>
-                <th class="text-center" nzWidth="100px">No Access</th>
-                <th class="text-center" nzWidth="100px">Read Only</th>
-                <th class="text-center" nzWidth="100px">Full Access</th>
+                <th class="text-center" nzWidth="80px">Read</th>
+                <th class="text-center" nzWidth="80px">Add</th>
+                <th class="text-center" nzWidth="80px">Edit</th>
+                <th class="text-center" nzWidth="80px">Delete</th>
+                <th class="text-center" nzWidth="80px">Print</th>
               </tr>
             </thead>
             <tbody>
               @for (module of allModules; track module) {
                 <tr>
                   <td class="font-medium">{{ moduleLabels[module] }}</td>
-                  <td colspan="3" class="text-center">
-                    <nz-radio-group
-                      [(ngModel)]="editingUser.permissions[module]"
-                      [name]="module"
+                  <td class="text-center">
+                    <nz-switch
                       nzSize="small"
-                      nzButtonStyle="solid"
-                    >
-                      <label nz-radio-button nzValue="none">
-                        <span nz-icon nzType="close" nzTheme="outline"></span>
-                        None
-                      </label>
-                      <label nz-radio-button nzValue="read">
-                        <span nz-icon nzType="eye" nzTheme="outline"></span>
-                        Read
-                      </label>
-                      <label nz-radio-button nzValue="write">
-                        <span nz-icon nzType="edit" nzTheme="outline"></span>
-                        Write
-                      </label>
-                    </nz-radio-group>
+                      [ngModel]="editingUser.permissions[module]?.read"
+                      (ngModelChange)="togglePermission(module, 'read', $event)"
+                      [name]="module + '_read'"
+                    ></nz-switch>
+                  </td>
+                  <td class="text-center">
+                    <nz-switch
+                      nzSize="small"
+                      [ngModel]="editingUser.permissions[module]?.add"
+                      (ngModelChange)="togglePermission(module, 'add', $event)"
+                      [name]="module + '_add'"
+                    ></nz-switch>
+                  </td>
+                  <td class="text-center">
+                    <nz-switch
+                      nzSize="small"
+                      [ngModel]="editingUser.permissions[module]?.edit"
+                      (ngModelChange)="togglePermission(module, 'edit', $event)"
+                      [name]="module + '_edit'"
+                    ></nz-switch>
+                  </td>
+                  <td class="text-center">
+                    <nz-switch
+                      nzSize="small"
+                      [ngModel]="editingUser.permissions[module]?.delete"
+                      (ngModelChange)="togglePermission(module, 'delete', $event)"
+                      [name]="module + '_delete'"
+                    ></nz-switch>
+                  </td>
+                  <td class="text-center">
+                    <nz-switch
+                      nzSize="small"
+                      [ngModel]="editingUser.permissions[module]?.print"
+                      (ngModelChange)="togglePermission(module, 'print', $event)"
+                      [name]="module + '_print'"
+                    ></nz-switch>
                   </td>
                 </tr>
               }
@@ -136,7 +160,7 @@
             </p>
             <div class="flex items-center justify-end gap-3">
               <button
-                *appHasPermission="'users:write'"
+                *appHasPermission="'users:add'"
                 nzBlock
                 nz-button
                 nzType="primary"
@@ -236,7 +260,7 @@
             </nz-filter-trigger>
           </th>
           <th class="text-center" nzWidth="80px" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
-          @if (permissionService.canWrite('users')) {
+          @if (permissionService.canEdit('users') || permissionService.canDelete('users')) {
             <th class="text-center" nzWidth="120px" nzAlign="center">
               {{ 'ACTIONS' | translate }}
             </th>
@@ -274,7 +298,7 @@
                 [nzTooltipTitle]="u.isActive ? 'Deactivate' : 'Activate'"
               ></nz-switch>
             </td>
-            @if (permissionService.canWrite('users')) {
+            @if (permissionService.canEdit('users') || permissionService.canDelete('users')) {
               <td class="text-center" nzAlign="center">
                 <div class="flex items-center justify-center gap-2">
                   <button
@@ -285,6 +309,7 @@
                     nzTooltipTitle="Edit user"
                     style="color: var(--color-accent)"
                     (click)="editUser(u.id)"
+                    *appHasPermission="'users:edit'"
                   >
                     <span nz-icon nzType="edit" nzTheme="outline"></span>
                   </button>
@@ -295,6 +320,7 @@
                     nz-popconfirm
                     nzPopconfirmTitle="Reset password to 'Welcome123'?"
                     (nzOnConfirm)="resetPassword(u.id)"
+                    *appHasPermission="'users:edit'"
                     nz-tooltip
                     nzTooltipTitle="Reset password"
                     style="color: var(--color-warning)"
@@ -309,6 +335,7 @@
                     nz-popconfirm
                     nzPopconfirmTitle="Delete this user?"
                     (nzOnConfirm)="deleteUser(u.id)"
+                    *appHasPermission="'users:delete'"
                     nz-tooltip
                     nzTooltipTitle="Delete user"
                   >
@@ -319,16 +346,18 @@
             }
           </tr>
         }
-        <!-- @if (!users().length && !loading) {
+        @if (!users().length && !loading) {
           <tr>
             <td
-              [attr.colspan]="permissionService.canWrite('users') ? 6 : 5"
+              [attr.colspan]="
+                permissionService.canEdit('users') || permissionService.canDelete('users') ? 6 : 5
+              "
               class="text-center text-text-muted"
             >
               {{ 'USER.NO_USERS_YET' | translate }}
             </td>
           </tr>
-        } -->
+        }
       </tbody>
     </nz-table>
   </nz-card>

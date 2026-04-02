@@ -5,7 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type User, type UserList, UserService } from './user-service';
 import { AuthService } from '../auth/auth-service';
 import { PermissionService } from '../auth/permission.service';
-import { ALL_MODULES, MODULE_LABELS, type UserPermissions } from '../models/permission.model';
+import { ALL_MODULES, MODULE_LABELS, type ModulePermissions, type UserPermissions } from '../models/permission.model';
 import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
@@ -65,7 +65,7 @@ export class Users implements OnInit {
 
   isAdmin = this.auth.currentUserRole === 'admin';
 
-  editingUser: Partial<User> & { permissions: Record<string, string> } = {
+  editingUser: Partial<User> & { permissions: Record<string, ModulePermissions> } = {
     id: undefined,
     username: '',
     firstName: '',
@@ -81,8 +81,24 @@ export class Users implements OnInit {
   ngOnInit(): void {
   }
 
-  defaultPermissions(): Record<string, string> {
-    return Object.fromEntries(ALL_MODULES.map((m) => [m, 'none']));
+  defaultPermissions(): Record<string, ModulePermissions> {
+    return Object.fromEntries(
+      ALL_MODULES.map((m) => [
+        m,
+        { read: false, add: false, edit: false, delete: false, print: false },
+      ])
+    );
+  }
+
+  togglePermission(module: string, action: keyof ModulePermissions, checked: boolean) {
+    if (this.editingUser.permissions[module]) {
+      this.editingUser.permissions[module][action] = checked;
+      
+      // Auto-enable read if any write permission is enabled
+      if (checked && action !== 'read') {
+        this.editingUser.permissions[module].read = true;
+      }
+    }
   }
 
   loadUsers() {
@@ -178,7 +194,19 @@ export class Users implements OnInit {
       this.editingUser.isActive = res.isActive;
 
       const perms = typeof res.permissions === 'string' ? JSON.parse(res.permissions || '{}') : (res.permissions || {});
-      this.editingUser.permissions = { ...this.defaultPermissions(), ...perms };
+      
+      // Convert legacy string permissions during editing
+      const convertedPerms: Record<string, ModulePermissions> = this.defaultPermissions();
+      Object.keys(perms).forEach(m => {
+        const val = perms[m];
+        if (typeof val === 'string') {
+          if (val === 'read') convertedPerms[m] = { read: true, add: false, edit: false, delete: false, print: false };
+          else if (val === 'write') convertedPerms[m] = { read: true, add: true, edit: true, delete: true, print: true };
+        } else {
+          convertedPerms[m] = { ...convertedPerms[m], ...val };
+        }
+      });
+      this.editingUser.permissions = convertedPerms;
     });
   }
 

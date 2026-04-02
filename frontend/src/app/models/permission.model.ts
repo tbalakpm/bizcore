@@ -1,34 +1,54 @@
-export type PermissionLevel = 'none' | 'read' | 'write';
+export interface ModulePermissions {
+  read: boolean;
+  add: boolean;
+  edit: boolean;
+  delete: boolean;
+  print: boolean;
+}
+
+export type PermissionLevel = 'none' | 'read' | 'write' | ModulePermissions;
 
 export interface UserPermissions {
-  categories: PermissionLevel;
-  products: PermissionLevel;
-  customers: PermissionLevel;
-  suppliers: PermissionLevel;
-  'sales-invoices': PermissionLevel;
-  'purchase-invoices': PermissionLevel;
-  'stock-invoices': PermissionLevel;
-  users: PermissionLevel;
+  categories: ModulePermissions;
+  products: ModulePermissions;
+  customers: ModulePermissions;
+  suppliers: ModulePermissions;
+  'sales-invoices': ModulePermissions;
+  'purchase-invoices': ModulePermissions;
+  'stock-invoices': ModulePermissions;
+  users: ModulePermissions;
+  dashboard: ModulePermissions;
+  'settings-general': ModulePermissions;
+  'settings-serial': ModulePermissions;
+  'settings-pricing-categories': ModulePermissions;
 }
 
 export const ALL_MODULES: (keyof UserPermissions)[] = [
-  'categories',
-  'products',
-  'customers',
-  'suppliers',
+  'dashboard',
   'sales-invoices',
   'purchase-invoices',
   'stock-invoices',
+  'products',
+  'customers',
+  'suppliers',
+  'categories',
   'users',
+  'settings-general',
+  'settings-serial',
+  'settings-pricing-categories',
 ];
 
 export const MODULE_LABELS: Record<keyof UserPermissions, string> = {
-  categories: 'Categories',
+  dashboard: 'Dashboard',
+  'sales-invoices': 'Sales',
+  'purchase-invoices': 'Purchase',
+  'stock-invoices': 'Opening Stock',
   products: 'Products',
   customers: 'Customers',
   suppliers: 'Suppliers',
-  'sales-invoices': 'Sales Invoices',
-  'purchase-invoices': 'Purchase Invoices',
-  'stock-invoices': 'Stock Invoices',
+  categories: 'Categories',
   users: 'Users',
+  'settings-general': 'Settings (General)',
+  'settings-serial': 'Settings (Serials)',
+  'settings-pricing-categories': 'Settings (Pricing Categories)',
 };

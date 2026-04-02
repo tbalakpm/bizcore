@@ -9,6 +9,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { PermissionService } from '../auth/permission.service';
 
 import { SettingsService } from './settings.service';
 import { forkJoin } from 'rxjs';
@@ -31,6 +32,7 @@ import { forkJoin } from 'rxjs';
 export class SerialSettings implements OnInit {
   private settingsService = inject(SettingsService);
   private message = inject(NzMessageService);
+  public permission = inject(PermissionService);
 
   loading = false;
   saving = false;
