@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
@@ -26,36 +26,44 @@ export class AuthService {
 
   // ─── Token storage (sessionStorage – clears on tab close) ─────────────────
 
+  /** Reactive signal for the current token */
+  public readonly tokenSignal = signal<string | null>(this.token);
+
   private setToken(token: string): void {
     sessionStorage.setItem(this.TOKEN_KEY, token);
+    this.tokenSignal.set(token);
   }
 
   private removeToken(): void {
     sessionStorage.removeItem(this.TOKEN_KEY);
+    this.tokenSignal.set(null);
   }
 
   get token(): string | null {
+    if (typeof window === 'undefined') return null;
     return sessionStorage.getItem(this.TOKEN_KEY);
   }
 
   // ─── Decoded token helpers ─────────────────────────────────────────────────
 
   get decodedToken(): DecodedToken | null {
-    const token = this.token;
-    if (!token) return null;
+    const t = this.tokenSignal();
+    if (!t) return null;
     try {
-      return jwtDecode<DecodedToken>(token);
+      return jwtDecode<DecodedToken>(t);
     } catch {
       return null;
     }
   }
 
-  /** True only if we have a token that hasn't expired yet */
+  /**
+   * True if we have a token.
+   * We don't check expiration here because the interceptor handles 401s by refreshing.
+   * Hiding the UI just because the access token is expired (while the refresh token might still be valid)
+   * causes jarring flickering and hides the header prematurely.
+   */
   get isLoggedIn(): boolean {
-    const decoded = this.decodedToken;
-    if (!decoded) return false;
-    // exp is in seconds; Date.now() is ms
-    return decoded.exp * 1000 > Date.now();
+    return !!this.tokenSignal();
   }
 
   get currentUserRole(): string | null {
