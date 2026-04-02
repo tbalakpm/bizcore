@@ -19,6 +19,7 @@ if (!jwtRefreshSecretFromEnv && !isDevelopment) {
 export const config = {
   environment: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '4000', 10),
+  isDevelopment,
   corsOrigins: process.env.CORS_ORIGINS?.split(',') || [],
   jwtSecret: jwtSecretFromEnv || 'dev-only-insecure-jwt-secret',
   jwtRefreshSecret: jwtRefreshSecretFromEnv || 'dev-only-insecure-refresh-secret',
@@ -26,10 +27,19 @@ export const config = {
   accessTokenExpirySeconds: parseInt(process.env.ACCESS_TOKEN_EXPIRY_SECONDS || '900', 10), // 15 min
   /** Refresh token lifetime in days */
   refreshTokenExpiryDays: parseInt(process.env.REFRESH_TOKEN_EXPIRY_DAYS || '7', 10),
+
+  dbType: process.env.DB_TYPE || 'sqlite',
+
   tursoDatabaseUrl: process.env.TURSO_DATABASE_URL || 'file:bizcore.db',
   tursoAuthToken: process.env.TURSO_AUTH_TOKEN || '',
+
+  pgHost: process.env.PG_HOST || '',
+  pgPort: parseInt(process.env.PG_PORT || '5432', 10),
+  pgUser: process.env.PG_USER || '',
+  pgPassword: process.env.PG_PASSWORD || '',
+  pgDatabase: process.env.PG_DATABASE || '',
+
   supportedLangs: ['en', 'ta'],
   defaultLang: 'en',
-  isDevelopment,
   autoMigrateOnStartup: process.env.AUTO_MIGRATE_ON_STARTUP === 'true',
 };

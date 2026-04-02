@@ -5,6 +5,7 @@ export default defineConfig({
   schema: './src/db/schema',
   out: './drizzle',
   dialect: 'sqlite',
+  // driver: "durable-sqlite",
   dbCredentials: {
     url: config.tursoDatabaseUrl,
   },
