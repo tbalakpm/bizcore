@@ -219,6 +219,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
       gtnLength: 10,
       useGlobal: true,
       trackBundleGtn: true,
+      isTaxInclusive: false,
       isActive: true,
       productType: 'simple',
       bundleItems: [],

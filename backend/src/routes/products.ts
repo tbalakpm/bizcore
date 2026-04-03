@@ -148,6 +148,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
         productType: products.productType,
         parentId: products.parentId,
         templateId: products.templateId,
+        isTaxInclusive: products.isTaxInclusive,
         createdAt: products.createdAt,
         updatedAt: products.updatedAt,
       })
@@ -292,6 +293,7 @@ productsRouter.post('/', async (req, res) => {
     templateId,
     isActive,
     productType,
+    isTaxInclusive,
     bundleItems,
     attributeValues, // [{ attributeId, value }]
   } = req.body;
@@ -321,6 +323,7 @@ productsRouter.post('/', async (req, res) => {
         useGlobal: useGlobal !== false,
         trackBundleGtn: trackBundleGtn !== false,
         isActive: isActive !== false,
+        isTaxInclusive: isTaxInclusive === true,
       })
       .returning()
       .get();
@@ -406,6 +409,7 @@ productsRouter.put('/:id', async (req, res) => {
     templateId,
     bundleItems,
     attributeValues,
+    isTaxInclusive,
   } = req.body;
 
   const product = await db.select().from(products).where(eq(products.id, id)).get();
@@ -435,6 +439,7 @@ productsRouter.put('/:id', async (req, res) => {
     if (productType) updateData.productType = productType;
     if (parentId !== undefined) updateData.parentId = parentId;
     if (templateId !== undefined) updateData.templateId = templateId;
+    if (isTaxInclusive !== undefined) updateData.isTaxInclusive = isTaxInclusive;
 
     await db
       .update(products)

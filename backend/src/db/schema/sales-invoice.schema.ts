@@ -26,6 +26,8 @@ export const salesInvoices = sqliteTable('sales_invoices', {
 
   refDate: text('ref_date', { length: 25 }),
 
+  isTaxInclusive: integer('is_tax_inclusive', { mode: 'boolean' }),
+
   totalQty: real('total_qty')
     .notNull()
     .default(0.000),

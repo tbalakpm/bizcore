@@ -173,6 +173,14 @@
         </nz-form-control>
       </nz-form-item>
     </div>
+    <div class="col-span-4 md:col-span-2 lg:col-span-1">
+      <nz-form-item>
+        <nz-form-label>Tax Inclusive</nz-form-label>
+        <nz-form-control>
+          <nz-switch [(ngModel)]="product.isTaxInclusive" name="productIsTaxInclusive"></nz-switch>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
 
     <!-- Bundle Items Section -->
     @if (product.productType === 'bundle') {

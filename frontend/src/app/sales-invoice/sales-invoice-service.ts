@@ -45,6 +45,7 @@ export interface SalesInvoice {
   totalTaxAmount?: number | string;
   roundOff?: number | string;
   netAmount: number;
+  isTaxInclusive?: boolean | null;
   
   // E-Invoice Metadata
   irn?: string;

@@ -22,6 +22,7 @@ export interface Product {
   gtnLength?: number;
   useGlobal?: boolean;
   trackBundleGtn?: boolean;
+  isTaxInclusive?: boolean;
   // unitsInStock?: number;
   categoryName?: string;
   isActive: boolean;

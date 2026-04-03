@@ -68,6 +68,7 @@ type EditableSalesInvoice = {
   discountType?: string;
   discountPct?: number;
   discountAmount?: number;
+  isTaxInclusive?: boolean | null;
   items: EditableSalesInvoiceItem[];
 };
 
@@ -208,6 +209,7 @@ export class SalesInvoiceForm implements OnInit {
       discountType: 'none',
       discountPct: 0,
       discountAmount: 0,
+      isTaxInclusive: null,
       items: [{ qty: 1, unitPrice: 0, discountType: 'none', discountPct: 0, discountAmount: 0, taxPct: 0, taxAmount: 0, lineTotal: 0 }],
     };
   }
@@ -289,6 +291,7 @@ export class SalesInvoiceForm implements OnInit {
           discountType: invoice.discountType || 'none',
           discountPct: Number(invoice.discountPct || 0),
           discountAmount: Number(invoice.discountAmount || 0),
+          isTaxInclusive: invoice.isTaxInclusive,
           items: (invoice.items || []).map((item) => ({
             id: item.id,
             inventoryId: item.inventoryId,
@@ -404,8 +407,19 @@ export class SalesInvoiceForm implements OnInit {
           basePrice = Math.round(basePrice * 100) / 100;
         }
 
-        item.unitPrice = basePrice;
         item.taxPct = this.editingInvoice.type === 'estimate' ? 0 : Number(product.taxRate || 0);
+        
+        // Determine tax inclusive mode: Invoice override > Product setting
+        const isTaxInclusive = this.editingInvoice.isTaxInclusive !== null && this.editingInvoice.isTaxInclusive !== undefined
+          ? this.editingInvoice.isTaxInclusive
+          : !!product.isTaxInclusive;
+
+        if (isTaxInclusive && item.taxPct > 0) {
+          basePrice = basePrice / (1 + (item.taxPct / 100));
+          basePrice = Math.round(basePrice * 100) / 100;
+        }
+
+        item.unitPrice = basePrice;
       }
       item.unitsInStock = inventory.unitsInStock;
       this.calculateLineTotal(item);
@@ -434,6 +448,16 @@ export class SalesInvoiceForm implements OnInit {
 
   recalculateAllTaxes() {
     this.editingInvoice.items.forEach(item => this.calculateLineTotal(item));
+  }
+
+  onTaxModeChange(mode: boolean | null) {
+    this.editingInvoice.isTaxInclusive = mode;
+    // Re-select products to re-calculate base prices from inclusive prices if mode changed
+    this.editingInvoice.items.forEach(item => {
+      if (item.inventoryId) {
+        this.onInventorySelect(item);
+      }
+    });
   }
 
   onTypeChange(type: string) {
@@ -699,6 +723,7 @@ export class SalesInvoiceForm implements OnInit {
       totalTaxAmount: this.totalTax,
       roundOff: this.editingInvoice.roundOff,
       netAmount: this.netAmount,
+      isTaxInclusive: this.editingInvoice.isTaxInclusive,
       items: this.editingInvoice.items as SalesInvoiceItem[],
     };
 

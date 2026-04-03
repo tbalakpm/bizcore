@@ -237,6 +237,21 @@
         <nz-option nzValue="estimate" nzLabel="Estimate"></nz-option>
       </nz-select>
     </div>
+    
+    <div>
+      <label class="block text-sm font-medium mb-1">Tax Setup</label>
+      <nz-select
+        [ngModel]="editingInvoice.isTaxInclusive"
+        (ngModelChange)="onTaxModeChange($event)"
+        name="isTaxInclusive"
+        [nzDisabled]="!!editingInvoice.irn"
+        class="w-full"
+      >
+        <nz-option [nzValue]="null" nzLabel="Default (Product Level)"></nz-option>
+        <nz-option [nzValue]="true" nzLabel="Tax Inclusive"></nz-option>
+        <nz-option [nzValue]="false" nzLabel="Tax Exclusive"></nz-option>
+      </nz-select>
+    </div>
 
     <div>
       <label class="block text-sm font-medium mb-1"

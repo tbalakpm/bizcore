@@ -61,6 +61,10 @@ export const products = sqliteTable(
       .notNull()
       .default('global'),  // global (default), code, batch, tag, manual
 
+    isTaxInclusive: integer('is_tax_inclusive', { mode: 'boolean' })
+      .notNull()
+      .default(false),
+
     ...auditFields
   },
   (t) => [

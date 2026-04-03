@@ -187,7 +187,8 @@ salesInvoicesRouter.get('/', async (req: Request, res: Response) => {
         totalQty: salesInvoices.totalQty,
         roundOff: salesInvoices.roundOff,
         netAmount: salesInvoices.netAmount,
-        irn: salesInvoices.irn
+        irn: salesInvoices.irn,
+        isTaxInclusive: salesInvoices.isTaxInclusive
       })
       .from(salesInvoices)
       .leftJoin(customers, eq(customers.id, salesInvoices.customerId));
@@ -304,6 +305,7 @@ salesInvoicesRouter.post('/', async (req: Request, res: Response) => {
           discountAmount: toNumber(body.discountAmount),
           totalTaxAmount: toNumber(body.totalTaxAmount),
           roundOff: toNumber(body.roundOff) ?? 0,
+          isTaxInclusive: body.isTaxInclusive,
         })
         .returning()
         .get();
@@ -419,6 +421,7 @@ salesInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
           discountAmount: toNumber(body.discountAmount) ?? toNumber(totals.totalDiscount),
           totalTaxAmount: toNumber(body.totalTaxAmount) ?? existing.totalTaxAmount,
           roundOff: toNumber(body.roundOff) ?? existing.roundOff,
+          isTaxInclusive: body.isTaxInclusive !== undefined ? body.isTaxInclusive : existing.isTaxInclusive,
         })
         .where(eq(salesInvoices.id, id))
         .run();
