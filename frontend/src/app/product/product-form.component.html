@@ -96,7 +96,7 @@
     <div class="col-span-4 md:col-span-2 lg:col-span-1">
       <nz-form-item>
         <nz-form-label>{{ 'CATEGORY.TITLE' | translate }}</nz-form-label>
-        <nz-form-control [nzErrorTip]="'Please select a category'">
+        <nz-form-control>
           <nz-select [(ngModel)]="product.categoryId" name="categoryId" nzShowSearch required>
             @for (c of structuredCategories(); track c.id) {
               <nz-option [nzValue]="c.id" [nzLabel]="c.name"></nz-option>
