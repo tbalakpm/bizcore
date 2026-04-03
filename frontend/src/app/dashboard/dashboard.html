@@ -52,6 +52,63 @@
       Inventory
     </h2>
 
+    <!-- Stock Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <nz-card nzSize="small">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-xs uppercase text-gray-500 m-0">Total Stock</p>
+            <p class="text-xl font-bold m-0">
+              {{ stockSummary().total.qty }}
+              <span class="text-sm font-normal text-gray-400"
+                >({{ stockSummary().total.cost | number: '1.0-0' }})</span
+              >
+            </p>
+          </div>
+          <span nz-icon nzType="database" class="text-2xl text-blue-500"></span>
+        </div>
+      </nz-card>
+      <nz-card nzSize="small">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-xs uppercase text-gray-500 m-0">Low Stock</p>
+            <p class="text-xl font-bold m-0 text-orange-500">{{ stockSummary().reorderLevel }}</p>
+          </div>
+          <span nz-icon nzType="warning" class="text-2xl text-orange-500"></span>
+        </div>
+      </nz-card>
+      <nz-card nzSize="small">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-xs uppercase text-gray-500 m-0">Out of Stock</p>
+            <p class="text-xl font-bold m-0 text-red-500">{{ stockSummary().outOfStock }}</p>
+          </div>
+          <span nz-icon nzType="stop" class="text-2xl text-red-500"></span>
+        </div>
+      </nz-card>
+    </div>
+
+    <nz-card nzTitle="Stock Aging" nzSize="small" class="mb-4!">
+      <nz-table #agingStockTable [nzData]="agingStock()" nzSize="small" [nzShowPagination]="false">
+        <thead>
+          <tr>
+            <th>Range</th>
+            <th class="text-right">Qty</th>
+            <th class="text-right">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of agingStockTable.data; track a.range) {
+            <tr>
+              <td>{{ a.range }}</td>
+              <td class="text-right">{{ a.qty }}</td>
+              <td class="text-right">{{ a.value | number: '1.0-0' }}</td>
+            </tr>
+          }
+        </tbody>
+      </nz-table>
+    </nz-card>
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Sales Summary -->
       <nz-card nzTitle="Sales Summary" nzSize="small">
@@ -138,42 +195,6 @@
       </nz-card>
     </div>
 
-    <!-- Stock Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-      <nz-card nzSize="small">
-        <div class="flex justify-between items-center">
-          <div>
-            <p class="text-xs uppercase text-gray-500 m-0">Total Stock</p>
-            <p class="text-xl font-bold m-0">
-              {{ stockSummary().total.qty }}
-              <span class="text-sm font-normal text-gray-400"
-                >({{ stockSummary().total.cost | number: '1.0-0' }})</span
-              >
-            </p>
-          </div>
-          <span nz-icon nzType="database" class="text-2xl text-blue-500"></span>
-        </div>
-      </nz-card>
-      <nz-card nzSize="small">
-        <div class="flex justify-between items-center">
-          <div>
-            <p class="text-xs uppercase text-gray-500 m-0">Low Stock</p>
-            <p class="text-xl font-bold m-0 text-orange-500">{{ stockSummary().reorderLevel }}</p>
-          </div>
-          <span nz-icon nzType="warning" class="text-2xl text-orange-500"></span>
-        </div>
-      </nz-card>
-      <nz-card nzSize="small">
-        <div class="flex justify-between items-center">
-          <div>
-            <p class="text-xs uppercase text-gray-500 m-0">Out of Stock</p>
-            <p class="text-xl font-bold m-0 text-red-500">{{ stockSummary().outOfStock }}</p>
-          </div>
-          <span nz-icon nzType="stop" class="text-2xl text-red-500"></span>
-        </div>
-      </nz-card>
-    </div>
-
     <!-- Top 10 & Aging -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
       <nz-card nzTitle="Top 10 Products" nzSize="small">
@@ -242,32 +263,6 @@
               <tr>
                 <td>{{ s.name }}</td>
                 <td class="text-right">{{ s.amount | number: '1.0-0' }}</td>
-              </tr>
-            }
-          </tbody>
-        </nz-table>
-      </nz-card>
-
-      <nz-card nzTitle="Stock Aging" nzSize="small">
-        <nz-table
-          #agingStockTable
-          [nzData]="agingStock()"
-          nzSize="small"
-          [nzShowPagination]="false"
-        >
-          <thead>
-            <tr>
-              <th>Range</th>
-              <th class="text-right">Qty</th>
-              <th class="text-right">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (a of agingStockTable.data; track a.range) {
-              <tr>
-                <td>{{ a.range }}</td>
-                <td class="text-right">{{ a.qty }}</td>
-                <td class="text-right">{{ a.value | number: '1.0-0' }}</td>
               </tr>
             }
           </tbody>
