@@ -1,5 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -19,7 +18,6 @@ import { PermissionService } from '../../auth/permission.service';
 @Component({
   selector: 'app-general-settings',
   imports: [
-    CommonModule,
     FormsModule,
     NzFormModule,
     NzInputModule,
@@ -29,7 +27,7 @@ import { PermissionService } from '../../auth/permission.service';
     NzInputNumberModule,
     NzSwitchModule,
     NzSelectModule,
-    NzIconModule
+    NzIconModule,
   ],
   templateUrl: './general-settings.html',
 })

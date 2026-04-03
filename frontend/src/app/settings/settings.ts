@@ -32,7 +32,7 @@ import { PermissionService } from '../auth/permission.service';
           Serial Settings
         </a>
       }
-      @if (permission.canRead('settings-pricing-categories')) {
+      @if (permission.canRead('settings-pricing')) {
         <a routerLink="/settings/pricing-categories"
            routerLinkActive="active-tab"
            style="color: var(--color-text)"

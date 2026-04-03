@@ -2,7 +2,7 @@
   <nz-card>
     <div class="flex justify-between items-center mb-3">
       <h2 class="text-base font-semibold">Product Attributes</h2>
-      <button nz-button nzType="primary" nzSize="small" (click)="showModal()">
+      <button nz-button nzType="primary" nzSize="small" (click)="showModal()" *appHasPermission="'product-settings-attributes:add'">
         <span nz-icon nzType="plus" nzTheme="outline"></span>
         Add Attribute
       </button>
@@ -28,7 +28,9 @@
           <th>Name</th>
           <th class="w-32">Type</th>
           <th class="w-20 text-center" nzAlign="center">Active</th>
-          <th class="w-28 text-center" nzAlign="center">Actions</th>
+          @if (permissionService.canEdit('product-settings-attributes') || permissionService.canDelete('product-settings-attributes')) {
+            <th class="w-28 text-center" nzAlign="center">Actions</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -49,27 +51,31 @@
             <td nzAlign="center">
               <nz-switch [ngModel]="data.isActive" nzDisabled nzSize="small"></nz-switch>
             </td>
-            <td nzAlign="center">
-              <div class="flex items-center justify-center gap-2">
-                <button
-                  nz-button nzType="link" nzSize="small"
-                  nz-tooltip nzTooltipTitle="Edit attribute"
-                  style="color: var(--color-accent)"
-                  (click)="showModal(data)"
-                >
-                  <span nz-icon nzType="edit" nzTheme="outline"></span>
-                </button>
-                <button
-                  nz-button nzType="link" nzDanger nzSize="small"
-                  nz-tooltip nzTooltipTitle="Delete attribute"
-                  nz-popconfirm
-                  [nzPopconfirmTitle]="'Delete attribute &quot;' + data.name + '&quot;?'"
-                  (nzOnConfirm)="deleteAttribute(data.id!)"
-                >
-                  <span nz-icon nzType="delete" nzTheme="outline"></span>
-                </button>
-              </div>
-            </td>
+            @if (permissionService.canEdit('product-settings-attributes') || permissionService.canDelete('product-settings-attributes')) {
+              <td nzAlign="center">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    nz-button nzType="link" nzSize="small"
+                    nz-tooltip nzTooltipTitle="Edit attribute"
+                    style="color: var(--color-accent)"
+                    (click)="showModal(data)"
+                    *appHasPermission="'product-settings-attributes:edit'"
+                  >
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                  </button>
+                  <button
+                    nz-button nzType="link" nzDanger nzSize="small"
+                    nz-tooltip nzTooltipTitle="Delete attribute"
+                    nz-popconfirm
+                    [nzPopconfirmTitle]="'Delete attribute &quot;' + data.name + '&quot;?'"
+                    (nzOnConfirm)="deleteAttribute(data.id!)"
+                    *appHasPermission="'product-settings-attributes:delete'"
+                  >
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                </div>
+              </td>
+            }
           </tr>
         }
         @if (attributes.length === 0 && !loading) {
@@ -133,22 +139,34 @@
       <nz-form-item>
         <nz-form-label>Default Value</nz-form-label>
         <nz-form-control>
-          <ng-container [ngSwitch]="attributeForm.get('type')?.value">
-            <input *ngSwitchCase="'text'" nz-input formControlName="defaultValue" placeholder="Default text" />
-            <input *ngSwitchCase="'number'" type="number" nz-input formControlName="defaultValue" placeholder="0" />
-            <nz-switch *ngSwitchCase="'boolean'" formControlName="defaultValue"></nz-switch>
-            <nz-select *ngSwitchCase="'single_select'" formControlName="defaultValue" nzAllowClear class="w-full">
-              @for (o of attributeForm.get('options')?.value; track o) {
-                <nz-option [nzLabel]="o" [nzValue]="o"></nz-option>
-              }
-            </nz-select>
-            <nz-select *ngSwitchCase="'multi_select'" nzMode="multiple" formControlName="defaultValue" class="w-full">
-              @for (o of attributeForm.get('options')?.value; track o) {
-                <nz-option [nzLabel]="o" [nzValue]="o"></nz-option>
-              }
-            </nz-select>
-            <input *ngSwitchDefault nz-input formControlName="defaultValue" />
-          </ng-container>
+          @switch (attributeForm.get('type')?.value) {
+            @case ('text') {
+              <input nz-input formControlName="defaultValue" placeholder="Default text" />
+            }
+            @case ('number') {
+              <input type="number" nz-input formControlName="defaultValue" placeholder="0" />
+            }
+            @case ('boolean') {
+              <nz-switch formControlName="defaultValue"></nz-switch>
+            }
+            @case ('single_select') {
+              <nz-select formControlName="defaultValue" nzAllowClear class="w-full">
+                @for (o of attributeForm.get('options')?.value; track o) {
+                  <nz-option [nzLabel]="o" [nzValue]="o"></nz-option>
+                }
+              </nz-select>
+            }
+            @case ('multi_select') {
+              <nz-select nzMode="multiple" formControlName="defaultValue" class="w-full">
+                @for (o of attributeForm.get('options')?.value; track o) {
+                  <nz-option [nzLabel]="o" [nzValue]="o"></nz-option>
+                }
+              </nz-select>
+            }
+            @default {
+              <input nz-input formControlName="defaultValue" />
+            }
+          }
         </nz-form-control>
       </nz-form-item>
 

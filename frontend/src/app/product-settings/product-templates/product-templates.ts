@@ -1,5 +1,4 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -15,11 +14,12 @@ import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { Attribute, AttributeService } from '../../product/attribute-service';
 import { ProductTemplate, ProductTemplateService } from './product-template-service';
+import { PermissionService } from '../../auth/permission.service';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-product-templates',
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     NzTableModule,
@@ -33,6 +33,7 @@ import { ProductTemplate, ProductTemplateService } from './product-template-serv
     NzPopconfirmModule,
     NzTooltipModule,
     NzCardModule,
+    HasPermissionDirective,
   ],
   templateUrl: './product-templates.html',
 })
@@ -42,6 +43,7 @@ export class ProductTemplates implements OnInit {
   private fb = inject(FormBuilder);
   private modal = inject(NzModalService);
   private message = inject(NzMessageService);
+  permissionService = inject(PermissionService);
 
   templates: ProductTemplate[] = [];
   allAttributes: Attribute[] = [];

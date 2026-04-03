@@ -12,8 +12,8 @@
 <div class="grid grid-cols-1 gap-4">
   <!-- Add / Edit form -->
   @if (
-    (editing && permissionService.canEdit('settings-pricing-categories')) ||
-    (!editing && permissionService.canAdd('settings-pricing-categories'))
+    (editing && permissionService.canEdit('settings-pricing')) ||
+    (!editing && permissionService.canAdd('settings-pricing'))
   ) {
     <nz-card>
       <h2 class="text-base font-semibold mb-2">{{ editing ? 'Edit' : 'Add' }} Pricing Category</h2>
@@ -104,8 +104,8 @@
           <th>Description</th>
           <th nzWidth="80px" nzAlign="center">Active</th>
           @if (
-            permissionService.canEdit('settings-pricing-categories') ||
-            permissionService.canDelete('settings-pricing-categories')
+            permissionService.canEdit('settings-pricing') ||
+            permissionService.canDelete('settings-pricing')
           ) {
             <th nzWidth="160px" nzAlign="center">Actions</th>
           }
@@ -122,12 +122,12 @@
                 [ngModel]="cat.isActive"
                 (ngModelChange)="toggleActive(cat)"
                 nzSize="small"
-                [nzDisabled]="!permissionService.canEdit('settings-pricing-categories')"
+                [nzDisabled]="!permissionService.canEdit('settings-pricing')"
               ></nz-switch>
             </td>
             @if (
-              permissionService.canEdit('settings-pricing-categories') ||
-              permissionService.canDelete('settings-pricing-categories')
+              permissionService.canEdit('settings-pricing') ||
+              permissionService.canDelete('settings-pricing')
             ) {
               <td nzAlign="center">
                 <div class="flex items-center justify-center gap-1">
@@ -152,7 +152,7 @@
                     nzTooltipTitle="Edit"
                     style="color: var(--color-accent)"
                     (click)="startEdit(cat)"
-                    *appHasPermission="'settings-pricing-categories:edit'"
+                    *appHasPermission="'settings-pricing:edit'"
                   >
                     <span nz-icon nzType="edit" nzTheme="outline"></span>
                   </button>
@@ -166,7 +166,7 @@
                     (nzOnConfirm)="deleteCategory(cat)"
                     nz-tooltip
                     nzTooltipTitle="Delete"
-                    *appHasPermission="'settings-pricing-categories:delete'"
+                    *appHasPermission="'settings-pricing:delete'"
                   >
                     <span nz-icon nzType="delete" nzTheme="outline"></span>
                   </button>
@@ -182,7 +182,7 @@
                     <h3 class="font-semibold text-sm">
                       Product Margins for <span class="text-accent">{{ cat.name }}</span>
                     </h3>
-                    @if (permissionService.canEdit('settings-pricing-categories')) {
+                    @if (permissionService.canEdit('settings-pricing')) {
                       <button
                         nz-button
                         nzType="primary"
@@ -223,7 +223,7 @@
                                 [ngModelOptions]="{ standalone: true }"
                                 class="w-full"
                                 [nzDisabled]="
-                                  !permissionService.canEdit('settings-pricing-categories')
+                                  !permissionService.canEdit('settings-pricing')
                                 "
                               >
                                 @for (mt of marginTypes; track mt.value) {
@@ -240,7 +240,7 @@
                                   [nzStep]="0.5"
                                   class="w-full"
                                   [nzDisabled]="
-                                    !permissionService.canEdit('settings-pricing-categories')
+                                    !permissionService.canEdit('settings-pricing')
                                   "
                                 />
                               } @else if (
@@ -254,7 +254,7 @@
                                   [nzStep]="1"
                                   class="w-full"
                                   [nzDisabled]="
-                                    !permissionService.canEdit('settings-pricing-categories')
+                                    !permissionService.canEdit('settings-pricing')
                                   "
                                 />
                               } @else {

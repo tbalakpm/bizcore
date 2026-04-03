@@ -10,6 +10,7 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { PermissionService } from '../../auth/permission.service';
+// import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 import { SettingsService } from '../settings.service';
 import { forkJoin } from 'rxjs';
@@ -17,7 +18,6 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-serial-settings',
   imports: [
-    CommonModule,
     FormsModule,
     NzFormModule,
     NzInputModule,

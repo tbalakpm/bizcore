@@ -1,4 +1,4 @@
-import { CommonModule, DatePipe, CurrencyPipe, TitleCasePipe } from '@angular/common';
+import { DatePipe, CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -26,7 +26,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 @Component({
   selector: 'app-sales-invoices',
   imports: [
-    CommonModule, ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, TitleCasePipe, RouterLink,
+    ReactiveFormsModule, FormsModule, DatePipe, CurrencyPipe, TitleCasePipe, RouterLink,
     NzTableModule, NzSelectModule, NzInputModule, NzDatePickerModule,
     NzInputNumberModule, NzButtonModule, NzIconModule, NzTagModule,
     NzPaginationModule, NzTooltipModule, NzPopconfirmModule, NzCardModule, NzAlertModule, HasPermissionDirective,

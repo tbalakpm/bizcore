@@ -14,7 +14,7 @@ import { PermissionService } from '../auth/permission.service';
       </h1>
     </div>
     <div class="flex gap-0 border-b border-border mb-4">
-      @if (permission.canRead('categories')) {
+      @if (permission.canRead('product-settings-categories')) {
         <a routerLink="/product-settings/categories"
            routerLinkActive="active-tab"
            style="color: var(--color-text)"
@@ -23,7 +23,7 @@ import { PermissionService } from '../auth/permission.service';
           Categories
         </a>
       }
-      @if (permission.canRead('settings-general')) {
+      @if (permission.canRead('product-settings-brands')) {
         <a routerLink="/product-settings/brands"
             routerLinkActive="active-tab"
             style="color: var(--color-text)"
@@ -32,7 +32,7 @@ import { PermissionService } from '../auth/permission.service';
           Brands
         </a>
       }
-      @if (permission.canRead('settings-product-templates')) {
+      @if (permission.canRead('product-settings-templates')) {
         <a routerLink="/product-settings/product-templates"
             routerLinkActive="active-tab"
             style="color: var(--color-text)"
@@ -41,7 +41,7 @@ import { PermissionService } from '../auth/permission.service';
           Templates
         </a>
       }
-      @if (permission.canRead('settings-attributes')) {
+      @if (permission.canRead('product-settings-attributes')) {
         <a routerLink="/product-settings/attributes"
             routerLinkActive="active-tab"
             style="color: var(--color-text)"

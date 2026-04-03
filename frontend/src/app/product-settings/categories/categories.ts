@@ -2,7 +2,6 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CategoryService, Category, CategoryList } from './category-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { PermissionService } from '../../auth/permission.service';
 
 import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
@@ -22,7 +21,7 @@ import { HasPermissionDirective } from '../../shared/directives/has-permission.d
 
 @Component({
   selector: 'app-categories',
-  imports: [TranslatePipe, FormsModule, CommonModule, HasPermissionDirective, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule, NzSelectModule],
+  imports: [TranslatePipe, FormsModule, HasPermissionDirective, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule, NzSelectModule],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {

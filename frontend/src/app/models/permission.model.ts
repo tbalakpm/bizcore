@@ -9,20 +9,21 @@ export interface ModulePermissions {
 export type PermissionLevel = 'none' | 'read' | 'write' | ModulePermissions;
 
 export interface UserPermissions {
-  categories: ModulePermissions;
-  products: ModulePermissions;
-  customers: ModulePermissions;
-  suppliers: ModulePermissions;
+  dashboard: ModulePermissions;
   'sales-invoices': ModulePermissions;
   'purchase-invoices': ModulePermissions;
   'stock-invoices': ModulePermissions;
+  products: ModulePermissions;
+  customers: ModulePermissions;
+  suppliers: ModulePermissions;
   users: ModulePermissions;
-  dashboard: ModulePermissions;
+  'product-settings-categories': ModulePermissions;
+  'product-settings-brands': ModulePermissions;
+  'product-settings-attributes': ModulePermissions;
+  'product-settings-templates': ModulePermissions;
   'settings-general': ModulePermissions;
   'settings-serial': ModulePermissions;
-  'settings-pricing-categories': ModulePermissions;
-  'settings-attributes': ModulePermissions;
-  'settings-product-templates': ModulePermissions;
+  'settings-pricing': ModulePermissions;
 }
 
 export const ALL_MODULES: (keyof UserPermissions)[] = [
@@ -33,13 +34,14 @@ export const ALL_MODULES: (keyof UserPermissions)[] = [
   'products',
   'customers',
   'suppliers',
-  'categories',
   'users',
+  'product-settings-categories',
+  'product-settings-brands',
+  'product-settings-attributes',
+  'product-settings-templates',
   'settings-general',
   'settings-serial',
-  'settings-pricing-categories',
-  'settings-attributes',
-  'settings-product-templates',
+  'settings-pricing',
 ];
 
 export const MODULE_LABELS: Record<keyof UserPermissions, string> = {
@@ -50,11 +52,12 @@ export const MODULE_LABELS: Record<keyof UserPermissions, string> = {
   products: 'Products',
   customers: 'Customers',
   suppliers: 'Suppliers',
-  categories: 'Categories',
   users: 'Users',
+  'product-settings-categories': 'Product Settings (Categories)',
+  'product-settings-brands': 'Product Settings (Brands)',
+  'product-settings-attributes': 'Product Settings (Attributes)',
+  'product-settings-templates': 'Product Settings (Templates)',
   'settings-general': 'Settings (General)',
   'settings-serial': 'Settings (Serials)',
-  'settings-pricing-categories': 'Settings (Pricing Categories)',
-  'settings-attributes': 'Settings (Attributes)',
-  'settings-product-templates': 'Settings (Product Templates)',
+  'settings-pricing': 'Settings (Pricing)',
 };

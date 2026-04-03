@@ -5,10 +5,9 @@
 
   <div
     class="grid gap-4"
-    [ngClass]="{
-      'grid-cols-1!': !permissionService.canAdd('settings-general'),
-      'grid-cols-1 lg:grid-cols-3': permissionService.canAdd('settings-general'),
-    }"
+    [class.grid-cols-1!]="!permissionService.canAdd('product-settings-brands')"
+    [class.grid-cols-1]="permissionService.canAdd('product-settings-brands')"
+    [class.lg:grid-cols-3]="permissionService.canAdd('product-settings-brands')"
   >
     <!-- List -->
     <div class="lg:col-span-2">
@@ -73,8 +72,8 @@
               </th>
               <th class="text-center w-16" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
               @if (
-                permissionService.canEdit('settings-general') ||
-                permissionService.canDelete('settings-general')
+                permissionService.canEdit('product-settings-brands') ||
+                permissionService.canDelete('product-settings-brands')
               ) {
                 <th class="text-center w-32" nzAlign="center">{{ 'ACTIONS' | translate }}</th>
               }
@@ -130,8 +129,8 @@
                   </nz-switch>
                 </td>
                 @if (
-                  permissionService.canEdit('settings-general') ||
-                  permissionService.canDelete('settings-general')
+                  permissionService.canEdit('product-settings-brands') ||
+                  permissionService.canDelete('product-settings-brands')
                 ) {
                   <td class="text-center" nzAlign="center">
                     <div class="flex items-center justify-center gap-2">
@@ -166,6 +165,7 @@
                           nzTooltipTitle="Edit brand"
                           style="color: var(--color-accent)"
                           (click)="startEdit(b)"
+                          *appHasPermission="'product-settings-brands:edit'"
                         >
                           <span nz-icon nzType="edit" nzTheme="outline"></span>
                         </button>
@@ -179,6 +179,7 @@
                           nz-popconfirm
                           [nzPopconfirmTitle]="'Delete brand &quot;' + b.name + '&quot;?'"
                           (nzOnConfirm)="deleteBrand(b)"
+                          *appHasPermission="'product-settings-brands:delete'"
                         >
                           <span nz-icon nzType="delete" nzTheme="outline"></span>
                         </button>
@@ -198,7 +199,7 @@
       </nz-card>
     </div>
 
-    @if (permissionService.canAdd('settings-general')) {
+    @if (permissionService.canAdd('product-settings-brands')) {
       <!-- Add form -->
       <div class="max-h-max">
         <nz-card>

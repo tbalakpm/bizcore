@@ -32,7 +32,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
-      { path: 'dashboard', component: Dashboard },
+      { path: 'dashboard', component: Dashboard, data: { module: 'dashboard' } },
       { path: 'products', component: Products, data: { module: 'products' } },
       { path: 'customers', component: Customers, data: { module: 'customers' } },
       { path: 'suppliers', component: Suppliers, data: { module: 'suppliers' } },
@@ -70,9 +70,9 @@ export const routes: Routes = [
         component: Settings,
         children: [
           { path: '', redirectTo: 'general', pathMatch: 'full' },
-          { path: 'general', component: GeneralSettings },
-          { path: 'pricing-categories', component: PricingCategories },
-          { path: 'serial', component: SerialSettings },
+          { path: 'general', component: GeneralSettings, data: { module: 'settings-general' } },
+          { path: 'pricing-categories', component: PricingCategories, data: { module: 'settings-pricing' } },
+          { path: 'serial', component: SerialSettings, data: { module: 'settings-serial' } },
         ],
       },
       {
@@ -80,10 +80,10 @@ export const routes: Routes = [
         component: ProductSettings,
         children: [
           { path: '', redirectTo: 'categories', pathMatch: 'full' },
-          { path: 'categories', component: Categories, data: { module: 'categories' } },
-          { path: 'brands', component: Brands },
-          { path: 'attributes', component: Attributes },
-          { path: 'product-templates', component: ProductTemplates },
+          { path: 'categories', component: Categories, data: { module: 'product-settings-categories' } },
+          { path: 'brands', component: Brands, data: { module: 'product-settings-brands' } },
+          { path: 'attributes', component: Attributes, data: { module: 'product-settings-attributes' } },
+          { path: 'product-templates', component: ProductTemplates, data: { module: 'product-settings-templates' } },
         ],
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
 import { Component, HostListener, inject, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -74,7 +74,7 @@ type EditableSalesInvoice = {
 @Component({
   selector: 'app-sales-invoice-form',
   imports: [
-    CommonModule, FormsModule, RouterLink, AddressForm, TranslatePipe,
+    DatePipe, DecimalPipe, TitleCasePipe, FormsModule, RouterLink, AddressForm, TranslatePipe,
     NzSelectModule, NzFormModule, NzInputModule, NzDatePickerModule,
     NzInputNumberModule, NzButtonModule, NzIconModule, NzTableModule,
     NzAlertModule, NzTooltipModule, NzCardModule, NzCollapseModule,

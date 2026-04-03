@@ -62,26 +62,25 @@
         <nz-form-item>
           <nz-form-label>{{ 'GSTIN' | translate }}</nz-form-label>
           <nz-form-control>
-            <!-- <nz-input-group [nzSuffix]="suffixIconButton"> -->
-            <input
-              nz-input
-              [(ngModel)]="editingSupplier.gstin"
-              name="newSupplierGstin"
-              placeholder="e.g. 22AAAAA0000A1Z5"
-            />
-            <!-- </nz-input-group> -->
-            <!-- <ng-template #suffixIconButton>
+            <nz-input-group [nzAddOnAfter]="suffixIconButton">
+              <input
+                nz-input
+                [(ngModel)]="editingSupplier.gstin"
+                name="newSupplierGstin"
+                placeholder="e.g. 22AAAAA0000A1Z5"
+              />
+            </nz-input-group>
+            <ng-template #suffixIconButton>
               <button
                 nz-button
                 nzType="primary"
-                nzSearch
                 type="button"
                 (click)="searchGstin()"
                 [disabled]="!editingSupplier.gstin || editingSupplier.gstin.length < 15"
               >
                 <span nz-icon nzType="search"></span>
               </button>
-            </ng-template> -->
+            </ng-template>
           </nz-form-control>
         </nz-form-item>
         <nz-form-item class="md:col-span-2 xl:col-span-4">

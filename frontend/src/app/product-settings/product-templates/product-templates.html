@@ -2,7 +2,7 @@
   <nz-card>
     <div class="flex justify-between items-center mb-3">
       <h2 class="text-base font-semibold">Product Templates</h2>
-      <button nz-button nzType="primary" nzSize="small" (click)="showModal()">
+      <button nz-button nzType="primary" nzSize="small" (click)="showModal()" *appHasPermission="'product-settings-templates:add'">
         <span nz-icon nzType="plus" nzTheme="outline"></span>
         Add Template
       </button>
@@ -26,9 +26,11 @@
       <thead>
         <tr>
           <th>Name / Description</th>
-          <th class="w-36 text-center" nzAlign="center">Attributes</th>
+          <th class="w-32">Mapped Attributes</th>
           <th class="w-20 text-center" nzAlign="center">Active</th>
-          <th class="w-28 text-center" nzAlign="center">Actions</th>
+          @if (permissionService.canEdit('product-settings-templates') || permissionService.canDelete('product-settings-templates')) {
+            <th class="w-28 text-center" nzAlign="center">Actions</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -52,27 +54,29 @@
             <td nzAlign="center">
               <nz-switch [ngModel]="data.isActive" nzDisabled nzSize="small"></nz-switch>
             </td>
-            <td nzAlign="center">
-              <div class="flex items-center justify-center gap-2">
-                <button
-                  nz-button nzType="link" nzSize="small"
-                  nz-tooltip nzTooltipTitle="Edit template"
-                  style="color: var(--color-accent)"
-                  (click)="showModal(data)"
-                >
-                  <span nz-icon nzType="edit" nzTheme="outline"></span>
-                </button>
-                <button
-                  nz-button nzType="link" nzDanger nzSize="small"
-                  nz-tooltip nzTooltipTitle="Delete template"
-                  nz-popconfirm
-                  [nzPopconfirmTitle]="'Delete template &quot;' + data.name + '&quot;?'"
-                  (nzOnConfirm)="deleteTemplate(data.id!)"
-                >
-                  <span nz-icon nzType="delete" nzTheme="outline"></span>
-                </button>
-              </div>
-            </td>
+            @if (permissionService.canEdit('product-settings-templates') || permissionService.canDelete('product-settings-templates')) {
+              <td nzAlign="center">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    nz-button nzType="link" nzSize="small"
+                    nz-tooltip nzTooltipTitle="Edit template"
+                    style="color: var(--color-accent)"
+                    (click)="showModal(data)"
+                    *appHasPermission="'product-settings-templates:edit'"
+                  >
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                  </button>
+                  <button
+                    nz-button nzType="link" nzDanger nzSize="small"
+                    nz-tooltip nzTooltipTitle="Delete template"
+                    (click)="deleteTemplate(data.id!)"
+                    *appHasPermission="'product-settings-templates:delete'"
+                  >
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                </div>
+              </td>
+            }
           </tr>
         }
         @if (templates.length === 0 && !loading) {

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { Component, HostListener, inject, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -44,7 +44,7 @@ type EditableStockInvoice = {
 @Component({
   selector: 'app-stock-invoice-form',
   imports: [
-    CommonModule, FormsModule, RouterLink, ProductFormComponent,
+    DecimalPipe, FormsModule, RouterLink, ProductFormComponent,
     NzSelectModule, NzInputModule, NzInputNumberModule, NzDatePickerModule,
     NzButtonModule, NzIconModule, NzTableModule, NzAlertModule,
     NzTooltipModule, NzCardModule,

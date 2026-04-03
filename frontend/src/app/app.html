@@ -359,10 +359,10 @@
           <!-- Product Settings-->
           <!-- Product Settings -->
           @if (
-            permissions.canRead('categories') ||
-            permissions.canRead('settings-general') ||
-            permissions.canRead('settings-product-templates') ||
-            permissions.canRead('settings-attributes')
+            permissions.canRead('product-settings-categories') ||
+            permissions.canRead('product-settings-brands') ||
+            permissions.canRead('product-settings-attributes') ||
+            permissions.canRead('product-settings-templates')
           ) {
             <a
               routerLink="/product-settings"
@@ -391,7 +391,7 @@
           @if (
             permissions.canRead('settings-general') ||
             permissions.canRead('settings-serial') ||
-            permissions.canRead('settings-pricing-categories')
+            permissions.canRead('settings-pricing')
           ) {
             <a
               routerLink="/settings"

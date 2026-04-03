@@ -1,6 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Supplier, type Address, SupplierList, SupplierService, type SupplierBank } from './supplier-service';
 import { AddressForm } from '../shared/components/address-form';
@@ -22,15 +21,16 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 
 @Component({
   selector: 'app-suppliers',
   imports: [
-    FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm,
+    FormsModule, TranslatePipe, AddressForm,
     NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule,
     NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
-    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule, NzSelectModule,
+    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule, NzSelectModule, HasPermissionDirective,
   ],
   templateUrl: './suppliers.html',
 })

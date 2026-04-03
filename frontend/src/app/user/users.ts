@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -28,7 +27,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
   selector: 'app-users',
   standalone: true,
   imports: [
-    FormsModule, TranslatePipe, CommonModule,
+    FormsModule, TranslatePipe,
     HasPermissionDirective,
     NzTableModule, NzFormModule, NzInputModule, NzSelectModule,
     NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule,

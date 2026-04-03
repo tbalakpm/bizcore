@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -35,7 +35,7 @@ type PrintableBarcodeLabel = {
 @Component({
   selector: 'app-stock-invoices',
   imports: [
-    CommonModule, FormsModule, RouterLink,
+    DatePipe, CurrencyPipe, FormsModule, RouterLink,
     NzTableModule, NzInputModule, NzDatePickerModule, NzSelectModule,
     NzButtonModule, NzIconModule, NzPaginationModule, NzTooltipModule,
     NzPopconfirmModule, NzCardModule, NzAlertModule, NzInputNumberModule, HasPermissionDirective,

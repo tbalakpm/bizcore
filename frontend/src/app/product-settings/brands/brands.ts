@@ -2,7 +2,6 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { BrandService, Brand, BrandList } from './brand-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { PermissionService } from '../../auth/permission.service';
 
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -21,7 +20,7 @@ import { HasPermissionDirective } from '../../shared/directives/has-permission.d
 
 @Component({
   selector: 'app-brands',
-  imports: [TranslatePipe, FormsModule, CommonModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule],
+  imports: [TranslatePipe, FormsModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule, HasPermissionDirective],
   templateUrl: './brands.html',
 })
 export class Brands implements OnInit {

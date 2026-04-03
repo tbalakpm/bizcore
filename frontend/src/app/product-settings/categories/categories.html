@@ -11,10 +11,9 @@
 
   <div
     class="grid gap-4"
-    [ngClass]="{
-      'grid-cols-1!': !permissionService.canAdd('categories'),
-      'grid-cols-1 lg:grid-cols-3': permissionService.canAdd('categories'),
-    }"
+    [class.grid-cols-1!]="!permissionService.canAdd('product-settings-categories')"
+    [class.grid-cols-1]="permissionService.canAdd('product-settings-categories')"
+    [class.lg:grid-cols-3]="permissionService.canAdd('product-settings-categories')"
   >
     <!-- List -->
     <div class="lg:col-span-2">
@@ -80,7 +79,7 @@
               <th>Parent Category</th>
               <th class="text-center w-16" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
               @if (
-                permissionService.canEdit('categories') || permissionService.canDelete('categories')
+                permissionService.canEdit('product-settings-categories') || permissionService.canDelete('product-settings-categories')
               ) {
                 <th class="text-center w-32" nzAlign="center">{{ 'ACTIONS' | translate }}</th>
               }
@@ -155,8 +154,8 @@
                   </nz-switch>
                 </td>
                 @if (
-                  permissionService.canEdit('categories') ||
-                  permissionService.canDelete('categories')
+                  permissionService.canEdit('product-settings-categories') ||
+                  permissionService.canDelete('product-settings-categories')
                 ) {
                   <td class="text-center" nzAlign="center">
                     <div class="flex items-center justify-center gap-2">
@@ -191,7 +190,7 @@
                           nzTooltipTitle="Edit category"
                           style="color: var(--color-accent)"
                           (click)="startEdit(c)"
-                          *appHasPermission="'categories:edit'"
+                          *appHasPermission="'product-settings-categories:edit'"
                         >
                           <span nz-icon nzType="edit" nzTheme="outline"></span>
                         </button>
@@ -205,7 +204,7 @@
                           nz-popconfirm
                           [nzPopconfirmTitle]="'Delete category &quot;' + c.name + '&quot;?'"
                           (nzOnConfirm)="deleteCategory(c)"
-                          *appHasPermission="'categories:delete'"
+                          *appHasPermission="'product-settings-categories:delete'"
                         >
                           <span nz-icon nzType="delete" nzTheme="outline"></span>
                         </button>
@@ -227,7 +226,7 @@
       </nz-card>
     </div>
 
-    @if (permissionService.canAdd('categories')) {
+    @if (permissionService.canAdd('product-settings-categories')) {
       <!-- Add form -->
       <div class="max-h-max">
         <nz-card>

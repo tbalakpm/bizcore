@@ -69,7 +69,7 @@
         style="width: 130px"
       ></nz-input-number>
 
-      <ng-container *ngIf="hasFilters; else refreshBtn">
+      @if (hasFilters) {
         <button nz-button nzType="primary" (click)="applyFilters()">
           <span nz-icon nzType="filter" nzTheme="outline"></span> Apply
         </button>
@@ -82,12 +82,11 @@
         >
           <span nz-icon nzType="clear" nzTheme="outline"></span> Clear
         </button>
-      </ng-container>
-      <ng-template #refreshBtn>
+      } @else {
         <button nz-button nzType="default" (click)="applyFilters()">
           <span nz-icon nzType="reload" nzTheme="outline"></span> Refresh
         </button>
-      </ng-template>
+      }
     </div>
     <div
       class="flex flex-col sm:flex-row sm:items-center gap-2 border-l pl-2"

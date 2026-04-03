@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -25,7 +24,7 @@ import { ProductService, Product } from '../../product/product-service';
 @Component({
   selector: 'app-pricing-categories',
   imports: [
-    CommonModule, FormsModule,
+    FormsModule,
     NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule,
     NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
     NzCardModule, NzSelectModule, NzTagModule, NzInputNumberModule,

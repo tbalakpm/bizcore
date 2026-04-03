@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { TitleCasePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -13,13 +13,13 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { TitleCasePipe } from '@angular/common';
 import { Attribute, AttributeService } from '../../product/attribute-service';
+import { PermissionService } from '../../auth/permission.service';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-attributes',
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     NzTableModule,
@@ -34,6 +34,7 @@ import { Attribute, AttributeService } from '../../product/attribute-service';
     NzTooltipModule,
     NzCardModule,
     TitleCasePipe,
+    HasPermissionDirective,
   ],
   templateUrl: './attributes.html',
 })
@@ -42,6 +43,7 @@ export class Attributes implements OnInit {
   private fb = inject(FormBuilder);
   private modal = inject(NzModalService);
   private message = inject(NzMessageService);
+  permissionService = inject(PermissionService);
 
   attributes: Attribute[] = [];
   loading = false;

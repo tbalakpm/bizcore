@@ -1,6 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Customer, type Address, CustomerList, CustomerService } from './customer-service';
 import { AddressForm } from '../shared/components/address-form';
@@ -23,15 +22,16 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 
 @Component({
   selector: 'app-customers',
   imports: [
-    FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm,
+    FormsModule, TranslatePipe, AddressForm,
     NzTableModule, NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
     NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
-    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule,
+    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule, HasPermissionDirective,
   ],
 
   templateUrl: './customers.html',
