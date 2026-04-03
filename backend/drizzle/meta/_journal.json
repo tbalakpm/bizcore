@@ -85,6 +85,13 @@
       "when": 1775202162831,
       "tag": "0011_sales-tax-inclusive-nullable",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1775203834020,
+      "tag": "0012_sales-tax-rate-and-rule",
+      "breakpoints": true
     }
   ]
 }

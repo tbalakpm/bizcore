@@ -23,6 +23,7 @@ import { Attributes } from './product-settings/attributes/attributes';
 import { ProductTemplates } from './product-settings/product-templates/product-templates';
 import { Brands } from './product-settings/brands/brands';
 import { ProductSettings } from './product-settings/product-settings';
+import { TaxSettings } from './settings/tax/tax-settings';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -73,6 +74,7 @@ export const routes: Routes = [
           { path: 'general', component: GeneralSettings, data: { module: 'settings-general' } },
           { path: 'pricing-categories', component: PricingCategories, data: { module: 'settings-pricing' } },
           { path: 'serial', component: SerialSettings, data: { module: 'settings-serial' } },
+          { path: 'tax', component: TaxSettings, data: { module: 'settings-tax' } },
         ],
       },
       {

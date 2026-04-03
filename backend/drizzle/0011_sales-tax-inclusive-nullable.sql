@@ -23,7 +23,7 @@ CREATE TABLE `__new_sales_invoices` (
 	FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-INSERT INTO `__new_sales_invoices`("id", "invoice_number", "invoice_date", "type", "customer_id", "ref_number", "ref_date", "is_tax_inclusive", "total_qty", "subtotal", "discount_type", "discount_pct", "discount_amount", "total_tax_amount", "round_off", "net_amount", "irn", "ack_no", "ack_date", "signed_qr_code") SELECT "id", "invoice_number", "invoice_date", "type", "customer_id", "ref_number", "ref_date", "is_tax_inclusive", "total_qty", "subtotal", "discount_type", "discount_pct", "discount_amount", "total_tax_amount", "round_off", "net_amount", "irn", "ack_no", "ack_date", "signed_qr_code" FROM `sales_invoices`;--> statement-breakpoint
+INSERT INTO `__new_sales_invoices`("id", "invoice_number", "invoice_date", "type", "customer_id", "ref_number", "ref_date", "is_tax_inclusive", "total_qty", "subtotal", "discount_type", "discount_pct", "discount_amount", "total_tax_amount", "round_off", "irn", "ack_no", "ack_date", "signed_qr_code") SELECT "id", "invoice_number", "invoice_date", "type", "customer_id", "ref_number", "ref_date", "is_tax_inclusive", "total_qty", "subtotal", "discount_type", "discount_pct", "discount_amount", "total_tax_amount", "round_off", "irn", "ack_no", "ack_date", "signed_qr_code" FROM `sales_invoices`;--> statement-breakpoint
 DROP TABLE `sales_invoices`;--> statement-breakpoint
 ALTER TABLE `__new_sales_invoices` RENAME TO `sales_invoices`;--> statement-breakpoint
 PRAGMA foreign_keys=ON;--> statement-breakpoint

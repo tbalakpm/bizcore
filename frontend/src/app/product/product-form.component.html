@@ -163,13 +163,11 @@
       <nz-form-item>
         <nz-form-label>Tax Rate</nz-form-label>
         <nz-form-control>
-          <nz-input-number
-            [(ngModel)]="product.taxRate"
-            name="productTaxRate"
-            [nzStep]="0.01"
-            [nzPrecision]="2"
-            class="w-full"
-          ></nz-input-number>
+          <nz-select [(ngModel)]="product.taxRate" name="productTaxRate" nzPlaceHolder="Select tax rate" nzShowSearch nzAllowClear>
+            @for (r of taxRates(); track r.id) {
+              <nz-option [nzValue]="r.rate" [nzLabel]="r.rate + '%'"></nz-option>
+            }
+          </nz-select>
         </nz-form-control>
       </nz-form-item>
     </div>

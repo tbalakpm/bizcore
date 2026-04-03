@@ -24,6 +24,7 @@ export interface UserPermissions {
   'settings-general': ModulePermissions;
   'settings-serial': ModulePermissions;
   'settings-pricing': ModulePermissions;
+  'settings-tax': ModulePermissions;
 }
 
 export const ALL_MODULES: (keyof UserPermissions)[] = [
@@ -42,6 +43,7 @@ export const ALL_MODULES: (keyof UserPermissions)[] = [
   'settings-general',
   'settings-serial',
   'settings-pricing',
+  'settings-tax',
 ];
 
 export const MODULE_LABELS: Record<keyof UserPermissions, string> = {
@@ -60,4 +62,5 @@ export const MODULE_LABELS: Record<keyof UserPermissions, string> = {
   'settings-general': 'Settings (General)',
   'settings-serial': 'Settings (Serials)',
   'settings-pricing': 'Settings (Pricing)',
+  'settings-tax': 'Settings (Tax)',
 };

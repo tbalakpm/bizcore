@@ -12,6 +12,7 @@ import { type SalesInvoiceItem, SalesInvoiceService, SalesInvoice } from './sale
 import { type Inventory, InventoryService } from '../inventory/inventory-service';
 import { PricingCategoryService, ProductMargin } from '../settings/pricing-categories/pricing-category-service';
 import { SettingsService } from '../settings/settings.service';
+import { TaxRuleService, TaxRule } from '../settings/tax/tax-rule-service';
 
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSelectComponent } from 'ng-zorro-antd/select';
@@ -90,6 +91,7 @@ export class SalesInvoiceForm implements OnInit {
   private inventoryService = inject(InventoryService);
   private pricingCategoryService = inject(PricingCategoryService);
   private settingsService = inject(SettingsService);
+  private taxRuleService = inject(TaxRuleService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NzSelectComponent>;
@@ -98,6 +100,7 @@ export class SalesInvoiceForm implements OnInit {
   customers = signal<Customer[]>([]);
   inventories = signal<Inventory[]>([]);
   originalInventories = signal<Inventory[]>([]);
+  taxRules = signal<TaxRule[]>([]);
 
   // Pricing category for selected customer
   selectedPricingCategoryName: string | null = null;
@@ -170,6 +173,7 @@ export class SalesInvoiceForm implements OnInit {
     this.loadProducts();
     this.loadCustomers();
     this.loadInventories();
+    this.loadTaxRules();
     this.setupInventorySearch();
 
     this.settingsService.getSetting('company_gstin').subscribe({
@@ -225,6 +229,13 @@ export class SalesInvoiceForm implements OnInit {
     this.customerService.getAll().subscribe({
       next: (res) => this.customers.set(res.data),
       error: () => this.error = 'Failed to load customers',
+    });
+  }
+
+  loadTaxRules() {
+    this.taxRuleService.getAll().subscribe({
+      next: (res) => this.taxRules.set(res.data),
+      error: () => { }
     });
   }
 
@@ -407,7 +418,7 @@ export class SalesInvoiceForm implements OnInit {
           basePrice = Math.round(basePrice * 100) / 100;
         }
 
-        item.taxPct = this.editingInvoice.type === 'estimate' ? 0 : Number(product.taxRate || 0);
+        item.taxPct = this.editingInvoice.type === 'estimate' ? 0 : this.getEffectiveTaxRate(product, basePrice);
         
         // Determine tax inclusive mode: Invoice override > Product setting
         const isTaxInclusive = this.editingInvoice.isTaxInclusive !== null && this.editingInvoice.isTaxInclusive !== undefined
@@ -530,6 +541,26 @@ export class SalesInvoiceForm implements OnInit {
     }
 
     item.lineTotal = Number((afterDiscount + taxAmt).toFixed(2));
+  }
+
+  getEffectiveTaxRate(product: Product, unitPrice: number): number {
+    const hsn = product.hsnSac || '';
+    const rules = this.taxRules();
+    
+    // Find matching rules
+    const matchingRules = rules.filter(r => {
+      const hsnMatch = hsn.startsWith(r.hsnCodeStartsWith || '');
+      const priceMatch = unitPrice >= r.minPrice && (r.maxPrice === 0 || unitPrice <= r.maxPrice);
+      return hsnMatch && priceMatch;
+    });
+
+    if (matchingRules.length > 0) {
+      // Sort by HSN prefix length descending to find most specific match
+      matchingRules.sort((a, b) => (b.hsnCodeStartsWith?.length || 0) - (a.hsnCodeStartsWith?.length || 0));
+      return Number(matchingRules[0].tax_rate);
+    }
+
+    return Number(product.taxRate || 0);
   }
 
   @HostListener('window:keydown', ['$event'])

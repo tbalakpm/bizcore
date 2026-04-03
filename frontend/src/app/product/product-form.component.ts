@@ -7,6 +7,7 @@ import { type Brand, BrandService } from '../product-settings/brands/brand-servi
 import { type Product, ProductService } from './product-service';
 import { Attribute, AttributeService } from './attribute-service';
 import { ProductTemplate, ProductTemplateService } from '../product-settings/product-templates/product-template-service';
+import { TaxRateService, TaxRate } from '../settings/tax/tax-rate-service';
 
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -41,6 +42,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
   private brandService = inject(BrandService);
   private attributeService = inject(AttributeService);
   private templateService = inject(ProductTemplateService);
+  private taxRateService = inject(TaxRateService);
 
   categories = signal<Category[]>([]);
   structuredCategories = computed(() => {
@@ -66,6 +68,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
   allAttributes = signal<Attribute[]>([]);
   templates = signal<ProductTemplate[]>([]);
   brands = signal<Brand[]>([]);
+  taxRates = signal<TaxRate[]>([]);
   get filteredBrands(): Brand[] {
     const catId = this.product.categoryId;
     if (!catId) return this.brands();
@@ -87,6 +90,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
     this.templateService.getTemplates().subscribe((res) => this.templates.set(res));
     this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
     this.brandService.getAll({ limit: 1000 }).subscribe((res) => this.brands.set(res.data.filter(b => b.isActive)));
+    this.taxRateService.getAll().subscribe((res) => this.taxRates.set(res.data));
     this.loadProduct();
   }
 

@@ -390,7 +390,8 @@
           @if (
             permissions.canRead('settings-general') ||
             permissions.canRead('settings-serial') ||
-            permissions.canRead('settings-pricing')
+            permissions.canRead('settings-pricing') ||
+            permissions.canRead('settings-tax')
           ) {
             <a
               routerLink="/settings"

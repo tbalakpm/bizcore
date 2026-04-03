@@ -51,3 +51,9 @@ export type { ProductTemplateAttribute, NewProductTemplateAttribute } from './pr
 
 export { productAttributeValues } from './product-attribute-value.schema';
 export type { ProductAttributeValue, NewProductAttributeValue } from './product-attribute-value.schema';
+
+export { taxRates } from './tax-rate.schema';
+export type { TaxRate, NewTaxRate } from './tax-rate.schema';
+
+export { taxRules } from './tax-rule.schema';
+export type { TaxRule, NewTaxRule } from './tax-rule.schema';
