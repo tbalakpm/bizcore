@@ -14,6 +14,8 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { PermissionService } from '../../auth/permission.service';
+import { StateService, State } from '../tax/state-service';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-general-settings',
@@ -34,10 +36,12 @@ import { PermissionService } from '../../auth/permission.service';
 export class GeneralSettings implements OnInit {
   private settingsService = inject(SettingsService);
   private message = inject(NzMessageService);
+  private stateService = inject(StateService);
   public permission = inject(PermissionService);
 
   loading = false;
   saving = false;
+  states = signal<State[]>([]);
 
   settings: Record<string, any> = {
     company_name: '',
@@ -63,6 +67,13 @@ export class GeneralSettings implements OnInit {
 
   ngOnInit(): void {
     this.loadSettings();
+    this.loadStates();
+  }
+
+  loadStates() {
+    this.stateService.getAll().subscribe(res => {
+      this.states.set(res.data);
+    });
   }
 
   loadSettings() {

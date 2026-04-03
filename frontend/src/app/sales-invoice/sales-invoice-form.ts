@@ -116,6 +116,7 @@ export class SalesInvoiceForm implements OnInit {
   inventoryTotal = 0;
 
   companyGstin: string = '';
+  companyState: string = '';
 
   editingInvoice: EditableSalesInvoice = this.defaultInvoice();
 
@@ -179,6 +180,14 @@ export class SalesInvoiceForm implements OnInit {
     this.settingsService.getSetting('company_gstin').subscribe({
       next: (setting) => {
         this.companyGstin = setting.value || '';
+        this.recalculateAllTaxes();
+      },
+      error: () => { }
+    });
+
+    this.settingsService.getSetting('company_state').subscribe({
+      next: (setting) => {
+        this.companyState = setting.value || '';
         this.recalculateAllTaxes();
       },
       error: () => { }
@@ -528,7 +537,17 @@ export class SalesInvoiceForm implements OnInit {
 
     const customer = this.customers().find(c => c.id === this.editingInvoice.customerId);
     const customerGstin = customer?.gstin || '';
-    const isInterState = this.companyGstin && customerGstin && this.companyGstin.substring(0, 2) !== customerGstin.substring(0, 2);
+    const customerState = customer?.billingAddress?.state || '';
+
+    let isInterState = false;
+    if (this.companyGstin && customerGstin) {
+      isInterState = this.companyGstin.substring(0, 2) !== customerGstin.substring(0, 2);
+    } else if (this.companyState && customerState) {
+      isInterState = this.companyState.toLowerCase() !== customerState.toLowerCase();
+    } else {
+      // Default to intra-state if information is missing
+      isInterState = false;
+    }
 
     if (isInterState) {
       item.igstAmount = taxAmt;

@@ -9,6 +9,7 @@ import { AddressForm } from '../shared/components/address-form';
 import { ProductFormComponent } from '../product/product-form.component';
 
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { SettingsService } from '../settings/settings.service';
 import { NzSelectComponent } from 'ng-zorro-antd/select';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -41,6 +42,9 @@ type EditablePurchaseInvoiceItem = {
   marginPct: number;
   marginAmount: number;
   sellingPrice: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  igstAmount: number;
 };
 
 type EditablePurchaseInvoice = {
@@ -79,6 +83,7 @@ export class PurchaseInvoiceForm implements OnInit {
   private supplierService = inject(SupplierService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private settingsService = inject(SettingsService);
   @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NzSelectComponent>;
 
   products = signal<Product[]>([]);
@@ -86,6 +91,9 @@ export class PurchaseInvoiceForm implements OnInit {
 
   editingInvoice: EditablePurchaseInvoice = this.defaultInvoice();
   selectedRowItem: EditablePurchaseInvoiceItem | null = null;
+
+  companyGstin: string = '';
+  companyState: string = '';
 
   // Date bindings for nz-date-picker
   invoiceDateValue: Date | null = null;
@@ -127,6 +135,22 @@ export class PurchaseInvoiceForm implements OnInit {
       ? new Date(this.editingInvoice.invoiceDate + 'T00:00:00')
       : null;
 
+    this.settingsService.getSetting('company_gstin').subscribe({
+      next: (setting) => {
+        this.companyGstin = setting.value || '';
+        this.recalculateAll();
+      },
+      error: () => { }
+    });
+
+    this.settingsService.getSetting('company_state').subscribe({
+      next: (setting) => {
+        this.companyState = setting.value || '';
+        this.recalculateAll();
+      },
+      error: () => { }
+    });
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       const id = Number(idParam);
@@ -144,7 +168,7 @@ export class PurchaseInvoiceForm implements OnInit {
       supplierId: undefined,
       refNumber: '',
       refDate: '',
-      items: [{ qty: 1, unitPrice: 0, lineTotal: 0, taxPct: 0, taxAmount: 0, discountType: 'none', discountPct: 0, discountAmount: 0, marginType: 'none', marginPct: 0, marginAmount: 0, sellingPrice: 0 }],
+      items: [{ qty: 1, unitPrice: 0, lineTotal: 0, taxPct: 0, taxAmount: 0, discountType: 'none', discountPct: 0, discountAmount: 0, marginType: 'none', marginPct: 0, marginAmount: 0, sellingPrice: 0, cgstAmount: 0, sgstAmount: 0, igstAmount: 0 }],
       subtotal: 0,
       totalQty: 0,
       discountType: 'none',
@@ -209,11 +233,14 @@ export class PurchaseInvoiceForm implements OnInit {
             marginPct: Number(item.marginPct || 0),
             marginAmount: Number(item.marginAmount || 0),
             sellingPrice: Number(item.sellingPrice || 0),
+            cgstAmount: Number(item.cgstAmount || 0),
+            sgstAmount: Number(item.sgstAmount || 0),
+            igstAmount: Number(item.igstAmount || 0),
           })),
         };
 
         if (this.editingInvoice.items.length === 0) {
-          this.editingInvoice.items = [{ qty: 1, unitPrice: 0, lineTotal: 0, taxPct: 0, taxAmount: 0, discountType: 'none', discountPct: 0, discountAmount: 0, marginType: 'none', marginPct: 0, marginAmount: 0, sellingPrice: 0 }];
+          this.editingInvoice.items = [{ qty: 1, unitPrice: 0, lineTotal: 0, taxPct: 0, taxAmount: 0, discountType: 'none', discountPct: 0, discountAmount: 0, marginType: 'none', marginPct: 0, marginAmount: 0, sellingPrice: 0, cgstAmount: 0, sgstAmount: 0, igstAmount: 0 }];
         }
 
         // Sync date pickers
@@ -267,7 +294,23 @@ export class PurchaseInvoiceForm implements OnInit {
   }
 
   addItemRow() {
-    this.editingInvoice.items.push({ qty: 1, unitPrice: 0, lineTotal: 0, taxPct: 0, taxAmount: 0, discountType: 'none', discountPct: 0, discountAmount: 0, marginType: 'none', marginPct: 0, marginAmount: 0, sellingPrice: 0 });
+    this.editingInvoice.items.push({ 
+      qty: 1, 
+      unitPrice: 0, 
+      lineTotal: 0, 
+      taxPct: 0, 
+      taxAmount: 0, 
+      discountType: 'none', 
+      discountPct: 0, 
+      discountAmount: 0, 
+      marginType: 'none', 
+      marginPct: 0, 
+      marginAmount: 0, 
+      sellingPrice: 0,
+      cgstAmount: 0,
+      sgstAmount: 0,
+      igstAmount: 0,
+    });
     this.editingInvoice.items = [...this.editingInvoice.items];
     setTimeout(() => {
       const lastSelect = this.itemRowSelects.last;
@@ -349,6 +392,28 @@ export class PurchaseInvoiceForm implements OnInit {
 
     const amountAfterDiscount = grossTotal - item.discountAmount;
     item.taxAmount = Number((amountAfterDiscount * taxPct / 100).toFixed(2));
+
+    const supplier = this.suppliers().find(s => s.id === this.editingInvoice.supplierId);
+    const supplierGstin = supplier?.gstin || '';
+    const supplierState = supplier?.billingAddress?.state || '';
+
+    let isInterState = false;
+    if (this.companyGstin && supplierGstin) {
+      isInterState = this.companyGstin.substring(0, 2) !== supplierGstin.substring(0, 2);
+    } else if (this.companyState && supplierState) {
+      isInterState = this.companyState.toLowerCase() !== supplierState.toLowerCase();
+    }
+
+    if (isInterState) {
+      item.igstAmount = item.taxAmount;
+      item.cgstAmount = 0;
+      item.sgstAmount = 0;
+    } else {
+      item.igstAmount = 0;
+      item.cgstAmount = item.taxAmount / 2;
+      item.sgstAmount = item.taxAmount / 2;
+    }
+
     item.lineTotal = Number((amountAfterDiscount + item.taxAmount).toFixed(2));
 
     this.recalculateMargin(item);
@@ -498,6 +563,9 @@ export class PurchaseInvoiceForm implements OnInit {
         marginPct: item.marginPct,
         marginAmount: item.marginAmount,
         sellingPrice: item.sellingPrice,
+        cgstAmount: item.cgstAmount,
+        sgstAmount: item.sgstAmount,
+        igstAmount: item.igstAmount,
       }));
 
     return {

@@ -57,3 +57,6 @@ export type { TaxRate, NewTaxRate } from './tax-rate.schema';
 
 export { taxRules } from './tax-rule.schema';
 export type { TaxRule, NewTaxRule } from './tax-rule.schema';
+
+export { states } from './state.schema';
+export type { State, NewState } from './state.schema';

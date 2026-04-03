@@ -202,4 +202,97 @@
       </tbody>
     </nz-table>
   </nz-tab>
+
+  <nz-tab nzTitle="States">
+    @if (permissionService.canAdd('settings-tax')) {
+      <nz-card nzSize="small" class="mb-4">
+        <h3 class="text-sm font-semibold mb-3">{{ editingState ? 'Edit' : 'Add' }} State</h3>
+        <form nz-form [nzLayout]="'inline'" class="flex flex-wrap gap-2">
+          <nz-form-item>
+            <nz-form-label nzRequired>State Name</nz-form-label>
+            <nz-form-control>
+              <input nz-input [(ngModel)]="stateForm.stateName" name="stName" placeholder="e.g. Tamil Nadu" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label nzRequired>State Code (GST)</nz-form-label>
+            <nz-form-control>
+              <input nz-input [(ngModel)]="stateForm.stateCode" name="stCode" placeholder="e.g. 33" maxlength="2" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label nzRequired>Short Code</nz-form-label>
+            <nz-form-control>
+              <input nz-input [(ngModel)]="stateForm.stateShortCode" name="stShort" placeholder="e.g. TN" maxlength="5" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Country</nz-form-label>
+            <nz-form-control>
+              <input nz-input [(ngModel)]="stateForm.countryCode" name="stCountry" placeholder="IN" maxlength="2" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <label nz-checkbox [(ngModel)]="stateForm.isUnionTerritory" name="stUT">Union Territory</label>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-control>
+              <div class="flex gap-2">
+                <button nz-button nzType="primary" (click)="editingState ? saveEditState() : addState()">
+                  {{ editingState ? 'Save' : 'Add' }}
+                </button>
+                @if (editingState) {
+                  <button nz-button (click)="cancelEditState()">Cancel</button>
+                }
+              </div>
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+      </nz-card>
+    }
+
+    <nz-table #statesTable [nzData]="states()" [nzLoading]="loadingStates" nzSize="small">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>GST Code</th>
+          <th>Short Code</th>
+          <th>Country</th>
+          <th>UT</th>
+          <th>Status</th>
+          <th class="text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of statesTable.data; track s.id) {
+          <tr>
+            <td class="font-bold">{{ s.stateName }}</td>
+            <td>{{ s.stateCode }}</td>
+            <td>{{ s.stateShortCode }}</td>
+            <td>{{ s.countryCode }}</td>
+            <td>
+              <span nz-icon [nzType]="s.isUnionTerritory ? 'check' : 'close'"></span>
+            </td>
+            <td>
+              <nz-tag [nzColor]="s.isActive ? 'success' : 'default'">
+                {{ s.isActive ? 'Active' : 'Inactive' }}
+              </nz-tag>
+            </td>
+            <td class="text-right">
+              @if (permissionService.canEdit('settings-tax')) {
+                <button nz-button nzType="link" (click)="startEditState(s)" nz-tooltip nzTooltipTitle="Edit">
+                  <span nz-icon nzType="edit"></span>
+                </button>
+              }
+              @if (permissionService.canDelete('settings-tax')) {
+                <button nz-button nzType="link" nzDanger nz-popconfirm nzPopconfirmTitle="Are you sure?" (nzOnConfirm)="deleteState(s)" nz-tooltip nzTooltipTitle="Delete">
+                  <span nz-icon nzType="delete"></span>
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </nz-tab>
 </nz-tabs>

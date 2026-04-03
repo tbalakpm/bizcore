@@ -25,6 +25,9 @@ export interface PurchaseInvoiceItem {
   marginPct?: number | string;
   marginAmount?: number | string;
   sellingPrice?: number | string;
+  cgstAmount?: number | string;
+  sgstAmount?: number | string;
+  igstAmount?: number | string;
   productCode?: string;
   productName?: string;
 }

@@ -356,17 +356,17 @@
             </td>
 
             <td>
-              <div class="flex flex-col items-end">
-                <!-- <nz-input-number
-                  [ngModel]="item.taxPct"
-                  [name]="'itemTaxPct' + i"
-                  [nzDisabled]="true"
-                  class="w-full text-right mb-1"
-                ></nz-input-number> -->
-                <span class="text-xs text-text-muted whitespace-nowrap"
-                  >{{ item.taxPct | number: '1.0-1' }}% -
-                  {{ item.taxAmount | number: '1.2-2' }}</span
-                >
+              <div class="text-right">
+                <div class="text-sm font-medium">
+                  {{ item.taxAmount | number: '1.2-2' }}
+                  <span class="text-xs text-text-muted">({{ item.taxPct }}%)</span>
+                </div>
+                @if (item.igstAmount) {
+                  <div class="text-[10px] text-text-muted uppercase">IGST: {{ item.igstAmount | number: '1.2-2' }}</div>
+                } @else {
+                  <div class="text-[10px] text-text-muted uppercase">CGST: {{ item.cgstAmount | number: '1.2-2' }}</div>
+                  <div class="text-[10px] text-text-muted uppercase">SGST: {{ item.sgstAmount | number: '1.2-2' }}</div>
+                }
               </div>
             </td>
             <td class="text-right font-medium">

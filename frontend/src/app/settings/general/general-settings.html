@@ -61,14 +61,19 @@
       <nz-form-item>
         <nz-form-label nzFor="company_state">State</nz-form-label>
         <nz-form-control>
-          <input
-            nz-input
+          <nz-select
             name="company_state"
             id="company_state"
             [(ngModel)]="settings['company_state']"
-            placeholder="Tamil Nadu"
-            [disabled]="!permission.canEdit('settings-general')"
-          />
+            [nzDisabled]="!permission.canEdit('settings-general')"
+            nzShowSearch
+            nzAllowClear
+            placeholder="Select State"
+          >
+            @for (s of states(); track s.id) {
+              <nz-option [nzValue]="s.stateName" [nzLabel]="s.stateName"></nz-option>
+            }
+          </nz-select>
         </nz-form-control>
       </nz-form-item>
 
