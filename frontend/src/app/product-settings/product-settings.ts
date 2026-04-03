@@ -9,7 +9,7 @@ import { PermissionService } from '../auth/permission.service';
   template: `
     <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
       <h1 class="text-xl font-semibold flex items-center gap-2">
-        <span nz-icon nzType="appstore" nzTheme="outline" class="text-2xl"></span>
+        <span nz-icon nzType="appstore-add" nzTheme="outline" class="text-2xl"></span>
         Product Settings
       </h1>
     </div>

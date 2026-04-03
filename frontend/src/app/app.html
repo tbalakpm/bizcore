@@ -322,7 +322,6 @@
           }
 
           <hr class="border-chrome-border my-2" />
-          <!-- Reports -->
           <button
             (click)="switchMenu('reports')"
             class="w-full flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden justify-between gap-3 text-left transition-colors relative"
@@ -330,7 +329,7 @@
             [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.REPORTS' | translate) : ''"
             nzTooltipPlacement="right"
           >
-            <span class="flex items-center overflow-hidden gap-3">
+            <span class="flex items-center gap-3">
               <span
                 nz-icon
                 nzType="fund"
@@ -352,12 +351,12 @@
               class="text-chrome-muted transition-opacity duration-300 shrink-0"
               style="font-size: 14px"
               [class.opacity-0]="isSidebarCollapsed()"
+              [class.w-0]="isSidebarCollapsed()"
             ></span>
           </button>
 
           <hr class="border-chrome-border my-2" />
           <!-- Product Settings-->
-          <!-- Product Settings -->
           @if (
             permissions.canRead('product-settings-categories') ||
             permissions.canRead('product-settings-brands') ||

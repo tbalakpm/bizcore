@@ -2,7 +2,13 @@
   <nz-card>
     <div class="flex justify-between items-center mb-3">
       <h2 class="text-base font-semibold">Product Attributes</h2>
-      <button nz-button nzType="primary" nzSize="small" (click)="showModal()" *appHasPermission="'product-settings-attributes:add'">
+      <button
+        nz-button
+        nzType="primary"
+        nzSize="small"
+        (click)="showModal()"
+        *appHasPermission="'product-settings-attributes:add'"
+      >
         <span nz-icon nzType="plus" nzTheme="outline"></span>
         Add Attribute
       </button>
@@ -20,7 +26,9 @@
     >
       <ng-template #totalTemplate let-total let-range="range">
         <div style="position: absolute; left: 0">
-          <span class="text-text-muted text-sm">Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span>
+          <span class="text-text-muted text-sm"
+            >Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span
+          >
         </div>
       </ng-template>
       <thead>
@@ -28,7 +36,10 @@
           <th>Name</th>
           <th class="w-32">Type</th>
           <th class="w-20 text-center" nzAlign="center">Active</th>
-          @if (permissionService.canEdit('product-settings-attributes') || permissionService.canDelete('product-settings-attributes')) {
+          @if (
+            permissionService.canEdit('product-settings-attributes') ||
+            permissionService.canDelete('product-settings-attributes')
+          ) {
             <th class="w-28 text-center" nzAlign="center">Actions</th>
           }
         </tr>
@@ -43,8 +54,10 @@
               }
             </td>
             <td>
-              <span class="px-2 py-0.5 rounded text-xs uppercase font-medium"
-                style="background-color: var(--color-surface-muted); color: var(--color-text)">
+              <span
+                class="px-2 py-0.5 rounded text-xs uppercase font-medium"
+                style="background-color: var(--color-surface-muted); color: var(--color-text)"
+              >
                 {{ data.type | titlecase }}
               </span>
             </td>
@@ -56,12 +69,18 @@
                 nzSize="small"
               ></nz-switch>
             </td>
-            @if (permissionService.canEdit('product-settings-attributes') || permissionService.canDelete('product-settings-attributes')) {
+            @if (
+              permissionService.canEdit('product-settings-attributes') ||
+              permissionService.canDelete('product-settings-attributes')
+            ) {
               <td nzAlign="center">
                 <div class="flex items-center justify-center gap-2">
                   <button
-                    nz-button nzType="link" nzSize="small"
-                    nz-tooltip nzTooltipTitle="Edit attribute"
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    nz-tooltip
+                    nzTooltipTitle="Edit attribute"
                     style="color: var(--color-accent)"
                     (click)="showModal(data)"
                     *appHasPermission="'product-settings-attributes:edit'"
@@ -69,8 +88,12 @@
                     <span nz-icon nzType="edit" nzTheme="outline"></span>
                   </button>
                   <button
-                    nz-button nzType="link" nzDanger nzSize="small"
-                    nz-tooltip nzTooltipTitle="Delete attribute"
+                    nz-button
+                    nzType="link"
+                    nzDanger
+                    nzSize="small"
+                    nz-tooltip
+                    nzTooltipTitle="Delete attribute"
                     nz-popconfirm
                     [nzPopconfirmTitle]="'Delete attribute &quot;' + data.name + '&quot;?'"
                     (nzOnConfirm)="deleteAttribute(data.id!)"
@@ -116,7 +139,12 @@
       <nz-form-item>
         <nz-form-label>Description</nz-form-label>
         <nz-form-control>
-          <textarea nz-input formControlName="description" [nzAutosize]="{ minRows: 2, maxRows: 4 }" placeholder="Optional description"></textarea>
+          <textarea
+            nz-input
+            formControlName="description"
+            [nzAutosize]="{ minRows: 2, maxRows: 4 }"
+            placeholder="Optional description"
+          ></textarea>
         </nz-form-control>
       </nz-form-item>
 
@@ -135,7 +163,12 @@
         <nz-form-item>
           <nz-form-label>Options</nz-form-label>
           <nz-form-control nzExtra="Enter option values (e.g., S, M, L, XL)">
-            <nz-select nzMode="tags" formControlName="options" nzPlaceHolder="Type and press Enter to add options" class="w-full">
+            <nz-select
+              nzMode="tags"
+              formControlName="options"
+              nzPlaceHolder="Type and press Enter to add options"
+              class="w-full"
+            >
             </nz-select>
           </nz-form-control>
         </nz-form-item>
@@ -175,12 +208,12 @@
         </nz-form-control>
       </nz-form-item>
 
-      <nz-form-item>
+      <!-- <nz-form-item>
         <nz-form-label>Active</nz-form-label>
         <nz-form-control>
           <nz-switch formControlName="isActive"></nz-switch>
         </nz-form-control>
-      </nz-form-item>
+      </nz-form-item> -->
     </form>
   </div>
 </nz-modal>
