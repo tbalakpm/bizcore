@@ -11,6 +11,7 @@ export interface Brand {
   description?: string;
   
   isActive: boolean;
+  categoryIds?: number[];
 }
 
 export interface BrandList {
@@ -30,6 +31,7 @@ export class BrandService {
     name?: string;
     description?: string;
     isActive?: boolean;
+    categoryId?: number;
   }): Observable<BrandList> {
     let params = new HttpParams();
     if (paramsObj) {
@@ -40,6 +42,7 @@ export class BrandService {
       if (paramsObj.name) params = params.set('name', paramsObj.name);
       if (paramsObj.description) params = params.set('description', paramsObj.description);
       if (paramsObj.isActive !== undefined) params = params.set('isActive', paramsObj.isActive.toString());
+      if (paramsObj.categoryId) params = params.set('categoryId', paramsObj.categoryId.toString());
     }
     return this.http.get<BrandList>(`${environment.apiUrl}/brands`, { params });
   }

@@ -4,6 +4,8 @@ export type { RefreshToken, NewRefreshToken } from './refresh-token.schema';
 export { categories } from './category.schema';
 export { brands } from './brand.schema';
 export type { Brand, NewBrand } from './brand.schema';
+export { brandCategories } from './brand-category.schema';
+export type { BrandCategory, NewBrandCategory } from './brand-category.schema';
 export { products } from './product.schema';
 export { customers } from './customer.schema';
 export { suppliers } from './supplier.schema';

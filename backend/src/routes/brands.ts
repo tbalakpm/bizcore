@@ -1,7 +1,7 @@
-import { and, eq, like, sql, type SQL } from 'drizzle-orm';
+import { and, eq, like, sql, type SQL, inArray } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
-import { brands, db } from '../db';
+import { brands, db, brandCategories } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 import { LogService } from '../core/logger/logger.service';
 import { auditLog } from '../core/logger/audit.service';
@@ -46,6 +46,26 @@ brandsRouter.get('/', async (req: Request, res: Response) => {
     if (req.query.isActive !== undefined) {
       const isActive = req.query.isActive === 'true';
       filters.push(eq(brands.isActive, isActive));
+    }
+
+    // Filter by category
+    if (req.query.categoryId) {
+      const catId = parseInt(req.query.categoryId as string, 10);
+      if (!Number.isNaN(catId)) {
+        const brandIdsInCat = await db
+          .select({ id: brandCategories.brandId })
+          .from(brandCategories)
+          .where(eq(brandCategories.categoryId, catId))
+          .all();
+
+        const ids = brandIdsInCat.map((b) => b.id);
+        if (ids.length > 0) {
+          filters.push(inArray(brands.id, ids));
+        } else {
+          // If no brands match the category, push a filter that returns nothing
+          filters.push(eq(brands.id, -1));
+        }
+      }
     }
 
     // Build sort dynamically
@@ -102,9 +122,28 @@ brandsRouter.get('/', async (req: Request, res: Response) => {
       ? await orderedQuery.limit(pagination.limit).offset(pagination.offset).all()
       : await orderedQuery.all();
 
-    LogService.info('Fetched brands list', { count: result.length, total: filteredCount });
+    // Fetch mappings for the fetched brands
+    const brandIds = result.map((b) => b.id);
+    let brandsWithCats = result.map(b => ({ ...b, categoryIds: [] as number[] }));
+    
+    if (brandIds.length > 0) {
+      const mappings = await db
+        .select()
+        .from(brandCategories)
+        .where(inArray(brandCategories.brandId, brandIds))
+        .all();
+      
+      brandsWithCats = result.map((b) => ({
+        ...b,
+        categoryIds: mappings
+          .filter((m) => m.brandId === b.id)
+          .map((m) => m.categoryId),
+      }));
+    }
+
+    LogService.info('Fetched brands list', { count: brandsWithCats.length, total: filteredCount });
     res.json({
-      data: result,
+      data: brandsWithCats,
       pagination: pagination
         ? toPagination(pagination.limit, pagination.offset, filteredCount, pagination.pageNum)
         : {
@@ -135,37 +174,59 @@ brandsRouter.get('/:id', async (req: Request, res: Response) => {
     });
   }
 
-  LogService.info('Fetched brand details', { brandId: id, brandName: brand.name });
-  res.json(brand);
+  const brandCategoriesList = await db
+    .select({ categoryId: brandCategories.categoryId })
+    .from(brandCategories)
+    .where(eq(brandCategories.brandId, id))
+    .all();
+
+  const categoryIds = brandCategoriesList.map((cb) => cb.categoryId);
+
+  LogService.info('Fetched brand details', { brandId: id, brandName: brand.name, categoryIds });
+  res.json({ ...brand, categoryIds });
 });
 
 brandsRouter.post('/', async (req, res) => {
-  const { code, name, description, isActive } = req.body;
+  LogService.info('Creating brand', { body: req.body });
+  const { code, name, description, isActive, categoryIds } = req.body;
 
   if (!name) return res.status(400).json({ error: 'Name is required' });
   if (!code) return res.status(400).json({ error: 'Code is required' });
 
   try {
-    const brand = await db
-      .insert(brands)
-      .values({
-        code,
-        name,
-        description,
-        isActive: isActive !== false,
-      })
-      .returning()
-      .get();
+    const result = await db.transaction(async (tx) => {
+      const brand = await tx
+        .insert(brands)
+        .values({
+          code,
+          name,
+          description,
+          isActive: isActive !== false,
+        })
+        .returning()
+        .get();
+
+      if (categoryIds && Array.isArray(categoryIds)) {
+        for (const catId of categoryIds) {
+          await tx.insert(brandCategories).values({
+            brandId: brand.id,
+            categoryId: catId,
+          }).run();
+        }
+      }
+
+      return brand;
+    });
 
     await auditLog({
       action: 'CREATE_BRAND',
       entity: 'BRAND',
-      entityId: brand.id,
-      newValue: brand,
+      entityId: result.id,
+      newValue: { ...result, categoryIds },
     });
 
-    LogService.info('Brand created successfully', { brandId: brand.id, brandName: brand.name });
-    res.status(201).json(brand);
+    LogService.info('Brand created successfully', { brandId: result.id, brandName: result.name });
+    res.status(201).json({ ...result, categoryIds });
   } catch (err) {
     LogService.error('Failed to create brand', err, { code, name });
     res.status(400).json({
@@ -176,6 +237,7 @@ brandsRouter.post('/', async (req, res) => {
 
 brandsRouter.put('/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
+  LogService.info('Updating brand', { brandId: id, body: req.body });
 
   const oldBrand = await db.select().from(brands).where(eq(brands.id, id)).get();
   if (!oldBrand) {
@@ -185,31 +247,50 @@ brandsRouter.put('/:id', async (req, res) => {
     });
   }
 
-  const { code, name, description, isActive } = req.body;
+  const oldCategories = await db
+    .select({ categoryId: brandCategories.categoryId })
+    .from(brandCategories)
+    .where(eq(brandCategories.brandId, id))
+    .all();
+  const oldCategoryIds = oldCategories.map((c) => c.categoryId);
+
+  const { code, name, description, isActive, categoryIds } = req.body;
   const updateData: any = {};
   if (code !== undefined) updateData.code = code;
   if (name !== undefined) updateData.name = name;
   if (description !== undefined) updateData.description = description;
   if (typeof isActive === 'boolean') updateData.isActive = isActive;
 
-  await db
-    .update(brands)
-    .set(updateData)
-    .where(eq(brands.id, id))
-    .run();
+  const result = await db.transaction(async (tx) => {
+    if (Object.keys(updateData).length > 0) {
+      await tx.update(brands).set(updateData).where(eq(brands.id, id)).run();
+    }
 
-  const updatedBrand = await db.select().from(brands).where(eq(brands.id, id)).get();
+    if (categoryIds !== undefined && Array.isArray(categoryIds)) {
+      // Refresh categories
+      await tx.delete(brandCategories).where(eq(brandCategories.brandId, id)).run();
+      for (const catId of categoryIds) {
+        await tx.insert(brandCategories).values({
+          brandId: id,
+          categoryId: catId,
+        }).run();
+      }
+    }
+
+    const updatedBrand = await tx.select().from(brands).where(eq(brands.id, id)).get();
+    return updatedBrand;
+  });
 
   await auditLog({
     action: 'UPDATE_BRAND',
     entity: 'BRAND',
     entityId: id,
-    oldValue: oldBrand,
-    newValue: updatedBrand,
+    oldValue: { ...oldBrand, categoryIds: oldCategoryIds },
+    newValue: { ...result, categoryIds },
   });
 
-  LogService.info('Brand updated successfully', { brandId: id, brandName: updatedBrand?.name });
-  res.json(updatedBrand);
+  LogService.info('Brand updated successfully', { brandId: id, brandName: result?.name });
+  res.json({ ...result, categoryIds });
 });
 
 brandsRouter.delete('/:id', async (req, res) => {

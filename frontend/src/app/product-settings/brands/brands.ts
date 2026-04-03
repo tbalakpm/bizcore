@@ -3,6 +3,7 @@ import { BrandService, Brand, BrandList } from './brand-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { PermissionService } from '../../auth/permission.service';
+import { CategoryService, Category } from '../categories/category-service';
 
 import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -15,19 +16,22 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-brands',
-  imports: [TranslatePipe, FormsModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropdownModule, HasPermissionDirective],
+  imports: [TranslatePipe, FormsModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropdownModule, HasPermissionDirective, NzSelectModule],
   templateUrl: './brands.html',
 })
 export class Brands implements OnInit {
   brandService = inject(BrandService);
   permissionService = inject(PermissionService);
+  categoryService = inject(CategoryService);
 
   brands = signal<Brand[]>([]);
+  categories = signal<Category[]>([]);
   total = 0;
   pageSize = 10;
   pageIndex = 1;
@@ -43,7 +47,7 @@ export class Brands implements OnInit {
     description: false,
   };
 
-  newBrand: Partial<Brand> = { code: '', name: '', description: '', isActive: true };
+  newBrand: Partial<Brand> = { code: '', name: '', description: '', isActive: true, categoryIds: [] };
   loading = false;
   error: string | null = null;
 
@@ -51,6 +55,13 @@ export class Brands implements OnInit {
 
   ngOnInit(): void {
     this.loadBrands();
+    this.loadCategories();
+  }
+
+  loadCategories() {
+    this.categoryService.getAll({ limit: 1000 }).subscribe({
+      next: (res) => this.categories.set(res.data),
+    });
   }
 
   loadBrands() {
@@ -103,7 +114,7 @@ export class Brands implements OnInit {
     if (!this.newBrand.name) return;
     this.brandService.create(this.newBrand).subscribe({
       next: () => {
-        this.newBrand = { code: '', name: '', description: '', isActive: true };
+        this.newBrand = { code: '', name: '', description: '', isActive: true, categoryIds: [] };
         this.loadBrands();
         this.error = null;
       },
@@ -152,5 +163,9 @@ export class Brands implements OnInit {
         this.error = err.error?.error || 'Failed to delete brand';
       },
     });
+  }
+
+  getCategoryName(id: number): string {
+    return this.categories().find((c) => c.id === id)?.name || id.toString();
   }
 }

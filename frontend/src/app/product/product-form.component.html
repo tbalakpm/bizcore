@@ -110,7 +110,7 @@
         <nz-form-label>Brand</nz-form-label>
         <nz-form-control>
           <nz-select [(ngModel)]="product.brandId" name="brandId" nzPlaceHolder="Select a brand" nzShowSearch nzAllowClear>
-            @for (b of brands(); track b.id) {
+            @for (b of filteredBrands; track b.id) {
               <nz-option [nzValue]="b.id" [nzLabel]="b.name"></nz-option>
             }
           </nz-select>

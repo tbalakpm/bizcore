@@ -66,6 +66,15 @@ export class ProductFormComponent implements OnInit, OnChanges {
   allAttributes = signal<Attribute[]>([]);
   templates = signal<ProductTemplate[]>([]);
   brands = signal<Brand[]>([]);
+  get filteredBrands(): Brand[] {
+    const catId = this.product.categoryId;
+    if (!catId) return this.brands();
+    return this.brands().filter(b => 
+      !b.categoryIds || 
+      b.categoryIds.length === 0 || 
+      b.categoryIds.includes(catId)
+    );
+  }
   loading = false;
   error: string | null = null;
   productList = signal<Product[]>([]);

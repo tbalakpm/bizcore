@@ -70,6 +70,7 @@
                   <span nz-icon nzType="search"></span>
                 </nz-filter-trigger>
               </th>
+              <th>Categories</th>
               <th class="text-center w-16" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
               @if (
                 permissionService.canEdit('product-settings-brands') ||
@@ -116,6 +117,27 @@
                     />
                   } @else {
                     {{ b.description }}
+                  }
+                </td>
+                <td>
+                  @if (editing?.id == b.id) {
+                    <nz-select
+                      [(ngModel)]="editing!.categoryIds"
+                      name="editCategories"
+                      nzMode="multiple"
+                      style="width: 100%"
+                      nzSize="small"
+                    >
+                      @for (cat of categories(); track cat.id) {
+                        <nz-option [nzValue]="cat.id" [nzLabel]="cat.name"></nz-option>
+                      }
+                    </nz-select>
+                  } @else {
+                    @for (catId of b.categoryIds; track catId) {
+                      <span class="text-xs px-1 rounded mr-1" style="background-color: var(--color-surface-raised); color: var(--color-text-dim)">
+                        {{ getCategoryName(catId) }}
+                      </span>
+                    }
                   }
                 </td>
                 <td class="text-center" nzAlign="center">
@@ -191,7 +213,7 @@
             }
             @if (brands().length == 0) {
               <tr>
-                <td colspan="5" class="text-center text-text-muted">No brands defined yet.</td>
+                <td colspan="6" class="text-center text-text-muted">No brands defined yet.</td>
               </tr>
             }
           </tbody>
@@ -237,6 +259,21 @@
                   name="newBrandDesc"
                   placeholder="Brief description (optional)"
                 ></textarea>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label>Categories</nz-form-label>
+              <nz-form-control>
+                <nz-select
+                  [(ngModel)]="newBrand.categoryIds"
+                  name="newBrandCategories"
+                  nzMode="multiple"
+                  nzPlaceHolder="Select categories"
+                >
+                  @for (cat of categories(); track cat.id) {
+                    <nz-option [nzValue]="cat.id" [nzLabel]="cat.name"></nz-option>
+                  }
+                </nz-select>
               </nz-form-control>
             </nz-form-item>
             <button nz-button nzBlock nzType="primary" type="submit" class="mt-3!">
