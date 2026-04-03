@@ -6,10 +6,10 @@
   "type": "commonjs",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf ./dist && tsc",
     "dev": "nodemon --watch src --ext ts,json --exec tsx src/index.ts",
-    "start": "node dist/index.js",
-    "postbuild": "cp -R src/i18n dist/i18n && cp -R src/public dist/public && cp package.json dist/package.json",
+    "start": "node index.js",
+    "postbuild": "cp -R drizzle dist/drizzle && mkdir dist/.env && cp .env/.env.local dist/.env  && cp -R src/i18n dist/i18n && cp -R src/public dist/public && cp package.json dist/package.json",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",

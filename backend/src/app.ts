@@ -39,16 +39,16 @@ import { taxRulesRouter } from "./routes/tax-rules";
 import stateRouter from "./routes/state.router";
 
 
-
 export async function app() {
+  console.table(config)
   LogService.info(`Starting BizCore API`, { environment: config.environment });
   await initializeDatabase();
-  await createAdminUser();
-  await seedStates();
-  await seedTaxRates();
   if (config.autoMigrateOnStartup) {
     await migrateDatabase();
   }
+  await createAdminUser();
+  await seedStates();
+  await seedTaxRates();
 
   const app = express();
   app.use(
