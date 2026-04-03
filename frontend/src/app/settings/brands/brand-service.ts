@@ -1,25 +1,25 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import type { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { pagination } from '../models/pagination';
+import { environment } from '../../../environments/environment';
+import { pagination } from '../../models/pagination';
 
-export interface Category {
+export interface Brand {
   id: number;
   code: string;
   name: string;
   description?: string;
-  parentCategoryId?: number;
+  
   isActive: boolean;
 }
 
-export interface CategoryList {
-  data: Category[];
+export interface BrandList {
+  data: Brand[];
   pagination: pagination;
 }
 
 @Injectable({ providedIn: 'root' })
-export class CategoryService {
+export class BrandService {
   private http = inject(HttpClient);
 
   getAll(paramsObj?: {
@@ -30,7 +30,7 @@ export class CategoryService {
     name?: string;
     description?: string;
     isActive?: boolean;
-  }): Observable<CategoryList> {
+  }): Observable<BrandList> {
     let params = new HttpParams();
     if (paramsObj) {
       if (paramsObj.page) params = params.set('page', paramsObj.page.toString());
@@ -41,18 +41,18 @@ export class CategoryService {
       if (paramsObj.description) params = params.set('description', paramsObj.description);
       if (paramsObj.isActive !== undefined) params = params.set('isActive', paramsObj.isActive.toString());
     }
-    return this.http.get<CategoryList>(`${environment.apiUrl}/categories`, { params });
+    return this.http.get<BrandList>(`${environment.apiUrl}/brands`, { params });
   }
 
-  create(category: Partial<Category>): Observable<Category> {
-    return this.http.post<Category>(`${environment.apiUrl}/categories`, category);
+  create(brand: Partial<Brand>): Observable<Brand> {
+    return this.http.post<Brand>(`${environment.apiUrl}/brands`, brand);
   }
 
-  update(id: number, category: Partial<Category>): Observable<Category> {
-    return this.http.put<Category>(`${environment.apiUrl}/categories/${id}`, category);
+  update(id: number, brand: Partial<Brand>): Observable<Brand> {
+    return this.http.put<Brand>(`${environment.apiUrl}/brands/${id}`, brand);
   }
 
   delete(id: number) {
-    return this.http.delete(`${environment.apiUrl}/categories/${id}`);
+    return this.http.delete(`${environment.apiUrl}/brands/${id}`);
   }
 }

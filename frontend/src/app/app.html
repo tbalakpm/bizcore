@@ -57,7 +57,9 @@
           class="flex items-center gap-2 cursor-pointer hover:bg-chrome-hover px-2 py-1 rounded transition-colors"
         >
           <nz-avatar nzIcon="user" nzSize="small" class="bg-accent"></nz-avatar>
-          <span class="text-chrome-text-bright hidden md:inline">{{ auth.decodedToken?.username }}</span>
+          <span class="text-chrome-text-bright hidden md:inline">{{
+            auth.decodedToken?.username
+          }}</span>
           <span nz-icon nzType="down" class="text-xs text-chrome-text opacity-70"></span>
         </a>
 
@@ -293,32 +295,6 @@
             >
           }
 
-          <!-- Categories -->
-          @if (permissions.canRead('categories')) {
-            <a
-              routerLink="/categories"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.CATEGORIES' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span
-                nz-icon
-                nzType="tags"
-                nzTheme="outline"
-                class="shrink-0"
-                style="font-size: 20px"
-              ></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.CATEGORIES' | translate }}</span
-              ></a
-            >
-          }
-
           <!-- Users -->
           @if (permissions.canRead('users')) {
             <a
@@ -380,8 +356,43 @@
           </button>
 
           <hr class="border-chrome-border my-2" />
+          <!-- Product Settings-->
+          <!-- Product Settings -->
+          @if (
+            permissions.canRead('categories') ||
+            permissions.canRead('settings-general') ||
+            permissions.canRead('settings-product-templates') ||
+            permissions.canRead('settings-attributes')
+          ) {
+            <a
+              routerLink="/product-settings"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? 'Product Settings' : ''"
+              nzTooltipPlacement="right"
+            >
+              <span
+                nz-icon
+                nzType="appstore-add"
+                nzTheme="outline"
+                class="shrink-0"
+                style="font-size: 20px"
+              ></span>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >Product Settings</span
+              ></a
+            >
+          }
           <!-- Settings -->
-          @if (permissions.canRead('settings-general') || permissions.canRead('settings-serial') || permissions.canRead('settings-pricing-categories')) {
+          @if (
+            permissions.canRead('settings-general') ||
+            permissions.canRead('settings-serial') ||
+            permissions.canRead('settings-pricing-categories')
+          ) {
             <a
               routerLink="/settings"
               routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"

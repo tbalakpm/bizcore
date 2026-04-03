@@ -10,7 +10,8 @@ export interface Product {
   name: string;
   description?: string;
   categoryId: number;
-  qtyPerUnit?: string;
+  brandId?: number;
+  qtyPerUnit: string;
   unitPrice?: number;
   hsnSac?: string;
   taxRate?: number;
@@ -20,16 +21,32 @@ export interface Product {
   gtnStartPos?: number;
   gtnLength?: number;
   useGlobal?: boolean;
+  trackBundleGtn?: boolean;
   // unitsInStock?: number;
   categoryName?: string;
   isActive: boolean;
-  productType?: 'simple' | 'bundle';
+  productType: 'simple' | 'bundle' | 'variant';
+  parentId?: number;
+  templateId?: number;
   bundleItems?: {
     id?: number;
     productId: number;
     quantity: number;
-    productName?: string; // For display
+    productName?: string;
   }[];
+  mappedAttributes?: {
+    id?: number;
+    attributeId: number;
+    name?: string;
+    type?: string;
+    isVariantDefining: boolean;
+  }[];
+  attributeValues?: {
+    id?: number;
+    attributeId: number;
+    value: any;
+  }[];
+  variants?: Product[];
 }
 
 export interface ProductList {

@@ -29,6 +29,41 @@
       "when": 1775058345654,
       "tag": "0003_refresh-tokens",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1775139553684,
+      "tag": "0004_nappy_sentinel",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1775180163253,
+      "tag": "0005_soft_caretaker",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1775181281358,
+      "tag": "0006_long_risque",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1775182181645,
+      "tag": "0007_past_tenebrous",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1775182714353,
+      "tag": "0008_faithful_vision",
+      "breakpoints": true
     }
   ]
 }

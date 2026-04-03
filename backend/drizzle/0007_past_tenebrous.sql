@@ -1,0 +1,1 @@
+ALTER TABLE `categories` ADD `parent_category_id` integer REFERENCES categories(id);

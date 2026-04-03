@@ -16,12 +16,13 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-categories',
-  imports: [TranslatePipe, FormsModule, CommonModule, HasPermissionDirective, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule],
+  imports: [TranslatePipe, FormsModule, CommonModule, HasPermissionDirective, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule, NzSelectModule],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {
@@ -29,6 +30,7 @@ export class Categories implements OnInit {
   permissionService = inject(PermissionService);
 
   categories = signal<Category[]>([]);
+  rootCategories = signal<Category[]>([]);
   total = 0;
   pageSize = 10;
   pageIndex = 1;
@@ -51,6 +53,26 @@ export class Categories implements OnInit {
   editing: Category | null = null;
 
   ngOnInit(): void {
+    this.loadRootCategories();
+  }
+
+  loadRootCategories() {
+    this.categoryService.getAll({ limit: 1000 }).subscribe({
+      next: (res) => {
+        // filter client side to only get categories without a parent
+        this.rootCategories.set(res.data.filter(c => !c.parentCategoryId));
+      }
+    });
+  }
+
+  getCategoryName(id: number | null | undefined): string {
+    if (!id) return '-';
+    // Look in rootCategories first
+    const cat = this.rootCategories().find(c => c.id === id);
+    if (cat) return cat.name;
+    // Look in categories (if it exists)
+    const inList = this.categories().find(c => c.id === id);
+    return inList ? inList.name : id.toString();
   }
 
   loadCategories() {
@@ -105,6 +127,7 @@ export class Categories implements OnInit {
       next: () => {
         this.newCategory = { code: '', name: '', description: '', isActive: true };
         this.loadCategories();
+        this.loadRootCategories();
         this.error = null;
       },
       error: (err) => {
@@ -123,6 +146,7 @@ export class Categories implements OnInit {
       next: () => {
         this.editing = null;
         this.loadCategories();
+        this.loadRootCategories();
         this.error = null;
       },
       error: (err) => {
@@ -146,6 +170,7 @@ export class Categories implements OnInit {
     this.categoryService.delete(cat.id).subscribe({
       next: () => {
         this.loadCategories();
+        this.loadRootCategories();
         this.error = null;
       },
       error: (err) => {

@@ -5,7 +5,6 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type Customer, type Address, CustomerList, CustomerService } from './customer-service';
 import { AddressForm } from '../shared/components/address-form';
 import { PermissionService } from '../auth/permission.service';
-import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 import { GstService } from '../shared/services/gst.service';
 import { PricingCategoryService, PricingCategory } from '../settings/pricing-category-service';
 
@@ -32,7 +31,7 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
     FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm,
     NzTableModule, NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
     NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
-    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule, HasPermissionDirective,
+    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule,
   ],
 
   templateUrl: './customers.html',

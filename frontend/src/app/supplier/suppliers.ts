@@ -5,7 +5,6 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { type Supplier, type Address, SupplierList, SupplierService, type SupplierBank } from './supplier-service';
 import { AddressForm } from '../shared/components/address-form';
 import { PermissionService } from '../auth/permission.service';
-import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 import { GstService } from '../shared/services/gst.service';
 
 
@@ -31,7 +30,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
     FormsModule, ReactiveFormsModule, TranslatePipe, CommonModule, AddressForm,
     NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule,
     NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
-    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule, NzSelectModule, HasPermissionDirective,
+    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule, NzSelectModule,
   ],
   templateUrl: './suppliers.html',
 })

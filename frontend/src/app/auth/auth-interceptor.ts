@@ -38,7 +38,7 @@ function handle401(
   lang: string,
 ): ReturnType<HttpInterceptorFn> {
   if (isRefreshing) {
-    // Wait for the ongoing refresh to complete then retry
+    // Wait for the ongoing refresh to complete, then retry with the new token
     return refreshToken$.pipe(
       filter((t): t is string => t !== null),
       take(1),
@@ -47,16 +47,17 @@ function handle401(
   }
 
   isRefreshing = true;
-  refreshToken$.next(null);
+  refreshToken$.next(null); // signal "refresh in progress" to queued requests
 
   return auth.refreshToken().pipe(
     switchMap((res) => {
       isRefreshing = false;
-      refreshToken$.next(res.token);
+      refreshToken$.next(res.token); // unblock all queued requests
       return next(addAuthHeaders(req, res.token, lang));
     }),
     catchError((err) => {
       isRefreshing = false;
+      refreshToken$.next(null); // ensure queued requests don't hang
       // Refresh failed — force logout
       auth.logout();
       return throwError(() => err);

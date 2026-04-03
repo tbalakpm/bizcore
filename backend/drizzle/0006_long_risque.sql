@@ -1,0 +1,1 @@
+ALTER TABLE `products` ADD `track_bundle_gtn` integer DEFAULT true;

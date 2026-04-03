@@ -1,10 +1,4 @@
 <div class="space-y-4">
-  <!-- <div class="flex justify-between items-center">
-    <h1 class="flex items-center gap-2 text-xl font-semibold">
-      <span nz-icon nzType="tags" nzTheme="outline" class="text-2xl"></span>
-      {{ 'MENU.CATEGORIES' | translate }}
-    </h1>
-  </div> -->
   @if (error) {
     <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable></nz-alert>
   }
@@ -12,20 +6,20 @@
   <div
     class="grid gap-4"
     [ngClass]="{
-      'grid-cols-1!': !permissionService.canAdd('categories'),
-      'grid-cols-1 lg:grid-cols-3': permissionService.canAdd('categories'),
+      'grid-cols-1!': !permissionService.canAdd('settings-general'),
+      'grid-cols-1 lg:grid-cols-3': permissionService.canAdd('settings-general'),
     }"
   >
     <!-- List -->
     <div class="lg:col-span-2">
       <nz-card>
         <div class="flex justify-between items-center mb-2">
-          <h2 class="text-base font-semibold">List of {{ 'MENU.CATEGORIES' | translate }}</h2>
+          <h2 class="text-base font-semibold">List of Brands</h2>
         </div>
 
         <nz-table
-          #categoryTable
-          [nzData]="categories()"
+          #brandTable
+          [nzData]="brands()"
           [nzLoading]="loading"
           nzSize="small"
           [nzBordered]="true"
@@ -77,20 +71,17 @@
                   <span nz-icon nzType="search"></span>
                 </nz-filter-trigger>
               </th>
-              <th>Parent Category</th>
               <th class="text-center w-16" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
-              @if (
-                permissionService.canEdit('categories') || permissionService.canDelete('categories')
-              ) {
+              @if (permissionService.canEdit('settings-general') || permissionService.canDelete('settings-general')) {
                 <th class="text-center w-32" nzAlign="center">{{ 'ACTIONS' | translate }}</th>
               }
             </tr>
           </thead>
           <tbody>
-            @for (c of categoryTable.data; track c.id) {
-              <tr [class.ant-table-row-selected]="editing?.id == c.id">
+            @for (b of brandTable.data; track b.id) {
+              <tr [class.ant-table-row-selected]="editing?.id == b.id">
                 <td>
-                  @if (editing?.id == c.id) {
+                  @if (editing?.id == b.id) {
                     <input
                       nz-input
                       [(ngModel)]="editing!.code"
@@ -98,11 +89,11 @@
                       placeholder="Code"
                     />
                   } @else {
-                    {{ c.code }}
+                    {{ b.code }}
                   }
                 </td>
                 <td>
-                  @if (editing?.id == c.id) {
+                  @if (editing?.id == b.id) {
                     <input
                       nz-input
                       [(ngModel)]="editing!.name"
@@ -110,11 +101,11 @@
                       placeholder="Name"
                     />
                   } @else {
-                    {{ c.name }}
+                    {{ b.name }}
                   }
                 </td>
                 <td>
-                  @if (editing?.id == c.id) {
+                  @if (editing?.id == b.id) {
                     <input
                       nz-input
                       [(ngModel)]="editing!.description"
@@ -122,44 +113,23 @@
                       placeholder="Description"
                     />
                   } @else {
-                    {{ c.description }}
-                  }
-                </td>
-                <td>
-                  @if (editing?.id == c.id) {
-                    <nz-select
-                      [(ngModel)]="editing!.parentCategoryId"
-                      name="editParent"
-                      nzAllowClear
-                      nzPlaceHolder="Select parent"
-                    >
-                      @for (rc of rootCategories(); track rc.id) {
-                        @if (rc.id !== c.id) {
-                          <nz-option [nzValue]="rc.id" [nzLabel]="rc.name"></nz-option>
-                        }
-                      }
-                    </nz-select>
-                  } @else {
-                    {{ getCategoryName(c.parentCategoryId) }}
+                    {{ b.description }}
                   }
                 </td>
                 <td class="text-center" nzAlign="center">
                   <nz-switch
-                    [ngModel]="c.isActive"
-                    (ngModelChange)="toggleActive(c)"
+                    [ngModel]="b.isActive"
+                    (ngModelChange)="toggleActive(b)"
                     nzSize="small"
                     nz-tooltip
-                    [nzTooltipTitle]="c.isActive ? 'Deactivate' : 'Activate'"
+                    [nzTooltipTitle]="b.isActive ? 'Deactivate' : 'Activate'"
                   >
                   </nz-switch>
                 </td>
-                @if (
-                  permissionService.canEdit('categories') ||
-                  permissionService.canDelete('categories')
-                ) {
+                @if (permissionService.canEdit('settings-general') || permissionService.canDelete('settings-general')) {
                   <td class="text-center" nzAlign="center">
                     <div class="flex items-center justify-center gap-2">
-                      @if (editing?.id == c.id) {
+                      @if (editing?.id == b.id) {
                         <button
                           nz-button
                           nzType="link"
@@ -187,10 +157,9 @@
                           nzType="link"
                           nzSize="small"
                           nz-tooltip
-                          nzTooltipTitle="Edit category"
+                          nzTooltipTitle="Edit brand"
                           style="color: var(--color-accent)"
-                          (click)="startEdit(c)"
-                          *appHasPermission="'categories:edit'"
+                          (click)="startEdit(b)"
                         >
                           <span nz-icon nzType="edit" nzTheme="outline"></span>
                         </button>
@@ -200,11 +169,10 @@
                           nzDanger
                           nzSize="small"
                           nz-tooltip
-                          nzTooltipTitle="Delete category"
+                          nzTooltipTitle="Delete brand"
                           nz-popconfirm
-                          [nzPopconfirmTitle]="'Delete category &quot;' + c.name + '&quot;?'"
-                          (nzOnConfirm)="deleteCategory(c)"
-                          *appHasPermission="'categories:delete'"
+                          [nzPopconfirmTitle]="'Delete brand &quot;' + b.name + '&quot;?'"
+                          (nzOnConfirm)="deleteBrand(b)"
                         >
                           <span nz-icon nzType="delete" nzTheme="outline"></span>
                         </button>
@@ -214,10 +182,10 @@
                 }
               </tr>
             }
-            @if (categories().length == 0) {
+            @if (brands().length == 0) {
               <tr>
                 <td colspan="5" class="text-center text-text-muted">
-                  {{ 'CATEGORY.NO_CATEGORIES_YET' | translate }}.
+                  No brands defined yet.
                 </td>
               </tr>
             }
@@ -226,21 +194,21 @@
       </nz-card>
     </div>
 
-    @if (permissionService.canAdd('categories')) {
+    @if (permissionService.canAdd('settings-general')) {
       <!-- Add form -->
       <div class="max-h-max">
         <nz-card>
-          <h2 class="text-base font-semibold mb-2">{{ 'CATEGORY.ADD' | translate }}</h2>
-          <form nz-form (ngSubmit)="addCategory()" class="space-y-2" nzLayout="vertical">
+          <h2 class="text-base font-semibold mb-2">Add Brand</h2>
+          <form nz-form (ngSubmit)="addBrand()" class="space-y-2" nzLayout="vertical">
             <nz-form-item>
               <nz-form-label>{{ 'CODE' | translate }}</nz-form-label>
               <nz-form-control>
                 <input
                   nz-input
-                  [(ngModel)]="newCategory.code"
-                  name="newCategoryCode"
+                  [(ngModel)]="newBrand.code"
+                  name="newBrandCode"
                   autofocus
-                  placeholder="e.g. CAT-01"
+                  placeholder="e.g. BRD-01"
                 />
               </nz-form-control>
             </nz-form-item>
@@ -249,9 +217,9 @@
               <nz-form-control>
                 <input
                   nz-input
-                  [(ngModel)]="newCategory.name"
-                  name="newCategoryName"
-                  placeholder="Category name"
+                  [(ngModel)]="newBrand.name"
+                  name="newBrandName"
+                  placeholder="Brand name"
                 />
               </nz-form-control>
             </nz-form-item>
@@ -260,25 +228,10 @@
               <nz-form-control>
                 <textarea
                   nz-input
-                  [(ngModel)]="newCategory.description"
-                  name="newCategoryDesc"
+                  [(ngModel)]="newBrand.description"
+                  name="newBrandDesc"
                   placeholder="Brief description (optional)"
                 ></textarea>
-              </nz-form-control>
-            </nz-form-item>
-            <nz-form-item>
-              <nz-form-label>Parent Category</nz-form-label>
-              <nz-form-control>
-                <nz-select
-                  [(ngModel)]="newCategory.parentCategoryId"
-                  name="newCategoryParent"
-                  nzAllowClear
-                  nzPlaceHolder="None (Root Category)"
-                >
-                  @for (rc of rootCategories(); track rc.id) {
-                    <nz-option [nzValue]="rc.id" [nzLabel]="rc.name"></nz-option>
-                  }
-                </nz-select>
               </nz-form-control>
             </nz-form-item>
             <button nz-button nzBlock nzType="primary" type="submit" class="mt-3!">

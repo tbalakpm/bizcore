@@ -57,6 +57,39 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
         throw new Error(`Product not found for productId=${item.productId}`);
       }
 
+      // Check if product is bundle and trackBundleGtn is disabled
+      if (product.productType === 'bundle' && product.trackBundleGtn === false) {
+        const { productBundles } = await import('../db');
+        const bundles = await tx.select().from(productBundles).where(eq(productBundles.bundleProductId, product.id)).all();
+        let baseTotal = 0;
+        const comps = [];
+
+        for (const b of bundles) {
+          const cProduct = await tx.select().from(products).where(eq(products.id, b.productId)).get();
+          if (cProduct) {
+            const bVal = b.quantity * toPositiveNumber(cProduct.unitPrice, 1);
+            baseTotal += bVal;
+            comps.push({ b, cProduct, bVal });
+          }
+        }
+
+        for (const c of comps) {
+          const compQty = qty * c.b.quantity;
+          const compUnitPrice = baseTotal > 0 ? (unitPrice * c.bVal / baseTotal) / c.b.quantity : 0;
+          items.push({
+            ...item,
+            productId: c.cProduct.id,
+            qty: compQty,
+            unitPrice: compUnitPrice,
+            lineTotal: Number((compQty * compUnitPrice).toFixed(2)),
+            gtn: undefined, // ensure gtn is re-generated or blank for component
+          });
+        }
+        
+        // Skip adding the bundle itself since we've queued its components
+        continue;
+      }
+
       if (item.gtn) {
         // Manual GTN provided
         const createdInventory = await tx

@@ -11,10 +11,43 @@
           <nz-radio-group [(ngModel)]="product.productType" name="productType">
             <label nz-radio nzValue="simple">Simple</label>
             <label nz-radio nzValue="bundle">Bundle</label>
+            <label nz-radio nzValue="variant">Variant</label>
           </nz-radio-group>
         </nz-form-control>
       </nz-form-item>
     </div>
+
+    @if (product.productType === 'variant') {
+      <div class="col-span-4">
+        <nz-form-item>
+          <nz-form-label>Product Template</nz-form-label>
+          <nz-form-control>
+            <nz-select [(ngModel)]="product.templateId" name="templateId" nzShowSearch nzAllowClear>
+              @for (t of templates(); track t.id) {
+                <nz-option [nzValue]="t.id" [nzLabel]="t.name"></nz-option>
+              }
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    }
+
+    @if (product.productType === 'simple') {
+      <div class="col-span-4">
+        <nz-form-item>
+          <nz-form-label>Parent Product</nz-form-label>
+          <nz-form-control>
+            <nz-select [(ngModel)]="product.parentId" name="parentId" nzShowSearch nzAllowClear>
+              @for (p of productList(); track p.id) {
+                @if (p.id !== productId) {
+                  <nz-option [nzValue]="p.id" [nzLabel]="p.name"></nz-option>
+                }
+              }
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    }
     <div class="col-span-4 md:col-span-2 lg:col-span-1">
       <nz-form-item>
         <nz-form-label>{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</nz-form-label>
@@ -61,15 +94,22 @@
     <div class="col-span-4 md:col-span-2 lg:col-span-1">
       <nz-form-item>
         <nz-form-label>{{ 'CATEGORY.TITLE' | translate }}</nz-form-label>
-        <nz-form-control>
-          <nz-select
-            [(ngModel)]="product.categoryId"
-            name="productCategory"
-            nzPlaceHolder="Select category"
-            nzAllowClear
-          >
-            @for (c of categories(); track c.id) {
+        <nz-form-control [nzErrorTip]="'Please select a category'">
+          <nz-select [(ngModel)]="product.categoryId" name="categoryId" nzShowSearch required>
+            @for (c of structuredCategories(); track c.id) {
               <nz-option [nzValue]="c.id" [nzLabel]="c.name"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="col-span-4 md:col-span-2 lg:col-span-1">
+      <nz-form-item>
+        <nz-form-label>Brand</nz-form-label>
+        <nz-form-control>
+          <nz-select [(ngModel)]="product.brandId" name="brandId" nzPlaceHolder="Select a brand" nzShowSearch nzAllowClear>
+            @for (b of brands(); track b.id) {
+              <nz-option [nzValue]="b.id" [nzLabel]="b.name"></nz-option>
             }
           </nz-select>
         </nz-form-control>
@@ -199,6 +239,35 @@
       </div>
     }
 
+    <!-- Attribute Values Section -->
+      <div class="col-span-4 mt-4 p-4 rounded-lg border border-border" style="background-color: var(--color-surface-raised)">
+        <h3 class="font-medium mb-4">Attribute Values</h3>
+        <div class="grid grid-cols-2 gap-4">
+          @for (attr of getTemplateAttributes(); track attr.id) {
+            <nz-form-item>
+              <nz-form-label>{{ attr.name }}</nz-form-label>
+              <nz-form-control>
+                <ng-container [ngSwitch]="attr.type">
+                  <input *ngSwitchCase="'text'" nz-input [name]="'val' + attr.id" [ngModel]="getAttributeValue(attr.id!)" (ngModelChange)="setAttributeValue(attr.id!, $event)" />
+                  <nz-input-number *ngSwitchCase="'number'" class="w-full" [name]="'val' + attr.id" [ngModel]="getAttributeValue(attr.id!)" (ngModelChange)="setAttributeValue(attr.id!, $event)"></nz-input-number>
+                  <nz-switch *ngSwitchCase="'boolean'" [name]="'val' + attr.id" [ngModel]="getAttributeValue(attr.id!)" (ngModelChange)="setAttributeValue(attr.id!, $event)"></nz-switch>
+                  <nz-select *ngSwitchCase="'single_select'" [name]="'val' + attr.id" [ngModel]="getAttributeValue(attr.id!)" (ngModelChange)="setAttributeValue(attr.id!, $event)">
+                    @for (o of attr.options; track o) {
+                      <nz-option [nzValue]="o" [nzLabel]="o"></nz-option>
+                    }
+                  </nz-select>
+                  <nz-select *ngSwitchCase="'multi_select'" nzMode="multiple" [name]="'val' + attr.id" [ngModel]="getAttributeValue(attr.id!)" (ngModelChange)="setAttributeValue(attr.id!, $event)">
+                    @for (o of attr.options; track o) {
+                      <nz-option [nzValue]="o" [nzLabel]="o"></nz-option>
+                    }
+                  </nz-select>
+                </ng-container>
+              </nz-form-control>
+            </nz-form-item>
+          }
+        </div>
+      </div>
+
     <!-- GTN Setup -->
 
     <div class="flex flex-col col-span-full">
@@ -208,9 +277,15 @@
           <nz-switch [(ngModel)]="product.useGlobal" name="productUseGlobal"></nz-switch>
           <span class="text-xs text-text-muted">Use Global Settings</span>
         </div>
+        @if (product.productType === 'bundle') {
+          <div class="flex items-center gap-2 ml-4 border-l border-surface-muted pl-4">
+            <nz-switch [(ngModel)]="product.trackBundleGtn" name="productTrackBundleGtn"></nz-switch>
+            <span class="text-xs text-text-muted">Generate GTN for Bundle</span>
+          </div>
+        }
       </div>
 
-      @if (!product.useGlobal) {
+      @if (!product.useGlobal && (product.productType !== 'bundle' || product.trackBundleGtn)) {
         <div class="grid grid-cols-5 gap-2">
           <nz-form-item>
             <nz-form-label

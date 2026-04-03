@@ -1,0 +1,107 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-semibold">Product Attributes</h1>
+    <button nz-button nzType="primary" (click)="showModal()">
+      <i nz-icon nzType="plus"></i> Add Attribute
+    </button>
+  </div>
+
+  <nz-table #basicTable [nzData]="attributes" [nzLoading]="loading">
+    <thead>
+      <tr>
+        <th nzWidth="30%">Name</th>
+        <th nzWidth="20%">Type</th>
+        <th nzWidth="20%">Active</th>
+        <th nzWidth="30%">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of basicTable.data">
+        <td>
+          <div class="font-medium text-text">{{ data.name }}</div>
+          <div class="text-sm text-text-muted">{{ data.description }}</div>
+        </td>
+        <td>
+          <span class="px-2 py-1 rounded text-xs uppercase" style="background-color: var(--color-surface-muted); color: var(--color-text)">{{ data.type }}</span>
+        </td>
+        <td>
+          <nz-switch [ngModel]="data.isActive" nzDisabled></nz-switch>
+        </td>
+        <td>
+          <a (click)="showModal(data)" class="mr-3 text-blue-600 hover:text-blue-800">Edit</a>
+          <a (click)="deleteAttribute(data.id!)" class="text-red-600 hover:text-red-800">Delete</a>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+  <nz-modal
+    [(nzVisible)]="isModalVisible"
+    [nzTitle]="editingAttribute ? 'Edit Attribute' : 'New Attribute'"
+    (nzOnCancel)="handleCancel()"
+    (nzOnOk)="handleOk()"
+    nzWidth="600px"
+  >
+    <div *nzModalContent>
+      <form nz-form [formGroup]="attributeForm" nzLayout="vertical">
+        <nz-form-item>
+          <nz-form-label nzRequired>Name</nz-form-label>
+          <nz-form-control nzErrorTip="Please input attribute name!">
+            <input nz-input formControlName="name" placeholder="e.g., Size, Color, Weight" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Description</nz-form-label>
+          <nz-form-control>
+            <textarea nz-input formControlName="description"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label nzRequired>Type</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="type">
+              <nz-option *ngFor="let t of types" [nzLabel]="t.label" [nzValue]="t.value"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <div *ngIf="showOptions">
+          <nz-form-item>
+            <nz-form-label>Options</nz-form-label>
+            <nz-form-control nzExtra="Enter values like S, M, L, XL">
+              <nz-select nzMode="tags" formControlName="options" nzPlaceHolder="Enter options">
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <nz-form-item>
+          <nz-form-label>Default Value</nz-form-label>
+          <nz-form-control>
+            <ng-container [ngSwitch]="attributeForm.get('type')?.value">
+              <input *ngSwitchCase="'text'" nz-input formControlName="defaultValue" />
+              <input *ngSwitchCase="'number'" type="number" nz-input formControlName="defaultValue" />
+              <nz-switch *ngSwitchCase="'boolean'" formControlName="defaultValue"></nz-switch>
+              <nz-select *ngSwitchCase="'single_select'" formControlName="defaultValue">
+                <nz-option *ngFor="let o of attributeForm.get('options')?.value" [nzLabel]="o" [nzValue]="o"></nz-option>
+              </nz-select>
+              <nz-select *ngSwitchCase="'multi_select'" nzMode="multiple" formControlName="defaultValue">
+                <nz-option *ngFor="let o of attributeForm.get('options')?.value" [nzLabel]="o" [nzValue]="o"></nz-option>
+              </nz-select>
+              <input *ngSwitchDefault nz-input formControlName="defaultValue" />
+            </ng-container>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Active</nz-form-label>
+          <nz-form-control>
+            <nz-switch formControlName="isActive"></nz-switch>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </div>
+  </nz-modal>
+</div>

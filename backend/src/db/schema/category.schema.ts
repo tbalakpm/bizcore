@@ -1,4 +1,4 @@
-import { sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, uniqueIndex, integer } from 'drizzle-orm/sqlite-core';
 import { auditFields, keyFields } from './base';
 
 export const categories = sqliteTable(
@@ -7,6 +7,7 @@ export const categories = sqliteTable(
     ...keyFields,
 
     description: text('description', { length: 255 }),
+    parentCategoryId: integer('parent_category_id').references((): any => categories.id),
 
     ...auditFields
   },

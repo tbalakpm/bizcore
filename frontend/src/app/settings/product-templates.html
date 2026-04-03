@@ -1,0 +1,121 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-semibold">Product Templates</h1>
+    <button nz-button nzType="primary" (click)="showModal()">
+      <i nz-icon nzType="plus"></i> Add Template
+    </button>
+  </div>
+
+  <nz-table #basicTable [nzData]="templates" [nzLoading]="loading">
+    <thead>
+      <tr>
+        <th nzWidth="30%">Name</th>
+        <th nzWidth="30%">Attributes Count</th>
+        <th nzWidth="20%">Active</th>
+        <th nzWidth="20%">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of basicTable.data">
+        <td>
+          <div class="font-medium text-text">{{ data.name }}</div>
+          <div class="text-sm text-text-muted">{{ data.description }}</div>
+        </td>
+        <td>
+          <nz-tag nzColor="processing">{{ data.mappedAttributes?.length || 0 }} Attributes</nz-tag>
+        </td>
+        <td>
+          <nz-switch [ngModel]="data.isActive" nzDisabled></nz-switch>
+        </td>
+        <td>
+          <a (click)="showModal(data)" class="mr-3 text-blue-600 hover:text-blue-800">Edit</a>
+          <a (click)="deleteTemplate(data.id!)" class="text-red-600 hover:text-red-800">Delete</a>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+  <nz-modal
+    [(nzVisible)]="isModalVisible"
+    [nzTitle]="editingTemplate ? 'Edit Product Template' : 'New Product Template'"
+    (nzOnCancel)="handleCancel()"
+    (nzOnOk)="handleOk()"
+    nzWidth="700px"
+  >
+    <div *nzModalContent>
+      <form nz-form [formGroup]="templateForm" nzLayout="vertical">
+        <nz-form-item>
+          <nz-form-label nzRequired>Name</nz-form-label>
+          <nz-form-control nzErrorTip="Please input template name!">
+            <input nz-input formControlName="name" placeholder="e.g., Apparel, Electronics" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Description</nz-form-label>
+          <nz-form-control>
+            <textarea nz-input formControlName="description"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Active</nz-form-label>
+          <nz-form-control>
+            <nz-switch formControlName="isActive"></nz-switch>
+          </nz-form-control>
+        </nz-form-item>
+
+        <div class="mt-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-medium m-0">Template Attributes</h3>
+            <button nz-button nzType="dashed" type="button" nzSize="small" (click)="addAttribute()">
+              <nz-icon nzType="plus" /> Add Attribute
+            </button>
+          </div>
+          
+          <nz-table
+            #mappedAttrTable
+            [nzData]="mappedAttributesFormArray"
+            nzSize="small"
+            [nzShowPagination]="false"
+          >
+            <thead>
+              <tr>
+                <th>Attribute</th>
+                <th nzWidth="150px" class="text-center">Variant Defining?</th>
+                <th nzWidth="60px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of mappedAttrTable.data; let i = index">
+                <td>
+                  <nz-select
+                    [ngModel]="item.attributeId"
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="updateAttribute(i, 'attributeId', $event)"
+                    nzPlaceHolder="Select attribute"
+                    class="w-full"
+                  >
+                    <nz-option *ngFor="let a of allAttributes" [nzValue]="a.id" [nzLabel]="a.name"></nz-option>
+                  </nz-select>
+                </td>
+                <td class="text-center">
+                  <nz-switch 
+                    [ngModel]="item.isVariantDefining" 
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="updateAttribute(i, 'isVariantDefining', $event)"
+                  ></nz-switch>
+                </td>
+                <td class="text-center">
+                  <button nz-button nzType="text" nzDanger type="button" (click)="removeAttribute(i)">
+                    <nz-icon nzType="delete" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div>
+      </form>
+    </div>
+  </nz-modal>
+</div>

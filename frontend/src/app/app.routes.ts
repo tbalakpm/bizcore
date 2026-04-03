@@ -19,6 +19,10 @@ import { Settings } from './settings/settings';
 import { PricingCategories } from './settings/pricing-categories';
 import { GeneralSettings } from './settings/general-settings';
 import { SerialSettings } from './settings/serial-settings';
+import { Attributes } from './settings/attributes';
+import { ProductTemplates } from './settings/product-templates';
+import { Brands } from './settings/brands/brands';
+import { ProductSettings } from './product-settings/product-settings';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -29,7 +33,6 @@ export const routes: Routes = [
     canActivateChild: [AuthGuard],
     children: [
       { path: 'dashboard', component: Dashboard },
-      { path: 'categories', component: Categories, data: { module: 'categories' } },
       { path: 'products', component: Products, data: { module: 'products' } },
       { path: 'customers', component: Customers, data: { module: 'customers' } },
       { path: 'suppliers', component: Suppliers, data: { module: 'suppliers' } },
@@ -70,6 +73,17 @@ export const routes: Routes = [
           { path: 'general', component: GeneralSettings },
           { path: 'pricing-categories', component: PricingCategories },
           { path: 'serial', component: SerialSettings },
+        ],
+      },
+      {
+        path: 'product-settings',
+        component: ProductSettings,
+        children: [
+          { path: '', redirectTo: 'categories', pathMatch: 'full' },
+          { path: 'categories', component: Categories, data: { module: 'categories' } },
+          { path: 'brands', component: Brands },
+          { path: 'attributes', component: Attributes },
+          { path: 'product-templates', component: ProductTemplates },
         ],
       },
       // { path: 'customers', component: Entries },

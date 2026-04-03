@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Category, CategoryService } from '../category/category-service';
+import { type Brand, BrandService } from '../settings/brands/brand-service';
 import { type Product, ProductService } from './product-service';
+import { Attribute, AttributeService } from './attribute-service';
+import { ProductTemplate, ProductTemplateService } from '../settings/product-template-service';
 
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -28,19 +31,41 @@ import { NzTableModule } from 'ng-zorro-antd/table';
   templateUrl: './product-form.component.html',
 })
 export class ProductFormComponent implements OnInit, OnChanges {
-  /** Pass a product ID to edit an existing product. Omit (or pass undefined) to create a new one. */
+  // ... other properties
   @Input() productId?: number;
-
-  /** Emitted with the saved product after a successful create or update. */
   @Output() saved = new EventEmitter<Product>();
-
-  /** Emitted when the user clicks Cancel. */
   @Output() cancelled = new EventEmitter<void>();
 
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
+  private brandService = inject(BrandService);
+  private attributeService = inject(AttributeService);
+  private templateService = inject(ProductTemplateService);
 
   categories = signal<Category[]>([]);
+  structuredCategories = computed(() => {
+    const cats = this.categories();
+    const roots = cats.filter(c => !c.parentCategoryId);
+    const sorted: Category[] = [];
+    for (const r of roots) {
+      sorted.push(r);
+      const children = cats.filter(c => c.parentCategoryId === r.id);
+      for (const child of children) {
+        sorted.push({ ...child, name: '  ⤿ ' + child.name });
+      }
+    }
+    // append any unassigned/orphaned categories just in case
+    for (const c of cats) {
+      if (c.parentCategoryId && !roots.find(r => r.id === c.parentCategoryId) && !sorted.find(s => s.id === c.id)) {
+        sorted.push(c);
+      }
+    }
+    return sorted;
+  });
+
+  allAttributes = signal<Attribute[]>([]);
+  templates = signal<ProductTemplate[]>([]);
+  brands = signal<Brand[]>([]);
   loading = false;
   error: string | null = null;
   productList = signal<Product[]>([]);
@@ -48,8 +73,11 @@ export class ProductFormComponent implements OnInit, OnChanges {
   product: Partial<Product> = this.blankProduct();
 
   ngOnInit(): void {
-    this.categoryService.getAll().subscribe((res) => this.categories.set(res.data));
-    // this.productService.getAll({}).subscribe((res) => this.productList.set(res.data));
+    this.categoryService.getAll({ limit: 1000 }).subscribe((res) => this.categories.set(res.data));
+    this.attributeService.getAttributes().subscribe((res) => this.allAttributes.set(res));
+    this.templateService.getTemplates().subscribe((res) => this.templates.set(res));
+    this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
+    this.brandService.getAll({ limit: 1000 }).subscribe((res) => this.brands.set(res.data.filter(b => b.isActive)));
     this.loadProduct();
   }
 
@@ -80,6 +108,13 @@ export class ProductFormComponent implements OnInit, OnChanges {
   }
 
   onSubmit(): void {
+    if (this.product.productType === 'simple' && this.product.parentId) {
+      const parentProd = this.productList().find(p => p.id === this.product.parentId);
+      if (parentProd && parentProd.templateId) {
+        this.product.templateId = parentProd.templateId;
+      }
+    }
+
     this.error = null;
     const request$ = this.productId
       ? this.productService.update(this.productId, this.product)
@@ -116,6 +151,47 @@ export class ProductFormComponent implements OnInit, OnChanges {
     }
   }
 
+  // Mapped attributes logic moved to templates
+
+  getTemplateAttributes(): Attribute[] {
+    let tId = this.product.templateId;
+    
+    // If simple, inherit template from parent
+    if (this.product.productType === 'simple' && this.product.parentId) {
+      const parentProd = this.productList().find(p => p.id === this.product.parentId);
+      if (parentProd && parentProd.templateId) {
+        tId = parentProd.templateId;
+      }
+    }
+
+    if (!tId) return [];
+
+    const tmpl = this.templates().find(t => t.id === tId);
+    if (!tmpl || !tmpl.mappedAttributes) return [];
+
+    // Map attributeIds back to full Attributes
+    return tmpl.mappedAttributes
+      .map(ma => this.allAttributes().find(a => a.id === ma.attributeId))
+      .filter((a): a is Attribute => !!a);
+  }
+
+  getAttributeValue(attributeId: number): any {
+    const val = this.product.attributeValues?.find(v => v.attributeId === attributeId);
+    return val ? val.value : null;
+  }
+
+  setAttributeValue(attributeId: number, value: any): void {
+    if (!this.product.attributeValues) {
+      this.product.attributeValues = [];
+    }
+    const index = this.product.attributeValues.findIndex(v => v.attributeId === attributeId);
+    if (index > -1) {
+      this.product.attributeValues[index].value = value;
+    } else {
+      this.product.attributeValues.push({ attributeId, value });
+    }
+  }
+
   private blankProduct(): Partial<Product> {
     return {
       id: undefined,
@@ -133,9 +209,13 @@ export class ProductFormComponent implements OnInit, OnChanges {
       gtnStartPos: 1,
       gtnLength: 10,
       useGlobal: true,
+      trackBundleGtn: true,
       isActive: true,
       productType: 'simple',
       bundleItems: [],
+      attributeValues: [],
+      templateId: undefined,
+      parentId: undefined,
     };
   }
 }

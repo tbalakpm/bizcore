@@ -29,6 +29,9 @@ import { gstRouter } from "./routes/gst";
 import { pricingCategoriesRouter } from "./routes/pricing-categories";
 import { dashboardRouter } from "./routes/dashboard";
 import { profileRouter } from "./routes/profile";
+import { attributesRouter } from "./routes/attributes";
+import { productTemplatesRouter } from "./routes/product-templates";
+import { brandsRouter } from "./routes/brands";
 
 
 export async function app() {
@@ -93,6 +96,9 @@ export async function app() {
   app.use("/api/gst", authRequired, gstRouter);
   app.use("/api/dashboard", authRequired, dashboardRouter);
   app.use("/api/profile", authRequired, profileRouter);
+  app.use("/api/attributes", authRequired, attributesRouter);
+  app.use("/api/product-templates", authRequired, productTemplatesRouter);
+  app.use("/api/brands", authRequired, brandsRouter);
 
 
   // Handle any requests that don't match the static files by serving the index.html file

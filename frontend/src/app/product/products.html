@@ -119,10 +119,11 @@
             <td>{{ p.hsnSac || '-' }}</td>
             <td class="text-right">{{ p.taxRate ? `${p.taxRate}%` : '-' }}</td>
             <td>
-              @if (p.productType === 'bundle') {
-                <nz-tag nzColor="blue">Bundle</nz-tag>
-              } @else {
-                <nz-tag nzColor="default">Simple</nz-tag>
+              @switch (p.productType) {
+                @case ('bundle') { <nz-tag nzColor="blue">Bundle</nz-tag> }
+                @case ('template') { <nz-tag nzColor="orange">Template</nz-tag> }
+                @case ('variant') { <nz-tag nzColor="green">Variant</nz-tag> }
+                @default { <nz-tag nzColor="default">Simple</nz-tag> }
               }
             </td>
             <td>

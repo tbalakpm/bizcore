@@ -1,7 +1,7 @@
 import { and, eq, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
-import { categories, db, products, productSerialNumbers, productBundles } from '../db';
+import { categories, db, products, productSerialNumbers, productBundles, productTemplateAttributes, productTemplates, productAttributeValues, attributes } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 import { LogService } from '../core/logger/logger.service';
 import { auditLog } from '../core/logger/audit.service';
@@ -134,6 +134,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
         description: products.description,
         categoryId: products.categoryId,
         categoryName: categories.name,
+        brandId: products.brandId,
         qtyPerUnit: products.qtyPerUnit,
         unitPrice: products.unitPrice,
         hsnSac: products.hsnSac,
@@ -141,9 +142,12 @@ productsRouter.get('/', async (req: Request, res: Response) => {
         gtnMode: products.gtnMode,
         gtnGeneration: products.gtnGeneration,
         useGlobal: products.useGlobal,
+        trackBundleGtn: products.trackBundleGtn,
         //unitsInStock: products.unitsInStock,
         isActive: products.isActive,
         productType: products.productType,
+        parentId: products.parentId,
+        templateId: products.templateId,
         createdAt: products.createdAt,
         updatedAt: products.updatedAt,
       })
@@ -224,12 +228,45 @@ productsRouter.get('/:id', async (req, res) => {
       .all();
   }
 
+  // Fetch mapped attributes if templateId exists
+  let mappedAttributes: any[] = [];
+  if (product.templateId) {
+    mappedAttributes = await db.select({
+      id: productTemplateAttributes.id,
+      attributeId: productTemplateAttributes.attributeId,
+      name: attributes.name,
+      type: attributes.type,
+      isVariantDefining: productTemplateAttributes.isVariantDefining,
+    })
+      .from(productTemplateAttributes)
+      .innerJoin(attributes, eq(attributes.id, productTemplateAttributes.attributeId))
+      .where(eq(productTemplateAttributes.templateId, product.templateId))
+      .all();
+  }
+
+  // Fetch attribute values
+  const attributeValues = await db.select({
+    id: productAttributeValues.id,
+    attributeId: productAttributeValues.attributeId,
+    value: productAttributeValues.value,
+  })
+    .from(productAttributeValues)
+    .where(eq(productAttributeValues.productId, id))
+    .all();
+
+  // Fetch variants if this is a parent product
+  let variants: any[] = [];
+  variants = await db.select().from(products).where(eq(products.parentId, id)).all();
+
   res.json({
     ...product,
     gtnPrefix: serial?.prefix ?? '',
     gtnStartPos: serial?.current ?? 1,
     gtnLength: serial?.length ?? 10,
     bundleItems,
+    mappedAttributes,
+    attributeValues: attributeValues.map(v => ({ ...v, value: JSON.parse(v.value) })),
+    variants,
   });
 });
 
@@ -239,6 +276,7 @@ productsRouter.post('/', async (req, res) => {
     name,
     description,
     categoryId,
+    brandId,
     qtyPerUnit,
     unitPrice,
     hsnSac,
@@ -249,9 +287,13 @@ productsRouter.post('/', async (req, res) => {
     gtnStartPos,
     gtnLength,
     useGlobal,
+    trackBundleGtn,
+    parentId,
+    templateId,
     isActive,
     productType,
-    bundleItems, // Array of { productId, quantity }
+    bundleItems,
+    attributeValues, // [{ attributeId, value }]
   } = req.body;
 
   if (!code) return res.status(400).json({ error: 'Code is required' });
@@ -266,6 +308,7 @@ productsRouter.post('/', async (req, res) => {
         name,
         description,
         categoryId,
+        brandId: brandId || null,
         qtyPerUnit,
         unitPrice: unitPrice?.toString(),
         hsnSac,
@@ -273,7 +316,10 @@ productsRouter.post('/', async (req, res) => {
         gtnMode: gtnMode as any,
         gtnGeneration: gtnGeneration as any,
         productType: (productType || 'simple') as any,
+        parentId: parentId || null,
+        templateId: templateId || null,
         useGlobal: useGlobal !== false,
+        trackBundleGtn: trackBundleGtn !== false,
         isActive: isActive !== false,
       })
       .returning()
@@ -300,6 +346,17 @@ productsRouter.post('/', async (req, res) => {
         current: startPos,
         length: parseInt(gtnLength, 10) || 10,
       }).run();
+    }
+
+    // Save attribute values
+    if (Array.isArray(attributeValues)) {
+      for (const val of attributeValues) {
+        await db.insert(productAttributeValues).values({
+          productId: product.id,
+          attributeId: val.attributeId,
+          value: JSON.stringify(val.value)
+        }).run();
+      }
     }
 
     const finalSerial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, product.id)).get();
@@ -331,6 +388,7 @@ productsRouter.put('/:id', async (req, res) => {
     name,
     description,
     categoryId,
+    brandId,
     qtyPerUnit,
     unitPrice,
     hsnSac,
@@ -341,9 +399,13 @@ productsRouter.put('/:id', async (req, res) => {
     gtnStartPos,
     gtnLength,
     useGlobal,
+    trackBundleGtn,
     isActive,
     productType,
+    parentId,
+    templateId,
     bundleItems,
+    attributeValues,
   } = req.body;
 
   const product = await db.select().from(products).where(eq(products.id, id)).get();
@@ -357,9 +419,10 @@ productsRouter.put('/:id', async (req, res) => {
     // Update product entity
     const updateData: any = {};
     if (code) updateData.code = code;
-    if (name) updateData.name = name;
+    if (name !== undefined) updateData.name = name;
     if (description !== undefined) updateData.description = description;
-    if (categoryId) updateData.categoryId = categoryId;
+    if (categoryId !== undefined) updateData.categoryId = categoryId;
+    if (brandId !== undefined) updateData.brandId = brandId || null;
     if (qtyPerUnit !== undefined) updateData.qtyPerUnit = qtyPerUnit;
     if (unitPrice !== undefined) updateData.unitPrice = unitPrice?.toString();
     if (hsnSac !== undefined) updateData.hsnSac = hsnSac;
@@ -367,8 +430,11 @@ productsRouter.put('/:id', async (req, res) => {
     if (gtnMode !== undefined) updateData.gtnMode = gtnMode;
     if (gtnGeneration !== undefined) updateData.gtnGeneration = gtnGeneration;
     if (useGlobal !== undefined) updateData.useGlobal = useGlobal;
+    if (trackBundleGtn !== undefined) updateData.trackBundleGtn = trackBundleGtn;
     if (typeof isActive === 'boolean') updateData.isActive = isActive;
     if (productType) updateData.productType = productType;
+    if (parentId !== undefined) updateData.parentId = parentId;
+    if (templateId !== undefined) updateData.templateId = templateId;
 
     await db
       .update(products)
@@ -413,6 +479,18 @@ productsRouter.put('/:id', async (req, res) => {
       }
     } else {
       await db.delete(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).run();
+    }
+
+    // Update attribute values
+    if (Array.isArray(attributeValues)) {
+      await db.delete(productAttributeValues).where(eq(productAttributeValues.productId, id)).run();
+      for (const val of attributeValues) {
+        await db.insert(productAttributeValues).values({
+          productId: id,
+          attributeId: val.attributeId,
+          value: JSON.stringify(val.value)
+        }).run();
+      }
     }
 
     const updatedProductEntity = await db.select().from(products).where(eq(products.id, id)).get();

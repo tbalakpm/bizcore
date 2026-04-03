@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, NgZone } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
@@ -19,15 +19,26 @@ export interface DecodedToken {
   mustChangePassword: boolean;
 }
 
+/** User-activity events that reset the idle clock */
+const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http: HttpClient = inject(HttpClient);
   private router = inject(Router);
+  private zone = inject(NgZone);
+
   private readonly TOKEN_KEY = 'bc_token';
-  private refreshTimer?: any;
+
+  /** Timer that fires 60 s before the access token expires */
+  private refreshTimer?: ReturnType<typeof setTimeout>;
+
+  /** Last time the user did anything (ms since epoch) */
+  private lastActivityAt = Date.now();
 
   constructor() {
-    this.scheduleAutoLogout(this.token);
+    this.startActivityTracking();
+    this.scheduleTokenRefresh(this.token);
   }
 
   // ─── Token storage (sessionStorage – clears on tab close) ─────────────────
@@ -38,13 +49,13 @@ export class AuthService {
   private setToken(token: string): void {
     sessionStorage.setItem(this.TOKEN_KEY, token);
     this.tokenSignal.set(token);
-    this.scheduleAutoLogout(token);
+    this.scheduleTokenRefresh(token);
   }
 
   private removeToken(): void {
     sessionStorage.removeItem(this.TOKEN_KEY);
     this.tokenSignal.set(null);
-    this.clearAutoLogout();
+    this.clearRefreshTimer();
   }
 
   get token(): string | null {
@@ -52,29 +63,91 @@ export class AuthService {
     return sessionStorage.getItem(this.TOKEN_KEY);
   }
 
-  private scheduleAutoLogout(token: string | null): void {
-    this.clearAutoLogout();
+  // ─── Activity tracking ─────────────────────────────────────────────────────
+
+  /** Listen to DOM events outside Angular's change-detection zone for efficiency */
+  private startActivityTracking(): void {
+    if (typeof window === 'undefined') return;
+    this.zone.runOutsideAngular(() => {
+      for (const evt of ACTIVITY_EVENTS) {
+        window.addEventListener(evt, () => { this.lastActivityAt = Date.now(); }, { passive: true });
+      }
+    });
+  }
+
+  // ─── Token refresh scheduling ──────────────────────────────────────────────
+
+  /**
+   * Schedule a check ~60 seconds before the access token expires.
+   * At that point we check whether the user has been active during this token's
+   * lifetime — if yes, silently refresh; if idle, log out.
+   */
+  private scheduleTokenRefresh(token: string | null): void {
+    this.clearRefreshTimer();
     if (!token) return;
 
     try {
       const decoded = jwtDecode<DecodedToken>(token);
+      const issuedAt = (decoded as any).iat ? (decoded as any).iat * 1000 : Date.now();
       const expiry = decoded.exp * 1000;
-      const delay = expiry - Date.now();
+      const tokenLifetimeMs = expiry - issuedAt; // e.g. 15 min
+      const refreshAt = expiry - 60_000;          // fire 60 s before expiry
+      const delay = refreshAt - Date.now();
 
-      if (delay > 0) {
-        this.refreshTimer = setTimeout(() => {
-          this.logout();
-        }, delay);
+      if (delay <= 0) {
+        // Already past the refresh-trigger point
+        if (Date.now() < expiry) {
+          this.trySilentRefreshOrLogout(tokenLifetimeMs);
+        } else {
+          // Already expired — check idleness then decide
+          this.trySilentRefreshOrLogout(tokenLifetimeMs);
+        }
       } else {
-        // Already expired
-        this.logout();
+        this.refreshTimer = setTimeout(
+          () => this.trySilentRefreshOrLogout(tokenLifetimeMs),
+          delay,
+        );
       }
     } catch {
-      this.logout();
+      // Unparseable token — clear it
+      this.removeToken();
+      this.zone.run(() => this.router.navigateByUrl('/login'));
     }
   }
 
-  private clearAutoLogout(): void {
+  /**
+   * Decide whether to silently refresh or log out based on idle time.
+   * If the user hasn't interacted since before this token was issued
+   * (i.e. idle for a full token lifetime), treat the session as expired.
+   */
+  private trySilentRefreshOrLogout(tokenLifetimeMs: number): void {
+    const idleMs = Date.now() - this.lastActivityAt;
+
+    if (idleMs >= tokenLifetimeMs) {
+      // User has been idle for at least one full token lifetime — log out
+      this.zone.run(() => {
+        this.logout();
+      });
+    } else {
+      // User was active — silently refresh in the background
+      this.silentRefresh();
+    }
+  }
+
+  /** Attempt a background token refresh. Only force logout if the refresh itself fails. */
+  private silentRefresh(): void {
+    this.refreshToken().subscribe({
+      error: () => {
+        // Refresh token expired or revoked — force logout
+        this.zone.run(() => {
+          this.removeToken();
+          this.router.navigateByUrl('/login');
+        });
+      },
+    });
+  }
+
+  private clearRefreshTimer(): void {
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);
       this.refreshTimer = undefined;
@@ -93,12 +166,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * True if we have a token.
-   * We don't check expiration here because the interceptor handles 401s by refreshing.
-   * Hiding the UI just because the access token is expired (while the refresh token might still be valid)
-   * causes jarring flickering and hides the header prematurely.
-   */
   get isLoggedIn(): boolean {
     return !!this.tokenSignal();
   }
@@ -120,7 +187,10 @@ export class AuthService {
   login(username: string, password: string): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${environment.apiUrl}/auth/login`, { username, password }, { withCredentials: true })
-      .pipe(tap((res) => this.setToken(res.token)));
+      .pipe(tap((res) => {
+        this.lastActivityAt = Date.now(); // login counts as activity
+        this.setToken(res.token);
+      }));
   }
 
   register(username: string, password: string): Observable<unknown> {

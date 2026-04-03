@@ -46,5 +46,5 @@ import { PermissionService } from '../auth/permission.service';
   `,
 })
 export class Settings {
-  constructor(public permission: PermissionService) {}
+  constructor(public permission: PermissionService) { }
 }

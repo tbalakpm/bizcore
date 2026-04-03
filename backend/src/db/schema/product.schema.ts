@@ -2,7 +2,9 @@ import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, text, real, uniqueIndex, check, index } from 'drizzle-orm/sqlite-core';
 
 import { categories } from './category.schema';
+import { brands } from './brand.schema';
 import { auditFields, keyFields } from './base';
+import { productTemplates } from './product-template.schema';
 
 export const products = sqliteTable(
   'products',
@@ -15,9 +17,18 @@ export const products = sqliteTable(
       .notNull()
       .references(() => categories.id),
 
-    productType: text("product_type", { length: 25, enum: ["simple", "bundle"] })
+    brandId: integer('brand_id')
+      .references(() => brands.id),
+
+    productType: text("product_type", { length: 25, enum: ["simple", "bundle", "variant"] })
       .notNull()
       .default('simple'),
+
+    parentId: integer('parent_id')
+      .references((): any => products.id),
+
+    templateId: integer('template_id')
+      .references(() => productTemplates.id),
 
     qtyPerUnit: text('qty_per_unit', { length: 25 })
       .notNull()
@@ -38,6 +49,9 @@ export const products = sqliteTable(
     useGlobal: integer('use_global', { mode: 'boolean' })
       .notNull()
       .default(true), // true - use global settings from gtn key of serial_numbers table, false - use product specific settings
+
+    trackBundleGtn: integer('track_bundle_gtn', { mode: 'boolean' })
+      .default(true), // true - generate GTN for bundle, false - track bundle components
 
     gtnMode: text('gtn_mode', { length: 25, enum: ['global', 'auto', 'manual'] })
       .notNull()
