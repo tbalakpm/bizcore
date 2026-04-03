@@ -4,7 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { PermissionService } from '../../auth/permission.service';
 
-import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -14,13 +14,13 @@ import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-brands',
-  imports: [TranslatePipe, FormsModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule, HasPermissionDirective],
+  imports: [TranslatePipe, FormsModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropdownModule, HasPermissionDirective],
   templateUrl: './brands.html',
 })
 export class Brands implements OnInit {
@@ -75,7 +75,7 @@ export class Brands implements OnInit {
       });
   }
 
-  onQueryParamsChange(params: any): void {
+  onQueryParamsChange(params: NzTableQueryParams): void {
     const { pageSize, pageIndex, sort } = params;
     this.pageSize = pageSize;
     this.pageIndex = pageIndex;

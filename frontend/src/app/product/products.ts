@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Product, ProductList, ProductService } from './product-service';
@@ -16,15 +15,15 @@ import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { FormsModule } from '@angular/forms';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 
 @Component({
   selector: 'app-products',
   imports: [
-    CommonModule, TranslatePipe, FormsModule, ProductFormComponent,
+    TranslatePipe, FormsModule, ProductFormComponent,
     NzTableModule, NzTagModule, NzSwitchModule, NzButtonModule,
     NzIconModule, NzTooltipModule, NzPopconfirmModule, NzAlertModule, NzCardModule,
-    NzDropDownModule, HasPermissionDirective,
+    NzDropdownModule, HasPermissionDirective,
   ],
   templateUrl: './products.html',
 })
@@ -82,7 +81,7 @@ export class Products implements OnInit {
       });
   }
 
-  onQueryParamsChange(params: any): void {
+  onQueryParamsChange(params: NzTableQueryParams): void {
     const { pageSize, pageIndex, sort } = params;
     this.pageSize = pageSize;
     this.pageIndex = pageIndex;

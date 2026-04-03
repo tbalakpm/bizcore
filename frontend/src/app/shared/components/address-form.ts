@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Address } from '../../customer/customer-service';
@@ -12,7 +12,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 @Component({
   selector: 'app-address-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, NzCollapseModule, NzFormModule, NzInputModule, NzIconModule],
+  imports: [NgTemplateOutlet, FormsModule, TranslatePipe, NzCollapseModule, NzFormModule, NzInputModule, NzIconModule],
   templateUrl: './address-form.html',
 })
 export class AddressForm {

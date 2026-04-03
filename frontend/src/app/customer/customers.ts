@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { type Customer, type Address, CustomerList, CustomerService } from './customer-service';
+import { type Customer, CustomerList, CustomerService } from './customer-service';
 import { AddressForm } from '../shared/components/address-form';
 import { PermissionService } from '../auth/permission.service';
 import { GstService } from '../shared/services/gst.service';
@@ -20,7 +20,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
@@ -31,7 +31,7 @@ import { HasPermissionDirective } from '../shared/directives/has-permission.dire
     FormsModule, TranslatePipe, AddressForm,
     NzTableModule, NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
     NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,
-    NzCheckboxModule, NzCardModule, NzDropDownModule, NzModalModule, HasPermissionDirective,
+    NzCheckboxModule, NzCardModule, NzDropdownModule, NzModalModule, HasPermissionDirective,
   ],
 
   templateUrl: './customers.html',
@@ -121,7 +121,7 @@ export class Customers implements OnInit {
       });
   }
 
-  onQueryParamsChange(params: any): void {
+  onQueryParamsChange(params: NzTableQueryParams): void {
     const { pageSize, pageIndex, sort } = params;
     this.pageSize = pageSize;
     this.pageIndex = pageIndex;

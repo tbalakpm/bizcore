@@ -14,14 +14,14 @@ import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-categories',
-  imports: [TranslatePipe, FormsModule, HasPermissionDirective, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropDownModule, NzSelectModule],
+  imports: [TranslatePipe, FormsModule, HasPermissionDirective, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropdownModule, NzSelectModule],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {
@@ -96,7 +96,7 @@ export class Categories implements OnInit {
       });
   }
 
-  onQueryParamsChange(params: any): void {
+  onQueryParamsChange(params: NzTableQueryParams): void {
     const { pageSize, pageIndex, sort } = params;
     this.pageSize = pageSize;
     this.pageIndex = pageIndex;

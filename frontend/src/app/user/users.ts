@@ -1,10 +1,10 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type User, type UserList, UserService } from './user-service';
 import { AuthService } from '../auth/auth-service';
 import { PermissionService } from '../auth/permission.service';
-import { ALL_MODULES, MODULE_LABELS, type ModulePermissions, type UserPermissions } from '../models/permission.model';
+import { ALL_MODULES, MODULE_LABELS, type ModulePermissions } from '../models/permission.model';
 import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
@@ -20,7 +20,7 @@ import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
@@ -31,7 +31,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
     HasPermissionDirective,
     NzTableModule, NzFormModule, NzInputModule, NzSelectModule,
     NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule,
-    NzAlertModule, NzTooltipModule, NzRadioModule, NzCardModule, NzTagModule, NzDropDownModule,
+    NzAlertModule, NzTooltipModule, NzRadioModule, NzCardModule, NzTagModule, NzDropdownModule,
   ],
   templateUrl: './users.html',
 })
@@ -122,7 +122,7 @@ export class Users implements OnInit {
       });
   }
 
-  onQueryParamsChange(params: any): void {
+  onQueryParamsChange(params: NzTableQueryParams): void {
     const { pageSize, pageIndex, sort } = params;
     this.pageSize = pageSize;
     this.pageIndex = pageIndex;

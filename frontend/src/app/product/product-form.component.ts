@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -23,7 +23,7 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 @Component({
   selector: 'app-product-form',
   imports: [
-    FormsModule, CommonModule, TranslatePipe,
+    FormsModule, NgSwitch, NgSwitchCase, TranslatePipe,
     NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
     NzAlertModule, NzIconModule, NzInputNumberModule, NzTooltipModule,
     NzSwitchModule, NzRadioModule, NzTableModule
