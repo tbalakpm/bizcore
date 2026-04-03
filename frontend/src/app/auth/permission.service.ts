@@ -32,6 +32,19 @@ export class PermissionService {
     return !!perm[action];
   }
 
+  getFirstReadPermission() {
+    const permissions = this.auth.currentUserPermissions as any;
+    const permissionKeys = Object.keys(this.auth.currentUserPermissions);
+
+    for (const key of permissionKeys) {
+      if (permissions[key].read) {
+        return key;
+      }
+    }
+    return '';
+  }
+
+
   canRead(module: keyof UserPermissions): boolean {
     return this.hasPermission(module, 'read');
   }

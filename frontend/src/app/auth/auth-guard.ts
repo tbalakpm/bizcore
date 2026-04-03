@@ -15,6 +15,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     if (this.auth.mustChangePassword && !route.routeConfig?.path?.includes('change-password')) {
       return this.router.parseUrl('/change-password');
     }
+
     return this.checkPermission(route);
   }
 
@@ -30,7 +31,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   private checkPermission(route: ActivatedRouteSnapshot): boolean | UrlTree {
     const module = route.data?.['module'];
     if (module && !this.permissionService.canRead(module)) {
-      return this.router.createUrlTree(['/dashboard']);
+      const firstReadPermission = this.permissionService.getFirstReadPermission();
+      return this.router.createUrlTree([`/${firstReadPermission}`]);
     }
     return true;
   }
