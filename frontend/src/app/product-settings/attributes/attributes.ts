@@ -169,6 +169,19 @@ export class Attributes implements OnInit {
     });
   }
 
+  toggleStatus(attribute: Attribute): void {
+    const newStatus = !attribute.isActive;
+    this.attributeService.updateAttribute(attribute.id!, { ...attribute, isActive: newStatus }).subscribe({
+      next: () => {
+        this.message.success(`Attribute ${newStatus ? 'activated' : 'deactivated'}`);
+        attribute.isActive = newStatus;
+      },
+      error: () => {
+        this.message.error('Failed to update status');
+      }
+    });
+  }
+
   get showOptions(): boolean {
     const type = this.attributeForm.get('type')?.value;
     return type === 'single_select' || type === 'multi_select';

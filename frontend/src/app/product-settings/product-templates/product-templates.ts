@@ -165,6 +165,19 @@ export class ProductTemplates implements OnInit {
     });
   }
 
+  toggleStatus(template: ProductTemplate): void {
+    const newStatus = !template.isActive;
+    this.templateService.updateTemplate(template.id!, { isActive: newStatus }).subscribe({
+      next: () => {
+        this.message.success(`Template ${newStatus ? 'activated' : 'deactivated'}`);
+        template.isActive = newStatus;
+      },
+      error: () => {
+        this.message.error('Failed to update status');
+      }
+    });
+  }
+
   addAttribute(): void {
     const current = this.templateForm.get('mappedAttributes')?.value || [];
     this.templateForm.patchValue({ mappedAttributes: [...current, { attributeId: null, isVariantDefining: false }] });

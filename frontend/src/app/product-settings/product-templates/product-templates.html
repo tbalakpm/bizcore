@@ -2,7 +2,13 @@
   <nz-card>
     <div class="flex justify-between items-center mb-3">
       <h2 class="text-base font-semibold">Product Templates</h2>
-      <button nz-button nzType="primary" nzSize="small" (click)="showModal()" *appHasPermission="'product-settings-templates:add'">
+      <button
+        nz-button
+        nzType="primary"
+        nzSize="small"
+        (click)="showModal()"
+        *appHasPermission="'product-settings-templates:add'"
+      >
         <span nz-icon nzType="plus" nzTheme="outline"></span>
         Add Template
       </button>
@@ -20,15 +26,20 @@
     >
       <ng-template #totalTemplate let-total let-range="range">
         <div style="position: absolute; left: 0">
-          <span class="text-text-muted text-sm">Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span>
+          <span class="text-text-muted text-sm"
+            >Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span
+          >
         </div>
       </ng-template>
       <thead>
         <tr>
           <th>Name / Description</th>
-          <th class="w-32">Mapped Attributes</th>
+          <th class="w-48" nzAlign="center">Mapped Attributes</th>
           <th class="w-20 text-center" nzAlign="center">Active</th>
-          @if (permissionService.canEdit('product-settings-templates') || permissionService.canDelete('product-settings-templates')) {
+          @if (
+            permissionService.canEdit('product-settings-templates') ||
+            permissionService.canDelete('product-settings-templates')
+          ) {
             <th class="w-28 text-center" nzAlign="center">Actions</th>
           }
         </tr>
@@ -52,14 +63,25 @@
               </span>
             </td>
             <td nzAlign="center">
-              <nz-switch [ngModel]="data.isActive" nzDisabled nzSize="small"></nz-switch>
+              <nz-switch
+                [ngModel]="data.isActive"
+                (ngModelChange)="toggleStatus(data)"
+                [nzDisabled]="!permissionService.canEdit('product-settings-templates')"
+                nzSize="small"
+              ></nz-switch>
             </td>
-            @if (permissionService.canEdit('product-settings-templates') || permissionService.canDelete('product-settings-templates')) {
+            @if (
+              permissionService.canEdit('product-settings-templates') ||
+              permissionService.canDelete('product-settings-templates')
+            ) {
               <td nzAlign="center">
                 <div class="flex items-center justify-center gap-2">
                   <button
-                    nz-button nzType="link" nzSize="small"
-                    nz-tooltip nzTooltipTitle="Edit template"
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    nz-tooltip
+                    nzTooltipTitle="Edit template"
                     style="color: var(--color-accent)"
                     (click)="showModal(data)"
                     *appHasPermission="'product-settings-templates:edit'"
@@ -67,8 +89,12 @@
                     <span nz-icon nzType="edit" nzTheme="outline"></span>
                   </button>
                   <button
-                    nz-button nzType="link" nzDanger nzSize="small"
-                    nz-tooltip nzTooltipTitle="Delete template"
+                    nz-button
+                    nzType="link"
+                    nzDanger
+                    nzSize="small"
+                    nz-tooltip
+                    nzTooltipTitle="Delete template"
                     (click)="deleteTemplate(data.id!)"
                     *appHasPermission="'product-settings-templates:delete'"
                   >
@@ -112,7 +138,12 @@
       <nz-form-item>
         <nz-form-label>Description</nz-form-label>
         <nz-form-control>
-          <textarea nz-input formControlName="description" [nzAutosize]="{ minRows: 2, maxRows: 4 }" placeholder="Optional description"></textarea>
+          <textarea
+            nz-input
+            formControlName="description"
+            [nzAutosize]="{ minRows: 2, maxRows: 4 }"
+            placeholder="Optional description"
+          ></textarea>
         </nz-form-control>
       </nz-form-item>
 
@@ -174,7 +205,14 @@
                   </nz-switch>
                 </td>
                 <td class="text-center" nzAlign="center">
-                  <button nz-button nzType="text" nzDanger type="button" nzSize="small" (click)="removeAttribute($index)">
+                  <button
+                    nz-button
+                    nzType="text"
+                    nzDanger
+                    type="button"
+                    nzSize="small"
+                    (click)="removeAttribute($index)"
+                  >
                     <span nz-icon nzType="delete" nzTheme="outline"></span>
                   </button>
                 </td>

@@ -49,7 +49,12 @@
               </span>
             </td>
             <td nzAlign="center">
-              <nz-switch [ngModel]="data.isActive" nzDisabled nzSize="small"></nz-switch>
+              <nz-switch
+                [ngModel]="data.isActive"
+                (ngModelChange)="toggleStatus(data)"
+                [nzDisabled]="!permissionService.canEdit('product-settings-attributes')"
+                nzSize="small"
+              ></nz-switch>
             </td>
             @if (permissionService.canEdit('product-settings-attributes') || permissionService.canDelete('product-settings-attributes')) {
               <td nzAlign="center">
