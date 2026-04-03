@@ -20,7 +20,7 @@
     <div class="lg:col-span-2">
       <nz-card>
         <div class="flex justify-between items-center mb-2">
-          <h2 class="text-base font-semibold">List of {{ 'MENU.CATEGORIES' | translate }}</h2>
+          <h2 class="text-base font-semibold">Product {{ 'MENU.CATEGORIES' | translate }}</h2>
         </div>
 
         <nz-table
@@ -132,6 +132,7 @@
                       name="editParent"
                       nzAllowClear
                       nzPlaceHolder="Select parent"
+                      class="w-full"
                     >
                       @for (rc of rootCategories(); track rc.id) {
                         @if (rc.id !== c.id) {

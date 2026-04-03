@@ -14,7 +14,7 @@
     <div class="lg:col-span-2">
       <nz-card>
         <div class="flex justify-between items-center mb-2">
-          <h2 class="text-base font-semibold">List of Brands</h2>
+          <h2 class="text-base font-semibold">Product Brands</h2>
         </div>
 
         <nz-table
@@ -72,7 +72,10 @@
                 </nz-filter-trigger>
               </th>
               <th class="text-center w-16" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
-              @if (permissionService.canEdit('settings-general') || permissionService.canDelete('settings-general')) {
+              @if (
+                permissionService.canEdit('settings-general') ||
+                permissionService.canDelete('settings-general')
+              ) {
                 <th class="text-center w-32" nzAlign="center">{{ 'ACTIONS' | translate }}</th>
               }
             </tr>
@@ -126,7 +129,10 @@
                   >
                   </nz-switch>
                 </td>
-                @if (permissionService.canEdit('settings-general') || permissionService.canDelete('settings-general')) {
+                @if (
+                  permissionService.canEdit('settings-general') ||
+                  permissionService.canDelete('settings-general')
+                ) {
                   <td class="text-center" nzAlign="center">
                     <div class="flex items-center justify-center gap-2">
                       @if (editing?.id == b.id) {
@@ -184,9 +190,7 @@
             }
             @if (brands().length == 0) {
               <tr>
-                <td colspan="5" class="text-center text-text-muted">
-                  No brands defined yet.
-                </td>
+                <td colspan="5" class="text-center text-text-muted">No brands defined yet.</td>
               </tr>
             }
           </tbody>

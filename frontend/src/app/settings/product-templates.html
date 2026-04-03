@@ -1,121 +1,191 @@
-<div class="p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-semibold">Product Templates</h1>
-    <button nz-button nzType="primary" (click)="showModal()">
-      <i nz-icon nzType="plus"></i> Add Template
-    </button>
-  </div>
+<div class="space-y-4">
+  <nz-card>
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-base font-semibold">Product Templates</h2>
+      <button nz-button nzType="primary" nzSize="small" (click)="showModal()">
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        Add Template
+      </button>
+    </div>
 
-  <nz-table #basicTable [nzData]="templates" [nzLoading]="loading">
-    <thead>
-      <tr>
-        <th nzWidth="30%">Name</th>
-        <th nzWidth="30%">Attributes Count</th>
-        <th nzWidth="20%">Active</th>
-        <th nzWidth="20%">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let data of basicTable.data">
-        <td>
-          <div class="font-medium text-text">{{ data.name }}</div>
-          <div class="text-sm text-text-muted">{{ data.description }}</div>
-        </td>
-        <td>
-          <nz-tag nzColor="processing">{{ data.mappedAttributes?.length || 0 }} Attributes</nz-tag>
-        </td>
-        <td>
-          <nz-switch [ngModel]="data.isActive" nzDisabled></nz-switch>
-        </td>
-        <td>
-          <a (click)="showModal(data)" class="mr-3 text-blue-600 hover:text-blue-800">Edit</a>
-          <a (click)="deleteTemplate(data.id!)" class="text-red-600 hover:text-red-800">Delete</a>
-        </td>
-      </tr>
-    </tbody>
-  </nz-table>
+    <nz-table
+      #tplTable
+      [nzData]="templates"
+      [nzLoading]="loading"
+      nzSize="small"
+      [nzBordered]="true"
+      [nzShowSizeChanger]="true"
+      [nzPageSizeOptions]="[10, 20, 50]"
+      [nzShowTotal]="totalTemplate"
+    >
+      <ng-template #totalTemplate let-total let-range="range">
+        <div style="position: absolute; left: 0">
+          <span class="text-text-muted text-sm">Showing {{ range[0] }}-{{ range[1] }} of {{ total }} items</span>
+        </div>
+      </ng-template>
+      <thead>
+        <tr>
+          <th>Name / Description</th>
+          <th class="w-36 text-center" nzAlign="center">Attributes</th>
+          <th class="w-20 text-center" nzAlign="center">Active</th>
+          <th class="w-28 text-center" nzAlign="center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (data of tplTable.data; track data.id) {
+          <tr>
+            <td>
+              <div class="font-medium">{{ data.name }}</div>
+              @if (data.description) {
+                <div class="text-xs text-text-muted mt-0.5">{{ data.description }}</div>
+              }
+            </td>
+            <td nzAlign="center">
+              <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium"
+                style="background-color: var(--color-surface-muted); color: var(--color-text)"
+              >
+                <span nz-icon nzType="tag" nzTheme="outline"></span>
+                {{ data.mappedAttributes?.length || 0 }} Attributes
+              </span>
+            </td>
+            <td nzAlign="center">
+              <nz-switch [ngModel]="data.isActive" nzDisabled nzSize="small"></nz-switch>
+            </td>
+            <td nzAlign="center">
+              <div class="flex items-center justify-center gap-2">
+                <button
+                  nz-button nzType="link" nzSize="small"
+                  nz-tooltip nzTooltipTitle="Edit template"
+                  style="color: var(--color-accent)"
+                  (click)="showModal(data)"
+                >
+                  <span nz-icon nzType="edit" nzTheme="outline"></span>
+                </button>
+                <button
+                  nz-button nzType="link" nzDanger nzSize="small"
+                  nz-tooltip nzTooltipTitle="Delete template"
+                  nz-popconfirm
+                  [nzPopconfirmTitle]="'Delete template &quot;' + data.name + '&quot;?'"
+                  (nzOnConfirm)="deleteTemplate(data.id!)"
+                >
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+        @if (templates.length === 0 && !loading) {
+          <tr>
+            <td colspan="4" class="text-center text-text-muted py-6">
+              No templates defined yet. Click "Add Template" to create one.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
 
-  <nz-modal
-    [(nzVisible)]="isModalVisible"
-    [nzTitle]="editingTemplate ? 'Edit Product Template' : 'New Product Template'"
-    (nzOnCancel)="handleCancel()"
-    (nzOnOk)="handleOk()"
-    nzWidth="700px"
-  >
-    <div *nzModalContent>
-      <form nz-form [formGroup]="templateForm" nzLayout="vertical">
-        <nz-form-item>
-          <nz-form-label nzRequired>Name</nz-form-label>
-          <nz-form-control nzErrorTip="Please input template name!">
-            <input nz-input formControlName="name" placeholder="e.g., Apparel, Electronics" />
-          </nz-form-control>
-        </nz-form-item>
+<!-- Add / Edit Modal -->
+<nz-modal
+  [(nzVisible)]="isModalVisible"
+  [nzTitle]="editingTemplate ? 'Edit Product Template' : 'New Product Template'"
+  (nzOnCancel)="handleCancel()"
+  (nzOnOk)="handleOk()"
+  nzOkText="Save"
+  nzWidth="640px"
+>
+  <div *nzModalContent>
+    <form nz-form [formGroup]="templateForm" nzLayout="vertical">
+      <nz-form-item>
+        <nz-form-label nzRequired>Name</nz-form-label>
+        <nz-form-control nzErrorTip="Please enter a template name">
+          <input nz-input formControlName="name" placeholder="e.g., Apparel, Electronics" />
+        </nz-form-control>
+      </nz-form-item>
 
-        <nz-form-item>
-          <nz-form-label>Description</nz-form-label>
-          <nz-form-control>
-            <textarea nz-input formControlName="description"></textarea>
-          </nz-form-control>
-        </nz-form-item>
+      <nz-form-item>
+        <nz-form-label>Description</nz-form-label>
+        <nz-form-control>
+          <textarea nz-input formControlName="description" [nzAutosize]="{ minRows: 2, maxRows: 4 }" placeholder="Optional description"></textarea>
+        </nz-form-control>
+      </nz-form-item>
 
-        <nz-form-item>
-          <nz-form-label>Active</nz-form-label>
-          <nz-form-control>
-            <nz-switch formControlName="isActive"></nz-switch>
-          </nz-form-control>
-        </nz-form-item>
+      <nz-form-item>
+        <nz-form-label>Active</nz-form-label>
+        <nz-form-control>
+          <nz-switch formControlName="isActive"></nz-switch>
+        </nz-form-control>
+      </nz-form-item>
 
-        <div class="mt-4">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-medium m-0">Template Attributes</h3>
-            <button nz-button nzType="dashed" type="button" nzSize="small" (click)="addAttribute()">
-              <nz-icon nzType="plus" /> Add Attribute
-            </button>
-          </div>
-          
-          <nz-table
-            #mappedAttrTable
-            [nzData]="mappedAttributesFormArray"
-            nzSize="small"
-            [nzShowPagination]="false"
-          >
-            <thead>
+      <!-- Mapped Attributes -->
+      <div class="mt-2">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-medium m-0 text-sm">Template Attributes</h3>
+          <button nz-button nzType="dashed" type="button" nzSize="small" (click)="addAttribute()">
+            <span nz-icon nzType="plus" nzTheme="outline"></span>
+            Add Attribute
+          </button>
+        </div>
+
+        <nz-table
+          #mappedAttrTable
+          [nzData]="mappedAttributesFormArray"
+          nzSize="small"
+          [nzBordered]="true"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th class="w-36 text-center" nzAlign="center">Variant Defining?</th>
+              <th class="w-12"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of mappedAttrTable.data; track $index) {
               <tr>
-                <th>Attribute</th>
-                <th nzWidth="150px" class="text-center">Variant Defining?</th>
-                <th nzWidth="60px"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of mappedAttrTable.data; let i = index">
                 <td>
                   <nz-select
                     [ngModel]="item.attributeId"
-                    [ngModelOptions]="{standalone: true}"
-                    (ngModelChange)="updateAttribute(i, 'attributeId', $event)"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="updateAttribute($index, 'attributeId', $event)"
                     nzPlaceHolder="Select attribute"
+                    nzShowSearch
                     class="w-full"
                   >
-                    <nz-option *ngFor="let a of allAttributes" [nzValue]="a.id" [nzLabel]="a.name"></nz-option>
+                    @for (a of allAttributes; track a.id) {
+                      <nz-option [nzValue]="a.id" [nzLabel]="a.name"></nz-option>
+                    }
                   </nz-select>
                 </td>
-                <td class="text-center">
-                  <nz-switch 
-                    [ngModel]="item.isVariantDefining" 
-                    [ngModelOptions]="{standalone: true}"
-                    (ngModelChange)="updateAttribute(i, 'isVariantDefining', $event)"
-                  ></nz-switch>
+                <td nzAlign="center">
+                  <nz-switch
+                    [ngModel]="item.isVariantDefining"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="updateAttribute($index, 'isVariantDefining', $event)"
+                    nzSize="small"
+                  >
+                  </nz-switch>
                 </td>
-                <td class="text-center">
-                  <button nz-button nzType="text" nzDanger type="button" (click)="removeAttribute(i)">
-                    <nz-icon nzType="delete" />
+                <td class="text-center" nzAlign="center">
+                  <button nz-button nzType="text" nzDanger type="button" nzSize="small" (click)="removeAttribute($index)">
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
                   </button>
                 </td>
               </tr>
-            </tbody>
-          </nz-table>
-        </div>
-      </form>
-    </div>
-  </nz-modal>
-</div>
+            }
+            @if (mappedAttributesFormArray.length === 0) {
+              <tr>
+                <td colspan="3" class="text-center text-text-muted py-3 text-sm">
+                  No attributes added yet.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </div>
+    </form>
+  </div>
+</nz-modal>

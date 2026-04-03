@@ -33,7 +33,7 @@
               </nz-form-control>
             </nz-form-item>
           </div>
-          <div class="col-span-12 md:col-span-4">
+          <div class="col-span-12 md:col-span-10">
             <nz-form-item>
               <nz-form-label>Name</nz-form-label>
               <nz-form-control>
@@ -47,17 +47,17 @@
               </nz-form-control>
             </nz-form-item>
           </div>
-          <div class="col-span-12 md:col-span-4">
+          <div class="col-span-12">
             <nz-form-item>
               <nz-form-label>Description</nz-form-label>
               <nz-form-control>
-                <input
+                <textarea
                   nz-input
-                  type="text"
                   [(ngModel)]="editForm.description"
                   name="catDesc"
                   placeholder="Optional description"
-                />
+                  [nzAutosize]="{ minRows: 2, maxRows: 4 }"
+                ></textarea>
               </nz-form-control>
             </nz-form-item>
           </div>

@@ -10,11 +10,14 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { TitleCasePipe } from '@angular/common';
 import { Attribute, AttributeService } from '../product/attribute-service';
 
 @Component({
   selector: 'app-attributes',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -27,6 +30,10 @@ import { Attribute, AttributeService } from '../product/attribute-service';
     NzSelectModule,
     NzSwitchModule,
     NzIconModule,
+    NzPopconfirmModule,
+    NzTooltipModule,
+    NzCardModule,
+    TitleCasePipe,
   ],
   templateUrl: './attributes.html',
 })
