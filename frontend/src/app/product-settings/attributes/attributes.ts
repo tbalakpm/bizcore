@@ -14,7 +14,7 @@ import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { TitleCasePipe } from '@angular/common';
-import { Attribute, AttributeService } from '../product/attribute-service';
+import { Attribute, AttributeService } from '../../product/attribute-service';
 
 @Component({
   selector: 'app-attributes',

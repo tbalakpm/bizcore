@@ -9,9 +9,9 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { PermissionService } from '../auth/permission.service';
+import { PermissionService } from '../../auth/permission.service';
 
-import { SettingsService } from './settings.service';
+import { SettingsService } from '../settings.service';
 import { forkJoin } from 'rxjs';
 
 @Component({

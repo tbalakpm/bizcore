@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import type { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { pagination } from '../models/pagination';
+import { environment } from '../../../environments/environment';
+import { pagination } from '../../models/pagination';
 
 export interface PricingCategory {
   id: number;

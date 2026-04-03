@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { type Category, CategoryService } from '../category/category-service';
-import { type Brand, BrandService } from '../settings/brands/brand-service';
+import { type Category, CategoryService } from '../product-settings/categories/category-service';
+import { type Brand, BrandService } from '../product-settings/brands/brand-service';
 import { type Product, ProductService } from './product-service';
 import { Attribute, AttributeService } from './attribute-service';
-import { ProductTemplate, ProductTemplateService } from '../settings/product-template-service';
+import { ProductTemplate, ProductTemplateService } from '../product-settings/product-templates/product-template-service';
 
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';

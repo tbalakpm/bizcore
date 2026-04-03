@@ -9,12 +9,12 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 
-import { SettingsService } from './settings.service';
+import { SettingsService } from '../settings.service';
 import { forkJoin } from 'rxjs';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { PermissionService } from '../auth/permission.service';
+import { PermissionService } from '../../auth/permission.service';
 
 @Component({
   selector: 'app-general-settings',

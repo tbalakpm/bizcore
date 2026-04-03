@@ -3,7 +3,7 @@ import { AuthGuard } from './auth/auth-guard';
 import { Login } from './auth/login';
 import { ChangePassword } from './auth/change-password';
 import { Dashboard } from './dashboard/dashboard';
-import { Categories } from './category/categories';
+import { Categories } from './product-settings/categories/categories';
 import { Products } from './product/products';
 import { Customers } from './customer/customers';
 import { Users } from './user/users';
@@ -16,12 +16,12 @@ import { Suppliers } from './supplier/suppliers';
 import { PurchaseInvoices } from './purchase-invoice/purchase-invoices';
 import { PurchaseInvoiceForm } from './purchase-invoice/purchase-invoice-form';
 import { Settings } from './settings/settings';
-import { PricingCategories } from './settings/pricing-categories';
-import { GeneralSettings } from './settings/general-settings';
-import { SerialSettings } from './settings/serial-settings';
-import { Attributes } from './settings/attributes';
-import { ProductTemplates } from './settings/product-templates';
-import { Brands } from './settings/brands/brands';
+import { PricingCategories } from './settings/pricing-categories/pricing-categories';
+import { GeneralSettings } from './settings/general/general-settings';
+import { SerialSettings } from './settings/serial/serial-settings';
+import { Attributes } from './product-settings/attributes/attributes';
+import { ProductTemplates } from './product-settings/product-templates/product-templates';
+import { Brands } from './product-settings/brands/brands';
 import { ProductSettings } from './product-settings/product-settings';
 
 export const routes: Routes = [
@@ -86,7 +86,6 @@ export const routes: Routes = [
           { path: 'product-templates', component: ProductTemplates },
         ],
       },
-      // { path: 'customers', component: Entries },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

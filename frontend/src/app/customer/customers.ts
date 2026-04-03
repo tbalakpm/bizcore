@@ -6,7 +6,7 @@ import { type Customer, type Address, CustomerList, CustomerService } from './cu
 import { AddressForm } from '../shared/components/address-form';
 import { PermissionService } from '../auth/permission.service';
 import { GstService } from '../shared/services/gst.service';
-import { PricingCategoryService, PricingCategory } from '../settings/pricing-category-service';
+import { PricingCategoryService, PricingCategory } from '../settings/pricing-categories/pricing-category-service';
 
 
 import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';

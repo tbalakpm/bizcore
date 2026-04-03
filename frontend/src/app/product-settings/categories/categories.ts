@@ -3,7 +3,7 @@ import { CategoryService, Category, CategoryList } from './category-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { PermissionService } from '../auth/permission.service';
+import { PermissionService } from '../../auth/permission.service';
 
 import { NzTableModule, NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -18,7 +18,7 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
-import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-categories',

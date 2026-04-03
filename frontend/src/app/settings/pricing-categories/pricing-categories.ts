@@ -16,11 +16,11 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { PermissionService } from '../auth/permission.service';
-import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
+import { PermissionService } from '../../auth/permission.service';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 import { PricingCategoryService, PricingCategory, ProductMargin } from './pricing-category-service';
-import { ProductService, Product } from '../product/product-service';
+import { ProductService, Product } from '../../product/product-service';
 
 @Component({
   selector: 'app-pricing-categories',

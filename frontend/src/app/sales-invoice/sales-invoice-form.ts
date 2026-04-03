@@ -10,7 +10,7 @@ import { type Product, ProductService } from '../product/product-service';
 import { type Customer, CustomerService } from '../customer/customer-service';
 import { type SalesInvoiceItem, SalesInvoiceService, SalesInvoice } from './sales-invoice-service';
 import { type Inventory, InventoryService } from '../inventory/inventory-service';
-import { PricingCategoryService, ProductMargin } from '../settings/pricing-category-service';
+import { PricingCategoryService, ProductMargin } from '../settings/pricing-categories/pricing-category-service';
 import { SettingsService } from '../settings/settings.service';
 
 import { NzSelectModule } from 'ng-zorro-antd/select';
