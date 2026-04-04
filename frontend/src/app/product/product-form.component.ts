@@ -20,6 +20,7 @@ import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzTableModule } from 'ng-zorro-antd/table';
+import { SettingsService } from '../settings/settings.service';
 
 @Component({
   selector: 'app-product-form',
@@ -43,8 +44,10 @@ export class ProductFormComponent implements OnInit, OnChanges {
   private attributeService = inject(AttributeService);
   private templateService = inject(ProductTemplateService);
   private taxRateService = inject(TaxRateService);
+  private settings = inject(SettingsService);
 
   categories = signal<Category[]>([]);
+
   structuredCategories = computed(() => {
     const cats = this.categories();
     const roots = cats.filter(c => !c.parentCategoryId);
@@ -69,12 +72,15 @@ export class ProductFormComponent implements OnInit, OnChanges {
   templates = signal<ProductTemplate[]>([]);
   brands = signal<Brand[]>([]);
   taxRates = signal<TaxRate[]>([]);
+
+  useGlobalGtn = signal<boolean>(false);
+
   get filteredBrands(): Brand[] {
     const catId = this.product.categoryId;
     if (!catId) return this.brands();
-    return this.brands().filter(b => 
-      !b.categoryIds || 
-      b.categoryIds.length === 0 || 
+    return this.brands().filter(b =>
+      !b.categoryIds ||
+      b.categoryIds.length === 0 ||
       b.categoryIds.includes(catId)
     );
   }
@@ -82,16 +88,20 @@ export class ProductFormComponent implements OnInit, OnChanges {
   error: string | null = null;
   productList = signal<Product[]>([]);
 
-  product: Partial<Product> = this.blankProduct();
+  product: Partial<Product> = {}; //this.blankProduct();
 
   ngOnInit(): void {
-    this.categoryService.getAll({ limit: 1000 }).subscribe((res) => this.categories.set(res.data));
-    this.attributeService.getAttributes().subscribe((res) => this.allAttributes.set(res));
-    this.templateService.getTemplates().subscribe((res) => this.templates.set(res));
-    this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
-    this.brandService.getAll({ limit: 1000 }).subscribe((res) => this.brands.set(res.data.filter(b => b.isActive)));
-    this.taxRateService.getAll().subscribe((res) => this.taxRates.set(res.data));
-    this.loadProduct();
+    this.settings.getSetting('use_global_gtn').subscribe((res) => {
+      this.useGlobalGtn.set(res.value === 'true');
+
+      this.categoryService.getAll({ limit: 1000 }).subscribe((res) => this.categories.set(res.data));
+      this.attributeService.getAttributes().subscribe((res) => this.allAttributes.set(res));
+      this.templateService.getTemplates().subscribe((res) => this.templates.set(res));
+      this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
+      this.brandService.getAll({ limit: 1000 }).subscribe((res) => this.brands.set(res.data.filter(b => b.isActive)));
+      this.taxRateService.getAll().subscribe((res) => this.taxRates.set(res.data));
+      this.loadProduct();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -168,7 +178,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
 
   getTemplateAttributes(): Attribute[] {
     let tId = this.product.templateId;
-    
+
     // If simple, inherit template from parent
     if (this.product.productType === 'simple' && this.product.parentId) {
       const parentProd = this.productList().find(p => p.id === this.product.parentId);
@@ -221,7 +231,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
       gtnPrefix: undefined,
       gtnStartPos: 1,
       gtnLength: 10,
-      useGlobal: true,
+      useGlobal: this.useGlobalGtn(),
       trackBundleGtn: true,
       isTaxInclusive: false,
       isActive: true,

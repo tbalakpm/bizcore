@@ -20,6 +20,7 @@ settingsRouter.get('/:key', async (req, res) => {
 });
 
 settingsRouter.put('/:key', async (req, res) => {
+
   const key = req.params.key;
   const { value } = req.body;
 

@@ -9,7 +9,7 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 
 import { SettingsService } from '../settings.service';
-import { forkJoin } from 'rxjs';
+import { zip } from 'rxjs';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -44,6 +44,7 @@ export class GeneralSettings implements OnInit {
   states = signal<State[]>([]);
 
   settings: Record<string, any> = {
+    // Company
     company_name: '',
     company_gstin: '',
     company_address_line1: '',
@@ -51,15 +52,23 @@ export class GeneralSettings implements OnInit {
     company_state: '',
     company_postal_code: '',
     company_phone: '',
+
+    // Bank
     bank_name: '',
     bank_account: '',
     bank_ifsc: '',
+
+    // Tax & Invoice
     sgst_sharing_rate: 50,
     igst_sharing_rate: 100,
     invoice_terms: '',
+
+    // Barcode
     barcode_width: '2',
     barcode_height: '1.2',
     barcode_columns: 1,
+
+    // GTN
     use_global_gtn: true,
     gtn_mode: 'auto', // auto, manual
     gtn_generation: 'tag', // code, batch, tag, manual
@@ -85,6 +94,8 @@ export class GeneralSettings implements OnInit {
             // parse numbers if applicable
             if (s.key === 'sgst_sharing_rate' || s.key === 'igst_sharing_rate' || s.key === 'barcode_columns') {
               this.settings[s.key] = s.value ? Number(s.value) : null;
+            } else if (s.key === 'use_global_gtn') {
+              this.settings[s.key] = s.value === 'true';
             } else {
               this.settings[s.key] = s.value;
             }
@@ -109,7 +120,7 @@ export class GeneralSettings implements OnInit {
       return this.settingsService.updateSetting(key, val);
     });
 
-    forkJoin(requests).subscribe({
+    zip(requests).subscribe({
       next: () => {
         this.message.success('Settings saved successfully');
         this.saving = false;

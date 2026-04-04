@@ -41,9 +41,9 @@ import stateRouter from "./routes/state.router";
 
 export async function app() {
   LogService.info(`Starting BizCore API`, { environment: config.environment });
-  if (config.environment === "development") {
-    console.table(config)
-  }
+  // if (config.environment === "development") {
+  //   console.table(config)
+  // }
 
   await initializeDatabase();
   if (config.autoMigrateOnStartup) {
