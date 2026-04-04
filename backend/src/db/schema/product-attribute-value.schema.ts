@@ -9,7 +9,7 @@ export const productAttributeValues = sqliteTable('product_attribute_values', {
 
   productId: integer('product_id')
     .notNull()
-    .references(() => products.id),
+    .references(() => products.id, { onDelete: 'cascade' }),
 
   attributeId: integer('attribute_id')
     .notNull()

@@ -10,7 +10,7 @@ export const productSerialNumbers = sqliteTable(
 
     productId: integer('product_id')
       .notNull()
-      .references(() => products.id),
+      .references(() => products.id, { onDelete: 'cascade' }),
 
     prefix: text('prefix', { length: 50 })
       .notNull()
