@@ -1,4 +1,4 @@
-import { sqliteTable, integer, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { brands } from './brand.schema';
 import { categories } from './category.schema';
 
@@ -18,7 +18,8 @@ export const brandCategories = sqliteTable(
       .references(() => categories.id, { onDelete: 'cascade' }),
   },
   (t) => [
-    index('brand_categories_brand_id_idx').on(t.brandId),
+    uniqueIndex('brand_categories_brand_id_category_id_unique').on(t.brandId, t.categoryId),
+    // index('brand_categories_brand_id_idx').on(t.brandId),
     index('brand_categories_category_id_idx').on(t.categoryId),
   ]
 );

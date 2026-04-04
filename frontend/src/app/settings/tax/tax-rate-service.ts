@@ -6,12 +6,12 @@ import { environment } from '../../../environments/environment';
 export interface TaxRate {
   id: number;
   rate: number;
-  cgst_rate: number;
-  sgst_rate: number;
-  igst_rate: number;
-  cess_rate: number;
-  cess_amount: number;
-  effective_from: string;
+  cgstRate: number;
+  sgstRate: number;
+  igstRate: number;
+  cessRate: number;
+  cessAmount: number;
+  effectiveFrom: string;
 }
 
 @Injectable({ providedIn: 'root' })

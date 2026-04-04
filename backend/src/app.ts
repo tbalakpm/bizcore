@@ -40,8 +40,11 @@ import stateRouter from "./routes/state.router";
 
 
 export async function app() {
-  console.table(config)
   LogService.info(`Starting BizCore API`, { environment: config.environment });
+  if (config.environment === "development") {
+    console.table(config)
+  }
+
   await initializeDatabase();
   if (config.autoMigrateOnStartup) {
     await migrateDatabase();
@@ -110,7 +113,6 @@ export async function app() {
   app.use("/api/tax-rates", authRequired, taxRatesRouter);
   app.use("/api/tax-rules", authRequired, taxRulesRouter);
   app.use("/api/states", authRequired, stateRouter);
-
 
   // Handle any requests that don't match the static files by serving the index.html file
   app.get("/{*any}", (req, res, next) => {

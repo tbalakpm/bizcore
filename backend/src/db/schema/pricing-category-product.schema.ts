@@ -31,7 +31,6 @@ export const pricingCategoryProducts = sqliteTable(
   },
   (t) => [
     index('pcp_pricing_category_id_idx').on(t.pricingCategoryId),
-
     index('pcp_product_id_idx').on(t.productId),
   ]
 );

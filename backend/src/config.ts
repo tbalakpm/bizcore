@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const isDevelopment = nodeEnv === 'development';
-const dotenvConfigPath = isDevelopment ? './.env/.env.local' : './.env/.env.production';
+const dotenvConfigPath = isDevelopment ? '.env/.env.local' : '.env/.env.production';
 
 dotenv.config({ path: dotenvConfigPath });
 
@@ -20,6 +20,7 @@ export const config = {
   environment: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '4000', 10),
   isDevelopment,
+  logLevel: process.env.LOG_LEVEL || 'info',
   corsOrigins: process.env.CORS_ORIGINS?.split(',') || [],
   jwtSecret: jwtSecretFromEnv || 'dev-only-insecure-jwt-secret',
   jwtRefreshSecret: jwtRefreshSecretFromEnv || 'dev-only-insecure-refresh-secret',

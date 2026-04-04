@@ -428,7 +428,7 @@ export class SalesInvoiceForm implements OnInit {
         }
 
         item.taxPct = this.editingInvoice.type === 'estimate' ? 0 : this.getEffectiveTaxRate(product, basePrice);
-        
+
         // Determine tax inclusive mode: Invoice override > Product setting
         const isTaxInclusive = this.editingInvoice.isTaxInclusive !== null && this.editingInvoice.isTaxInclusive !== undefined
           ? this.editingInvoice.isTaxInclusive
@@ -565,7 +565,7 @@ export class SalesInvoiceForm implements OnInit {
   getEffectiveTaxRate(product: Product, unitPrice: number): number {
     const hsn = product.hsnSac || '';
     const rules = this.taxRules();
-    
+
     // Find matching rules
     const matchingRules = rules.filter(r => {
       const hsnMatch = hsn.startsWith(r.hsnCodeStartsWith || '');
@@ -576,7 +576,7 @@ export class SalesInvoiceForm implements OnInit {
     if (matchingRules.length > 0) {
       // Sort by HSN prefix length descending to find most specific match
       matchingRules.sort((a, b) => (b.hsnCodeStartsWith?.length || 0) - (a.hsnCodeStartsWith?.length || 0));
-      return Number(matchingRules[0].tax_rate);
+      return Number(matchingRules[0].taxRate);
     }
 
     return Number(product.taxRate || 0);

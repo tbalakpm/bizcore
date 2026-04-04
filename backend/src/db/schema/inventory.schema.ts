@@ -55,7 +55,6 @@ export const inventories = sqliteTable(
   },
   (t) => [
     uniqueIndex('inventories_gtn_unique').on(t.gtn),
-
     index('inventories_product_id_idx').on(t.productId),
   ]
 );

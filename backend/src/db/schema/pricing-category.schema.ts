@@ -12,7 +12,6 @@ export const pricingCategories = sqliteTable(
   },
   (t) => [
     uniqueIndex('pricing_categories_code_unique').on(t.code),
-
     uniqueIndex('pricing_categories_name_unique').on(t.name),
   ]
 );

@@ -8,8 +8,8 @@ export interface TaxRule {
   hsnCodeStartsWith: string;
   minPrice: number;
   maxPrice: number;
-  tax_rate: number;
-  effective_from: string;
+  taxRate: number;
+  effectiveFrom: string;
 }
 
 @Injectable({ providedIn: 'root' })

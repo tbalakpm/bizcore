@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { products } from "./product.schema";
 
 export const productBundles = sqliteTable("product_bundles", {
@@ -14,8 +14,8 @@ export const productBundles = sqliteTable("product_bundles", {
 
     quantity: integer("quantity").notNull().default(1),
 }, (t) => [
-    index('product_bundles_bundle_product_id_idx').on(t.bundleProductId),
-
+    uniqueIndex('product_bundles_bundle_product_id_product_id_unique').on(t.bundleProductId, t.productId),
+    // index('product_bundles_bundle_product_id_idx').on(t.bundleProductId),
     index('product_bundles_product_id_idx').on(t.productId),
 ]);
 

@@ -30,17 +30,11 @@ export const customers = sqliteTable(
   },
   (t) => [
     check('type_must_be_in_list', sql`${t.type} IN ('retail','wholesale')`),
-
     uniqueIndex('customers_code_unique').on(t.code),
-
     uniqueIndex('customers_name_unique').on(t.name),
-
     index('customers_billing_address_id_idx').on(t.billingAddressId),
-
     index('customers_shipping_address_id_idx').on(t.shippingAddressId),
-
     index('cusotomers_gstin_idx').on(t.gstin),
-
     index('customers_pricing_category_id_idx').on(t.pricingCategoryId)
   ]
 );

@@ -46,7 +46,6 @@ export const stockInvoiceItems = sqliteTable('stock_invoice_items', {
     .default(0.00)
 }, (t) => [
   index('stock_invoice_items_stock_invoice_id_idx').on(t.stockInvoiceId),
-
   index('stock_invoice_items_inventory_id_idx').on(t.inventoryId)
 ]);
 

@@ -6,7 +6,14 @@
 </div>
 
 @if (error) {
-  <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4" (nzOnClose)="error = null"></nz-alert>
+  <nz-alert
+    nzType="error"
+    [nzMessage]="error"
+    nzShowIcon
+    nzCloseable
+    class="mb-4"
+    (nzOnClose)="error = null"
+  ></nz-alert>
 }
 
 <nz-tabs>
@@ -19,47 +26,86 @@
           <nz-form-item>
             <nz-form-label nzRequired>Total Rate (%)</nz-form-label>
             <nz-form-control>
-              <nz-input-number [(ngModel)]="rateForm.rate" name="rate" (ngModelChange)="onRateValueChange($event)" [nzMin]="0" [nzStep]="1"></nz-input-number>
+              <nz-input-number
+                [(ngModel)]="rateForm.rate"
+                name="rate"
+                (ngModelChange)="onRateValueChange($event)"
+                [nzMin]="0"
+                [nzStep]="1"
+              ></nz-input-number>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label>CGST (%)</nz-form-label>
             <nz-form-control>
-              <nz-input-number [(ngModel)]="rateForm.cgst_rate" name="cgst" [nzMin]="0" [nzStep]="0.1"></nz-input-number>
+              <nz-input-number
+                [(ngModel)]="rateForm.cgstRate"
+                name="cgst"
+                [nzMin]="0"
+                [nzStep]="0.1"
+              ></nz-input-number>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label>SGST (%)</nz-form-label>
             <nz-form-control>
-              <nz-input-number [(ngModel)]="rateForm.sgst_rate" name="sgst" [nzMin]="0" [nzStep]="0.1"></nz-input-number>
+              <nz-input-number
+                [(ngModel)]="rateForm.sgstRate"
+                name="sgst"
+                [nzMin]="0"
+                [nzStep]="0.1"
+              ></nz-input-number>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label>IGST (%)</nz-form-label>
             <nz-form-control>
-              <nz-input-number [(ngModel)]="rateForm.igst_rate" name="igst" [nzMin]="0" [nzStep]="0.1"></nz-input-number>
+              <nz-input-number
+                [(ngModel)]="rateForm.igstRate"
+                name="igst"
+                [nzMin]="0"
+                [nzStep]="0.1"
+              ></nz-input-number>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label>CESS (%)</nz-form-label>
             <nz-form-control>
-              <nz-input-number [(ngModel)]="rateForm.cess_rate" name="cess_rate" [nzMin]="0" [nzStep]="0.1"></nz-input-number>
+              <nz-input-number
+                [(ngModel)]="rateForm.cessRate"
+                name="cess_rate"
+                [nzMin]="0"
+                [nzStep]="0.1"
+              ></nz-input-number>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label>CESS (₹)</nz-form-label>
             <nz-form-control>
-              <nz-input-number [(ngModel)]="rateForm.cess_amount" name="cess_amount" [nzMin]="0" [nzStep]="1"></nz-input-number>
+              <nz-input-number
+                [(ngModel)]="rateForm.cessAmount"
+                name="cess_amount"
+                [nzMin]="0"
+                [nzStep]="1"
+              ></nz-input-number>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <label class="block text-[14px]">Effective From</label>
-            <nz-date-picker [(ngModel)]="rateForm.effective_from" name="rate_eff" style="width: 140px;"></nz-date-picker>
+            <nz-date-picker
+              [(ngModel)]="rateForm.effectiveFrom"
+              name="rate_eff"
+              style="width: 140px"
+            ></nz-date-picker>
           </nz-form-item>
           <nz-form-item>
             <nz-form-control>
               <div class="flex gap-2">
-                <button nz-button nzType="primary" (click)="editingRate ? saveEditRate() : addRate()">
+                <button
+                  nz-button
+                  nzType="primary"
+                  (click)="editingRate ? saveEditRate() : addRate()"
+                >
                   {{ editingRate ? 'Save' : 'Add' }}
                 </button>
                 @if (editingRate) {
@@ -89,20 +135,35 @@
         @for (r of ratesTable.data; track r.id) {
           <tr>
             <td class="font-bold">{{ r.rate }}%</td>
-            <td>{{ r.cgst_rate }}%</td>
-            <td>{{ r.sgst_rate }}%</td>
-            <td>{{ r.igst_rate }}%</td>
-            <td>{{ r.cess_rate }}%</td>
-            <td>₹{{ r.cess_amount }}</td>
-            <td>{{ r.effective_from }}</td>
+            <td>{{ r.cgstRate }}%</td>
+            <td>{{ r.sgstRate }}%</td>
+            <td>{{ r.igstRate }}%</td>
+            <td>{{ r.cessRate }}%</td>
+            <td>₹{{ r.cessAmount }}</td>
+            <td>{{ r.effectiveFrom }}</td>
             <td class="text-right">
               @if (permissionService.canEdit('settings-tax')) {
-                <button nz-button nzType="link" (click)="startEditRate(r)" nz-tooltip nzTooltipTitle="Edit">
+                <button
+                  nz-button
+                  nzType="link"
+                  (click)="startEditRate(r)"
+                  nz-tooltip
+                  nzTooltipTitle="Edit"
+                >
                   <span nz-icon nzType="edit"></span>
                 </button>
               }
               @if (permissionService.canDelete('settings-tax')) {
-                <button nz-button nzType="link" nzDanger nz-popconfirm nzPopconfirmTitle="Are you sure?" (nzOnConfirm)="deleteRate(r)" nz-tooltip nzTooltipTitle="Delete">
+                <button
+                  nz-button
+                  nzType="link"
+                  nzDanger
+                  nz-popconfirm
+                  nzPopconfirmTitle="Are you sure?"
+                  (nzOnConfirm)="deleteRate(r)"
+                  nz-tooltip
+                  nzTooltipTitle="Delete"
+                >
                   <span nz-icon nzType="delete"></span>
                 </button>
               }
@@ -121,25 +182,38 @@
           <nz-form-item>
             <nz-form-label nzRequired>HSN Starts With</nz-form-label>
             <nz-form-control>
-              <input nz-input [(ngModel)]="ruleForm.hsnCodeStartsWith" name="hsn" placeholder="e.g. 8517" />
+              <input
+                nz-input
+                [(ngModel)]="ruleForm.hsnCodeStartsWith"
+                name="hsn"
+                placeholder="e.g. 8517"
+              />
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label>Min Price (₹)</nz-form-label>
             <nz-form-control>
-              <nz-input-number [(ngModel)]="ruleForm.minPrice" name="minP" [nzMin]="0"></nz-input-number>
+              <nz-input-number
+                [(ngModel)]="ruleForm.minPrice"
+                name="minP"
+                [nzMin]="0"
+              ></nz-input-number>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label>Max Price (₹)</nz-form-label>
             <nz-form-control>
-              <nz-input-number [(ngModel)]="ruleForm.maxPrice" name="maxP" [nzMin]="0"></nz-input-number>
+              <nz-input-number
+                [(ngModel)]="ruleForm.maxPrice"
+                name="maxP"
+                [nzMin]="0"
+              ></nz-input-number>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label nzRequired>Tax Rate (%)</nz-form-label>
             <nz-form-control>
-              <nz-select [(ngModel)]="ruleForm.tax_rate" name="ruleRate" style="width: 120px;">
+              <nz-select [(ngModel)]="ruleForm.taxRate" name="ruleRate" style="width: 120px">
                 @for (rate of taxRates(); track rate.id) {
                   <nz-option [nzValue]="rate.rate" [nzLabel]="rate.rate + '%'"></nz-option>
                 }
@@ -148,12 +222,20 @@
           </nz-form-item>
           <nz-form-item>
             <label class="block text-[14px]">Effective From</label>
-            <nz-date-picker [(ngModel)]="ruleForm.effective_from" name="rule_eff" style="width: 140px;"></nz-date-picker>
+            <nz-date-picker
+              [(ngModel)]="ruleForm.effectiveFrom"
+              name="rule_eff"
+              style="width: 140px"
+            ></nz-date-picker>
           </nz-form-item>
           <nz-form-item>
             <nz-form-control>
               <div class="flex gap-2">
-                <button nz-button nzType="primary" (click)="editingRule ? saveEditRule() : addRule()">
+                <button
+                  nz-button
+                  nzType="primary"
+                  (click)="editingRule ? saveEditRule() : addRule()"
+                >
                   {{ editingRule ? 'Save' : 'Add' }}
                 </button>
                 @if (editingRule) {
@@ -183,16 +265,31 @@
             <td>{{ r.hsnCodeStartsWith }}</td>
             <td>₹{{ r.minPrice }}</td>
             <td>₹{{ r.maxPrice }}</td>
-            <td class="font-bold">{{ r.tax_rate }}%</td>
-            <td>{{ r.effective_from }}</td>
+            <td class="font-bold">{{ r.taxRate }}%</td>
+            <td>{{ r.effectiveFrom }}</td>
             <td class="text-right">
               @if (permissionService.canEdit('settings-tax')) {
-                <button nz-button nzType="link" (click)="startEditRule(r)" nz-tooltip nzTooltipTitle="Edit">
+                <button
+                  nz-button
+                  nzType="link"
+                  (click)="startEditRule(r)"
+                  nz-tooltip
+                  nzTooltipTitle="Edit"
+                >
                   <span nz-icon nzType="edit"></span>
                 </button>
               }
               @if (permissionService.canDelete('settings-tax')) {
-                <button nz-button nzType="link" nzDanger nz-popconfirm nzPopconfirmTitle="Are you sure?" (nzOnConfirm)="deleteRule(r)" nz-tooltip nzTooltipTitle="Delete">
+                <button
+                  nz-button
+                  nzType="link"
+                  nzDanger
+                  nz-popconfirm
+                  nzPopconfirmTitle="Are you sure?"
+                  (nzOnConfirm)="deleteRule(r)"
+                  nz-tooltip
+                  nzTooltipTitle="Delete"
+                >
                   <span nz-icon nzType="delete"></span>
                 </button>
               }
@@ -211,34 +308,63 @@
           <nz-form-item>
             <nz-form-label nzRequired>State Name</nz-form-label>
             <nz-form-control>
-              <input nz-input [(ngModel)]="stateForm.stateName" name="stName" placeholder="e.g. Tamil Nadu" />
+              <input
+                nz-input
+                [(ngModel)]="stateForm.stateName"
+                name="stName"
+                placeholder="e.g. Tamil Nadu"
+              />
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label nzRequired>State Code (GST)</nz-form-label>
             <nz-form-control>
-              <input nz-input [(ngModel)]="stateForm.stateCode" name="stCode" placeholder="e.g. 33" maxlength="2" />
+              <input
+                nz-input
+                [(ngModel)]="stateForm.stateCode"
+                name="stCode"
+                placeholder="e.g. 33"
+                maxlength="2"
+              />
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label nzRequired>Short Code</nz-form-label>
             <nz-form-control>
-              <input nz-input [(ngModel)]="stateForm.stateShortCode" name="stShort" placeholder="e.g. TN" maxlength="5" />
+              <input
+                nz-input
+                [(ngModel)]="stateForm.stateShortCode"
+                name="stShort"
+                placeholder="e.g. TN"
+                maxlength="5"
+              />
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label>Country</nz-form-label>
             <nz-form-control>
-              <input nz-input [(ngModel)]="stateForm.countryCode" name="stCountry" placeholder="IN" maxlength="2" />
+              <input
+                nz-input
+                [(ngModel)]="stateForm.countryCode"
+                name="stCountry"
+                placeholder="IN"
+                maxlength="2"
+              />
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
-            <label nz-checkbox [(ngModel)]="stateForm.isUnionTerritory" name="stUT">Union Territory</label>
+            <label nz-checkbox [(ngModel)]="stateForm.isUnionTerritory" name="stUT"
+              >Union Territory</label
+            >
           </nz-form-item>
           <nz-form-item>
             <nz-form-control>
               <div class="flex gap-2">
-                <button nz-button nzType="primary" (click)="editingState ? saveEditState() : addState()">
+                <button
+                  nz-button
+                  nzType="primary"
+                  (click)="editingState ? saveEditState() : addState()"
+                >
                   {{ editingState ? 'Save' : 'Add' }}
                 </button>
                 @if (editingState) {
@@ -280,12 +406,27 @@
             </td>
             <td class="text-right">
               @if (permissionService.canEdit('settings-tax')) {
-                <button nz-button nzType="link" (click)="startEditState(s)" nz-tooltip nzTooltipTitle="Edit">
+                <button
+                  nz-button
+                  nzType="link"
+                  (click)="startEditState(s)"
+                  nz-tooltip
+                  nzTooltipTitle="Edit"
+                >
                   <span nz-icon nzType="edit"></span>
                 </button>
               }
               @if (permissionService.canDelete('settings-tax')) {
-                <button nz-button nzType="link" nzDanger nz-popconfirm nzPopconfirmTitle="Are you sure?" (nzOnConfirm)="deleteState(s)" nz-tooltip nzTooltipTitle="Delete">
+                <button
+                  nz-button
+                  nzType="link"
+                  nzDanger
+                  nz-popconfirm
+                  nzPopconfirmTitle="Are you sure?"
+                  (nzOnConfirm)="deleteState(s)"
+                  nz-tooltip
+                  nzTooltipTitle="Delete"
+                >
                   <span nz-icon nzType="delete"></span>
                 </button>
               }

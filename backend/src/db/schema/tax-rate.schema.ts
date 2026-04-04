@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const taxRates = sqliteTable('tax_rates', {
     id: integer('id')
@@ -8,24 +8,26 @@ export const taxRates = sqliteTable('tax_rates', {
     rate: integer('rate')
         .notNull(),
 
-    cgst_rate: integer('cgst_rate')
+    cgstRate: integer('cgst_rate')
         .notNull(),
 
-    sgst_rate: integer('sgst_rate')
+    sgstRate: integer('sgst_rate')
         .notNull(),
 
-    igst_rate: integer('igst_rate')
+    igstRate: integer('igst_rate')
         .notNull(),
 
-    cess_rate: integer('cess_rate')
+    cessRate: integer('cess_rate')
         .notNull(),
 
-    cess_amount: integer('cess_amount')
+    cessAmount: integer('cess_amount')
         .notNull(),
 
-    effective_from: text('effective_from')
+    effectiveFrom: text('effective_from')
         .notNull(),
-});
+}, (t) => [
+    uniqueIndex('tax_rates_rate_effective_from_unique').on(t.rate, t.effectiveFrom)
+]);
 
 export type TaxRate = typeof taxRates.$inferSelect;
 export type NewTaxRate = typeof taxRates.$inferInsert;

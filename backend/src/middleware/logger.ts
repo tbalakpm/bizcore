@@ -15,7 +15,8 @@ export function logger(req: Request, res: Response, next: NextFunction): void {
       const timeTaken = Date.now() - startTime;
       const statusCode = res.statusCode;
 
-      const meta = { method, url, ip, statusCode, timeTaken, responseSize };
+      // const meta = { method, url, ip, statusCode, timeTaken, responseSize };
+      const meta = { ip }
 
       if (statusCode >= 500) {
         LogService.error(`${method} ${url} - ${statusCode} [${timeTaken}ms, ${responseSize}B]`, undefined, meta);

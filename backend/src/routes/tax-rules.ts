@@ -35,7 +35,7 @@ taxRulesRouter.get('/:id', async (req: Request, res: Response) => {
 });
 
 taxRulesRouter.post('/', async (req, res) => {
-  const { hsnCodeStartsWith, minPrice, maxPrice, tax_rate, effective_from } = req.body;
+  const { hsnCodeStartsWith, minPrice, maxPrice, taxRate, effectiveFrom } = req.body;
 
   try {
     const inserted = await db
@@ -44,8 +44,8 @@ taxRulesRouter.post('/', async (req, res) => {
         hsnCodeStartsWith: hsnCodeStartsWith || '',
         minPrice: toNumber(minPrice),
         maxPrice: toNumber(maxPrice),
-        tax_rate: toNumber(tax_rate),
-        effective_from: effective_from || new Date().toISOString().split('T')[0],
+        taxRate: toNumber(taxRate),
+        effectiveFrom: effectiveFrom || new Date().toISOString().split('T')[0],
       })
       .returning()
       .get();
@@ -73,13 +73,13 @@ taxRulesRouter.put('/:id', async (req, res) => {
     return res.status(404).json({ error: 'Tax rule not found' });
   }
 
-  const { hsnCodeStartsWith, minPrice, maxPrice, tax_rate, effective_from } = req.body;
+  const { hsnCodeStartsWith, minPrice, maxPrice, taxRate, effectiveFrom } = req.body;
   const updateData: any = {};
   if (hsnCodeStartsWith !== undefined) updateData.hsnCodeStartsWith = hsnCodeStartsWith;
   if (minPrice !== undefined) updateData.minPrice = toNumber(minPrice);
   if (maxPrice !== undefined) updateData.maxPrice = toNumber(maxPrice);
-  if (tax_rate !== undefined) updateData.tax_rate = toNumber(tax_rate);
-  if (effective_from !== undefined) updateData.effective_from = effective_from;
+  if (taxRate !== undefined) updateData.taxRate = toNumber(taxRate);
+  if (effectiveFrom !== undefined) updateData.effectiveFrom = effectiveFrom;
 
   await db
     .update(taxRules)

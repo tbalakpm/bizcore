@@ -3,10 +3,16 @@ import { auditFields, keyFieldsNoCode } from './base';
 
 export const attributes = sqliteTable('attributes', {
   ...keyFieldsNoCode,
-  description: text('description'),
-  type: text('type', { enum: ['single_select', 'multi_select', 'text', 'number', 'boolean'] }).notNull(),
+
+  description: text('description', { length: 255 }),
+
+  type: text('type', { enum: ['single_select', 'multi_select', 'text', 'number', 'boolean'] })
+    .notNull(),
+
   options: text('options'), // JSON string [ "S", "M", "L" ]
-  defaultValue: text('default_value'), // JSON string [ "S" ]
+
+  defaultValue: text('default_value', { length: 255 }), // JSON string [ "S" ]
+
   ...auditFields,
 });
 

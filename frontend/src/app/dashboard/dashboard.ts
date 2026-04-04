@@ -3,16 +3,14 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, inject, type OnInit, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { ChartConfiguration, ChartOptions } from 'chart.js';
-// import { BaseChartDirective } from 'ng2-charts';
-// import { type Entry, EntryService } from '../entry/entry-service';
-import { getLocalYYYYMMDD } from '../utils/datefns';
+import { BaseChartDirective } from 'ng2-charts';
+// import { getLocalYYYYMMDD } from '../utils/datefns';
 
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { DashboardService, type DashboardSummary } from './dashboard-service';
-import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-dashboard',

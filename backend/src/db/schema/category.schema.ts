@@ -7,13 +7,14 @@ export const categories = sqliteTable(
     ...keyFields,
 
     description: text('description', { length: 255 }),
-    parentCategoryId: integer('parent_category_id').references((): any => categories.id),
+
+    parentCategoryId: integer('parent_category_id')
+      .references((): any => categories.id),
 
     ...auditFields
   },
   (t) => [
     uniqueIndex('categories_code_unique').on(t.code),
-
     uniqueIndex('categories_name_unique').on(t.name)
   ]
 );

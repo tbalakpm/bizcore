@@ -23,13 +23,9 @@ export const suppliers = sqliteTable(
   },
   (t) => [
     uniqueIndex('suppliers_code_unique').on(t.code),
-
     uniqueIndex('suppliers_name_unique').on(t.name),
-
     index('suppliers_billing_address_id_idx').on(t.billingAddressId),
-
     index('suppliers_shipping_address_id_idx').on(t.shippingAddressId),
-
     index('suppliers_gstin_idx').on(t.gstin)
   ]
 );

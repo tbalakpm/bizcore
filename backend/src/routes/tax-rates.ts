@@ -1,7 +1,7 @@
-import { and, eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
-import { taxRates, db } from '../db';
+import { taxRates, db, TaxRate } from '../db';
 import { LogService } from '../core/logger/logger.service';
 import { auditLog } from '../core/logger/audit.service';
 import { toNumber } from '../utils/number.util';
@@ -35,19 +35,19 @@ taxRatesRouter.get('/:id', async (req: Request, res: Response) => {
 });
 
 taxRatesRouter.post('/', async (req, res) => {
-  const { rate, cgst_rate, sgst_rate, igst_rate, cess_rate, cess_amount, effective_from } = req.body;
+  const { rate, cgstRate, sgstRate, igstRate, cessRate, cessAmount, effectiveFrom } = req.body;
 
   try {
     const inserted = await db
       .insert(taxRates)
       .values({
         rate: toNumber(rate),
-        cgst_rate: toNumber(cgst_rate),
-        sgst_rate: toNumber(sgst_rate),
-        igst_rate: toNumber(igst_rate),
-        cess_rate: toNumber(cess_rate),
-        cess_amount: toNumber(cess_amount),
-        effective_from: effective_from || new Date().toISOString().split('T')[0],
+        cgstRate: toNumber(cgstRate),
+        sgstRate: toNumber(sgstRate),
+        igstRate: toNumber(igstRate),
+        cessRate: toNumber(cessRate),
+        cessAmount: toNumber(cessAmount),
+        effectiveFrom: effectiveFrom || new Date().toISOString().split('T')[0],
       })
       .returning()
       .get();
@@ -75,19 +75,19 @@ taxRatesRouter.put('/:id', async (req, res) => {
     return res.status(404).json({ error: 'Tax rate not found' });
   }
 
-  const { rate, cgst_rate, sgst_rate, igst_rate, cess_rate, cess_amount, effective_from } = req.body;
+  const { rate, cgstRate, sgstRate, igstRate, cessRate, cessAmount, effectiveFrom } = req.body;
   const updateData: any = {};
   if (rate !== undefined) updateData.rate = toNumber(rate);
-  if (cgst_rate !== undefined) updateData.cgst_rate = toNumber(cgst_rate);
-  if (sgst_rate !== undefined) updateData.sgst_rate = toNumber(sgst_rate);
-  if (igst_rate !== undefined) updateData.igst_rate = toNumber(igst_rate);
-  if (cess_rate !== undefined) updateData.cess_rate = toNumber(cess_rate);
-  if (cess_amount !== undefined) updateData.cess_amount = toNumber(cess_amount);
-  if (effective_from !== undefined) updateData.effective_from = effective_from;
+  if (cgstRate !== undefined) updateData.cgstRate = toNumber(cgstRate);
+  if (sgstRate !== undefined) updateData.sgstRate = toNumber(sgstRate);
+  if (igstRate !== undefined) updateData.igstRate = toNumber(igstRate);
+  if (cessRate !== undefined) updateData.cessRate = toNumber(cessRate);
+  if (cessAmount !== undefined) updateData.cessAmount = toNumber(cessAmount);
+  if (effectiveFrom !== undefined) updateData.effectiveFrom = effectiveFrom;
 
   await db
     .update(taxRates)
-    .set(updateData)
+    .set(updateData as TaxRate)
     .where(eq(taxRates.id, id))
     .run();
 

@@ -99,12 +99,12 @@ export class TaxSettings implements OnInit {
   defaultRateForm(): Partial<TaxRate> {
     return {
       rate: 0,
-      cgst_rate: 0,
-      sgst_rate: 0,
-      igst_rate: 0,
-      cess_rate: 0,
-      cess_amount: 0,
-      effective_from: new Date().toISOString().split('T')[0]
+      cgstRate: 0,
+      sgstRate: 0,
+      igstRate: 0,
+      cessRate: 0,
+      cessAmount: 0,
+      effectiveFrom: new Date().toISOString().split('T')[0]
     };
   }
 
@@ -113,8 +113,8 @@ export class TaxSettings implements OnInit {
       hsnCodeStartsWith: '',
       minPrice: 0,
       maxPrice: 0,
-      tax_rate: 0,
-      effective_from: new Date().toISOString().split('T')[0]
+      taxRate: 0,
+      effectiveFrom: new Date().toISOString().split('T')[0]
     };
   }
 
@@ -205,9 +205,9 @@ export class TaxSettings implements OnInit {
   }
 
   onRateValueChange(val: number) {
-    this.rateForm.cgst_rate = val / 2;
-    this.rateForm.sgst_rate = val / 2;
-    this.rateForm.igst_rate = val;
+    this.rateForm.cgstRate = val / 2;
+    this.rateForm.sgstRate = val / 2;
+    this.rateForm.igstRate = val;
   }
 
   // --- State Actions ---

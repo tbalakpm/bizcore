@@ -2,8 +2,8 @@ import { Config, defineConfig } from 'drizzle-kit';
 import { config } from './src/config';
 
 export default defineConfig({
-  schema: './src/db/schema',
-  out: './drizzle',
+  schema: 'src/db/schema',
+  out: 'drizzle',
   dialect: 'sqlite',
   // driver: "durable-sqlite",
   dbCredentials: {

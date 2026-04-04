@@ -21,7 +21,6 @@ export const stockInvoices = sqliteTable('stock_invoices', {
     .default(0.00)
 }, (t) => [
   uniqueIndex('stock_invoices_invoice_number_unique').on(t.invoiceNumber),
-
   index('stock_invoices_invoice_date_idx').on(t.invoiceDate)
 ]);
 

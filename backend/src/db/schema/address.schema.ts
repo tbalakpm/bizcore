@@ -39,11 +39,8 @@ export const addresses = sqliteTable(
   },
   (t) => [
     index('address_city_idx').on(t.city),
-
     index('address_phone_idx').on(t.phone),
-
     index('address_mobile_idx').on(t.mobile),
-
     index('address_email_idx').on(t.email)
   ]
 );

@@ -15,7 +15,7 @@ const shutdown = (server: Server) => {
 app()
   .then(({ express, port }) => {
     const server = express.listen(port, () => {
-      LogService.info(`Server (api) listening on http://localhost:${port}`);
+      LogService.info(`Server running on http://localhost:${port}`);
     });
 
     process.on('SIGINT', () => shutdown(server)); // Ctrl+C

@@ -43,10 +43,18 @@ export const purchaseInvoiceItems = sqliteTable('purchase_invoice_items', {
     taxAmount: real('tax_amount').generatedAlwaysAs(
         (): SQL => sql`(ROUND((qty * unit_price - discount_amount) * tax_pct / 100, 2))`
     ),
-    
-    sgstAmount: real('sgst_amount').notNull().default(0.00),
-    cgstAmount: real('cgst_amount').notNull().default(0.00),
-    igstAmount: real('igst_amount').notNull().default(0.00),
+
+    sgstAmount: real('sgst_amount')
+        .notNull()
+        .default(0.00),
+
+    cgstAmount: real('cgst_amount')
+        .notNull()
+        .default(0.00),
+
+    igstAmount: real('igst_amount')
+        .notNull()
+        .default(0.00),
 
     lineTotal: real('line_total').generatedAlwaysAs(
         (): SQL => sql`(ROUND((qty * unit_price - discount_amount) + tax_amount, 2))`
@@ -69,7 +77,6 @@ export const purchaseInvoiceItems = sqliteTable('purchase_invoice_items', {
         .default(0.00)
 }, (t) => [
     index('purchase_invoice_items_purchase_invoice_id_idx').on(t.purchaseInvoiceId),
-
     index('purchase_invoice_items_inventory_id_idx').on(t.inventoryId)
 ]);
 

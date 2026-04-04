@@ -1,15 +1,15 @@
-import { db, taxRates } from "../../db";
+import { db, TaxRate, taxRates } from "../../db";
 
 export const seedTaxRates = async () => {
     const existing = await db.select().from(taxRates).limit(1).all();
     if (existing.length > 0) return;
 
-    const initialTaxRates = [
-        { rate: 0, cgst_rate: 0, sgst_rate: 0, igst_rate: 0, cess_rate: 0, cess_amount: 0, effective_from: '2020-04-01' },
-        { rate: 5, cgst_rate: 2.5, sgst_rate: 2.5, igst_rate: 5, cess_rate: 0, cess_amount: 0, effective_from: '2020-04-01' },
-        { rate: 12, cgst_rate: 6, sgst_rate: 6, igst_rate: 12, cess_rate: 0, cess_amount: 0, effective_from: '2020-04-01' },
-        { rate: 18, cgst_rate: 9, sgst_rate: 9, igst_rate: 18, cess_rate: 0, cess_amount: 0, effective_from: '2020-04-01' },
-        { rate: 28, cgst_rate: 14, sgst_rate: 14, igst_rate: 28, cess_rate: 0, cess_amount: 0, effective_from: '2020-04-01' },
+    const initialTaxRates: Omit<TaxRate, 'id'>[] = [
+        { rate: 0, cgstRate: 0, sgstRate: 0, igstRate: 0, cessRate: 0, cessAmount: 0, effectiveFrom: '2020-04-01' },
+        { rate: 5, cgstRate: 2.5, sgstRate: 2.5, igstRate: 5, cessRate: 0, cessAmount: 0, effectiveFrom: '2020-04-01' },
+        { rate: 12, cgstRate: 6, sgstRate: 6, igstRate: 12, cessRate: 0, cessAmount: 0, effectiveFrom: '2020-04-01' },
+        { rate: 18, cgstRate: 9, sgstRate: 9, igstRate: 18, cessRate: 0, cessAmount: 0, effectiveFrom: '2020-04-01' },
+        { rate: 28, cgstRate: 14, sgstRate: 14, igstRate: 28, cessRate: 0, cessAmount: 0, effectiveFrom: '2020-04-01' },
     ];
 
     for (const taxRate of initialTaxRates) {

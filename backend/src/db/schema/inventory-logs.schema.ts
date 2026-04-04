@@ -32,7 +32,6 @@ export const inventoryLogs = sqliteTable("inventory_logs", {
         .default(sql`(CURRENT_TIMESTAMP)`)
 }, (t) => [
     index('inventory_logs_product_id_idx').on(t.productId),
-
     uniqueIndex('inventory_logs_gtn_idx').on(t.gtn),
 ]);
 
