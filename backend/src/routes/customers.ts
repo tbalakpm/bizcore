@@ -166,12 +166,16 @@ customersRouter.post('/', async (req, res) => {
       let shippingAddressId: number | undefined;
 
       if (bAddr && Object.keys(bAddr).length > 0) {
-        const addr = await tx.insert(addresses).values(bAddr).returning({ id: addresses.id }).get();
+        // Strip id if present
+        const { id: _, ...bAddrData } = bAddr;
+        const addr = await tx.insert(addresses).values(bAddrData).returning({ id: addresses.id }).get();
         billingAddressId = addr.id;
       }
 
       if (sAddr && Object.keys(sAddr).length > 0) {
-        const addr = await tx.insert(addresses).values(sAddr).returning({ id: addresses.id }).get();
+        // Strip id if present
+        const { id: _, ...sAddrData } = sAddr;
+        const addr = await tx.insert(addresses).values(sAddrData).returning({ id: addresses.id }).get();
         shippingAddressId = addr.id;
       }
 
@@ -226,24 +230,26 @@ customersRouter.put('/:id', async (req, res) => {
       let sAddrId = existingCustomer.shippingAddressId;
 
       if (bAddr) {
+        const { id: _, ...bAddrData } = bAddr;
         if (bAddrId) {
-          await tx.update(addresses).set(bAddr).where(eq(addresses.id, bAddrId)).run();
-        } else if (Object.keys(bAddr).length > 0) {
-          const addr = await tx.insert(addresses).values(bAddr).returning({ id: addresses.id }).get();
+          await tx.update(addresses).set(bAddrData).where(eq(addresses.id, bAddrId)).run();
+        } else if (Object.keys(bAddrData).length > 0) {
+          const addr = await tx.insert(addresses).values(bAddrData).returning({ id: addresses.id }).get();
           bAddrId = addr.id;
         }
       }
 
       if (sAddr) {
+        const { id: _, ...sAddrData } = sAddr;
         if (sAddrId) {
-          await tx.update(addresses).set(sAddr).where(eq(addresses.id, sAddrId)).run();
-        } else if (Object.keys(sAddr).length > 0) {
-          const addr = await tx.insert(addresses).values(sAddr).returning({ id: addresses.id }).get();
+          await tx.update(addresses).set(sAddrData).where(eq(addresses.id, sAddrId)).run();
+        } else if (Object.keys(sAddrData).length > 0) {
+          const addr = await tx.insert(addresses).values(sAddrData).returning({ id: addresses.id }).get();
           sAddrId = addr.id;
         }
       }
 
-      const newPricingCategoryId = pricingCategoryId !== undefined
+      const newPricingCategoryId = (pricingCategoryId !== undefined)
         ? (pricingCategoryId ? Number(pricingCategoryId) : null)
         : existingCustomer.pricingCategoryId;
 
