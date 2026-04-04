@@ -19,7 +19,7 @@ import { NzSelectComponent } from 'ng-zorro-antd/select';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzInputNumberModule, NzInputNumberComponent } from 'ng-zorro-antd/input-number';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -95,6 +95,7 @@ export class SalesInvoiceForm implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   @ViewChildren('itemRowSelect') itemRowSelects!: QueryList<NzSelectComponent>;
+  @ViewChildren('unitPriceInput') unitPriceInputs!: QueryList<NzInputNumberComponent>;
 
   products = signal<Product[]>([]);
   customers = signal<Customer[]>([]);
@@ -443,6 +444,30 @@ export class SalesInvoiceForm implements OnInit {
       }
       item.unitsInStock = inventory.unitsInStock;
       this.calculateLineTotal(item);
+
+      // Barcode scan flow: if price non-zero, next row; if zero price, focus price.
+      const index = this.editingInvoice.items.indexOf(item);
+      if (item.unitPrice > 0) {
+        if (index === this.editingInvoice.items.length - 1) {
+          this.addItemRow();
+        } else {
+          // Focus the GTN field of the next row
+          setTimeout(() => {
+            const nextSelect = this.itemRowSelects.toArray()[index + 1];
+            if (nextSelect) {
+              nextSelect.focus();
+            }
+          });
+        }
+      } else {
+        // Zero price: focus the unit price input of the current row
+        setTimeout(() => {
+          const currentPriceInput = this.unitPriceInputs.toArray()[index];
+          if (currentPriceInput) {
+            currentPriceInput.focus();
+          }
+        });
+      }
     }
   }
 

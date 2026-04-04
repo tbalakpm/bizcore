@@ -129,20 +129,7 @@
                 [nzDropdownStyle]="{ 'min-width': '400px', 'max-height': '600px' }"
               >
                 @for (p of products(); track p.id) {
-                  <nz-option
-                    [nzValue]="p.id"
-                    [nzLabel]="
-                      p.code +
-                      ' - ' +
-                      p.name +
-                      ' | HSN: ' +
-                      (p.hsnSac || 'N/A') +
-                      ' | Tax: ' +
-                      (p.taxRate || 0) +
-                      '%'
-                    "
-                    nzCustomContent
-                  >
+                  <nz-option [nzValue]="p.id" [nzLabel]="p.code + ' - ' + p.name" nzCustomContent>
                     <div class="font-medium">{{ p.code }} - {{ p.name }}</div>
                     <div class="text-xs text-text-muted">
                       HSN: {{ p.hsnSac || 'N/A' }} | Tax: {{ p.taxRate || 0 }}%

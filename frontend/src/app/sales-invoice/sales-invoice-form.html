@@ -448,6 +448,7 @@
           </td>
           <td>
             <nz-input-number
+              #unitPriceInput
               [(ngModel)]="item.unitPrice"
               (ngModelChange)="calculateLineTotal(item)"
               [nzDisabled]="!!editingInvoice.irn"
