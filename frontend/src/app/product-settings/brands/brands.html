@@ -134,7 +134,13 @@
                     </nz-select>
                   } @else {
                     @for (catId of b.categoryIds; track catId) {
-                      <span class="text-xs px-1 rounded mr-1" style="background-color: var(--color-surface-raised); color: var(--color-text-dim)">
+                      <span
+                        class="text-xs px-1 rounded mr-1"
+                        style="
+                          background-color: var(--color-surface-raised);
+                          color: var(--color-text-dim);
+                        "
+                      >
                         {{ getCategoryName(catId) }}
                       </span>
                     }
@@ -211,11 +217,11 @@
                 }
               </tr>
             }
-            @if (brands().length == 0) {
+            <!-- @if (brands().length == 0) {
               <tr>
                 <td colspan="6" class="text-center text-text-muted">No brands defined yet.</td>
               </tr>
-            }
+            } -->
           </tbody>
         </nz-table>
       </nz-card>

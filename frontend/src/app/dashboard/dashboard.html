@@ -89,7 +89,14 @@
     </div>
 
     <nz-card nzTitle="Stock Aging" nzSize="small" class="mb-4!">
-      <nz-table #agingStockTable [nzData]="agingStock()" nzSize="small" [nzShowPagination]="false">
+      <nz-table
+        #agingStockTable
+        [nzData]="agingStock()"
+        [nzLoading]="loading"
+        nzSize="small"
+        [nzShowPagination]="false"
+        [nzBordered]="true"
+      >
         <thead>
           <tr>
             <th>Range</th>
@@ -115,6 +122,7 @@
         <nz-table
           #salesTable
           [nzData]="['Today', 'This Week', 'This Month', 'This Year']"
+          [nzLoading]="loading"
           nzSize="small"
           [nzShowPagination]="false"
           [nzBordered]="true"
@@ -157,6 +165,7 @@
         <nz-table
           #purchasesTable
           [nzData]="['Today', 'This Week', 'This Month', 'This Year']"
+          [nzLoading]="loading"
           nzSize="small"
           [nzShowPagination]="false"
           [nzBordered]="true"
@@ -201,8 +210,10 @@
         <nz-table
           #topProductsTable
           [nzData]="topProducts()"
+          [nzLoading]="loading"
           nzSize="small"
           [nzShowPagination]="false"
+          [nzBordered]="true"
         >
           <thead>
             <tr>
@@ -225,8 +236,10 @@
         <nz-table
           #topCustomersTable
           [nzData]="topCustomers()"
+          [nzLoading]="loading"
           nzSize="small"
           [nzShowPagination]="false"
+          [nzBordered]="true"
         >
           <thead>
             <tr>
@@ -249,8 +262,10 @@
         <nz-table
           #topSuppliersTable
           [nzData]="topSuppliers()"
+          [nzLoading]="loading"
           nzSize="small"
           [nzShowPagination]="false"
+          [nzBordered]="true"
         >
           <thead>
             <tr>
@@ -356,8 +371,10 @@
         <nz-table
           #receivablesTable
           [nzData]="agingReceivables()"
+          [nzLoading]="loading"
           nzSize="small"
           [nzShowPagination]="false"
+          [nzBordered]="true"
         >
           <thead>
             <tr>
@@ -380,8 +397,10 @@
         <nz-table
           #payablesTable
           [nzData]="agingPayables()"
+          [nzLoading]="loading"
           nzSize="small"
           [nzShowPagination]="false"
+          [nzBordered]="true"
         >
           <thead>
             <tr>

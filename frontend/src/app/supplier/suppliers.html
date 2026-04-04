@@ -10,7 +10,10 @@
 }
 
 <div class="grid grid-cols-1 gap-4">
-  @if ((editingSupplier.id && permissionService.canEdit('suppliers')) || (!editingSupplier.id && permissionService.canAdd('suppliers'))) {
+  @if (
+    (editingSupplier.id && permissionService.canEdit('suppliers')) ||
+    (!editingSupplier.id && permissionService.canAdd('suppliers'))
+  ) {
     <!-- Add form -->
     <nz-card>
       <h2 class="text-base font-semibold mb-2">
@@ -334,7 +337,9 @@
                 [nzTooltipTitle]="s.isActive ? 'Deactivate' : 'Activate'"
               ></nz-switch>
             </td>
-            @if (permissionService.canEdit('suppliers') || permissionService.canDelete('suppliers')) {
+            @if (
+              permissionService.canEdit('suppliers') || permissionService.canDelete('suppliers')
+            ) {
               <td class="text-center" nzAlign="center">
                 <div class="flex items-center justify-center gap-2">
                   <button
@@ -368,7 +373,7 @@
             }
           </tr>
         }
-        @if (!suppliers().length && !loading) {
+        <!-- @if (!suppliers().length && !loading) {
           <tr>
             <td
               [attr.colspan]="(permissionService.canEdit('suppliers') || permissionService.canDelete('suppliers')) ? 6 : 5"
@@ -377,7 +382,7 @@
               No suppliers yet
             </td>
           </tr>
-        }
+        } -->
       </tbody>
     </nz-table>
   </nz-card>

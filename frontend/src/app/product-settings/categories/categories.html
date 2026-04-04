@@ -79,7 +79,8 @@
               <th>Parent Category</th>
               <th class="text-center w-16" nzAlign="center">{{ 'ACTIVE' | translate }}</th>
               @if (
-                permissionService.canEdit('product-settings-categories') || permissionService.canDelete('product-settings-categories')
+                permissionService.canEdit('product-settings-categories') ||
+                permissionService.canDelete('product-settings-categories')
               ) {
                 <th class="text-center w-32" nzAlign="center">{{ 'ACTIONS' | translate }}</th>
               }
@@ -214,13 +215,13 @@
                 }
               </tr>
             }
-            @if (categories().length == 0) {
+            <!-- @if (categories().length == 0) {
               <tr>
                 <td colspan="5" class="text-center text-text-muted">
                   {{ 'CATEGORY.NO_CATEGORIES_YET' | translate }}.
                 </td>
               </tr>
-            }
+            } -->
           </tbody>
         </nz-table>
       </nz-card>

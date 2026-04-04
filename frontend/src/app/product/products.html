@@ -10,7 +10,10 @@
 }
 
 <div class="grid grid-cols-1 gap-4">
-  @if ((editingProductId && permissionService.canEdit('products')) || (!editingProductId && permissionService.canAdd('products'))) {
+  @if (
+    (editingProductId && permissionService.canEdit('products')) ||
+    (!editingProductId && permissionService.canAdd('products'))
+  ) {
     <!-- Add / Edit form via reusable component -->
     <nz-card>
       <h2 class="text-base font-semibold mb-2">
@@ -120,9 +123,15 @@
             <td class="text-right">{{ p.taxRate ? `${p.taxRate}%` : '-' }}</td>
             <td>
               @switch (p.productType) {
-                @case ('bundle') { <nz-tag nzColor="blue">Bundle</nz-tag> }
-                @case ('variant') { <nz-tag nzColor="green">Variant</nz-tag> }
-                @default { <nz-tag nzColor="default">Simple</nz-tag> }
+                @case ('bundle') {
+                  <nz-tag nzColor="blue">Bundle</nz-tag>
+                }
+                @case ('variant') {
+                  <nz-tag nzColor="green">Variant</nz-tag>
+                }
+                @default {
+                  <nz-tag nzColor="default">Simple</nz-tag>
+                }
               }
             </td>
             <td>
@@ -190,7 +199,7 @@
             }
           </tr>
         }
-        @if (!products().length && !loading) {
+        <!-- @if (!products().length && !loading) {
           <tr>
             <td
               [attr.colspan]="(permissionService.canEdit('products') || permissionService.canDelete('products')) ? 10 : 9"
@@ -199,7 +208,7 @@
               {{ 'PRODUCT.NO_PRODUCTS_YET' | translate }}
             </td>
           </tr>
-        }
+        } -->
       </tbody>
     </nz-table>
   </nz-card>
