@@ -5,6 +5,7 @@ import { salesInvoices, salesInvoiceItems, customers, addresses, inventories, pr
 import { PdfDocument } from '../engine/pdf-document';
 import { fetchCompanyInfo, type TableColumn } from '../engine/pdf-types';
 import * as sections from '../engine/pdf-sections';
+import { DateUtil } from '../../../utils/date.util';
 
 export async function renderSalesInvoice(
   id: number,
@@ -97,12 +98,12 @@ export async function renderSalesInvoice(
   sections.renderReportMeta(pdf, {
     title: invoice.type === 'invoice' ? 'TAX INVOICE' : 'ESTIMATE',
     number: invoice.invoiceNumber,
-    date: invoice.invoiceDate,
-    extraMeta: invoice.refNumber ? [{ label: 'Ref No', value: invoice.refNumber }] : [],
+    date: DateUtil.formatDDMMYYYY(invoice.invoiceDate),
+    extraMeta: invoice.refNumber ? [{ label: 'Ref No', value: invoice.refNumber + (invoice.refDate ? ` dt ${DateUtil.formatDDMMYYYY(invoice.refDate)}` : "") }] : [],
   });
 
   if (invoice.irn) {
-    await sections.renderEInvoiceBlock(pdf, invoice.irn, invoice.ackNo, invoice.ackDate, invoice.signedQrCode);
+    await sections.renderEInvoiceBlock(pdf, invoice.irn, invoice.ackNo, DateUtil.formatDDMMYYYY(invoice.ackDate), invoice.signedQrCode);
   }
 
   sections.renderRule(pdf);

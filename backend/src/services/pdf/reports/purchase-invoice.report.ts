@@ -5,6 +5,7 @@ import { purchaseInvoices, purchaseInvoiceItems, suppliers, addresses, inventori
 import { PdfDocument } from '../engine/pdf-document';
 import { fetchCompanyInfo, type TableColumn } from '../engine/pdf-types';
 import * as sections from '../engine/pdf-sections';
+import { DateUtil } from '../../../utils/date.util';
 
 export async function renderPurchaseInvoice(
   id: number,
@@ -59,8 +60,8 @@ export async function renderPurchaseInvoice(
   sections.renderReportMeta(pdf, {
     title: 'PURCHASE INVOICE',
     number: invoice.invoiceNumber,
-    date: invoice.invoiceDate,
-    extraMeta: invoice.refNumber ? [{ label: 'Ref No', value: invoice.refNumber }] : [],
+    date: DateUtil.formatDDMMYYYY(invoice.invoiceDate),
+    extraMeta: invoice.refNumber ? [{ label: 'Ref No', value: invoice.refNumber + (invoice.refDate ? ` dt ${DateUtil.formatDDMMYYYY(invoice.refDate)}` : "") }] : [],
   });
 
   sections.renderRule(pdf);

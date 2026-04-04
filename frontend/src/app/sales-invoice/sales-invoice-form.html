@@ -45,7 +45,7 @@
         <div><span class="font-medium">Ack No:</span> {{ editingInvoice.ackNo }}</div>
         <div>
           <span class="font-medium">Ack Date:</span>
-          {{ editingInvoice.ackDate | date: 'medium' }}
+          {{ editingInvoice.ackDate | date: 'dd-MM-yyyy' }}
         </div>
       </div>
       <p class="mt-2 text-xs italic opacity-80">This invoice has been locked from future edits.</p>
@@ -262,7 +262,7 @@
         (ngModelChange)="onInvoiceDateChange($event)"
         name="invoiceDate"
         [nzDisabled]="!!editingInvoice.irn"
-        nzFormat="yyyy-MM-dd"
+        nzFormat="dd-MM-yyyy"
         class="w-full"
       ></nz-date-picker>
     </div>
@@ -286,7 +286,7 @@
         (ngModelChange)="onRefDateChange($event)"
         name="refDate"
         [nzDisabled]="!!editingInvoice.irn"
-        nzFormat="yyyy-MM-dd"
+        nzFormat="dd-MM-yyyy"
         class="w-full"
       ></nz-date-picker>
     </div>
@@ -321,6 +321,8 @@
             [nzDisabled]="!!editingInvoice.irn"
             name="globalDiscountAmount"
             [nzMin]="0"
+            [nzPrecision]="0"
+            [nzStep]="1"
             class="flex-1 w-full text-right"
           ></nz-input-number>
         } @else {
@@ -453,9 +455,9 @@
               (ngModelChange)="calculateLineTotal(item)"
               [nzDisabled]="!!editingInvoice.irn"
               [name]="'itemPrice' + i"
-              [nzStep]="0.1"
+              [nzStep]="1"
               [nzMin]="0"
-              [nzPrecision]="2"
+              [nzPrecision]="0"
               class="w-full text-right"
             ></nz-input-number>
           </td>
@@ -488,6 +490,8 @@
                   [nzDisabled]="!!editingInvoice.irn"
                   [name]="'itemDiscountAmount' + i"
                   [nzMin]="0"
+                  [nzPrecision]="0"
+                  [nzStep]="1"
                   class="flex-1 w-full text-right"
                 ></nz-input-number>
               } @else {
@@ -501,15 +505,15 @@
           </td>
           <td class="text-right text-text-muted text-xs">
             <div class="text-sm">
-              ₹{{ item.taxAmount || 0 | number: '1.2-2' }} ({{ item.taxPct || 0 }}%)
+              ₹{{ item.taxAmount || 0 | number: '1.0-2' }} ({{ item.taxPct || 0 }}%)
             </div>
             @if (item.taxAmount || 0 > 0) {
               <div class="opacity-80 mt-0.5">
                 @if (item.igstAmount || 0 > 0) {
-                  IGST: ₹{{ item.igstAmount | number: '1.2-2' }}
+                  IGST: ₹{{ item.igstAmount | number: '1.0-2' }}
                 } @else {
-                  CGST: ₹{{ item.cgstAmount | number: '1.2-2' }} - SGST: ₹{{
-                    item.sgstAmount | number: '1.2-2'
+                  CGST: ₹{{ item.cgstAmount | number: '1.0-2' }} - SGST: ₹{{
+                    item.sgstAmount | number: '1.0-2'
                   }}
                 }
               </div>

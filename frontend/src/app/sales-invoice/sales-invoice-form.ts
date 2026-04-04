@@ -322,7 +322,7 @@ export class SalesInvoiceForm implements OnInit {
             unitPrice: Number(item.unitPrice || 0),
             discountType: item.discountType,
             discountPct: Number(item.discountPct || 0),
-            discountAmount: Number(item.discountAmount || 0),
+            discountAmount: Math.round(Number(item.discountAmount || 0)),
             taxPct: Number(item.taxPct || 0),
             taxAmount: Number(item.taxAmount || 0),
             lineTotal: Number(item.lineTotal || 0),
@@ -391,7 +391,7 @@ export class SalesInvoiceForm implements OnInit {
     }
   }
 
-  onInventorySelect(item: EditableSalesInvoiceItem) {
+  onInventorySelect(item: EditableSalesInvoiceItem, skipFocus: boolean = false) {
     if (!item.inventoryId) {
       item.productId = undefined;
       item.gtn = undefined;
@@ -425,7 +425,7 @@ export class SalesInvoiceForm implements OnInit {
           } else if (margin.marginType === 'selling_price') {
             basePrice = Number(margin.marginAmount);
           }
-          basePrice = Math.round(basePrice * 100) / 100;
+          basePrice = Math.round(basePrice);
         }
 
         item.taxPct = this.editingInvoice.type === 'estimate' ? 0 : this.getEffectiveTaxRate(product, basePrice);
@@ -437,13 +437,15 @@ export class SalesInvoiceForm implements OnInit {
 
         if (isTaxInclusive && item.taxPct > 0) {
           basePrice = basePrice / (1 + (item.taxPct / 100));
-          basePrice = Math.round(basePrice * 100) / 100;
+          basePrice = Math.round(basePrice);
         }
 
         item.unitPrice = basePrice;
       }
       item.unitsInStock = inventory.unitsInStock;
       this.calculateLineTotal(item);
+
+      if (skipFocus) return;
 
       // Barcode scan flow: if price non-zero, next row; if zero price, focus price.
       const index = this.editingInvoice.items.indexOf(item);
@@ -476,33 +478,45 @@ export class SalesInvoiceForm implements OnInit {
     this.selectedPricingCategoryName = null;
     this.pricingCategoryMargins = [];
 
-    if (!customerId) return;
+    if (!customerId) {
+      this.recalculateAllPrices();
+      return;
+    }
 
     const customer = this.customers().find(c => c.id === customerId);
     if (customer?.pricingCategoryId) {
       this.selectedPricingCategoryName = customer.pricingCategoryName || null;
       this.pricingCategoryService.getProducts(customer.pricingCategoryId).subscribe({
-        next: (margins) => { this.pricingCategoryMargins = margins; },
-        error: () => { },
+        next: (margins) => {
+          this.pricingCategoryMargins = margins;
+          this.recalculateAllPrices();
+        },
+        error: () => {
+          this.recalculateAllPrices();
+        },
       });
+    } else {
+      this.recalculateAllPrices();
     }
+  }
 
-    // Recalculate taxes based on possible new customer GSTIN
-    this.recalculateAllTaxes();
+  recalculateAllPrices() {
+    this.editingInvoice.items.forEach(item => {
+      if (item.inventoryId) {
+        this.onInventorySelect(item, true);
+      } else {
+        this.calculateLineTotal(item);
+      }
+    });
   }
 
   recalculateAllTaxes() {
-    this.editingInvoice.items.forEach(item => this.calculateLineTotal(item));
+    this.recalculateAllPrices();
   }
 
   onTaxModeChange(mode: boolean | null) {
     this.editingInvoice.isTaxInclusive = mode;
-    // Re-select products to re-calculate base prices from inclusive prices if mode changed
-    this.editingInvoice.items.forEach(item => {
-      if (item.inventoryId) {
-        this.onInventorySelect(item);
-      }
-    });
+    this.recalculateAllPrices();
   }
 
   onTypeChange(type: string) {
@@ -545,21 +559,15 @@ export class SalesInvoiceForm implements OnInit {
     // Apply discount
     let discountAmt = 0;
     if (item.discountType === 'percent' && item.discountPct) {
-      discountAmt = grossTotal * (Number(item.discountPct) / 100);
+      discountAmt = Math.round(grossTotal * (Number(item.discountPct) / 100));
     } else if (item.discountType === 'amount' && item.discountAmount) {
-      discountAmt = Number(item.discountAmount);
+      discountAmt = Math.round(Number(item.discountAmount));
     }
     item.discountAmount = discountAmt;
 
     const afterDiscount = grossTotal - discountAmt;
 
-    // Apply tax
-    let rawTax = 0;
-    if (item.taxPct) {
-      rawTax = afterDiscount * (Number(item.taxPct) / 100);
-    }
-    item.taxAmount = Math.round(rawTax);
-
+    // Apply tax components and round them individually
     const customer = this.customers().find(c => c.id === this.editingInvoice.customerId);
     const customerGstin = customer?.gstin || '';
     const customerState = customer?.billingAddress?.state || '';
@@ -574,15 +582,19 @@ export class SalesInvoiceForm implements OnInit {
       isInterState = false;
     }
 
+    const taxPct = Number(item.taxPct || 0);
+
     if (isInterState) {
-      item.igstAmount = item.taxAmount;
+      item.igstAmount = Math.round(afterDiscount * (taxPct / 100));
       item.cgstAmount = 0;
       item.sgstAmount = 0;
     } else {
       item.igstAmount = 0;
-      item.cgstAmount = Math.round(item.taxAmount / 2);
-      item.sgstAmount = Math.round(item.taxAmount / 2);
+      const componentRate = taxPct / 2;
+      item.cgstAmount = Math.round(afterDiscount * (componentRate / 100));
+      item.sgstAmount = Math.round(afterDiscount * (componentRate / 100));
     }
+
     // and update total tax Amount of the row
     item.taxAmount = (item.igstAmount || 0) + (item.cgstAmount || 0) + (item.sgstAmount || 0);
 

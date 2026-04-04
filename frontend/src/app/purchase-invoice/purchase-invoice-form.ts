@@ -391,7 +391,6 @@ export class PurchaseInvoiceForm implements OnInit {
     }
 
     const amountAfterDiscount = grossTotal - item.discountAmount;
-    item.taxAmount = Math.round(amountAfterDiscount * taxPct / 100);
 
     const supplier = this.suppliers().find(s => s.id === this.editingInvoice.supplierId);
     const supplierGstin = supplier?.gstin || '';
@@ -405,15 +404,16 @@ export class PurchaseInvoiceForm implements OnInit {
     }
 
     if (isInterState) {
-      item.igstAmount = item.taxAmount;
+      item.igstAmount = Math.round(amountAfterDiscount * taxPct / 100);
       item.cgstAmount = 0;
       item.sgstAmount = 0;
     } else {
       item.igstAmount = 0;
-      item.cgstAmount = Math.round(item.taxAmount / 2);
-      item.sgstAmount = Math.round(item.taxAmount / 2);
+      const componentRate = taxPct / 2;
+      item.cgstAmount = Math.round(amountAfterDiscount * componentRate / 100);
+      item.sgstAmount = Math.round(amountAfterDiscount * componentRate / 100);
     }
-    // ensure taxAmount matches the sum of components for consistency
+    // and update total tax Amount of the row
     item.taxAmount = (item.igstAmount || 0) + (item.cgstAmount || 0) + (item.sgstAmount || 0);
 
     item.lineTotal = Number((amountAfterDiscount + item.taxAmount).toFixed(2));

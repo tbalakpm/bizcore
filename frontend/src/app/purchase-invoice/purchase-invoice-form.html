@@ -178,7 +178,7 @@
           [ngModel]="invoiceDateValue"
           (ngModelChange)="onInvoiceDateChange($event)"
           name="invoiceDate"
-          nzFormat="yyyy-MM-dd"
+          nzFormat="dd-MM-yyyy"
           class="w-full"
         ></nz-date-picker>
       </div>
@@ -200,7 +200,7 @@
           [ngModel]="refDateValue"
           (ngModelChange)="onRefDateChange($event)"
           name="refDate"
-          nzFormat="yyyy-MM-dd"
+          nzFormat="dd-MM-yyyy"
           class="w-full"
         ></nz-date-picker>
       </div>
@@ -358,19 +358,19 @@
             <td>
               <div class="text-right">
                 <div class="text-sm font-medium">
-                  {{ item.taxAmount | number: '1.2-2' }}
+                  {{ item.taxAmount | number: '1.0-2' }}
                   <span class="text-xs text-text-muted">({{ item.taxPct }}%)</span>
                 </div>
                 @if (item.igstAmount) {
                   <div class="text-[10px] text-text-muted uppercase">
-                    IGST: {{ item.igstAmount | number: '1.2-2' }}
+                    IGST: {{ item.igstAmount | number: '1.0-2' }}
                   </div>
                 } @else {
                   <div class="text-[10px] text-text-muted uppercase">
-                    CGST: {{ item.cgstAmount | number: '1.2-2' }} -
+                    CGST: {{ item.cgstAmount | number: '1.0-2' }} -
                     <!-- </div>
                   <div class="text-[10px] text-text-muted uppercase"> -->
-                    SGST: {{ item.sgstAmount | number: '1.2-2' }}
+                    SGST: {{ item.sgstAmount | number: '1.0-2' }}
                   </div>
                 }
               </div>

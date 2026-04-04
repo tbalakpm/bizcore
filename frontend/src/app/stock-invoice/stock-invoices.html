@@ -33,7 +33,7 @@
         [ngModel]="filterInvoiceDate"
         (ngModelChange)="onInvoiceDateChange($event)"
         [ngModelOptions]="{ standalone: true }"
-        nzFormat="yyyy-MM-dd"
+        nzFormat="dd-MM-yyyy"
         nzPlaceHolder="Invoice date"
       ></nz-date-picker>
 
@@ -117,7 +117,7 @@
       @for (invoice of invoiceTable.data; track invoice.id) {
         <tr>
           <td class="font-medium">{{ invoice.invoiceNumber }}</td>
-          <td>{{ invoice.invoiceDate | date: 'mediumDate' }}</td>
+          <td>{{ invoice.invoiceDate | date: 'dd-MM-yyyy' }}</td>
           <td class="text-right">{{ invoice.totalQty }}</td>
           <td class="td-cell text-right font-medium text-success">
             {{ invoice.totalAmount | currency: 'INR' }}

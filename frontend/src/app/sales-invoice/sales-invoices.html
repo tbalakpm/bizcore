@@ -51,7 +51,7 @@
         [ngModel]="filterInvoiceDate"
         (ngModelChange)="onInvoiceDateChange($event)"
         [ngModelOptions]="{ standalone: true }"
-        nzFormat="yyyy-MM-dd"
+        nzFormat="dd-MM-yyyy"
         nzPlaceHolder="Invoice date"
       ></nz-date-picker>
 
@@ -146,7 +146,7 @@
               }
             </div>
           </td>
-          <td>{{ invoice.invoiceDate | date: 'mediumDate' }}</td>
+          <td>{{ invoice.invoiceDate | date: 'dd-MM-YYYY' }}</td>
           <td>{{ invoice.customerName || '—' }}</td>
           <td>
             <nz-tag [nzColor]="invoice.type === 'estimate' ? 'processing' : 'default'">

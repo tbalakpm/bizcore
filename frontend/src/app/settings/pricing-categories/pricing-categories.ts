@@ -195,7 +195,7 @@ export class PricingCategories implements OnInit {
       { value: 'none', label: 'None' },
       { value: 'percent', label: 'Markup Percentage (%)' },
       { value: 'amount', label: 'Markup Amount (₹)' },
-      { value: 'selling_price', label: 'Selling Price (₹)' },
+      { value: 'selling_price', label: 'Final Selling Price (₹)' },
     ];
   }
 }

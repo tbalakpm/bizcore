@@ -208,8 +208,8 @@
                         <tr>
                           <th>Product Code</th>
                           <th>Product Name</th>
-                          <th nzWidth="160px" nzAlign="center">Margin Type</th>
-                          <th nzWidth="140px" nzAlign="center">Margin Value</th>
+                          <th nzWidth="220px" nzAlign="center">Margin Type</th>
+                          <th nzWidth="220px" nzAlign="center">Margin Value</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -222,9 +222,7 @@
                                 [(ngModel)]="margin.marginType"
                                 [ngModelOptions]="{ standalone: true }"
                                 class="w-full"
-                                [nzDisabled]="
-                                  !permissionService.canEdit('settings-pricing')
-                                "
+                                [nzDisabled]="!permissionService.canEdit('settings-pricing')"
                               >
                                 @for (mt of marginTypes; track mt.value) {
                                   <nz-option [nzValue]="mt.value" [nzLabel]="mt.label"></nz-option>
@@ -239,9 +237,7 @@
                                   [nzMin]="0"
                                   [nzStep]="0.5"
                                   class="w-full"
-                                  [nzDisabled]="
-                                    !permissionService.canEdit('settings-pricing')
-                                  "
+                                  [nzDisabled]="!permissionService.canEdit('settings-pricing')"
                                 />
                               } @else if (
                                 margin.marginType === 'amount' ||
@@ -253,9 +249,7 @@
                                   [nzMin]="0"
                                   [nzStep]="1"
                                   class="w-full"
-                                  [nzDisabled]="
-                                    !permissionService.canEdit('settings-pricing')
-                                  "
+                                  [nzDisabled]="!permissionService.canEdit('settings-pricing')"
                                 />
                               } @else {
                                 <span class="text-text-muted text-sm">–</span>
