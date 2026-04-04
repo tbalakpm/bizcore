@@ -87,11 +87,11 @@
         <tr>
           <th>Product</th>
           <th nzWidth="160px">GTN</th>
-          <th nzWidth="100px" nzAlign="right">Qty</th>
-          <th nzWidth="120px" nzAlign="right">Unit Price</th>
-          <th nzWidth="120px" nzAlign="right">Line Total</th>
+          <th nzWidth="120px" nzAlign="right">Qty</th>
+          <th nzWidth="150px" nzAlign="right">Unit Price</th>
+          <th nzWidth="180px" nzAlign="right">Line Total</th>
           <th nzWidth="180px" nzAlign="center">Margin</th>
-          <th nzWidth="120px" nzAlign="right">Selling Price</th>
+          <th nzWidth="150px" nzAlign="right">Selling Price</th>
           <th nzAlign="center" nzWidth="60px">
             <button
               nz-button
@@ -123,9 +123,10 @@
                 nzPlaceHolder="-- Select Product --"
                 class="w-full"
                 [nzDropdownRender]="addProductTpl"
-                [nzOptionOverflowSize]="6"
+                [nzOptionHeightPx]="50"
+                [nzOptionOverflowSize]="10"
                 [nzDropdownMatchSelectWidth]="false"
-                [nzDropdownStyle]="{ 'min-width': '400px' }"
+                [nzDropdownStyle]="{ 'min-width': '400px', 'max-height': '600px' }"
               >
                 @for (p of products(); track p.id) {
                   <nz-option
@@ -163,7 +164,7 @@
                 </div>
               </ng-template>
             </td>
-            <td class="px-2! py-2!">
+            <td>
               <input
                 nz-input
                 type="text"
@@ -177,7 +178,7 @@
                 [(ngModel)]="item.qty"
                 (ngModelChange)="onItemChanged(item)"
                 [name]="'itemQty' + i"
-                [nzStep]="1"
+                [nzStep]="0.1"
                 [nzMin]="1"
                 [nzDisabled]="isQtyDisabled(item)"
                 class="w-full text-right"
@@ -188,7 +189,7 @@
                 [(ngModel)]="item.unitPrice"
                 (ngModelChange)="onItemChanged(item)"
                 [name]="'itemPrice' + i"
-                [nzStep]="0.01"
+                [nzStep]="0.1"
                 [nzMin]="0"
                 [nzPrecision]="2"
                 class="w-full text-right"
@@ -214,6 +215,7 @@
                     [(ngModel)]="item.marginPct"
                     (ngModelChange)="onMarginChanged(item)"
                     [name]="'itemMarginPct' + i"
+                    [nzStep]="0.1"
                     [nzMin]="0"
                     class="flex-1 w-full text-right"
                   ></nz-input-number>
@@ -222,6 +224,7 @@
                     [(ngModel)]="item.marginAmount"
                     (ngModelChange)="onMarginChanged(item)"
                     [name]="'itemMarginAmount' + i"
+                    [nzStep]="0.1"
                     [nzMin]="0"
                     class="flex-1 w-full text-right"
                   ></nz-input-number>
@@ -239,7 +242,7 @@
                 [(ngModel)]="item.sellingPrice"
                 (ngModelChange)="onSellingPriceChanged(item)"
                 [name]="'itemSellingPrice' + i"
-                [nzStep]="0.01"
+                [nzStep]="0.1"
                 [nzMin]="0"
                 [nzPrecision]="2"
                 class="w-full text-right"

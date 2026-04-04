@@ -1,11 +1,11 @@
-import { and, eq, like, sql, type SQL, getTableColumns } from 'drizzle-orm';
+import { and, eq, inArray, like, sql, type SQL, getTableColumns } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
 import { db, purchaseInvoices, purchaseInvoiceItems, suppliers, products, inventories } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
-import { toNumericString, toPositiveNumber, toNumber, toOptionalNumber } from '../utils/number.util';
-import { generateGtn, shouldGenerateGtn } from '../utils/gtn.util';
-import { ProductSerialMode, productSerialNumberService } from '../services/product-serial-number.service';
+import { toNumericString, toPositiveNumber, toNumber } from '../utils/number.util';
+
+import { productSerialNumberService } from '../services/product-serial-number.service';
 import { serialNumberService } from '../services/serial-number.service';
 import type { DbTransaction } from '../shared/serial-number.shared';
 import { renderPurchaseInvoice } from '../services/pdf/reports/purchase-invoice.report';
@@ -173,6 +173,7 @@ purchaseInvoicesRouter.get('/:id', async (req: Request, res: Response) => {
 const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId: number, items: any[]) => {
   let totalQty = 0;
   let subtotal = 0;
+  let totalTaxAmount = 0;
 
   for (const item of items) {
     const qty = toPositiveNumber(item.qty, 0);
@@ -214,7 +215,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
             inventoryId: undefined,
           });
         }
-        
+
         continue;
       }
 
@@ -243,6 +244,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
               buyingPrice: toNumber(unitPrice) || product.unitPrice,
               sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : undefined,
               unitsInStock: toNumber(qty),
+              invoiceId: purchaseInvoiceId,
             })
             .returning({ id: inventories.id })
             .get();
@@ -266,6 +268,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
                 buyingPrice: toNumber(unitPrice) || product.unitPrice,
                 sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : undefined,
                 unitsInStock: 1,
+                invoiceId: purchaseInvoiceId,
               })
               .returning({ id: inventories.id })
               .get();
@@ -279,11 +282,16 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
               discountPct: toNumber(item.discountPct),
               discountAmount: toNumber(item.discountAmount),
               taxPct: toNumber(item.taxPct),
+              sgstAmount: toNumber(item.sgstAmount) || 0,
+              cgstAmount: toNumber(item.cgstAmount) || 0,
+              igstAmount: toNumber(item.igstAmount) || 0,
               marginType: item.marginType || 'none',
               marginPct: toNumber(item.marginPct) || 0,
               marginAmount: toNumber(item.marginAmount) || 0,
               sellingPrice: toNumber(item.sellingPrice) || 0,
             }).run();
+
+            totalTaxAmount += (toNumber(item.taxAmount) || (toNumber(item.sgstAmount || 0) + toNumber(item.cgstAmount || 0) + toNumber(item.igstAmount || 0)));
           }
           inventoryId = -1; // Marker that we handled insertion
         } else {
@@ -315,6 +323,7 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
                 buyingPrice: toNumber(unitPrice) || product.unitPrice,
                 sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : undefined,
                 unitsInStock: toNumber(qty),
+                invoiceId: purchaseInvoiceId,
               })
               .returning({ id: inventories.id })
               .get();
@@ -346,18 +355,22 @@ const processPurchaseInvoiceItems = async (tx: DbTransaction, purchaseInvoiceId:
         discountPct: toNumber(item.discountPct),
         discountAmount: toNumber(item.discountAmount),
         taxPct: toNumber(item.taxPct),
+        sgstAmount: toNumber(item.sgstAmount) || 0,
+        cgstAmount: toNumber(item.cgstAmount) || 0,
+        igstAmount: toNumber(item.igstAmount) || 0,
         marginType: item.marginType || 'none',
         marginPct: toNumber(item.marginPct) || 0,
         marginAmount: toNumber(item.marginAmount) || 0,
         sellingPrice: toNumber(item.sellingPrice) || 0,
       }).run();
+      totalTaxAmount += (toNumber(item.taxAmount) || (toNumber(item.sgstAmount || 0) + toNumber(item.cgstAmount || 0) + toNumber(item.igstAmount || 0)));
     }
 
     totalQty += qty;
     subtotal += (qty * unitPrice);
   }
 
-  return { totalQty, subtotal };
+  return { totalQty, subtotal, totalTaxAmount };
 };
 
 purchaseInvoicesRouter.post('/', async (req, res) => {
@@ -400,6 +413,7 @@ purchaseInvoicesRouter.post('/', async (req, res) => {
         .set({
           totalQty: toNumber(body.totalQty) ?? toNumber(totals.totalQty),
           subtotal: toNumber(body.subtotal) ?? toNumber(totals.subtotal),
+          totalTaxAmount: toNumber(body.taxAmount) ?? toNumber(totals.totalTaxAmount),
         })
         .where(eq(purchaseInvoices.id, invoice.id))
         .run();
@@ -447,17 +461,28 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
 
     await db.transaction(async (tx) => {
       // 1. Reverse stock
+      const inventoriesToDelete: number[] = [];
       for (const oldItem of oldItems) {
         const inv = await tx.select().from(inventories).where(eq(inventories.id, oldItem.inventoryId)).get();
         if (inv) {
-          await tx.update(inventories)
-            .set({ unitsInStock: (inv.unitsInStock || 0) - Number(oldItem.qty || 0) })
-            .where(eq(inventories.id, inv.id))
-            .run();
+          const nextQty = (inv.unitsInStock || 0) - Number(oldItem.qty || 0);
+          if (nextQty === 0 && inv.invoiceId === id) {
+            inventoriesToDelete.push(inv.id);
+          } else {
+            await tx.update(inventories)
+              .set({ unitsInStock: nextQty })
+              .where(eq(inventories.id, inv.id))
+              .run();
+          }
         }
       }
 
       await tx.delete(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).run();
+
+      if (inventoriesToDelete.length > 0) {
+        await tx.delete(inventories).where(inArray(inventories.id, inventoriesToDelete)).run();
+        LogService.info('Deleted inventory records during PUT reversal (Purchase)', { count: inventoriesToDelete.length, invoiceId: id });
+      }
 
       // 2. Update header
       await tx
@@ -488,6 +513,7 @@ purchaseInvoicesRouter.put('/:id', async (req, res) => {
         .set({
           totalQty: toNumber(body.totalQty) || totals.totalQty,
           subtotal: toNumber(body.subtotal) || totals.subtotal,
+          totalTaxAmount: toNumber(body.taxAmount) || totals.totalTaxAmount,
         })
         .where(eq(purchaseInvoices.id, id))
         .run();
@@ -526,17 +552,28 @@ purchaseInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
 
     await db.transaction(async (tx) => {
       // Reverse stock
+      const inventoriesToDelete: number[] = [];
       for (const item of oldItems) {
         const inv = await tx.select().from(inventories).where(eq(inventories.id, item.inventoryId)).get();
         if (inv) {
-          await tx.update(inventories)
-            .set({ unitsInStock: (inv.unitsInStock || 0) - Number(item.qty || 0) })
-            .where(eq(inventories.id, inv.id))
-            .run();
+          const nextQty = (inv.unitsInStock || 0) - Number(item.qty || 0);
+          if (nextQty === 0 && inv.invoiceId === id) {
+            inventoriesToDelete.push(inv.id);
+          } else {
+            await tx.update(inventories)
+              .set({ unitsInStock: nextQty })
+              .where(eq(inventories.id, inv.id))
+              .run();
+          }
         }
       }
       await tx.delete(purchaseInvoiceItems).where(eq(purchaseInvoiceItems.purchaseInvoiceId, id)).run();
       await tx.delete(purchaseInvoices).where(eq(purchaseInvoices.id, id)).run();
+
+      if (inventoriesToDelete.length > 0) {
+        await tx.delete(inventories).where(inArray(inventories.id, inventoriesToDelete)).run();
+        LogService.info('Deleted inventory records after invoice deletion (Purchase)', { count: inventoriesToDelete.length, invoiceId: id });
+      }
     });
 
     await auditLog({

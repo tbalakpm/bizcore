@@ -23,6 +23,7 @@ inventoriesRouter.get('/', async (req: Request, res: Response) => {
         productId: inventories.productId,
         gtn: inventories.gtn,
         unitsInStock: inventories.unitsInStock,
+        hsnSac: products.hsnSac,
         location: inventories.location,
         buyingPrice: inventories.buyingPrice,
         sellingPrice: inventories.sellingPrice,

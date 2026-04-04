@@ -37,6 +37,9 @@ export async function renderPurchaseInvoice(
       discountAmount: purchaseInvoiceItems.discountAmount,
       taxPct: purchaseInvoiceItems.taxPct,
       taxAmount: purchaseInvoiceItems.taxAmount,
+      cgstAmount: purchaseInvoiceItems.cgstAmount,
+      sgstAmount: purchaseInvoiceItems.sgstAmount,
+      igstAmount: purchaseInvoiceItems.igstAmount,
       lineTotal: purchaseInvoiceItems.lineTotal,
       productName: products.name,
       hsnSac: inventories.hsnSac,
@@ -99,17 +102,43 @@ export async function renderPurchaseInvoice(
     { header: 'Total', key: 'lineTotal', align: 'right', width: 'auto', format: (v) => Number(v).toFixed(2) },
   ];
 
+  const hsnMap = new Map<string, any>();
+  for (const item of items) {
+    const hsn = item.hsnSac || 'NA';
+    const taxableValue = (Number(item.qty) * Number(item.unitPrice)) - Number(item.discountAmount);
+    if (!hsnMap.has(hsn)) {
+      hsnMap.set(hsn, {
+        hsnSac: hsn,
+        taxableValue: 0,
+        taxPct: Number(item.taxPct).toFixed(0),
+        cgstAmount: 0,
+        sgstAmount: 0,
+        igstAmount: 0,
+      });
+    }
+    const hsnRow = hsnMap.get(hsn)!;
+    hsnRow.taxableValue += taxableValue;
+    hsnRow.cgstAmount += Number(item.cgstAmount);
+    hsnRow.sgstAmount += Number(item.sgstAmount);
+    hsnRow.igstAmount += Number(item.igstAmount);
+  }
+  const hsnSummary = Array.from(hsnMap.values());
+
+  const totalCgst = items.reduce((sum, i) => sum + Number(i.cgstAmount), 0);
+  const totalSgst = items.reduce((sum, i) => sum + Number(i.sgstAmount), 0);
+  const totalIgst = items.reduce((sum, i) => sum + Number(i.igstAmount), 0);
+
   sections.renderItemsTable(pdf, columns, items);
 
-  // Calculate totals if not in main invoice (or use main invoice if accurate)
+  // 4. Totals
   sections.renderTotals(pdf, {
-    subtotal: Number(invoice.subtotal),
-    discountAmount: Number(invoice.discountAmount),
-    taxAmount: Number(invoice.totalTaxAmount ?? 0),
-    taxPct: 0,
+    taxableAmount: Number(invoice.subtotal) - Number(invoice.discountAmount),
+    cgstAmount: totalCgst,
+    sgstAmount: totalSgst,
+    igstAmount: totalIgst,
     roundOff: Number(invoice.roundOff ?? 0),
     netAmount: Number(invoice.netAmount ?? 0),
-  }, company);
+  }, company, hsnSummary);
 
   sections.renderFooter(pdf, company);
 

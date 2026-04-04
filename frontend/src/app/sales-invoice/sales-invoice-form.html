@@ -237,7 +237,7 @@
         <nz-option nzValue="estimate" nzLabel="Estimate"></nz-option>
       </nz-select>
     </div>
-    
+
     <div>
       <label class="block text-sm font-medium mb-1">Tax Setup</label>
       <nz-select
@@ -397,9 +397,9 @@
               class="w-full"
               [nzCustomTemplate]="selectedItemTpl"
               [nzDropdownMatchSelectWidth]="false"
-              [nzDropdownStyle]="{ 'min-width': '400px' }"
-              [nzOptionHeightPx]="48"
-              [nzOptionOverflowSize]="6"
+              [nzDropdownStyle]="{ 'min-width': '400px', 'max-height': '600px' }"
+              [nzOptionHeightPx]="50"
+              [nzOptionOverflowSize]="10"
             >
               @for (p of getFilteredInventories(item); track p.id) {
                 <nz-option
@@ -411,7 +411,9 @@
                   <div class="flex justify-between items-start">
                     <div>
                       <div class="font-medium">{{ p.name }}</div>
-                      <div class="text-xs text-text-muted">GTN: {{ p.gtn || p.code }}</div>
+                      <div class="text-xs text-text-muted">
+                        GTN: {{ p.gtn || p.code }} | HSN: {{ p.hsnSac || 'N/A' }}
+                      </div>
                     </div>
                     <div class="text-right">
                       <div
@@ -439,7 +441,7 @@
               (ngModelChange)="calculateLineTotal(item)"
               [nzDisabled]="!!editingInvoice.irn || isQtyLocked(item)"
               [name]="'itemQty' + i"
-              [nzStep]="0.01"
+              [nzStep]="0.1"
               [nzMin]="0"
               class="w-full text-right"
             ></nz-input-number>
@@ -450,7 +452,7 @@
               (ngModelChange)="calculateLineTotal(item)"
               [nzDisabled]="!!editingInvoice.irn"
               [name]="'itemPrice' + i"
-              [nzStep]="0.01"
+              [nzStep]="0.1"
               [nzMin]="0"
               [nzPrecision]="2"
               class="w-full text-right"
@@ -498,7 +500,7 @@
           </td>
           <td class="text-right text-text-muted text-xs">
             <div class="text-sm">
-              {{ item.taxPct || 0 }}% (₹{{ item.taxAmount || 0 | number: '1.2-2' }})
+              ₹{{ item.taxAmount || 0 | number: '1.2-2' }} ({{ item.taxPct || 0 }}%)
             </div>
             @if (item.taxAmount || 0 > 0) {
               <div class="opacity-80 mt-0.5">

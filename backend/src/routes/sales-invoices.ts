@@ -62,14 +62,19 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
       .where(eq(inventories.id, inventory.id))
       .run();
 
-    const taxAmountValue = toPositiveNumber(item.taxAmount, 0);
+    const rawTaxPercent = toNumber(item.taxPct) / 100;
+    const rawTaxAmount = (qty * unitPrice - toPositiveNumber(item.discountAmount, 0)) * rawTaxPercent;
+    const taxAmountValue = Math.round(rawTaxAmount);
+    
     let sgst = 0, cgst = 0, igst = 0;
     if (isInterState) {
       igst = taxAmountValue;
     } else {
-      sgst = taxAmountValue / 2;
-      cgst = taxAmountValue / 2;
+      sgst = Math.round(taxAmountValue / 2);
+      cgst = Math.round(taxAmountValue / 2);
     }
+    // Update taxAmountValue to be the sum of rounded parts to maintain consistency
+    const totalTaxValue = igst || (sgst + cgst);
 
     await tx
       .insert(salesInvoiceItems)
@@ -90,7 +95,7 @@ const processInvoiceItems = async (tx: DbTransaction, salesInvoiceId: number, it
 
     totalQty += qty;
     subtotal += (qty * unitPrice);
-    totalTax += taxAmountValue;
+    totalTax += totalTaxValue;
     totalDiscount += toPositiveNumber(item.discountAmount, 0);
   }
 

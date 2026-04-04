@@ -9,6 +9,8 @@ export const inventories = sqliteTable(
       .primaryKey({ autoIncrement: true })
       .notNull(),
 
+    invoiceId: integer('invoice_id'),
+
     productId: integer('product_id')
       .references(() => products.id)
       .notNull(),
@@ -56,6 +58,7 @@ export const inventories = sqliteTable(
   (t) => [
     uniqueIndex('inventories_gtn_unique').on(t.gtn),
     index('inventories_product_id_idx').on(t.productId),
+    index('inventories_invoice_id_idx').on(t.invoiceId),
   ]
 );
 

@@ -529,11 +529,11 @@ export class SalesInvoiceForm implements OnInit {
     const afterDiscount = grossTotal - discountAmt;
 
     // Apply tax
-    let taxAmt = 0;
+    let rawTax = 0;
     if (item.taxPct) {
-      taxAmt = afterDiscount * (Number(item.taxPct) / 100);
+      rawTax = afterDiscount * (Number(item.taxPct) / 100);
     }
-    item.taxAmount = taxAmt;
+    item.taxAmount = Math.round(rawTax);
 
     const customer = this.customers().find(c => c.id === this.editingInvoice.customerId);
     const customerGstin = customer?.gstin || '';
@@ -550,16 +550,18 @@ export class SalesInvoiceForm implements OnInit {
     }
 
     if (isInterState) {
-      item.igstAmount = taxAmt;
+      item.igstAmount = item.taxAmount;
       item.cgstAmount = 0;
       item.sgstAmount = 0;
     } else {
       item.igstAmount = 0;
-      item.cgstAmount = taxAmt / 2;
-      item.sgstAmount = taxAmt / 2;
+      item.cgstAmount = Math.round(item.taxAmount / 2);
+      item.sgstAmount = Math.round(item.taxAmount / 2);
     }
+    // and update total tax Amount of the row
+    item.taxAmount = (item.igstAmount || 0) + (item.cgstAmount || 0) + (item.sgstAmount || 0);
 
-    item.lineTotal = Number((afterDiscount + taxAmt).toFixed(2));
+    item.lineTotal = Number((afterDiscount + item.taxAmount).toFixed(2));
   }
 
   getEffectiveTaxRate(product: Product, unitPrice: number): number {

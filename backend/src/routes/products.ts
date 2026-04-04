@@ -1,7 +1,7 @@
 import { and, eq, like, sql, type SQL } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
-import { categories, db, products, productSerialNumbers, productBundles, productTemplateAttributes, productTemplates, productAttributeValues, attributes } from '../db';
+import { categories, db, products, productSerialNumbers, productBundles, productTemplateAttributes, productAttributeValues, attributes } from '../db';
 import { parsePagination, resolveSortDirection, toPagination } from '../utils/list-query.util';
 import { LogService } from '../core/logger/logger.service';
 import { auditLog } from '../core/logger/audit.service';
@@ -528,18 +528,23 @@ productsRouter.delete('/:id', async (req, res) => {
     return res.status(404).json({ error: req.i18n?.t('product.notFound') || 'Product not found' });
   }
 
-  const serial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).get();
-  const bundleItems = await db.select().from(productBundles).where(eq(productBundles.bundleProductId, id)).all();
+  // const serial = await db.select().from(productSerialNumbers).where(eq(productSerialNumbers.productId, id)).get();
+  // const bundleItems = await db.select().from(productBundles).where(eq(productBundles.bundleProductId, id)).all();
 
-  await db.delete(products).where(eq(products.id, id)).run();
+  try {
+    await db.delete(products).where(eq(products.id, id)).run();
+    await auditLog({
+      action: 'DELETE_PRODUCT',
+      entity: 'PRODUCT',
+      entityId: id,
+      oldValue: product,
+    });
 
-  await auditLog({
-    action: 'DELETE_PRODUCT',
-    entity: 'PRODUCT',
-    entityId: id,
-    oldValue: { ...product, serial, bundleItems },
-  });
+    LogService.info('Product deleted successfully', { productId: id, productName: product.name });
+    res.status(204).send();
+  } catch (err) {
+    LogService.error('Failed to delete product', err, { productId: id });
+    res.status(400).json({ error: 'Failed to delete product' });
+  }
 
-  LogService.info('Product deleted successfully', { productId: id, productName: product.name });
-  res.status(204).send();
 });

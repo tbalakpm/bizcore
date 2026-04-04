@@ -9,6 +9,7 @@ export interface Inventory {
   productId: number;
   gtn?: string;
   unitsInStock: number;
+  hsnSac?: string;
   location?: string;
   buyingPrice?: number | string;
   sellingPrice?: number | string;
@@ -31,11 +32,11 @@ export class InventoryService {
     let params = new HttpParams()
       .set('limit', limit.toString())
       .set('offset', offset.toString());
-    
+
     if (q) {
       params = params.set('q', q);
     }
-    
+
     params = params.set('inStock', 'true');
 
     return this.http.get<InventoryList>(`${environment.apiUrl}/inventories`, { params });

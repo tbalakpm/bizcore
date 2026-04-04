@@ -104,6 +104,7 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
             sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : product.unitPrice,
             unitsInStock: toNumber(qty),
             location: item.location,
+            invoiceId: stockInvoiceId,
           })
           .returning({ id: inventories.id })
           .get();
@@ -142,6 +143,7 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
                 sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : product.unitPrice,
                 unitsInStock: 1,
                 location: item.location,
+                invoiceId: stockInvoiceId,
               })
               .returning({ id: inventories.id })
               .get();
@@ -176,6 +178,7 @@ const processInvoiceItems = async (tx: DbTransaction, stockInvoiceId: number, it
               sellingPrice: item.sellingPrice ? toNumber(item.sellingPrice) : product.unitPrice,
               unitsInStock: toNumber(qty),
               location: item.location,
+              invoiceId: stockInvoiceId,
             })
             .returning({ id: inventories.id })
             .get();
@@ -667,6 +670,7 @@ stockInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
         .all();
       if (existingItems.length > 0) {
         const inventoryIds = [...new Set(existingItems.map((item) => item.inventoryId))];
+        const inventoriesToDelete: number[] = [];
         const inventoryRows = await tx.select().from(inventories).where(inArray(inventories.id, inventoryIds)).all();
         const inventoryMap = new Map(inventoryRows.map((row) => [row.id, row]));
 
@@ -677,17 +681,27 @@ stockInvoicesRouter.put('/:id', async (req: Request, res: Response) => {
           }
 
           const qty = Number(item.qty ?? 0);
-          // Add inventory units back to stock
           const nextUnitsInStock = (inventory.unitsInStock ?? 0) - qty;
-          await tx
-            .update(inventories)
-            .set({ unitsInStock: nextUnitsInStock })
-            .where(eq(inventories.id, inventory.id))
-            .run();
+          
+          if (nextUnitsInStock === 0 && inventory.invoiceId === id) {
+            // Store for deletion after items are removed to avoid FK constraint error
+            inventoriesToDelete.push(inventory.id);
+          } else {
+            await tx
+              .update(inventories)
+              .set({ unitsInStock: nextUnitsInStock })
+              .where(eq(inventories.id, inventory.id))
+              .run();
+          }
           inventoryMap.set(inventory.id, { ...inventory, unitsInStock: nextUnitsInStock });
         }
 
         await tx.delete(stockInvoiceItems).where(eq(stockInvoiceItems.stockInvoiceId, id)).run();
+        
+        if (inventoriesToDelete.length > 0) {
+          await tx.delete(inventories).where(inArray(inventories.id, inventoriesToDelete)).run();
+          LogService.info('Deleted inventory records during PUT reversal (Stock)', { count: inventoriesToDelete.length, invoiceId: id });
+        }
       }
 
       const totals = await processInvoiceItems(tx, id, items);
@@ -754,6 +768,7 @@ stockInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
       }
 
       const items = await tx.select().from(stockInvoiceItems).where(eq(stockInvoiceItems.stockInvoiceId, id)).all();
+      const inventoriesToDelete: number[] = [];
       if (items.length > 0) {
         const inventoryIds = [...new Set(items.map((item) => item.inventoryId))];
         const inventoryRows = await tx.select().from(inventories).where(inArray(inventories.id, inventoryIds)).all();
@@ -766,19 +781,27 @@ stockInvoicesRouter.delete('/:id', async (req: Request, res: Response) => {
           }
 
           const qty = Number(item.qty ?? 0);
-          // Revert stock qty update
           const nextUnitsInStock = (inventory.unitsInStock ?? 0) - qty;
-          await tx
-            .update(inventories)
-            .set({ unitsInStock: nextUnitsInStock })
-            .where(eq(inventories.id, inventory.id))
-            .run();
+          if (nextUnitsInStock === 0 && inventory.invoiceId === id) {
+            inventoriesToDelete.push(inventory.id);
+          } else {
+            await tx
+              .update(inventories)
+              .set({ unitsInStock: nextUnitsInStock })
+              .where(eq(inventories.id, inventory.id))
+              .run();
+          }
           inventoryMap.set(inventory.id, { ...inventory, unitsInStock: nextUnitsInStock });
         }
       }
 
       await tx.delete(stockInvoiceItems).where(eq(stockInvoiceItems.stockInvoiceId, id)).run();
       await tx.delete(stockInvoices).where(eq(stockInvoices.id, id)).run();
+
+      if (inventoriesToDelete.length > 0) {
+        await tx.delete(inventories).where(inArray(inventories.id, inventoriesToDelete)).run();
+        LogService.info('Deleted inventory records after invoice deletion (Stock)', { count: inventoriesToDelete.length, invoiceId: id });
+      }
     });
 
     LogService.info('Stock invoice deleted successfully', { stockInvoiceId: id });
