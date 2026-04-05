@@ -97,7 +97,7 @@
       <nz-form-item>
         <nz-form-label>{{ 'CATEGORY.TITLE' | translate }}</nz-form-label>
         <nz-form-control>
-          <nz-select [(ngModel)]="product.categoryId" name="categoryId" nzShowSearch required>
+          <nz-select [(ngModel)]="product.categoryId" name="categoryId" nzShowSearch>
             @for (c of structuredCategories(); track c.id) {
               <nz-option [nzValue]="c.id" [nzLabel]="c.name"></nz-option>
             }

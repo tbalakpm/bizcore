@@ -1,6 +1,7 @@
 import { NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Category, CategoryService } from '../product-settings/categories/category-service';
 import { type Brand, BrandService } from '../product-settings/brands/brand-service';
@@ -73,7 +74,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
   brands = signal<Brand[]>([]);
   taxRates = signal<TaxRate[]>([]);
 
-  useGlobalGtn = signal<boolean>(false);
+  // useGlobalGtn = signal<boolean>(false);
 
   get filteredBrands(): Brand[] {
     const catId = this.product.categoryId;
@@ -88,19 +89,44 @@ export class ProductFormComponent implements OnInit, OnChanges {
   error: string | null = null;
   productList = signal<Product[]>([]);
 
-  product: Partial<Product> = {}; //this.blankProduct();
+  product: Partial<Product> = {};
+
+  private defaultGtnSettings = {
+    useGlobal: false,
+    gtnMode: 'auto',
+    gtnGeneration: 'code'
+  };
 
   ngOnInit(): void {
-    this.settings.getSetting('use_global_gtn').subscribe((res) => {
-      this.useGlobalGtn.set(res.value === 'true');
+    forkJoin({
+      useGlobalGtn: this.settings.getSetting('use_global_gtn'),
+      gtnMode: this.settings.getSetting('gtn_mode'),
+      gtnGeneration: this.settings.getSetting('gtn_generation')
+    }).subscribe({
+      next: (res) => {
+        this.defaultGtnSettings = {
+          useGlobal: res.useGlobalGtn?.value === 'true',
+          gtnMode: (res.gtnMode?.value as any) || 'auto',
+          gtnGeneration: (res.gtnGeneration?.value as any) || 'code'
+        };
 
-      this.categoryService.getAll({ limit: 1000 }).subscribe((res) => this.categories.set(res.data));
-      this.attributeService.getAttributes().subscribe((res) => this.allAttributes.set(res));
-      this.templateService.getTemplates().subscribe((res) => this.templates.set(res));
-      this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
-      this.brandService.getAll({ limit: 1000 }).subscribe((res) => this.brands.set(res.data.filter(b => b.isActive)));
-      this.taxRateService.getAll().subscribe((res) => this.taxRates.set(res.data));
-      this.loadProduct();
+        // If it's a new product, re-initialize with defaults
+        if (!this.productId) {
+          this.product = this.blankProduct();
+        }
+
+        this.categoryService.getAll({ limit: 1000 }).subscribe((res) => this.categories.set(res.data));
+        this.attributeService.getAttributes().subscribe((res) => this.allAttributes.set(res));
+        this.templateService.getTemplates().subscribe((res) => this.templates.set(res));
+        this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
+        this.brandService.getAll({ limit: 1000 }).subscribe((res) => this.brands.set(res.data.filter(b => b.isActive)));
+        this.taxRateService.getAll().subscribe((res) => this.taxRates.set(res.data));
+        this.loadProduct();
+      },
+      error: () => {
+        // Fallback or handle error
+        this.loadProduct();
+      }
     });
   }
 
@@ -226,13 +252,15 @@ export class ProductFormComponent implements OnInit, OnChanges {
       unitPrice: undefined,
       hsnSac: undefined,
       taxRate: undefined,
-      gtnMode: 'auto',
-      gtnGeneration: 'code',
+
+      useGlobal: this.defaultGtnSettings.useGlobal,
+      gtnMode: this.defaultGtnSettings.gtnMode,
+      gtnGeneration: this.defaultGtnSettings.gtnGeneration,
       gtnPrefix: undefined,
       gtnStartPos: 1,
       gtnLength: 10,
-      useGlobal: this.useGlobalGtn(),
       trackBundleGtn: true,
+
       isTaxInclusive: false,
       isActive: true,
       productType: 'simple',
