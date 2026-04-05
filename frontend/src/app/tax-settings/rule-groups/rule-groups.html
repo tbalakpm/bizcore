@@ -10,25 +10,35 @@
 }
 @if (permissionService.canAdd('settings-tax')) {
   <nz-card class="mb-4!" nzTitle="{{ editingGroup ? 'Edit' : 'Add' }} Rule Group">
-    <form nz-form [nzLayout]="'vertical'">
+    <form nz-form [nzLayout]="'vertical'" #f="ngForm">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <nz-form-item>
           <nz-form-label nzRequired>Group Name</nz-form-label>
-          <nz-form-control>
+          <nz-form-control
+            [nzValidateStatus]="groupName.invalid && groupName.touched ? 'error' : ''"
+            nzErrorTip="Please enter group name"
+          >
             <input
               nz-input
               [(ngModel)]="groupForm.name"
               name="groupName"
+              #groupName="ngModel"
+              required
               placeholder="e.g. Mobile Phones Lower Rate"
             />
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
           <nz-form-label nzRequired>Priority (High = evaluated first)</nz-form-label>
-          <nz-form-control>
+          <nz-form-control
+            [nzValidateStatus]="priority.invalid && priority.touched ? 'error' : ''"
+            nzErrorTip="Please enter priority"
+          >
             <nz-input-number
               [(ngModel)]="groupForm.priority"
               name="gPriority"
+              #priority="ngModel"
+              required
               [nzStep]="1"
               class="w-full"
             ></nz-input-number>
@@ -46,8 +56,13 @@
           </nz-form-control>
         </nz-form-item>
       </div>
-      <div class="mt-4 flex gap-2">
-        <button nz-button nzType="primary" (click)="editingGroup ? saveEditGroup() : addGroup()">
+      <div class="mt-4 flex justify-end gap-2">
+        <button
+          nz-button
+          nzType="primary"
+          [disabled]="f.invalid"
+          (click)="editingGroup ? saveEditGroup() : addGroup()"
+        >
           {{ editingGroup ? 'Save Group' : 'Add Rule Group' }}
         </button>
         @if (editingGroup) {
@@ -75,7 +90,7 @@
     </thead>
     <tbody>
       @for (g of groupsTable.data; track g.id) {
-        <tr>
+        <tr [ngClass]="{ 'bg-surface-raised hover:bg-surface-raised!': g.id === editingGroup?.id }">
           <td class="font-bold">{{ g.name }}</td>
           <td>
             <nz-tag nzColor="purple">{{ g.priority }}</nz-tag>

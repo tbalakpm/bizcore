@@ -15,12 +15,13 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-rule-groups',
   standalone: true,
   imports: [
-    FormsModule,
+    CommonModule, FormsModule,
     NzCardModule, NzFormModule, NzInputNumberModule, NzTableModule,
     NzTagModule, NzDatePickerModule, NzInputModule, NzCheckboxModule,
     NzIconModule, NzButtonModule, NzPopconfirmModule, NzAlertModule

@@ -10,14 +10,19 @@
 }
 @if (permissionService.canAdd('settings-tax')) {
   <nz-card class="mb-4!" nzTitle="{{ editingRule ? 'Edit' : 'Add' }} Tax Rule">
-    <form nz-form [nzLayout]="'vertical'">
+    <form nz-form [nzLayout]="'vertical'" #f="ngForm">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <nz-form-item>
           <nz-form-label nzRequired>Rule Group</nz-form-label>
-          <nz-form-control>
+          <nz-form-control
+            [nzValidateStatus]="ruleGroup.invalid && ruleGroup.touched ? 'error' : ''"
+            nzErrorTip="Please select a group"
+          >
             <nz-select
               [(ngModel)]="ruleForm.ruleGroupId"
               name="ruleGroup"
+              #ruleGroup="ngModel"
+              required
               nzPlaceHolder="Select Group"
               class="w-full"
             >
@@ -29,10 +34,15 @@
         </nz-form-item>
         <nz-form-item>
           <nz-form-label nzRequired>Tax Rate</nz-form-label>
-          <nz-form-control>
+          <nz-form-control
+            [nzValidateStatus]="ruleRate.invalid && ruleRate.touched ? 'error' : ''"
+            nzErrorTip="Please select a rate"
+          >
             <nz-select
               [(ngModel)]="ruleForm.taxRateId"
               name="ruleRate"
+              #ruleRate="ngModel"
+              required
               nzPlaceHolder="Select Rate"
               class="w-full"
             >
@@ -110,8 +120,13 @@
           </nz-form-control>
         </nz-form-item>
       </div>
-      <div class="mt-4 flex gap-2">
-        <button nz-button nzType="primary" (click)="editingRule ? saveEditRule() : addRule()">
+      <div class="mt-4 flex justify-end gap-2">
+        <button
+          nz-button
+          nzType="primary"
+          [disabled]="f.invalid"
+          (click)="editingRule ? saveEditRule() : addRule()"
+        >
           {{ editingRule ? 'Save Rule' : 'Add Tax Rule' }}
         </button>
         @if (editingRule) {
@@ -143,7 +158,7 @@
     </thead>
     <tbody>
       @for (r of rulesTable.data; track r.id) {
-        <tr>
+        <tr [ngClass]="{ 'bg-surface-raised hover:bg-surface-raised!': r.id === editingRule?.id }">
           <td class="font-bold">
             {{ getGroupName(r.ruleGroupId) }}
             <nz-tag nzColor="purple" class="text-[10px]">{{ r.priority }}</nz-tag>

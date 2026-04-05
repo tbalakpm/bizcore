@@ -17,11 +17,12 @@ import { TaxRateService } from '../tax-rates/tax-rate-service';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tax-rules',
   imports: [
-    FormsModule,
+    CommonModule, FormsModule,
     NzCardModule, NzFormModule, NzSelectModule, NzInputNumberModule,
     NzTableModule, NzTagModule, NzPopconfirmModule, NzButtonModule,
     NzIconModule, NzInputModule, NzCheckboxModule, NzAlertModule

@@ -15,12 +15,13 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tax-rate',
   standalone: true,
   imports: [
-    FormsModule,
+    CommonModule, FormsModule,
     NzCardModule, NzFormModule, NzInputNumberModule, NzTableModule,
     NzTagModule, NzDatePickerModule, NzInputModule, NzCheckboxModule,
     NzIconModule, NzButtonModule, NzPopconfirmModule, NzAlertModule

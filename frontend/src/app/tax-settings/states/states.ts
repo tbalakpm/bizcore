@@ -12,11 +12,12 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-states',
   imports: [
-    FormsModule,
+    CommonModule, FormsModule,
     NzAlertModule, NzCardModule, NzFormModule, NzInputModule,
     NzButtonModule, NzIconModule, NzCheckboxModule, NzTableModule,
     NzTagModule, NzPopconfirmModule

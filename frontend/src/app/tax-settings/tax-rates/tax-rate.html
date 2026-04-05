@@ -10,20 +10,35 @@
 }
 @if (permissionService.canAdd('settings-tax')) {
   <nz-card class="mb-4!" nzTitle="{{ editingRate ? 'Edit' : 'Add' }} Tax Rate">
-    <form nz-form [nzLayout]="'vertical'">
+    <form nz-form [nzLayout]="'vertical'" #f="ngForm">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <nz-form-item>
           <nz-form-label nzRequired>Rate Code</nz-form-label>
-          <nz-form-control>
-            <input nz-input [(ngModel)]="rateForm.code" name="rateCode" placeholder="e.g. GST-18" />
+          <nz-form-control
+            [nzValidateStatus]="rateCode.invalid && rateCode.touched ? 'error' : ''"
+            nzErrorTip="Please enter rate code"
+          >
+            <input
+              nz-input
+              [(ngModel)]="rateForm.code"
+              name="rateCode"
+              #rateCode="ngModel"
+              required
+              placeholder="e.g. GST-18"
+            />
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
           <nz-form-label nzRequired>Total Rate (%)</nz-form-label>
-          <nz-form-control>
+          <nz-form-control
+            [nzValidateStatus]="rateVal.invalid && rateVal.touched ? 'error' : ''"
+            nzErrorTip="Please enter total rate"
+          >
             <nz-input-number
               [(ngModel)]="rateForm.rate"
               name="rate"
+              #rateVal="ngModel"
+              required
               (ngModelChange)="onRateValueChange($event)"
               [nzMin]="0"
               [nzStep]="1"
@@ -100,8 +115,13 @@
           </nz-form-control>
         </nz-form-item>
       </div>
-      <div class="mt-4 flex gap-2">
-        <button nz-button nzType="primary" (click)="editingRate ? saveEditRate() : addRate()">
+      <div class="mt-4 flex justify-end gap-2">
+        <button
+          nz-button
+          nzType="primary"
+          [disabled]="f.invalid"
+          (click)="editingRate ? saveEditRate() : addRate()"
+        >
           {{ editingRate ? 'Save Rate' : 'Add Tax Rate' }}
         </button>
         @if (editingRate) {
@@ -131,7 +151,7 @@
     </thead>
     <tbody>
       @for (r of ratesTable.data; track r.id) {
-        <tr>
+        <tr [ngClass]="{ 'bg-surface-raised hover:bg-surface-raised!': r.id === editingRate?.id }">
           <td class="font-bold">{{ r.code }}</td>
           <td>
             <nz-tag nzColor="blue">{{ r.rate }}%</nz-tag>

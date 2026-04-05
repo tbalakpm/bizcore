@@ -11,77 +11,93 @@
 
 @if (permissionService.canAdd('settings-tax')) {
   <nz-card class="mb-4!" nzTitle="{{ editingState ? 'Edit' : 'Add' }} State">
-    <form nz-form [nzLayout]="'inline'" class="flex flex-wrap gap-2">
-      <nz-form-item>
-        <nz-form-label nzRequired>State</nz-form-label>
-        <nz-form-control>
-          <input
-            nz-input
-            [(ngModel)]="stateForm.stateName"
-            name="stName"
-            placeholder="e.g. Tamil Nadu"
-          />
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item>
-        <nz-form-label nzRequired>State Code (GST)</nz-form-label>
-        <nz-form-control>
-          <input
-            nz-input
-            [(ngModel)]="stateForm.stateCode"
-            name="stCode"
-            placeholder="e.g. 33"
-            maxlength="2"
-          />
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item>
-        <nz-form-label nzRequired>Short Code</nz-form-label>
-        <nz-form-control>
-          <input
-            nz-input
-            [(ngModel)]="stateForm.stateShortCode"
-            name="stShort"
-            placeholder="e.g. TN"
-            maxlength="5"
-          />
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item>
-        <nz-form-label>Country</nz-form-label>
-        <nz-form-control>
-          <input
-            nz-input
-            [(ngModel)]="stateForm.countryCode"
-            name="stCountry"
-            placeholder="IN"
-            maxlength="2"
-          />
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item>
-        <nz-form-control>
-          <label nz-checkbox [(ngModel)]="stateForm.isUnionTerritory" name="stUT"
-            >Union Territory</label
+    <form nz-form [nzLayout]="'vertical'" #f="ngForm">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <nz-form-item>
+          <nz-form-label nzRequired>State</nz-form-label>
+          <nz-form-control
+            [nzValidateStatus]="stName.invalid && stName.touched ? 'error' : ''"
+            nzErrorTip="Please enter state name"
           >
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item>
-        <nz-form-control>
-          <div class="flex gap-2">
-            <button
-              nz-button
-              nzType="primary"
-              (click)="editingState ? saveEditState() : addState()"
-            >
-              {{ editingState ? 'Save' : 'Add' }}
-            </button>
-            @if (editingState) {
-              <button nz-button (click)="cancelEditState()">Cancel</button>
-            }
-          </div>
-        </nz-form-control>
-      </nz-form-item>
+            <input
+              nz-input
+              [(ngModel)]="stateForm.stateName"
+              name="stName"
+              #stName="ngModel"
+              required
+              placeholder="e.g. Tamil Nadu"
+            />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label nzRequired>State Code (GST)</nz-form-label>
+          <nz-form-control
+            [nzValidateStatus]="stCode.invalid && stCode.touched ? 'error' : ''"
+            nzErrorTip="Please enter state code"
+          >
+            <input
+              nz-input
+              [(ngModel)]="stateForm.stateCode"
+              name="stCode"
+              #stCode="ngModel"
+              required
+              placeholder="e.g. 33"
+              maxlength="2"
+            />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label nzRequired>Short Code</nz-form-label>
+          <nz-form-control
+            [nzValidateStatus]="stShort.invalid && stShort.touched ? 'error' : ''"
+            nzErrorTip="Please enter short code"
+          >
+            <input
+              nz-input
+              [(ngModel)]="stateForm.stateShortCode"
+              name="stShort"
+              #stShort="ngModel"
+              required
+              placeholder="e.g. TN"
+              maxlength="5"
+            />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>Country</nz-form-label>
+          <nz-form-control>
+            <input
+              nz-input
+              [(ngModel)]="stateForm.countryCode"
+              name="stCountry"
+              placeholder="IN"
+              maxlength="2"
+            />
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div class="flex flex-wrap items-center justify-between mt-4">
+        <nz-form-item class="mb-0!">
+          <nz-form-control>
+            <label nz-checkbox [(ngModel)]="stateForm.isUnionTerritory" name="stUT">
+              Union Territory
+            </label>
+          </nz-form-control>
+        </nz-form-item>
+        <div class="flex gap-2">
+          <button
+            nz-button
+            nzType="primary"
+            [disabled]="f.invalid"
+            (click)="editingState ? saveEditState() : addState()"
+          >
+            {{ editingState ? 'Save' : 'Add' }}
+          </button>
+          @if (editingState) {
+            <button nz-button (click)="cancelEditState()">Cancel</button>
+          }
+        </div>
+      </div>
     </form>
   </nz-card>
 }
@@ -106,7 +122,7 @@
     </thead>
     <tbody>
       @for (s of statesTable.data; track s.id) {
-        <tr>
+        <tr [ngClass]="{ 'bg-surface-raised hover:bg-surface-raised!': s.id === editingState?.id }">
           <td class="font-bold">{{ s.stateName }}</td>
           <td>{{ s.stateCode }}</td>
           <td>{{ s.stateShortCode }}</td>

@@ -18,7 +18,7 @@ import { GlobalErrorHandler } from './utils/global-error-handler';
 import * as allIcons from '@ant-design/icons-angular/icons';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { provideNzConfig } from 'ng-zorro-antd/core/config';
-import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
+import { NZ_I18N, en_US, NZ_DATE_CONFIG } from 'ng-zorro-antd/i18n';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 registerLocaleData(localeEnIn);
@@ -46,6 +46,13 @@ export const appConfig: ApplicationConfig = {
       theme: { primaryColor: '#1e3a5f' },
     }),
     { provide: NZ_I18N, useValue: en_US },
+    {
+      provide: NZ_DATE_CONFIG,
+      useValue: {
+        firstDayOfWeek: 1,
+        format: 'dd-MM-yyyy',
+      }
+    },
     provideCharts(withDefaultRegisterables()),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ],
