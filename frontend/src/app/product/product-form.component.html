@@ -2,7 +2,7 @@
   <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-3"></nz-alert>
 }
 
-<form nz-form (ngSubmit)="onSubmit()" nzLayout="vertical">
+<form nz-form #f="ngForm" (ngSubmit)="onSubmit()" nzLayout="vertical">
   <div class="grid grid-cols-4 gap-2">
     <div class="col-span-4">
       <nz-form-item>
@@ -52,13 +52,14 @@
     -->
     <div class="col-span-4 md:col-span-2 lg:col-span-1">
       <nz-form-item>
-        <nz-form-label>{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</nz-form-label>
-        <nz-form-control>
+        <nz-form-label nzRequired>{{ 'PRODUCT.TITLE' | translate }} {{ 'CODE' | translate }}</nz-form-label>
+        <nz-form-control nzErrorTip="Please enter a code">
           <input
             nz-input
             type="text"
             [(ngModel)]="product.code"
             name="productCode"
+            required
             autofocus
             placeholder="e.g. PRD-001"
           />
@@ -67,13 +68,14 @@
     </div>
     <div class="col-span-4 md:col-span-2 lg:col-span-1">
       <nz-form-item>
-        <nz-form-label>{{ 'PRODUCT.TITLE' | translate }} {{ 'NAME' | translate }}</nz-form-label>
-        <nz-form-control>
+        <nz-form-label nzRequired>{{ 'PRODUCT.TITLE' | translate }} {{ 'NAME' | translate }}</nz-form-label>
+        <nz-form-control nzErrorTip="Please enter a name">
           <input
             nz-input
             type="text"
             [(ngModel)]="product.name"
             name="productName"
+            required
             placeholder="Product name"
           />
         </nz-form-control>
@@ -97,7 +99,7 @@
       <nz-form-item>
         <nz-form-label>{{ 'CATEGORY.TITLE' | translate }}</nz-form-label>
         <nz-form-control>
-          <nz-select [(ngModel)]="product.categoryId" name="categoryId" nzShowSearch>
+          <nz-select [(ngModel)]="product.categoryId" name="categoryId" nzPlaceHolder="Select Category" nzShowSearch>
             @for (c of structuredCategories(); track c.id) {
               <nz-option [nzValue]="c.id" [nzLabel]="c.name"></nz-option>
             }
@@ -448,7 +450,7 @@
         nz-button
         nzType="primary"
         type="submit"
-        [disabled]="loading"
+        [disabled]="loading || f.invalid"
         class="px-3! w-max! text-sm!"
       >
         <span nz-icon [nzType]="loading ? 'loading' : 'save'" nzTheme="outline"></span>

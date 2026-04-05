@@ -42,6 +42,7 @@
               (ngModelChange)="onRateValueChange($event)"
               [nzMin]="0"
               [nzStep]="1"
+              nzPlaceHolder="e.g. 18"
               class="w-full"
             ></nz-input-number>
           </nz-form-control>
@@ -53,6 +54,7 @@
               [(ngModel)]="rateForm.cgstRate"
               name="cgst"
               [nzMin]="0"
+              nzPlaceHolder="0"
               class="w-full"
             ></nz-input-number>
           </nz-form-control>
@@ -64,6 +66,7 @@
               [(ngModel)]="rateForm.sgstRate"
               name="sgst"
               [nzMin]="0"
+              nzPlaceHolder="0"
               class="w-full"
             ></nz-input-number>
           </nz-form-control>
@@ -75,6 +78,7 @@
               [(ngModel)]="rateForm.igstRate"
               name="igst"
               [nzMin]="0"
+              nzPlaceHolder="0"
               class="w-full"
             ></nz-input-number>
           </nz-form-control>
@@ -86,6 +90,7 @@
               [(ngModel)]="rateForm.cessRate"
               name="cess_rate"
               [nzMin]="0"
+              nzPlaceHolder="0"
               class="w-full"
             ></nz-input-number>
           </nz-form-control>

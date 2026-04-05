@@ -23,10 +23,13 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-users',
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule, TranslatePipe,
     HasPermissionDirective,
     NzTableModule, NzFormModule, NzInputModule, NzSelectModule,

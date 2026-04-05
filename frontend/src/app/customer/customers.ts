@@ -25,9 +25,12 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-customers',
   imports: [
+    CommonModule,
     FormsModule, TranslatePipe, AddressForm,
     NzTableModule, NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
     NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,

@@ -24,9 +24,12 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { HasPermissionDirective } from '../shared/directives/has-permission.directive';
 
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-suppliers',
   imports: [
+    CommonModule,
     FormsModule, TranslatePipe, AddressForm,
     NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule,
     NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule,

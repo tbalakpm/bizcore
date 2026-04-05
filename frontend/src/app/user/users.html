@@ -19,17 +19,18 @@
       @if (error) {
         <nz-alert nzType="error" [nzMessage]="error" nzShowIcon nzCloseable class="mb-4"></nz-alert>
       }
-      <form nz-form (ngSubmit)="onSubmit()" nzLayout="vertical">
+      <form nz-form #f="ngForm" (ngSubmit)="onSubmit()" nzLayout="vertical">
         <div class="grid grid-cols-12 gap-2">
           <div class="col-span-12 md:col-span-6 xl:col-span-3">
             <nz-form-item>
-              <nz-form-label>{{ 'USER.USERNAME' | translate }}</nz-form-label>
-              <nz-form-control>
+              <nz-form-label nzRequired>{{ 'USER.USERNAME' | translate }}</nz-form-label>
+              <nz-form-control nzErrorTip="Please enter a username">
                 <input
                   nz-input
                   type="text"
                   [(ngModel)]="editingUser.username"
                   name="newUserUsername"
+                  required
                   autofocus
                   placeholder="e.g. john.doe"
                 />
@@ -38,13 +39,14 @@
           </div>
           <div class="col-span-12 md:col-span-6 xl:col-span-3">
             <nz-form-item>
-              <nz-form-label>{{ 'USER.FIRST_NAME' | translate }}</nz-form-label>
-              <nz-form-control>
+              <nz-form-label nzRequired>{{ 'USER.FIRST_NAME' | translate }}</nz-form-label>
+              <nz-form-control nzErrorTip="Please enter a first name">
                 <input
                   nz-input
                   type="text"
                   [(ngModel)]="editingUser.firstName"
                   name="newUserFirstName"
+                  required
                   placeholder="First name"
                 />
               </nz-form-control>
@@ -66,11 +68,12 @@
           </div>
           <div class="col-span-12 md:col-span-6 xl:col-span-3">
             <nz-form-item>
-              <nz-form-label>{{ 'USER.ROLE' | translate }}</nz-form-label>
-              <nz-form-control>
+              <nz-form-label nzRequired>{{ 'USER.ROLE' | translate }}</nz-form-label>
+              <nz-form-control nzErrorTip="Please select a role">
                 <nz-select
                   [(ngModel)]="editingUser.role"
                   name="newUserRole"
+                  required
                   nzPlaceHolder="Select role"
                 >
                   <nz-option nzValue="user" nzLabel="user"></nz-option>
@@ -165,6 +168,7 @@
                 nz-button
                 nzType="primary"
                 type="submit"
+                [disabled]="f.invalid"
                 class="text-sm"
               >
                 <span
@@ -269,7 +273,7 @@
       </thead>
       <tbody>
         @for (u of userTable.data; track u.id) {
-          <tr [class.ant-table-row-selected]="editingUser.id == u.id">
+          <tr [ngClass]="{ 'bg-surface-raised hover:bg-surface-raised!': u.id === editingUser.id }">
             <td>{{ u.username }}</td>
             <td>{{ u.firstName || '-' }}</td>
             <td>{{ u.lastName || '-' }}</td>

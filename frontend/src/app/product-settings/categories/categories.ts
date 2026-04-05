@@ -19,9 +19,11 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-categories',
-  imports: [TranslatePipe, FormsModule, HasPermissionDirective, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropdownModule, NzSelectModule],
+  imports: [CommonModule, TranslatePipe, FormsModule, HasPermissionDirective, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropdownModule, NzSelectModule],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {

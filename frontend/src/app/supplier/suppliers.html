@@ -22,29 +22,32 @@
       </h2>
       <form
         nz-form
+        #f="ngForm"
         (ngSubmit)="onSubmit()"
         nzLayout="vertical"
         class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2"
       >
         <nz-form-item>
-          <nz-form-label>{{ 'CODE' | translate }}</nz-form-label>
-          <nz-form-control>
+          <nz-form-label nzRequired>{{ 'CODE' | translate }}</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a code">
             <input
               nz-input
               [(ngModel)]="editingSupplier.code"
               name="newSupplierCode"
+              required
               autofocus
               placeholder="e.g. SUP-001"
             />
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
-          <nz-form-label>{{ 'NAME' | translate }}</nz-form-label>
-          <nz-form-control>
+          <nz-form-label nzRequired>{{ 'NAME' | translate }}</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a name">
             <input
               nz-input
               [(ngModel)]="editingSupplier.name"
               name="newSupplierName"
+              required
               placeholder="Supplier name"
             />
           </nz-form-control>
@@ -228,7 +231,7 @@
         </div>
 
         <div class="flex col-span-full justify-end gap-3 mt-2">
-          <button nz-button nzType="primary" type="submit">
+          <button nz-button nzType="primary" type="submit" [disabled]="f.invalid">
             <span nz-icon nzType="save" nzTheme="outline"></span>
             Save
           </button>
@@ -323,7 +326,7 @@
       </thead>
       <tbody>
         @for (s of supplierTable.data; track s.id) {
-          <tr [class.ant-table-row-selected]="editingSupplier.id === s.id">
+          <tr [ngClass]="{ 'bg-surface-raised hover:bg-surface-raised!': s.id === editingSupplier.id }">
             <td>{{ s.code }}</td>
             <td>{{ s.name }}</td>
             <td class="capitalize">{{ s.type }}</td>

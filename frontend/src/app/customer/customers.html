@@ -20,17 +20,18 @@
         {{ editingCustomer.id ? ('EDIT' | translate) : ('ADD' | translate) }}
         {{ 'MENU.CUSTOMERS' | translate }}
       </h2>
-      <form nz-form (ngSubmit)="onSubmit()" nzLayout="vertical">
+      <form nz-form #f="ngForm" (ngSubmit)="onSubmit()" nzLayout="vertical">
         <div class="grid grid-cols-12 gap-2">
           <div class="col-span-12 md:col-span-6 xl:col-span-3">
             <nz-form-item>
-              <nz-form-label>{{ 'CODE' | translate }}</nz-form-label>
-              <nz-form-control>
+              <nz-form-label nzRequired>{{ 'CODE' | translate }}</nz-form-label>
+              <nz-form-control nzErrorTip="Please enter a code">
                 <input
                   nz-input
                   type="text"
                   [(ngModel)]="editingCustomer.code"
                   name="newCustomerCode"
+                  required
                   autofocus
                   placeholder="e.g. CUST-001"
                 />
@@ -39,13 +40,14 @@
           </div>
           <div class="col-span-12 md:col-span-6 xl:col-span-3">
             <nz-form-item>
-              <nz-form-label>{{ 'NAME' | translate }}</nz-form-label>
-              <nz-form-control>
+              <nz-form-label nzRequired>{{ 'NAME' | translate }}</nz-form-label>
+              <nz-form-control nzErrorTip="Please enter a name">
                 <input
                   nz-input
                   type="text"
                   [(ngModel)]="editingCustomer.name"
                   name="newCustomerName"
+                  required
                   placeholder="Customer name"
                 />
               </nz-form-control>
@@ -152,7 +154,7 @@
 
           <!-- Actions -->
           <div class="flex col-span-full justify-end mt-2 gap-3">
-            <button nz-button nzType="primary" type="submit">
+            <button nz-button nzType="primary" type="submit" [disabled]="f.invalid">
               <span nz-icon nzType="save" nzTheme="outline"></span>
               Save
             </button>
@@ -249,7 +251,7 @@
       </thead>
       <tbody>
         @for (c of customerTable.data; track c.id) {
-          <tr [class.ant-table-row-selected]="editingCustomer.id == c.id">
+          <tr [ngClass]="{ 'bg-surface-raised hover:bg-surface-raised!': c.id === editingCustomer.id }">
             <td>{{ c.code }}</td>
             <td>{{ c.name }}</td>
             <td>{{ c.type }}</td>

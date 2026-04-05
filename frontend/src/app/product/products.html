@@ -114,7 +114,7 @@
       </thead>
       <tbody>
         @for (p of productTable.data; track p.id) {
-          <tr [class.ant-table-row-selected]="editingProductId === p.id">
+          <tr [ngClass]="{ 'bg-surface-raised hover:bg-surface-raised!': p.id === editingProductId }">
             <td>{{ p.code }}</td>
             <td>{{ p.name }}</td>
             <td>{{ p.description }}</td>

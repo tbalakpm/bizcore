@@ -151,7 +151,7 @@
       <nz-form-item>
         <nz-form-label nzRequired>Type</nz-form-label>
         <nz-form-control>
-          <nz-select formControlName="type" class="w-full">
+          <nz-select formControlName="type" nzPlaceHolder="Select type" class="w-full">
             @for (t of types; track t.value) {
               <nz-option [nzLabel]="t.label" [nzValue]="t.value"></nz-option>
             }
@@ -179,23 +179,23 @@
         <nz-form-control>
           @switch (attributeForm.get('type')?.value) {
             @case ('text') {
-              <input nz-input formControlName="defaultValue" placeholder="Default text" />
+              <input nz-input formControlName="defaultValue" placeholder="e.g. Medium, Red, 10kg" />
             }
             @case ('number') {
-              <input type="number" nz-input formControlName="defaultValue" placeholder="0" />
+              <input type="number" nz-input formControlName="defaultValue" placeholder="e.g. 0" />
             }
             @case ('boolean') {
               <nz-switch formControlName="defaultValue"></nz-switch>
             }
             @case ('single_select') {
-              <nz-select formControlName="defaultValue" nzAllowClear class="w-full">
+              <nz-select formControlName="defaultValue" nzAllowClear nzPlaceHolder="Select default value" class="w-full">
                 @for (o of attributeForm.get('options')?.value; track o) {
                   <nz-option [nzLabel]="o" [nzValue]="o"></nz-option>
                 }
               </nz-select>
             }
             @case ('multi_select') {
-              <nz-select nzMode="multiple" formControlName="defaultValue" class="w-full">
+              <nz-select nzMode="multiple" formControlName="defaultValue" nzPlaceHolder="Select default values" class="w-full">
                 @for (o of attributeForm.get('options')?.value; track o) {
                   <nz-option [nzLabel]="o" [nzValue]="o"></nz-option>
                 }

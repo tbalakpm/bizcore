@@ -24,9 +24,12 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { SettingsService } from '../settings/settings.service';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-product-form',
   imports: [
+    CommonModule,
     FormsModule, NgSwitch, NgSwitchCase, TranslatePipe,
     NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
     NzAlertModule, NzIconModule, NzInputNumberModule, NzTooltipModule,

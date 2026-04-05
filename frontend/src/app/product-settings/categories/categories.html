@@ -88,7 +88,7 @@
           </thead>
           <tbody>
             @for (c of categoryTable.data; track c.id) {
-              <tr [class.ant-table-row-selected]="editing?.id == c.id">
+              <tr [ngClass]="{ 'bg-surface-raised hover:bg-surface-raised!': editing?.id === c.id }">
                 <td>
                   @if (editing?.id == c.id) {
                     <input
@@ -232,26 +232,28 @@
       <div class="max-h-max">
         <nz-card>
           <h2 class="text-base font-semibold mb-2">{{ 'CATEGORY.ADD' | translate }}</h2>
-          <form nz-form (ngSubmit)="addCategory()" class="space-y-2" nzLayout="vertical">
+          <form nz-form #f="ngForm" (ngSubmit)="addCategory()" class="space-y-2" nzLayout="vertical">
             <nz-form-item>
-              <nz-form-label>{{ 'CODE' | translate }}</nz-form-label>
-              <nz-form-control>
+              <nz-form-label nzRequired>{{ 'CODE' | translate }}</nz-form-label>
+              <nz-form-control nzErrorTip="Please enter a code">
                 <input
                   nz-input
                   [(ngModel)]="newCategory.code"
                   name="newCategoryCode"
+                  required
                   autofocus
                   placeholder="e.g. CAT-01"
                 />
               </nz-form-control>
             </nz-form-item>
             <nz-form-item>
-              <nz-form-label>{{ 'NAME' | translate }}</nz-form-label>
-              <nz-form-control>
+              <nz-form-label nzRequired>{{ 'NAME' | translate }}</nz-form-label>
+              <nz-form-control nzErrorTip="Please enter a name">
                 <input
                   nz-input
                   [(ngModel)]="newCategory.name"
                   name="newCategoryName"
+                  required
                   placeholder="Category name"
                 />
               </nz-form-control>
@@ -282,10 +284,12 @@
                 </nz-select>
               </nz-form-control>
             </nz-form-item>
-            <button nz-button nzBlock nzType="primary" type="submit" class="mt-3!">
-              <span nz-icon nzType="save" nzTheme="outline"></span>
-              {{ 'SAVE' | translate }}
-            </button>
+            <div class="flex justify-end mt-3">
+              <button nz-button nzType="primary" type="submit" [disabled]="f.invalid">
+                <span nz-icon nzType="save" nzTheme="outline"></span>
+                {{ 'SAVE' | translate }}
+              </button>
+            </div>
           </form>
         </nz-card>
       </div>

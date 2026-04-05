@@ -17,9 +17,12 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { FormsModule } from '@angular/forms';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-products',
   imports: [
+    CommonModule,
     TranslatePipe, FormsModule, ProductFormComponent,
     NzTableModule, NzTagModule, NzSwitchModule, NzButtonModule,
     NzIconModule, NzTooltipModule, NzPopconfirmModule, NzAlertModule, NzCardModule,

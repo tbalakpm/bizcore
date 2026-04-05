@@ -20,9 +20,11 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-brands',
-  imports: [TranslatePipe, FormsModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropdownModule, HasPermissionDirective, NzSelectModule],
+  imports: [CommonModule, TranslatePipe, FormsModule, NzTableModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule, NzSwitchModule, NzPopconfirmModule, NzAlertModule, NzTooltipModule, NzCardModule, NzDropdownModule, HasPermissionDirective, NzSelectModule],
   templateUrl: './brands.html',
 })
 export class Brands implements OnInit {
