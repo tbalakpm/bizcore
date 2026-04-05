@@ -3,7 +3,7 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Address } from '../../customer/customer-service';
-import { StateService, State } from '../../settings/tax/state-service';
+import { StateService, State } from '../../tax-settings/states/state-service';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NgIf, NgFor } from '@angular/common';
 

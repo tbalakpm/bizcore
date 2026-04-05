@@ -14,8 +14,8 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { PermissionService } from '../../auth/permission.service';
-import { StateService, State } from '../tax/state-service';
 import { signal } from '@angular/core';
+import { State, StateService } from '../../tax-settings/states/state-service';
 
 @Component({
   selector: 'app-general-settings',

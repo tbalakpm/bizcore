@@ -9,44 +9,46 @@
 
 ### 1.1 — nz-table `nzSize` inconsistency
 
-| File | Current | Recommended |
-|---|---|---|
-| `categories.html` | `nzSize="middle"` | Change to `nzSize="small"` for consistency with all other tables |
-| `dashboard.html` (recent entries) | `nzSize="small"` | ✅ OK |
-| `products.html` | `nzSize="small"` | ✅ OK |
-| `customers.html` | `nzSize="small"` | ✅ OK |
-| `suppliers.html` | `nzSize="small"` | ✅ OK |
-| `users.html` (both tables) | `nzSize="small"` | ✅ OK |
-| `sales-invoices.html` | `nzSize="small"` | ✅ OK |
-| `sales-invoice-form.html` | `nzSize="small"` | ✅ OK |
-| `purchase-invoices.html` | `nzSize="small"` | ✅ OK |
-| `purchase-invoice-form.html` | `nzSize="small"` | ✅ OK |
-| `stock-invoices.html` | `nzSize="small"` | ✅ OK |
-| `stock-invoice-form.html` | `nzSize="small"` | ✅ OK |
-| `entries.html` | `nzSize="small"` | ✅ OK |
-| `registers.html` | `nzSize="small"` | ✅ OK |
+| File                              | Current           | Recommended                                                      |
+| --------------------------------- | ----------------- | ---------------------------------------------------------------- |
+| `categories.html`                 | `nzSize="middle"` | Change to `nzSize="small"` for consistency with all other tables |
+| `dashboard.html` (recent entries) | `nzSize="small"`  | ✅ OK                                                            |
+| `products.html`                   | `nzSize="small"`  | ✅ OK                                                            |
+| `customers.html`                  | `nzSize="small"`  | ✅ OK                                                            |
+| `suppliers.html`                  | `nzSize="small"`  | ✅ OK                                                            |
+| `users.html` (both tables)        | `nzSize="small"`  | ✅ OK                                                            |
+| `sales-invoices.html`             | `nzSize="small"`  | ✅ OK                                                            |
+| `sales-invoice-form.html`         | `nzSize="small"`  | ✅ OK                                                            |
+| `purchase-invoices.html`          | `nzSize="small"`  | ✅ OK                                                            |
+| `purchase-invoice-form.html`      | `nzSize="small"`  | ✅ OK                                                            |
+| `stock-invoices.html`             | `nzSize="small"`  | ✅ OK                                                            |
+| `stock-invoice-form.html`         | `nzSize="small"`  | ✅ OK                                                            |
+| `entries.html`                    | `nzSize="small"`  | ✅ OK                                                            |
+| `registers.html`                  | `nzSize="small"`  | ✅ OK                                                            |
 
 **Action:** `categories.html` — change `nzSize="middle"` → `nzSize="small"` on the `<nz-table>`.
 
 ### 1.2 — nz-button missing `nzSize="small"` in action columns
 
-| File | Issue |
-|---|---|
-| `categories.html` | Action buttons (`edit`, `delete`, `save`, `cancel`) do NOT have `nzSize="small"` — all other list pages use `nzSize="small"` |
+| File              | Issue                                                                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `categories.html` | Action buttons (`edit`, `delete`, `save`, `cancel`) do NOT have `nzSize="small"` — all other list pages use `nzSize="small"`           |
 | `categories.html` | The "Add" submit button is full-width but doesn't have `nzSize` — it's fine as a form submit, but add `nzSize="small"` for consistency |
-| `login.html` | Login button — OK as full-width primary, no size needed |
-| `dashboard.html` | No action buttons — OK |
-| `customers.html` | Form "Save" button — missing `nzSize="small"` (though as form submit, this is debatable — see 1.3) |
-| `suppliers.html` | Form "Save" button — missing `nzSize="small"` (same note) |
-| `users.html` | Form "Save" button — missing `nzSize="small"` |
-| `entries.html` | Form "Save" button — no nzSize, OK as form submit |
+| `login.html`      | Login button — OK as full-width primary, no size needed                                                                                |
+| `dashboard.html`  | No action buttons — OK                                                                                                                 |
+| `customers.html`  | Form "Save" button — missing `nzSize="small"` (though as form submit, this is debatable — see 1.3)                                     |
+| `suppliers.html`  | Form "Save" button — missing `nzSize="small"` (same note)                                                                              |
+| `users.html`      | Form "Save" button — missing `nzSize="small"`                                                                                          |
+| `entries.html`    | Form "Save" button — no nzSize, OK as form submit                                                                                      |
 
 **Action:**
+
 - `categories.html`: Add `nzSize="small"` to ALL action column buttons (edit, delete, save, cancel) — align with products, customers, suppliers, users, entries, registers which all use `nzSize="small"` in action columns.
 
 ### 1.3 — Form submit buttons sizing inconsistency
 
 Across pages, form submit buttons have inconsistent sizing:
+
 - `customers.html`, `suppliers.html`, `users.html`: Submit buttons have NO `nzSize` (defaults to "default" = medium)
 - `product-form.component.html`: Submit/Cancel buttons have NO `nzSize`
 - `entries.html`, `registers.html`: Submit buttons have NO `nzSize`
@@ -56,8 +58,8 @@ Across pages, form submit buttons have inconsistent sizing:
 
 ### 1.4 — nz-switch missing `nzSize="small"` in categories.html
 
-| File | Issue |
-|---|---|
+| File              | Issue                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | `categories.html` | `<nz-switch>` has NO `nzSize` attribute — all other pages (products, customers, suppliers, users, registers) use `nzSize="small"` |
 
 **Action:** `categories.html`: Add `nzSize="small"` to the `<nz-switch>`.
@@ -82,53 +84,53 @@ The `app.html` content area uses `class="m-2 md:m-4 p-3 md:p-4"` — this is alr
 
 ### 2.2 — Page title bottom margin inconsistency
 
-| File | Pattern | Gap |
-|---|---|---|
-| `dashboard.html` | `<div class="flex flex-col gap-4">` (wraps entire page) | `gap-4` between title and content |
-| `categories.html` | `<div class="space-y-4">` | `space-y-4` |
-| `products.html` | Title has `mb-4` | `mb-4` |
-| `customers.html` | Title has `mb-4` | `mb-4` |
-| `suppliers.html` | Title has `mb-4` | `mb-4` |
-| `users.html` | Title has `mb-4` | `mb-4` |
-| `sales-invoices.html` | Title has `mb-4` | `mb-4` |
-| `purchase-invoices.html` | Title has `mb-4` | `mb-4` |
-| `stock-invoices.html` | Title has `mb-4` | `mb-4` |
-| `entries.html` | Title has `mb-3` | `mb-3` ← different |
-| `registers.html` | Title has `mb-4` | `mb-4` |
-| Invoice forms (all) | Title has `mb-4` | `mb-4` |
+| File                     | Pattern                                                 | Gap                               |
+| ------------------------ | ------------------------------------------------------- | --------------------------------- |
+| `dashboard.html`         | `<div class="flex flex-col gap-4">` (wraps entire page) | `gap-4` between title and content |
+| `categories.html`        | `<div class="space-y-4">`                               | `space-y-4`                       |
+| `products.html`          | Title has `mb-4`                                        | `mb-4`                            |
+| `customers.html`         | Title has `mb-4`                                        | `mb-4`                            |
+| `suppliers.html`         | Title has `mb-4`                                        | `mb-4`                            |
+| `users.html`             | Title has `mb-4`                                        | `mb-4`                            |
+| `sales-invoices.html`    | Title has `mb-4`                                        | `mb-4`                            |
+| `purchase-invoices.html` | Title has `mb-4`                                        | `mb-4`                            |
+| `stock-invoices.html`    | Title has `mb-4`                                        | `mb-4`                            |
+| `entries.html`           | Title has `mb-3`                                        | `mb-3` ← different                |
+| `registers.html`         | Title has `mb-4`                                        | `mb-4`                            |
+| Invoice forms (all)      | Title has `mb-4`                                        | `mb-4`                            |
 
 **Action:** `entries.html`: Change title wrapper `mb-3` → `mb-4` for consistency.
 
 ### 2.3 — Grid gap inconsistency across pages
 
-| File | Layout | Gap |
-|---|---|---|
-| `dashboard.html` (summary cards) | `grid gap-4` | `gap-4` |
-| `dashboard.html` (charts row) | `grid gap-4` | `gap-4` |
-| `categories.html` (list+form) | `grid gap-4` | `gap-4` |
-| `products.html` | `grid gap-4` | `gap-4` |
-| `customers.html` | `grid gap-4` | `gap-4` |
-| `suppliers.html` | `grid gap-4` | `gap-4` |
-| `users.html` | `grid gap-4` | `gap-4` |
-| `entries.html` | `grid gap-4` | `gap-4` |
-| `registers.html` | `grid gap-4` | `gap-4` |
-| `sales-invoice-form.html` (header form) | `grid gap-4` | `gap-4` |
+| File                                       | Layout       | Gap     |
+| ------------------------------------------ | ------------ | ------- |
+| `dashboard.html` (summary cards)           | `grid gap-4` | `gap-4` |
+| `dashboard.html` (charts row)              | `grid gap-4` | `gap-4` |
+| `categories.html` (list+form)              | `grid gap-4` | `gap-4` |
+| `products.html`                            | `grid gap-4` | `gap-4` |
+| `customers.html`                           | `grid gap-4` | `gap-4` |
+| `suppliers.html`                           | `grid gap-4` | `gap-4` |
+| `users.html`                               | `grid gap-4` | `gap-4` |
+| `entries.html`                             | `grid gap-4` | `gap-4` |
+| `registers.html`                           | `grid gap-4` | `gap-4` |
+| `sales-invoice-form.html` (header form)    | `grid gap-4` | `gap-4` |
 | `purchase-invoice-form.html` (header form) | `grid gap-4` | `gap-4` |
-| `stock-invoice-form.html` (header form) | `grid gap-4` | `gap-4` |
+| `stock-invoice-form.html` (header form)    | `grid gap-4` | `gap-4` |
 
 ✅ Grid gaps are consistent at `gap-4` across all pages.
 
 ### 2.4 — Form vertical spacing patterns
 
-| File | Form spacing |
-|---|---|
-| `categories.html` (add form) | `space-y-3` |
-| `entries.html` (edit form) | `space-y-3` |
-| `registers.html` (edit form) | `space-y-3` |
-| `login.html` | `space-y-4` ← different |
-| `suppliers.html` form | No `space-y-*` — uses CSS grid gap |
-| `customers.html` form | No `space-y-*` — uses nz-row gutter |
-| `users.html` form | No `space-y-*` — uses nz-row gutter |
+| File                          | Form spacing                        |
+| ----------------------------- | ----------------------------------- |
+| `categories.html` (add form)  | `space-y-3`                         |
+| `entries.html` (edit form)    | `space-y-3`                         |
+| `registers.html` (edit form)  | `space-y-3`                         |
+| `login.html`                  | `space-y-4` ← different             |
+| `suppliers.html` form         | No `space-y-*` — uses CSS grid gap  |
+| `customers.html` form         | No `space-y-*` — uses nz-row gutter |
+| `users.html` form             | No `space-y-*` — uses nz-row gutter |
 | `product-form.component.html` | No `space-y-*` — uses nz-row gutter |
 
 **Observation:** Some forms use `space-y-3`, some use `nz-row [nzGutter]="16"`, and the login uses `space-y-4`. The nz-row gutter approach is the NG-ZORRO-idiomatic way. The inconsistency is minor because the approaches are different (vertical list vs grid).
@@ -137,10 +139,10 @@ The `app.html` content area uses `class="m-2 md:m-4 p-3 md:p-4"` — this is alr
 
 ### 2.5 — Summary section spacing in invoice forms
 
-| File | Gap |
-|---|---|
-| `sales-invoice-form.html` | `gap-6` between summary help text and totals card |
-| `purchase-invoice-form.html` | `gap-6` between additional terms and totals card |
+| File                         | Gap                                               |
+| ---------------------------- | ------------------------------------------------- |
+| `sales-invoice-form.html`    | `gap-6` between summary help text and totals card |
+| `purchase-invoice-form.html` | `gap-6` between additional terms and totals card  |
 
 **Recommendation:** Reduce `gap-6` to `gap-4` in the summary sections of both `sales-invoice-form.html` and `purchase-invoice-form.html` for tighter spacing consistent with the rest of the app.
 
@@ -181,42 +183,42 @@ The card radius (12px) is intentionally larger than input/button radius (8px) wh
 
 ### 4.1 — Hardcoded Tailwind color classes (should use design tokens or NG-ZORRO theme)
 
-| File | Line/Element | Hardcoded Color | Recommendation |
-|---|---|---|---|
-| `products.html` | Empty state text | `text-gray-400` | Use `text-text-muted` or `style="color: var(--color-text-muted)"` |
-| `customers.html` | Empty state text | `text-gray-400` | Use `text-text-muted` |
-| `suppliers.html` | Empty state text | `text-gray-400` | Use `text-text-muted` |
-| `users.html` | Empty state text | `text-gray-400` | Use `text-text-muted` |
-| `users.html` | Permission help text | `text-gray-400` | Use `text-text-muted` |
-| `sales-invoices.html` | Empty state | `text-gray-400 italic py-8` | Use `text-text-muted` |
-| `sales-invoices.html` | Filter label | `text-gray-500` | Use `text-text-muted` |
-| `sales-invoices.html` | Rows label | `text-gray-500` | Use `text-text-muted` |
-| `sales-invoices.html` | Net amount | `text-green-600` | Use `style="color: var(--color-success)"` |
-| `purchase-invoices.html` | Empty state | `text-gray-400 italic py-8` | Use `text-text-muted` |
-| `purchase-invoices.html` | Filter/Sort labels | `text-gray-500` | Use `text-text-muted` |
-| `purchase-invoices.html` | Net amount | `text-green-600` | Use `style="color: var(--color-success)"` |
-| `purchase-invoice-form.html` | Various labels | `text-gray-500` | Use `text-text-muted` |
-| `purchase-invoice-form.html` | Various option sublabels | `text-gray-400` | Use `text-text-muted` |
-| `purchase-invoice-form.html` | Net amount | `text-green-600` | Use `style="color: var(--color-success)"` |
-| `stock-invoices.html` | Empty state | `text-gray-400 italic py-8` | Use `text-text-muted` |
-| `stock-invoices.html` | Filter/Sort/Rows labels | `text-gray-500` | Use `text-text-muted` |
-| `stock-invoices.html` | Amount column | `text-green-600` | Use `style="color: var(--color-success)"` |
-| `stock-invoice-form.html` | Product form hint | `text-gray-500` | Use `text-text-muted` |
-| `sales-invoice-form.html` | Various labels | `text-gray-500` | Use `text-text-muted` |
-| `sales-invoice-form.html` | Customer option sublabels | `text-gray-400` | Use `text-text-muted` |
-| `sales-invoice-form.html` | Net amount | `text-green-600` | Use `style="color: var(--color-success)"` |
-| `sales-invoice-form.html` | "Add Customer" link | `text-blue-600 hover:text-blue-700` | Use `style="color: var(--color-accent)"` |
-| `purchase-invoice-form.html` | "Add Supplier" link | `text-blue-600 hover:text-blue-700` | Use `style="color: var(--color-accent)"` |
-| `sales-invoice-form.html` | Inventory red/green stock | `text-red-500` / `text-green-600` | Use `style="color: var(--color-danger)"` / `style="color: var(--color-success)"` |
-| `sales-invoice-form.html` | Required asterisks | `text-red-500` | Use `style="color: var(--color-danger)"` |
-| `purchase-invoice-form.html` | Required asterisks | `text-red-500` | Use `style="color: var(--color-danger)"` |
-| `product-form.component.html` | GTN mode help text | `text-gray-400` | Use `text-text-muted` |
-| `entries.html` | Empty state text | `text-gray-400` | Use `text-text-muted` |
-| `entries.html` | Total income/expenses/balance | `text-green-600`, `text-red-600`, `text-blue-600` | Use `style="color: var(--color-success)"` / `var(--color-danger)` / `var(--color-accent)"` |
-| `registers.html` | Empty state text | `text-gray-400` | Use `text-text-muted` |
-| `categories.html` | Empty state text | `text-text-muted` | ✅ OK — uses token |
-| `dashboard.html` | Summary labels | `style="color: var(--color-text-muted)"` | ✅ OK — uses token |
-| `dashboard.html` | Icons | `style="color: var(--color-primary)"` | ✅ OK |
+| File                          | Line/Element                  | Hardcoded Color                                   | Recommendation                                                                             |
+| ----------------------------- | ----------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `products.html`               | Empty state text              | `text-gray-400`                                   | Use `text-text-muted` or `style="color: var(--color-text-muted)"`                          |
+| `customers.html`              | Empty state text              | `text-gray-400`                                   | Use `text-text-muted`                                                                      |
+| `suppliers.html`              | Empty state text              | `text-gray-400`                                   | Use `text-text-muted`                                                                      |
+| `users.html`                  | Empty state text              | `text-gray-400`                                   | Use `text-text-muted`                                                                      |
+| `users.html`                  | Permission help text          | `text-gray-400`                                   | Use `text-text-muted`                                                                      |
+| `sales-invoices.html`         | Empty state                   | `text-gray-400 italic py-8`                       | Use `text-text-muted`                                                                      |
+| `sales-invoices.html`         | Filter label                  | `text-gray-500`                                   | Use `text-text-muted`                                                                      |
+| `sales-invoices.html`         | Rows label                    | `text-gray-500`                                   | Use `text-text-muted`                                                                      |
+| `sales-invoices.html`         | Net amount                    | `text-green-600`                                  | Use `style="color: var(--color-success)"`                                                  |
+| `purchase-invoices.html`      | Empty state                   | `text-gray-400 italic py-8`                       | Use `text-text-muted`                                                                      |
+| `purchase-invoices.html`      | Filter/Sort labels            | `text-gray-500`                                   | Use `text-text-muted`                                                                      |
+| `purchase-invoices.html`      | Net amount                    | `text-green-600`                                  | Use `style="color: var(--color-success)"`                                                  |
+| `purchase-invoice-form.html`  | Various labels                | `text-gray-500`                                   | Use `text-text-muted`                                                                      |
+| `purchase-invoice-form.html`  | Various option sublabels      | `text-gray-400`                                   | Use `text-text-muted`                                                                      |
+| `purchase-invoice-form.html`  | Net amount                    | `text-green-600`                                  | Use `style="color: var(--color-success)"`                                                  |
+| `stock-invoices.html`         | Empty state                   | `text-gray-400 italic py-8`                       | Use `text-text-muted`                                                                      |
+| `stock-invoices.html`         | Filter/Sort/Rows labels       | `text-gray-500`                                   | Use `text-text-muted`                                                                      |
+| `stock-invoices.html`         | Amount column                 | `text-green-600`                                  | Use `style="color: var(--color-success)"`                                                  |
+| `stock-invoice-form.html`     | Product form hint             | `text-gray-500`                                   | Use `text-text-muted`                                                                      |
+| `sales-invoice-form.html`     | Various labels                | `text-gray-500`                                   | Use `text-text-muted`                                                                      |
+| `sales-invoice-form.html`     | Customer option sublabels     | `text-gray-400`                                   | Use `text-text-muted`                                                                      |
+| `sales-invoice-form.html`     | Net amount                    | `text-green-600`                                  | Use `style="color: var(--color-success)"`                                                  |
+| `sales-invoice-form.html`     | "Add Customer" link           | `text-blue-600 hover:text-blue-700`               | Use `class="text-accent!"`                                                                 |
+| `purchase-invoice-form.html`  | "Add Supplier" link           | `text-blue-600 hover:text-blue-700`               | Use `class="text-accent!"`                                                                 |
+| `sales-invoice-form.html`     | Inventory red/green stock     | `text-red-500` / `text-green-600`                 | Use `style="color: var(--color-danger)"` / `style="color: var(--color-success)"`           |
+| `sales-invoice-form.html`     | Required asterisks            | `text-red-500`                                    | Use `style="color: var(--color-danger)"`                                                   |
+| `purchase-invoice-form.html`  | Required asterisks            | `text-red-500`                                    | Use `style="color: var(--color-danger)"`                                                   |
+| `product-form.component.html` | GTN mode help text            | `text-gray-400`                                   | Use `text-text-muted`                                                                      |
+| `entries.html`                | Empty state text              | `text-gray-400`                                   | Use `text-text-muted`                                                                      |
+| `entries.html`                | Total income/expenses/balance | `text-green-600`, `text-red-600`, `text-blue-600` | Use `style="color: var(--color-success)"` / `var(--color-danger)` / `var(--color-accent)"` |
+| `registers.html`              | Empty state text              | `text-gray-400`                                   | Use `text-text-muted`                                                                      |
+| `categories.html`             | Empty state text              | `text-text-muted`                                 | ✅ OK — uses token                                                                         |
+| `dashboard.html`              | Summary labels                | `style="color: var(--color-text-muted)"`          | ✅ OK — uses token                                                                         |
+| `dashboard.html`              | Icons                         | `style="color: var(--color-primary)"`             | ✅ OK                                                                                      |
 
 **Critical Dark Mode Issue:** All `text-gray-400` and `text-gray-500` usages will NOT adapt properly in dark mode because they are hardcoded Tailwind colors. The custom design tokens (`text-text-muted`, `var(--color-text-muted)`) do adapt. This is the most impactful issue in the audit.
 
@@ -259,11 +261,11 @@ All items use `routerLinkActive="bg-chrome-hover font-semibold"` — consistent 
 
 ### 5.4 — Section header spacing inconsistency
 
-| Section Header | Top Margin | Bottom Margin |
-|---|---|---|
-| "Home" | `mt-2 mb-2` | |
-| "Transactions" | `mt-4 mb-2` | |
-| "Masters" | `mt-4 mb-2` | |
+| Section Header | Top Margin  | Bottom Margin |
+| -------------- | ----------- | ------------- |
+| "Home"         | `mt-2 mb-2` |               |
+| "Transactions" | `mt-4 mb-2` |               |
+| "Masters"      | `mt-4 mb-2` |               |
 
 The first section "Home" uses `mt-2` while others use `mt-4`. This is acceptable since it's the first section (close to top).
 
@@ -279,12 +281,12 @@ The reports sub-menu items use `class="ml-2 border-l-2 border-transparent hover:
 
 ### 6.1 — Heading hierarchy
 
-| Level | Used For | Class | Consistent? |
-|---|---|---|---|
-| h1 | Page title | `text-xl font-semibold` | ✅ consistent across all pages |
-| h2 | Section/card title | `text-base font-semibold` or `text-lg font-medium` | ⚠️ Inconsistent |
-| h3 | Sub-section | `font-medium` or `text-sm font-semibold` | Mixed |
-| h4 | Quick-add form headers | `text-xs font-semibold uppercase text-gray-500` | ✅ consistent |
+| Level | Used For               | Class                                              | Consistent?                    |
+| ----- | ---------------------- | -------------------------------------------------- | ------------------------------ |
+| h1    | Page title             | `text-xl font-semibold`                            | ✅ consistent across all pages |
+| h2    | Section/card title     | `text-base font-semibold` or `text-lg font-medium` | ⚠️ Inconsistent                |
+| h3    | Sub-section            | `font-medium` or `text-sm font-semibold`           | Mixed                          |
+| h4    | Quick-add form headers | `text-xs font-semibold uppercase text-gray-500`    | ✅ consistent                  |
 
 **Issue:** `categories.html` uses `text-lg font-medium` for the list/form section headers while all other pages use `text-base font-semibold`.
 
@@ -292,21 +294,22 @@ The reports sub-menu items use `class="ml-2 border-l-2 border-transparent hover:
 
 ### 6.2 — Page title icon sizing
 
-| File | Icon Size |
-|---|---|
-| `dashboard.html` | `text-2xl` |
-| `categories.html` | `text-2xl` |
-| `products.html` | `text-xl` ← different |
-| `customers.html` | `text-2xl` |
-| `suppliers.html` | `text-xl` ← different |
-| `users.html` | `text-2xl` |
-| `sales-invoices.html` | `text-2xl` |
-| `purchase-invoices.html` | `text-2xl` |
-| `stock-invoices.html` | `text-2xl` |
-| `entries.html` | `text-xl` ← different |
-| `registers.html` | `text-xl` ← different |
+| File                     | Icon Size             |
+| ------------------------ | --------------------- |
+| `dashboard.html`         | `text-2xl`            |
+| `categories.html`        | `text-2xl`            |
+| `products.html`          | `text-xl` ← different |
+| `customers.html`         | `text-2xl`            |
+| `suppliers.html`         | `text-xl` ← different |
+| `users.html`             | `text-2xl`            |
+| `sales-invoices.html`    | `text-2xl`            |
+| `purchase-invoices.html` | `text-2xl`            |
+| `stock-invoices.html`    | `text-2xl`            |
+| `entries.html`           | `text-xl` ← different |
+| `registers.html`         | `text-xl` ← different |
 
 **Action:** Standardize all page title icons to `text-2xl`:
+
 - `products.html`: Change icon `text-xl` → `text-2xl`
 - `suppliers.html`: Change icon `text-xl` → `text-2xl`
 - `entries.html`: Change icon `text-xl` → `text-2xl`
@@ -314,20 +317,20 @@ The reports sub-menu items use `class="ml-2 border-l-2 border-transparent hover:
 
 ### 6.3 — Form label approach inconsistency
 
-| File | Label Approach |
-|---|---|
-| `categories.html` | `<nz-form-label>` ✅ |
-| `product-form.component.html` | `<nz-form-label>` ✅ |
-| `customers.html` | `<nz-form-label>` ✅ |
-| `suppliers.html` | `<nz-form-label>` ✅ |
-| `users.html` | `<nz-form-label>` ✅ |
-| `entries.html` | `<nz-form-label>` ✅ |
-| `registers.html` | `<nz-form-label>` ✅ |
-| `login.html` | `<nz-form-label>` ✅ |
-| `address-form.html` | `<nz-form-label>` ✅ |
-| `sales-invoice-form.html` | `<label class="block text-sm font-medium mb-1">` ⚠️ **Plain HTML labels** |
-| `purchase-invoice-form.html` | `<label class="block text-sm font-medium mb-1">` ⚠️ **Plain HTML labels** |
-| `stock-invoice-form.html` | `<label class="block text-sm font-medium mb-1">` ⚠️ **Plain HTML labels** |
+| File                          | Label Approach                                                            |
+| ----------------------------- | ------------------------------------------------------------------------- |
+| `categories.html`             | `<nz-form-label>` ✅                                                      |
+| `product-form.component.html` | `<nz-form-label>` ✅                                                      |
+| `customers.html`              | `<nz-form-label>` ✅                                                      |
+| `suppliers.html`              | `<nz-form-label>` ✅                                                      |
+| `users.html`                  | `<nz-form-label>` ✅                                                      |
+| `entries.html`                | `<nz-form-label>` ✅                                                      |
+| `registers.html`              | `<nz-form-label>` ✅                                                      |
+| `login.html`                  | `<nz-form-label>` ✅                                                      |
+| `address-form.html`           | `<nz-form-label>` ✅                                                      |
+| `sales-invoice-form.html`     | `<label class="block text-sm font-medium mb-1">` ⚠️ **Plain HTML labels** |
+| `purchase-invoice-form.html`  | `<label class="block text-sm font-medium mb-1">` ⚠️ **Plain HTML labels** |
+| `stock-invoice-form.html`     | `<label class="block text-sm font-medium mb-1">` ⚠️ **Plain HTML labels** |
 
 **Issue:** The three invoice form pages use plain `<label>` elements with Tailwind classes instead of `<nz-form-label>`. While functional, this creates inconsistency with all other pages.
 
@@ -339,53 +342,53 @@ The reports sub-menu items use `class="ml-2 border-l-2 border-transparent hover:
 
 ### 7.1 — nz-card wrapper consistency
 
-| Page | Uses nz-card? |
-|---|---|
-| `dashboard.html` | ✅ Uses multiple nz-cards |
-| `categories.html` | ❌ NO nz-card wrapper — table is bare |
-| `products.html` | ✅ Uses nz-card for form and list |
-| `customers.html` | ✅ Uses nz-card for form and list |
-| `suppliers.html` | ✅ Uses nz-card for form and list |
-| `users.html` | ✅ Uses nz-card for form and list |
-| `sales-invoices.html` | ✅ Uses nz-card |
-| `purchase-invoices.html` | ✅ Uses nz-card |
-| `stock-invoices.html` | ✅ Uses nz-card |
-| `entries.html` | ✅ Uses nz-card for both panels |
-| `registers.html` | ✅ Uses nz-card for both panels |
+| Page                     | Uses nz-card?                         |
+| ------------------------ | ------------------------------------- |
+| `dashboard.html`         | ✅ Uses multiple nz-cards             |
+| `categories.html`        | ❌ NO nz-card wrapper — table is bare |
+| `products.html`          | ✅ Uses nz-card for form and list     |
+| `customers.html`         | ✅ Uses nz-card for form and list     |
+| `suppliers.html`         | ✅ Uses nz-card for form and list     |
+| `users.html`             | ✅ Uses nz-card for form and list     |
+| `sales-invoices.html`    | ✅ Uses nz-card                       |
+| `purchase-invoices.html` | ✅ Uses nz-card                       |
+| `stock-invoices.html`    | ✅ Uses nz-card                       |
+| `entries.html`           | ✅ Uses nz-card for both panels       |
+| `registers.html`         | ✅ Uses nz-card for both panels       |
 
 **Action:** `categories.html` — The table and form are not wrapped in `<nz-card>`. Every other list page wraps its table in `<nz-card>`. Wrap the categories table in `<nz-card>` and the add form in `<nz-card>` for visual consistency.
 
 ### 7.2 — nzBordered inconsistency
 
-| File | nzBordered |
-|---|---|
-| `categories.html` | Missing `[nzBordered]="true"` |
-| `dashboard.html` | `[nzBordered]="true"` ✅ |
-| `products.html` | `[nzBordered]="true"` ✅ |
-| `customers.html` | `[nzBordered]="true"` ✅ |
-| `suppliers.html` | `[nzBordered]="true"` ✅ |
-| `users.html` | `[nzBordered]="true"` ✅ |
-| All invoice tables | `[nzBordered]="true"` ✅ |
-| `entries.html` | `[nzBordered]="true"` ✅ |
-| `registers.html` | `[nzBordered]="true"` ✅ |
+| File               | nzBordered                    |
+| ------------------ | ----------------------------- |
+| `categories.html`  | Missing `[nzBordered]="true"` |
+| `dashboard.html`   | `[nzBordered]="true"` ✅      |
+| `products.html`    | `[nzBordered]="true"` ✅      |
+| `customers.html`   | `[nzBordered]="true"` ✅      |
+| `suppliers.html`   | `[nzBordered]="true"` ✅      |
+| `users.html`       | `[nzBordered]="true"` ✅      |
+| All invoice tables | `[nzBordered]="true"` ✅      |
+| `entries.html`     | `[nzBordered]="true"` ✅      |
+| `registers.html`   | `[nzBordered]="true"` ✅      |
 
 **Action:** `categories.html` — Add `[nzBordered]="true"` to the nz-table.
 
 ### 7.3 — Empty state styling inconsistency
 
-| File | Empty State Pattern |
-|---|---|
-| `categories.html` | `class="text-center text-text-muted"` — ✅ uses design token |
-| `products.html` | `class="text-center text-gray-400"` — ❌ hardcoded |
-| `customers.html` | `class="text-center text-gray-400"` — ❌ hardcoded |
-| `suppliers.html` | `class="text-center text-gray-400"` — ❌ hardcoded |
-| `users.html` | `class="text-center text-gray-400"` — ❌ hardcoded |
-| `sales-invoices.html` | `class="text-center text-gray-400 italic py-8"` — ❌ hardcoded + italic + extra padding |
+| File                     | Empty State Pattern                                                                     |
+| ------------------------ | --------------------------------------------------------------------------------------- |
+| `categories.html`        | `class="text-center text-text-muted"` — ✅ uses design token                            |
+| `products.html`          | `class="text-center text-gray-400"` — ❌ hardcoded                                      |
+| `customers.html`         | `class="text-center text-gray-400"` — ❌ hardcoded                                      |
+| `suppliers.html`         | `class="text-center text-gray-400"` — ❌ hardcoded                                      |
+| `users.html`             | `class="text-center text-gray-400"` — ❌ hardcoded                                      |
+| `sales-invoices.html`    | `class="text-center text-gray-400 italic py-8"` — ❌ hardcoded + italic + extra padding |
 | `purchase-invoices.html` | `class="text-center text-gray-400 italic py-8"` — ❌ hardcoded + italic + extra padding |
-| `stock-invoices.html` | `class="text-center text-gray-400 italic py-8"` — ❌ hardcoded + italic + extra padding |
-| `entries.html` | `class="text-center text-gray-400"` — ❌ hardcoded |
-| `registers.html` | `class="text-center text-gray-400"` — ❌ hardcoded |
-| `dashboard.html` | `style="color: var(--color-text-muted); padding: 24px 0;"` — ✅ inline token |
+| `stock-invoices.html`    | `class="text-center text-gray-400 italic py-8"` — ❌ hardcoded + italic + extra padding |
+| `entries.html`           | `class="text-center text-gray-400"` — ❌ hardcoded                                      |
+| `registers.html`         | `class="text-center text-gray-400"` — ❌ hardcoded                                      |
+| `dashboard.html`         | `style="color: var(--color-text-muted); padding: 24px 0;"` — ✅ inline token            |
 
 **Recommendation:** Standardize all empty states to: `class="text-center text-text-muted"` (matching categories.html which is the correct pattern). Remove `italic` and `py-8` from invoice list empty states for consistency.
 
@@ -431,21 +434,22 @@ In `sales-invoice-form.html`, the discount display uses `*ngIf="totalDiscount > 
 
 ### 7.10 — Missing `[nzLoading]` on some tables
 
-| File | Has nzLoading? |
-|---|---|
-| `categories.html` | ✅ `[nzLoading]="loading"` |
-| `products.html` | ✅ `[nzLoading]="loading"` |
-| `customers.html` | ✅ |
-| `suppliers.html` | ✅ |
-| `users.html` | ✅ |
-| `entries.html` | ✅ |
-| `registers.html` | ✅ |
-| `dashboard.html` | ✅ |
-| `sales-invoices.html` | ❌ Missing `[nzLoading]` |
+| File                     | Has nzLoading?             |
+| ------------------------ | -------------------------- |
+| `categories.html`        | ✅ `[nzLoading]="loading"` |
+| `products.html`          | ✅ `[nzLoading]="loading"` |
+| `customers.html`         | ✅                         |
+| `suppliers.html`         | ✅                         |
+| `users.html`             | ✅                         |
+| `entries.html`           | ✅                         |
+| `registers.html`         | ✅                         |
+| `dashboard.html`         | ✅                         |
+| `sales-invoices.html`    | ❌ Missing `[nzLoading]`   |
 | `purchase-invoices.html` | ✅ `[nzLoading]="loading"` |
-| `stock-invoices.html` | ❌ Missing `[nzLoading]` |
+| `stock-invoices.html`    | ❌ Missing `[nzLoading]`   |
 
 **Action:** Add `[nzLoading]="loading"` to the nz-table in:
+
 - `sales-invoices.html`
 - `stock-invoices.html`
 
@@ -454,16 +458,19 @@ In `sales-invoice-form.html`, the discount display uses `*ngIf="totalDiscount > 
 ## 8. PRIORITY SUMMARY
 
 ### High Priority (Dark Mode Breaking)
+
 1. **Replace all `text-gray-400` / `text-gray-500` with `text-text-muted`** — these break in dark mode. Affects: products, customers, suppliers, users, entries, registers, all invoice pages, product-form.
 2. **Replace all `text-green-600` / `text-red-600` / `text-red-500` / `text-blue-600` with design token equivalents** — these break in dark mode. Affects: invoice lists, invoice forms, entries.
 
 ### Medium Priority (Visual Consistency)
+
 3. **`categories.html`**: Change `nzSize="middle"` → `nzSize="small"`, add `[nzBordered]="true"`, add `nzSize="small"` to action buttons, add `nzSize="small"` to switch, wrap in `<nz-card>`, change h2 from `text-lg font-medium` to `text-base font-semibold`.
 4. **Standardize page title icon sizes** to `text-2xl` in: products, suppliers, entries, registers.
 5. **Standardize empty state styling** to `text-center text-text-muted` (remove italic and py-8 from invoice lists).
 6. **Add `[nzLoading]`** to sales-invoices.html and stock-invoices.html tables.
 
 ### Low Priority (Polish)
+
 7. **`sales-invoice-form.html`**: Change `mb-6` → `mb-4` on IRN alert; migrate `*ngIf` to `@if`.
 8. **`entries.html`**: Change title `mb-3` → `mb-4`, filter gap `gap-3 md:gap-5` → `gap-2`.
 9. **Invoice form summary sections**: Reduce `gap-6` → `gap-4`.
@@ -473,23 +480,23 @@ In `sales-invoice-form.html`, the discount display uses `*ngIf="totalDiscount > 
 
 ## 9. FILES REQUIRING CHANGES (Summary)
 
-| File | Number of Issues |
-|---|---|
-| `categories.html` | 6 issues (nzSize, nzBordered, nz-card, button sizes, switch size, heading style) |
-| `sales-invoice-form.html` | 5 issues (hardcoded colors, *ngIf, mb-6, gap-6, label approach) |
-| `purchase-invoice-form.html` | 4 issues (hardcoded colors, gap-6, label approach, add-supplier link color) |
-| `sales-invoices.html` | 4 issues (hardcoded colors, empty state, missing nzLoading, filter labels) |
-| `purchase-invoices.html` | 3 issues (hardcoded colors, empty state, filter labels) |
-| `stock-invoices.html` | 3 issues (hardcoded colors, empty state, missing nzLoading) |
-| `stock-invoice-form.html` | 2 issues (hardcoded colors) |
-| `entries.html` | 3 issues (hardcoded colors, gap, mb) |
-| `products.html` | 2 issues (hardcoded empty state color, icon size) |
-| `customers.html` | 1 issue (hardcoded empty state color) |
-| `suppliers.html` | 2 issues (hardcoded empty state color, icon size) |
-| `users.html` | 2 issues (hardcoded colors) |
-| `registers.html` | 2 issues (hardcoded empty state color, icon size) |
-| `product-form.component.html` | 1 issue (hardcoded gray text) |
-| `login.html` | 0 issues ✅ |
-| `dashboard.html` | 0 issues ✅ |
-| `address-form.html` | 0 issues ✅ |
-| `app.html` | 0 issues ✅ |
+| File                          | Number of Issues                                                                 |
+| ----------------------------- | -------------------------------------------------------------------------------- |
+| `categories.html`             | 6 issues (nzSize, nzBordered, nz-card, button sizes, switch size, heading style) |
+| `sales-invoice-form.html`     | 5 issues (hardcoded colors, \*ngIf, mb-6, gap-6, label approach)                 |
+| `purchase-invoice-form.html`  | 4 issues (hardcoded colors, gap-6, label approach, add-supplier link color)      |
+| `sales-invoices.html`         | 4 issues (hardcoded colors, empty state, missing nzLoading, filter labels)       |
+| `purchase-invoices.html`      | 3 issues (hardcoded colors, empty state, filter labels)                          |
+| `stock-invoices.html`         | 3 issues (hardcoded colors, empty state, missing nzLoading)                      |
+| `stock-invoice-form.html`     | 2 issues (hardcoded colors)                                                      |
+| `entries.html`                | 3 issues (hardcoded colors, gap, mb)                                             |
+| `products.html`               | 2 issues (hardcoded empty state color, icon size)                                |
+| `customers.html`              | 1 issue (hardcoded empty state color)                                            |
+| `suppliers.html`              | 2 issues (hardcoded empty state color, icon size)                                |
+| `users.html`                  | 2 issues (hardcoded colors)                                                      |
+| `registers.html`              | 2 issues (hardcoded empty state color, icon size)                                |
+| `product-form.component.html` | 1 issue (hardcoded gray text)                                                    |
+| `login.html`                  | 0 issues ✅                                                                      |
+| `dashboard.html`              | 0 issues ✅                                                                      |
+| `address-form.html`           | 0 issues ✅                                                                      |
+| `app.html`                    | 0 issues ✅                                                                      |

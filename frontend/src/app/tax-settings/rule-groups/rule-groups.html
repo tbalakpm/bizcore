@@ -1,0 +1,110 @@
+@if (error) {
+  <nz-alert
+    nzType="error"
+    [nzMessage]="error"
+    nzShowIcon
+    nzCloseable
+    class="mb-4"
+    (nzOnClose)="error = null"
+  ></nz-alert>
+}
+@if (permissionService.canAdd('settings-tax')) {
+  <nz-card nzSize="small" class="mb-4!">
+    <h3 class="text-sm font-semibold mb-3">{{ editingGroup ? 'Edit' : 'Add' }} Rule Group</h3>
+    <form nz-form [nzLayout]="'vertical'">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <nz-form-item>
+          <nz-form-label nzRequired>Group Name</nz-form-label>
+          <nz-form-control>
+            <input
+              nz-input
+              [(ngModel)]="groupForm.name"
+              name="groupName"
+              placeholder="e.g. Mobile Phones Lower Rate"
+            />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label nzRequired>Priority (High = evaluated first)</nz-form-label>
+          <nz-form-control>
+            <nz-input-number
+              [(ngModel)]="groupForm.priority"
+              name="gPriority"
+              [nzStep]="1"
+              class="w-full"
+            ></nz-input-number>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label>Description</nz-form-label>
+          <nz-form-control>
+            <input
+              nz-input
+              [(ngModel)]="groupForm.description"
+              name="gDesc"
+              placeholder="Optional notes"
+            />
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <button nz-button nzType="primary" (click)="editingGroup ? saveEditGroup() : addGroup()">
+          {{ editingGroup ? 'Save Group' : 'Add Rule Group' }}
+        </button>
+        @if (editingGroup) {
+          <button nz-button (click)="cancelEditGroup()">Cancel</button>
+        }
+      </div>
+    </form>
+  </nz-card>
+}
+
+<nz-table
+  #groupsTable
+  [nzData]="taxRuleGroups()"
+  [nzLoading]="loadingGroups"
+  nzSize="small"
+  [nzBordered]="true"
+>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Priority</th>
+      <th>Description</th>
+      <th nzAlign="center">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (g of groupsTable.data; track g.id) {
+      <tr>
+        <td class="font-bold">{{ g.name }}</td>
+        <td>
+          <nz-tag nzColor="purple">{{ g.priority }}</nz-tag>
+        </td>
+        <td>{{ g.description }}</td>
+        <td nzAlign="center">
+          <button
+            nz-button
+            nzType="text"
+            nzSize="small"
+            (click)="startEditGroup(g)"
+            class="text-accent!"
+          >
+            <span nz-icon nzType="edit"></span>
+          </button>
+          <button
+            nz-button
+            nzType="text"
+            nzSize="small"
+            nzDanger
+            nz-popconfirm
+            nzPopconfirmTitle="Delete Group?"
+            (nzOnConfirm)="deleteGroup(g)"
+          >
+            <span nz-icon nzType="delete"></span>
+          </button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</nz-table>

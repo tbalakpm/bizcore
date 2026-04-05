@@ -8,7 +8,8 @@ import { type Brand, BrandService } from '../product-settings/brands/brand-servi
 import { type Product, ProductService } from './product-service';
 import { Attribute, AttributeService } from './attribute-service';
 import { ProductTemplate, ProductTemplateService } from '../product-settings/product-templates/product-template-service';
-import { TaxRateService, TaxRate } from '../settings/tax/tax-rate-service';
+import { TaxRateService } from '../tax-settings/tax-rates/tax-rate-service';
+import { TaxRate } from '../tax-settings/tax.model';
 
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';

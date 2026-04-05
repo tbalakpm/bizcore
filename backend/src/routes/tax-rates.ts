@@ -35,19 +35,24 @@ taxRatesRouter.get('/:id', async (req: Request, res: Response) => {
 });
 
 taxRatesRouter.post('/', async (req, res) => {
-  const { rate, cgstRate, sgstRate, igstRate, cessRate, cessAmount, effectiveFrom } = req.body;
+  const { code, rate, cgstRate, sgstRate, igstRate, cessRate, cessAmount, effectiveFrom, effectiveTo, isExempt, isNilRated, reverseCharge } = req.body;
 
   try {
     const inserted = await db
       .insert(taxRates)
       .values({
+        code: code || `TAX-${rate}-${Date.now()}`,
         rate: toNumber(rate),
         cgstRate: toNumber(cgstRate),
         sgstRate: toNumber(sgstRate),
         igstRate: toNumber(igstRate),
         cessRate: toNumber(cessRate),
         cessAmount: toNumber(cessAmount),
+        isExempt: !!isExempt,
+        isNilRated: !!isNilRated,
+        reverseCharge: !!reverseCharge,
         effectiveFrom: effectiveFrom || new Date().toISOString().split('T')[0],
+        effectiveTo: effectiveTo || null,
       })
       .returning()
       .get();
@@ -75,15 +80,20 @@ taxRatesRouter.put('/:id', async (req, res) => {
     return res.status(404).json({ error: 'Tax rate not found' });
   }
 
-  const { rate, cgstRate, sgstRate, igstRate, cessRate, cessAmount, effectiveFrom } = req.body;
+  const { code, rate, cgstRate, sgstRate, igstRate, cessRate, cessAmount, effectiveFrom, effectiveTo, isExempt, isNilRated, reverseCharge } = req.body;
   const updateData: any = {};
+  if (code !== undefined) updateData.code = code;
   if (rate !== undefined) updateData.rate = toNumber(rate);
   if (cgstRate !== undefined) updateData.cgstRate = toNumber(cgstRate);
   if (sgstRate !== undefined) updateData.sgstRate = toNumber(sgstRate);
   if (igstRate !== undefined) updateData.igstRate = toNumber(igstRate);
   if (cessRate !== undefined) updateData.cessRate = toNumber(cessRate);
   if (cessAmount !== undefined) updateData.cessAmount = toNumber(cessAmount);
+  if (isExempt !== undefined) updateData.isExempt = !!isExempt;
+  if (isNilRated !== undefined) updateData.isNilRated = !!isNilRated;
+  if (reverseCharge !== undefined) updateData.reverseCharge = !!reverseCharge;
   if (effectiveFrom !== undefined) updateData.effectiveFrom = effectiveFrom;
+  if (effectiveTo !== undefined) updateData.effectiveTo = effectiveTo;
 
   await db
     .update(taxRates)

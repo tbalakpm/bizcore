@@ -58,5 +58,11 @@ export type { TaxRate, NewTaxRate } from './tax-rate.schema';
 export { taxRules } from './tax-rule.schema';
 export type { TaxRule, NewTaxRule } from './tax-rule.schema';
 
+export { taxRuleGroups } from './tax-rule-group.schema';
+export type { TaxRuleGroup, NewTaxRuleGroup } from './tax-rule-group.schema';
+
+export { taxRuleConditions } from './tax-rule-condition.schema';
+export type { TaxRuleCondition, NewTaxRuleCondition } from './tax-rule-condition.schema';
+
 export { states } from './state.schema';
 export type { State, NewState } from './state.schema';

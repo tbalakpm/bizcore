@@ -139,7 +139,7 @@
                     [nzTooltipTitle]="
                       expandedCategoryId === cat.id ? 'Hide Margins' : 'Configure Product Margins'
                     "
-                    style="color: var(--color-accent)"
+                    class="text-accent!"
                     (click)="toggleProductMargins(cat)"
                   >
                     <span nz-icon nzType="percentage" nzTheme="outline"></span>
@@ -150,7 +150,7 @@
                     nzSize="small"
                     nz-tooltip
                     nzTooltipTitle="Edit"
-                    style="color: var(--color-accent)"
+                    class="text-accent!"
                     (click)="startEdit(cat)"
                     *appHasPermission="'settings-pricing:edit'"
                   >

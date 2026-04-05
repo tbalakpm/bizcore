@@ -5,6 +5,10 @@ export const taxRates = sqliteTable('tax_rates', {
         .primaryKey({ autoIncrement: true })
         .notNull(),
 
+    code: text('code')
+        .unique()
+        .notNull(),
+
     rate: integer('rate')
         .notNull(),
 
@@ -23,8 +27,22 @@ export const taxRates = sqliteTable('tax_rates', {
     cessAmount: integer('cess_amount')
         .notNull(),
 
+    isExempt: integer('is_exempt', { mode: 'boolean' })
+        .default(false)
+        .notNull(),
+
+    isNilRated: integer('is_nil_rated', { mode: 'boolean' })
+        .default(false)
+        .notNull(),
+
+    reverseCharge: integer('reverse_charge', { mode: 'boolean' })
+        .default(false)
+        .notNull(),
+
     effectiveFrom: text('effective_from')
         .notNull(),
+
+    effectiveTo: text('effective_to'),
 }, (t) => [
     uniqueIndex('tax_rates_rate_effective_from_unique').on(t.rate, t.effectiveFrom)
 ]);

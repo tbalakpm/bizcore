@@ -3,16 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export interface TaxRate {
-  id: number;
-  rate: number;
-  cgstRate: number;
-  sgstRate: number;
-  igstRate: number;
-  cessRate: number;
-  cessAmount: number;
-  effectiveFrom: string;
-}
+import { TaxRate } from '../tax.model';
 
 @Injectable({ providedIn: 'root' })
 export class TaxRateService {

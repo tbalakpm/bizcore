@@ -1,12 +1,34 @@
 import { eq, asc } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
-import { taxRules, db } from '../db';
+import { taxRules, taxRuleConditions, db } from '../db';
 import { LogService } from '../core/logger/logger.service';
 import { auditLog } from '../core/logger/audit.service';
 import { toNumber } from '../utils/number.util';
+import { taxRuleEngine } from '../services/tax-rule-engine.service';
 
 export const taxRulesRouter = express.Router();
+
+taxRulesRouter.post('/evaluate', async (req: Request, res: Response) => {
+  try {
+    const result = await taxRuleEngine.evaluate(req.body);
+    res.json(result);
+  } catch (error) {
+    LogService.error('Failed to evaluate tax rule', error);
+    res.status(500).json({ error: 'Failed to evaluate tax rule' });
+  }
+});
+
+taxRulesRouter.post('/evaluate-bulk', async (req: Request, res: Response) => {
+  try {
+    const inputs = req.body as any[];
+    const results = await Promise.all(inputs.map(input => taxRuleEngine.evaluate(input)));
+    res.json(results);
+  } catch (error) {
+    LogService.error('Failed to evaluate tax rules bulk', error);
+    res.status(500).json({ error: 'Failed to evaluate tax rules bulk' });
+  }
+});
 
 taxRulesRouter.get('/', async (req: Request, res: Response) => {
   try {
@@ -35,20 +57,41 @@ taxRulesRouter.get('/:id', async (req: Request, res: Response) => {
 });
 
 taxRulesRouter.post('/', async (req, res) => {
-  const { hsnCodeStartsWith, minPrice, maxPrice, taxRate, effectiveFrom } = req.body;
+  const { ruleGroupId, taxRateId, hsnCodeStartsWith, minPrice, maxPrice, isInterState, isIntraState, customerType, priority, effectiveFrom, effectiveTo, conditions } = req.body;
 
   try {
     const inserted = await db
-      .insert(taxRules)
-      .values({
-        hsnCodeStartsWith: hsnCodeStartsWith || '',
-        minPrice: toNumber(minPrice),
-        maxPrice: toNumber(maxPrice),
-        taxRate: toNumber(taxRate),
-        effectiveFrom: effectiveFrom || new Date().toISOString().split('T')[0],
-      })
-      .returning()
-      .get();
+      .transaction(async (tx) => {
+        const rule = await tx
+          .insert(taxRules)
+          .values({
+            ruleGroupId: toNumber(ruleGroupId),
+            taxRateId: toNumber(taxRateId),
+            hsnCodeStartsWith: hsnCodeStartsWith || '',
+            minPrice: toNumber(minPrice),
+            maxPrice: toNumber(maxPrice),
+            isInterState: !!isInterState,
+            isIntraState: !!isIntraState,
+            customerType: customerType || 'retail',
+            priority: toNumber(priority),
+            effectiveFrom: effectiveFrom || new Date().toISOString().split('T')[0],
+            effectiveTo: effectiveTo || null,
+          })
+          .returning()
+          .get();
+
+        if (Array.isArray(conditions) && conditions.length > 0) {
+          for (const cond of conditions) {
+            await tx.insert(taxRuleConditions).values({
+              taxRuleId: rule.id,
+              field: cond.field,
+              operator: cond.operator,
+              value: String(cond.value),
+            }).run();
+          }
+        }
+        return rule;
+      });
 
     await auditLog({
       action: 'CREATE_TAX_RULE',
@@ -73,32 +116,61 @@ taxRulesRouter.put('/:id', async (req, res) => {
     return res.status(404).json({ error: 'Tax rule not found' });
   }
 
-  const { hsnCodeStartsWith, minPrice, maxPrice, taxRate, effectiveFrom } = req.body;
-  const updateData: any = {};
-  if (hsnCodeStartsWith !== undefined) updateData.hsnCodeStartsWith = hsnCodeStartsWith;
-  if (minPrice !== undefined) updateData.minPrice = toNumber(minPrice);
-  if (maxPrice !== undefined) updateData.maxPrice = toNumber(maxPrice);
-  if (taxRate !== undefined) updateData.taxRate = toNumber(taxRate);
-  if (effectiveFrom !== undefined) updateData.effectiveFrom = effectiveFrom;
+  const { ruleGroupId, taxRateId, hsnCodeStartsWith, minPrice, maxPrice, isInterState, isIntraState, customerType, priority, effectiveFrom, effectiveTo, conditions } = req.body;
+  
+  try {
+    const updated = await db.transaction(async (tx) => {
+      const updateData: any = {};
+      if (ruleGroupId !== undefined) updateData.ruleGroupId = toNumber(ruleGroupId);
+      if (taxRateId !== undefined) updateData.taxRateId = toNumber(taxRateId);
+      if (hsnCodeStartsWith !== undefined) updateData.hsnCodeStartsWith = hsnCodeStartsWith;
+      if (minPrice !== undefined) updateData.minPrice = toNumber(minPrice);
+      if (maxPrice !== undefined) updateData.maxPrice = toNumber(maxPrice);
+      if (isInterState !== undefined) updateData.isInterState = !!isInterState;
+      if (isIntraState !== undefined) updateData.isIntraState = !!isIntraState;
+      if (customerType !== undefined) updateData.customerType = customerType;
+      if (priority !== undefined) updateData.priority = toNumber(priority);
+      if (effectiveFrom !== undefined) updateData.effectiveFrom = effectiveFrom;
+      if (effectiveTo !== undefined) updateData.effectiveTo = effectiveTo;
 
-  await db
-    .update(taxRules)
-    .set(updateData)
-    .where(eq(taxRules.id, id))
-    .run();
+      if (Object.keys(updateData).length > 0) {
+        await tx
+          .update(taxRules)
+          .set(updateData)
+          .where(eq(taxRules.id, id))
+          .run();
+      }
 
-  const updatedTaxRule = await db.select().from(taxRules).where(eq(taxRules.id, id)).get();
+      if (conditions !== undefined && Array.isArray(conditions)) {
+        // Simple sync: delete all and re-insert
+        await tx.delete(taxRuleConditions).where(eq(taxRuleConditions.taxRuleId, id)).run();
+        for (const cond of conditions) {
+          await tx.insert(taxRuleConditions).values({
+            taxRuleId: id,
+            field: cond.field,
+            operator: cond.operator,
+            value: String(cond.value),
+          }).run();
+        }
+      }
 
-  await auditLog({
-    action: 'UPDATE_TAX_RULE',
-    entity: 'TAX_RULE',
-    entityId: id,
-    oldValue: oldTaxRule,
-    newValue: updatedTaxRule,
-  });
+      return await tx.select().from(taxRules).where(eq(taxRules.id, id)).get();
+    });
 
-  LogService.info('Tax rule updated successfully', { taxRuleId: id });
-  res.json(updatedTaxRule);
+    await auditLog({
+      action: 'UPDATE_TAX_RULE',
+      entity: 'TAX_RULE',
+      entityId: id,
+      oldValue: oldTaxRule,
+      newValue: updated,
+    });
+
+    LogService.info('Tax rule updated successfully', { taxRuleId: id });
+    res.json(updated);
+  } catch (err) {
+    LogService.error('Failed to update tax rule', err);
+    res.status(400).json({ error: 'Failed to update tax rule' });
+  }
 });
 
 taxRulesRouter.delete('/:id', async (req, res) => {

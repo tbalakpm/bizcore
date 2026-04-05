@@ -12,7 +12,8 @@ import { type SalesInvoiceItem, SalesInvoiceService, SalesInvoice } from './sale
 import { type Inventory, InventoryService } from '../inventory/inventory-service';
 import { PricingCategoryService, ProductMargin } from '../settings/pricing-categories/pricing-category-service';
 import { SettingsService } from '../settings/settings.service';
-import { TaxRuleService, TaxRule } from '../settings/tax/tax-rule-service';
+import { TaxRuleService } from '../tax-settings/tax-rules/tax-rule-service';
+import { TaxRule, TaxRate, RuleEvaluationInput } from '../tax-settings/tax.model';
 
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSelectComponent } from 'ng-zorro-antd/select';
@@ -428,7 +429,8 @@ export class SalesInvoiceForm implements OnInit {
           basePrice = Math.round(basePrice);
         }
 
-        item.taxPct = this.editingInvoice.type === 'estimate' ? 0 : this.getEffectiveTaxRate(product, basePrice);
+        // Tax will be updated asynchronously in calculateLineTotal
+        item.taxPct = 0;
 
         // Determine tax inclusive mode: Invoice override > Product setting
         const isTaxInclusive = this.editingInvoice.isTaxInclusive !== null && this.editingInvoice.isTaxInclusive !== undefined
@@ -511,7 +513,40 @@ export class SalesInvoiceForm implements OnInit {
   }
 
   recalculateAllTaxes() {
-    this.recalculateAllPrices();
+    if (this.editingInvoice.type === 'estimate' || !this.editingInvoice.items.length) {
+      this.recalculateAllPrices();
+      return;
+    }
+
+    const customer = this.customers().find(c => c.id === this.editingInvoice.customerId);
+    const customerGstin = customer?.gstin || '';
+    const customerState = customer?.billingAddress?.state || '';
+
+    let isInterState = false;
+    if (this.companyGstin && customerGstin) {
+      isInterState = this.companyGstin.substring(0, 2) !== customerGstin.substring(0, 2);
+    } else if (this.companyState && customerState) {
+      isInterState = this.companyState.toLowerCase() !== customerState.toLowerCase();
+    }
+
+    const inputs: RuleEvaluationInput[] = this.editingInvoice.items.map(item => {
+      const product = this.products().find(p => p.id === item.productId);
+      return {
+        hsnCode: product?.hsnSac || '',
+        unitPrice: Number(item.unitPrice || 0),
+        isInterState,
+        customerType: customer?.type || 'retail',
+        date: this.editingInvoice.invoiceDate
+      };
+    });
+
+    this.taxRuleService.evaluateBulk(inputs).subscribe(rates => {
+      rates.forEach((rate, index) => {
+        const item = this.editingInvoice.items[index];
+        item.taxPct = rate ? Number(rate.rate) : 0;
+        this.calculateLineTotal(item, true); // skip recursive tax evaluation
+      });
+    });
   }
 
   onTaxModeChange(mode: boolean | null) {
@@ -530,7 +565,7 @@ export class SalesInvoiceForm implements OnInit {
         if (item.productId) {
           const product = this.products().find(p => p.id === item.productId);
           if (product) {
-            item.taxPct = this.getEffectiveTaxRate(product, Number(item.unitPrice || 0));
+            this.updateItemTaxRate(item);
           }
         }
       }
@@ -551,16 +586,14 @@ export class SalesInvoiceForm implements OnInit {
     }
   }
 
-  calculateLineTotal(item: EditableSalesInvoiceItem) {
+  calculateLineTotal(item: EditableSalesInvoiceItem, skipTaxEval = false) {
     const qty = Number(item.qty || 0);
     const price = Number(item.unitPrice || 0);
 
     // Dynamically update tax percentage based on tax rules and current price
-    if (item.productId && this.editingInvoice.type !== 'estimate') {
-      const product = this.products().find(p => p.id === item.productId);
-      if (product) {
-        item.taxPct = this.getEffectiveTaxRate(product, price);
-      }
+    if (item.productId && this.editingInvoice.type !== 'estimate' && !skipTaxEval) {
+      this.updateItemTaxRate(item);
+      return; // line total will be updated again once tax request returns
     }
 
     const grossTotal = qty * price;
@@ -610,25 +643,39 @@ export class SalesInvoiceForm implements OnInit {
     item.lineTotal = Number((afterDiscount + item.taxAmount).toFixed(2));
   }
 
-  getEffectiveTaxRate(product: Product, unitPrice: number): number {
-    const hsn = product.hsnSac || '';
-    const rules = this.taxRules();
-
-    // Find matching rules
-    const matchingRules = rules.filter(r => {
-      const hsnMatch = hsn.startsWith(r.hsnCodeStartsWith || '');
-      const priceMatch = unitPrice >= r.minPrice && (r.maxPrice === 0 || unitPrice <= r.maxPrice);
-      return hsnMatch && priceMatch;
-    });
-
-    if (matchingRules.length > 0) {
-      // Sort by HSN prefix length descending to find most specific match
-      matchingRules.sort((a, b) => (b.hsnCodeStartsWith?.length || 0) - (a.hsnCodeStartsWith?.length || 0));
-      return Number(matchingRules[0].taxRate);
+  updateItemTaxRate(item: EditableSalesInvoiceItem) {
+    const product = this.products().find(p => p.id === item.productId);
+    if (!product || this.editingInvoice.type === 'estimate') {
+      item.taxPct = 0;
+      this.calculateLineTotal(item, true);
+      return;
     }
 
-    return Number(product.taxRate || 0);
+    const customer = this.customers().find(c => c.id === this.editingInvoice.customerId);
+    const customerGstin = customer?.gstin || '';
+    const customerState = customer?.billingAddress?.state || '';
+
+    let isInterState = false;
+    if (this.companyGstin && customerGstin) {
+      isInterState = this.companyGstin.substring(0, 2) !== customerGstin.substring(0, 2);
+    } else if (this.companyState && customerState) {
+      isInterState = this.companyState.toLowerCase() !== customerState.toLowerCase();
+    }
+
+    const input: RuleEvaluationInput = {
+      hsnCode: product.hsnSac || '',
+      unitPrice: Number(item.unitPrice || 0),
+      isInterState,
+      customerType: customer?.type || 'retail',
+      date: this.editingInvoice.invoiceDate
+    };
+
+    this.taxRuleService.evaluate(input).subscribe(rate => {
+      item.taxPct = rate ? Number(rate.rate) : (product.taxRate || 0);
+      this.calculateLineTotal(item, true);
+    });
   }
+
 
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {

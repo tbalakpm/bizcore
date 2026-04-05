@@ -394,6 +394,23 @@
             permissions.canRead('settings-tax')
           ) {
             <a
+              routerLink="/tax-settings"
+              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
+              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
+              nz-tooltip
+              [nzTooltipTitle]="isSidebarCollapsed() ? 'Tax Settings' : ''"
+              nzTooltipPlacement="right"
+            >
+              <span nz-icon nzType="percentage" nzTheme="outline" class="text-xl"></span>
+              <span
+                class="truncate whitespace-nowrap transition-opacity duration-300"
+                [class.opacity-0]="isSidebarCollapsed()"
+                [class.w-0]="isSidebarCollapsed()"
+                >Tax Settings</span
+              >
+            </a>
+
+            <a
               routerLink="/settings"
               routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
               class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"

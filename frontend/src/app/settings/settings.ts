@@ -41,15 +41,6 @@ import { PermissionService } from '../auth/permission.service';
           Pricing Categories
         </a>
       }
-      @if (permission.canRead('settings-tax')) {
-        <a routerLink="/settings/tax"
-           routerLinkActive="active-tab"
-           style="color: var(--color-text)"
-           class="px-4 py-2 text-sm transition-colors tab-link">
-          <span nz-icon nzType="percentage" nzTheme="outline" class="mr-1"></span>
-          Tax Rates & Rules
-        </a>
-      }
     </div>
     <router-outlet></router-outlet>
   `,

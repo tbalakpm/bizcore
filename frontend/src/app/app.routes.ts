@@ -23,7 +23,11 @@ import { Attributes } from './product-settings/attributes/attributes';
 import { ProductTemplates } from './product-settings/product-templates/product-templates';
 import { Brands } from './product-settings/brands/brands';
 import { ProductSettings } from './product-settings/product-settings';
-import { TaxSettings } from './settings/tax/tax-settings';
+import { TaxSettings } from './tax-settings/tax-settings';
+import { TaxRateComponent } from './tax-settings/tax-rates/tax-rate';
+import { RuleGroups } from './tax-settings/rule-groups/rule-groups';
+import { TaxRules } from './tax-settings/tax-rules/tax-rules';
+import { States } from './tax-settings/states/states';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -74,8 +78,17 @@ export const routes: Routes = [
           { path: 'general', component: GeneralSettings, data: { module: 'settings-general' } },
           { path: 'pricing-categories', component: PricingCategories, data: { module: 'settings-pricing' } },
           { path: 'serial', component: SerialSettings, data: { module: 'settings-serial' } },
-          { path: 'tax', component: TaxSettings, data: { module: 'settings-tax' } },
         ],
+      },
+      {
+        path: 'tax-settings', component: TaxSettings, data: { module: 'settings-tax' },
+        children: [
+          { path: '', redirectTo: 'tax-rate', pathMatch: 'full' },
+          { path: 'tax-rate', component: TaxRateComponent },
+          { path: 'rule-group', component: RuleGroups },
+          { path: 'tax-rules', component: TaxRules },
+          { path: 'states', component: States },
+        ]
       },
       {
         path: 'product-settings',
