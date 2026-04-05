@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 import express, { type Request, type Response } from 'express';
 
 import { taxRates, db, TaxRate } from '../db';
@@ -10,7 +10,7 @@ export const taxRatesRouter = express.Router();
 
 taxRatesRouter.get('/', async (req: Request, res: Response) => {
   try {
-    const data = await db.select().from(taxRates).all();
+    const data = await db.select().from(taxRates).orderBy(asc(taxRates.rate)).all();
     LogService.info('Fetched tax rates list', { count: data.length });
     res.json({ data });
   } catch (error) {

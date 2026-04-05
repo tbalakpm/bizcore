@@ -13,8 +13,8 @@ export interface CompanyInfo {
   bankAccount?: string;
   bankIfsc?: string;
   invoiceTerms?: string;
-  sgstSharingRate: number; // default 50
-  igstSharingRate: number; // default 100
+  // sgstSharingRate: number; // default 50
+  // igstSharingRate: number; // default 100
 }
 
 export interface Address {
@@ -61,8 +61,6 @@ export async function fetchCompanyInfo(db: LibSQLDatabase<any>): Promise<Company
     bankName: s['bank_name'] ?? '',
     bankAccount: s['bank_account'] ?? '',
     bankIfsc: s['bank_ifsc'] ?? '',
-    invoiceTerms: s['invoice_terms'] ?? '',
-    sgstSharingRate: Number(s['sgst_sharing_rate'] ?? 50),
-    igstSharingRate: Number(s['igst_sharing_rate'] ?? 100),
+    invoiceTerms: s['invoice_terms'] ?? ''
   };
 }

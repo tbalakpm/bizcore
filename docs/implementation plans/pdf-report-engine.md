@@ -353,8 +353,6 @@ export async function fetchCompanyInfo(db: DB): Promise<CompanyInfo> {
     bankAccount: s["bank_account"] ?? "",
     bankIfsc: s["bank_ifsc"] ?? "",
     terms: s["invoice_terms"] ?? "",
-    sgstSharingRate: Number(s["sgst_sharing_rate"] ?? 50),
-    igstSharingRate: Number(s["igst_sharing_rate"] ?? 100),
   };
 }
 ```

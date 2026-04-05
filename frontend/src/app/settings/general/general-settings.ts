@@ -58,9 +58,7 @@ export class GeneralSettings implements OnInit {
     bank_account: '',
     bank_ifsc: '',
 
-    // Tax & Invoice
-    sgst_sharing_rate: 50,
-    igst_sharing_rate: 100,
+    // Invoice
     invoice_terms: '',
 
     // Barcode
@@ -92,7 +90,7 @@ export class GeneralSettings implements OnInit {
         res.data.forEach((s) => {
           if (this.settings[s.key] !== undefined) {
             // parse numbers if applicable
-            if (s.key === 'sgst_sharing_rate' || s.key === 'igst_sharing_rate' || s.key === 'barcode_columns') {
+            if (s.key === 'barcode_columns') {
               this.settings[s.key] = s.value ? Number(s.value) : null;
             } else if (s.key === 'use_global_gtn') {
               this.settings[s.key] = s.value === 'true';

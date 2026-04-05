@@ -1,6 +1,6 @@
 <nz-card [nzLoading]="loading">
   <form nz-form nzLayout="vertical" (ngSubmit)="save()">
-    <nz-divider nzText="Serial Settings" nzOrientation="left"></nz-divider>
+    <!-- <nz-divider nzText="Serial Settings" nzOrientation="left"></nz-divider> -->
     @for (config of invoiceConfigs; track config.key) {
       <div class="mb-2 font-medium text-text-muted">{{ config.label }}</div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">

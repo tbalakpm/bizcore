@@ -153,38 +153,6 @@
 
     <nz-divider nzText="Invoice Settings" nzOrientation="left"></nz-divider>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <nz-form-item>
-        <nz-form-label nzFor="sgst_sharing_rate">SGST Sharing Rate (%)</nz-form-label>
-        <nz-form-control>
-          <nz-input-number
-            name="sgst_sharing_rate"
-            id="sgst_sharing_rate"
-            [(ngModel)]="settings['sgst_sharing_rate']"
-            [nzMin]="0"
-            [nzMax]="100"
-            [nzStep]="1"
-            class="w-full"
-            [nzDisabled]="!permission.canEdit('settings-general')"
-          ></nz-input-number>
-        </nz-form-control>
-      </nz-form-item>
-
-      <nz-form-item>
-        <nz-form-label nzFor="igst_sharing_rate">IGST Sharing Rate (%)</nz-form-label>
-        <nz-form-control>
-          <nz-input-number
-            name="igst_sharing_rate"
-            id="igst_sharing_rate"
-            [(ngModel)]="settings['igst_sharing_rate']"
-            [nzMin]="0"
-            [nzMax]="100"
-            [nzStep]="1"
-            class="w-full"
-            [nzDisabled]="!permission.canEdit('settings-general')"
-          ></nz-input-number>
-        </nz-form-control>
-      </nz-form-item>
-
       <nz-form-item class="md:col-span-2">
         <nz-form-label nzFor="invoice_terms">Invoice Terms</nz-form-label>
         <nz-form-control>

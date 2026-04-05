@@ -22,7 +22,4 @@ export type NewSetting = typeof settings.$inferInsert;
 /*
   tz = 'Asia/Kolkata'
   tz_time_diff = +5.5 or +5:30 or -5.5 or -5:30
-  sgst_sharing_rate =  50
-  cgst_sharing_rate =  50
-  igst_sharing_rate = 100
 */
