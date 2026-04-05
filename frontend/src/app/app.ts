@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnDestroy, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, OnDestroy, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth/auth-service';
@@ -9,9 +9,30 @@ import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 
+import { UserPermissions } from './models/permission.model';
+
+interface MenuItem {
+  type: 'group' | 'link' | 'divider' | 'action';
+  label?: string;
+  icon?: string;
+  link?: string;
+  permission?: keyof UserPermissions | (keyof UserPermissions)[];
+  action?: () => void;
+}
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, DatePipe, NzIconModule, NzTooltipModule, NzDropdownModule, NzAvatarModule],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    TranslatePipe,
+    DatePipe,
+    NzIconModule,
+    NzTooltipModule,
+    NzDropdownModule,
+    NzAvatarModule,
+  ],
   templateUrl: './app.html',
 })
 export class App implements OnDestroy {
@@ -37,6 +58,112 @@ export class App implements OnDestroy {
   private readonly sidebarStateKey = 'sidebar_state';
 
   protected readonly title = signal('BizCore');
+
+  mainMenu: MenuItem[] = [
+    { type: 'group', label: 'Home' },
+    { type: 'link', label: 'MENU.DASHBOARD', icon: 'dashboard', link: '/dashboard', permission: 'dashboard' },
+    { type: 'divider' },
+    { type: 'group', label: 'Transactions' },
+    {
+      type: 'link',
+      label: 'MENU.SALES',
+      icon: 'shopping-cart',
+      link: '/sales-invoices',
+      permission: 'sales-invoices',
+    },
+    {
+      type: 'link',
+      label: 'MENU.PURCHASE',
+      icon: 'audit',
+      link: '/purchase-invoices',
+      permission: 'purchase-invoices',
+    },
+    {
+      type: 'link',
+      label: 'MENU.OPENING_STOCK',
+      icon: 'inbox',
+      link: '/stock-invoices',
+      permission: 'stock-invoices',
+    },
+    { type: 'divider' },
+    { type: 'group', label: 'Masters' },
+    { type: 'link', label: 'MENU.PRODUCTS', icon: 'appstore', link: '/products', permission: 'products' },
+    { type: 'link', label: 'MENU.CUSTOMERS', icon: 'team', link: '/customers', permission: 'customers' },
+    { type: 'link', label: 'MENU.SUPPLIERS', icon: 'bank', link: '/suppliers', permission: 'suppliers' },
+    { type: 'link', label: 'MENU.USERS', icon: 'user', link: '/users', permission: 'users' },
+    { type: 'divider' },
+    {
+      type: 'action',
+      label: 'MENU.REPORTS',
+      icon: 'fund',
+      action: () => this.switchMenu('reports'),
+    },
+    { type: 'divider' },
+    {
+      type: 'link',
+      label: 'Product Settings',
+      icon: 'appstore-add',
+      link: '/product-settings',
+      permission: [
+        'product-settings-categories',
+        'product-settings-brands',
+        'product-settings-attributes',
+        'product-settings-templates',
+      ],
+    },
+    {
+      type: 'link',
+      label: 'Tax Settings',
+      icon: 'percentage',
+      link: '/tax-settings',
+      permission: ['settings-general', 'settings-serial', 'settings-pricing', 'settings-tax'],
+    },
+    {
+      type: 'link',
+      label: 'MENU.SETTINGS',
+      icon: 'setting',
+      link: '/settings',
+      permission: ['settings-general', 'settings-serial', 'settings-pricing', 'settings-tax'],
+    },
+  ];
+
+  reportsMenu: MenuItem[] = [
+    {
+      type: 'action',
+      label: 'MENU.BACK_TO_MENU',
+      icon: 'arrow-left',
+      action: () => this.switchMenu('main'),
+    },
+    { type: 'group', label: 'Reports' },
+    {
+      type: 'link',
+      label: 'MENU.SALES_REPORT',
+      icon: 'line-chart',
+      link: '/reports/sales',
+    },
+    {
+      type: 'link',
+      label: 'MENU.STOCK_REPORT',
+      icon: 'bar-chart',
+      link: '/reports/stock',
+    },
+    {
+      type: 'link',
+      label: 'MENU.TAX_OUTPUT',
+      icon: 'file-done',
+      link: '/reports/tax',
+    },
+  ];
+
+  isMenuVisible(item: MenuItem): boolean {
+    if (!item.permission) return true;
+
+    if (Array.isArray(item.permission)) {
+      return item.permission.some((p) => this.permissions.canRead(p));
+    }
+
+    return this.permissions.canRead(item.permission);
+  }
 
   constructor() {
     this.translate.addLangs(['en', 'ta']);

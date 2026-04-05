@@ -95,422 +95,95 @@
           ></div>
         }
 
-        @if (currentMenu() === 'main') {
-          <div
-            class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-2 mb-2"
-            [class.opacity-0]="isSidebarCollapsed()"
-          >
-            Home
-          </div>
-          <!-- Dashboard -->
-          @if (permissions.canRead('dashboard')) {
-            <a
-              routerLink="/dashboard"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              [routerLinkActiveOptions]="{ exact: true }"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.DASHBOARD' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span
-                nz-icon
-                nzType="dashboard"
-                nzTheme="outline"
-                class="shrink-0"
-                style="font-size: 20px"
-              ></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-              >
-                {{ 'MENU.DASHBOARD' | translate }}
-              </span>
-            </a>
+        @for (item of currentMenu() === 'main' ? mainMenu : reportsMenu; track item) {
+          @if (isMenuVisible(item)) {
+            @switch (item.type) {
+              @case ('group') {
+                <div
+                  class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2"
+                  [class.opacity-0]="isSidebarCollapsed()"
+                  [class.mt-2]="item.label === 'Home' || item.label === 'Reports'"
+                >
+                  {{ item.label }}
+                </div>
+              }
+              @case ('link') {
+                <a
+                  [routerLink]="item.link"
+                  routerLinkActive="active-sider"
+                  [routerLinkActiveOptions]="{ exact: item.link === '/dashboard' }"
+                  class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative z-10"
+                  nz-tooltip
+                  [nzTooltipTitle]="isSidebarCollapsed() ? (item.label! | translate) : ''"
+                  nzTooltipPlacement="right"
+                >
+                  <span
+                    nz-icon
+                    [nzType]="item.icon!"
+                    nzTheme="outline"
+                    class="shrink-0"
+                    style="font-size: 20px"
+                  ></span>
+                  <span
+                    class="truncate whitespace-nowrap transition-opacity duration-300"
+                    [class.opacity-0]="isSidebarCollapsed()"
+                    [class.w-0]="isSidebarCollapsed()"
+                  >
+                    {{ item.label! | translate }}
+                  </span></a
+                >
+              }
+              @case ('divider') {
+                <hr class="border-chrome-border my-2" />
+              }
+              @case ('action') {
+                <div [class.px-1]="item.label === 'MENU.BACK_TO_MENU'">
+                  <button
+                    (click)="item.action?.()"
+                    class="w-full flex rounded hover:bg-chrome-hover items-center overflow-hidden transition-colors relative"
+                    [class.px-4]="item.label !== 'MENU.BACK_TO_MENU'"
+                    [class.py-2]="true"
+                    [class.px-3]="item.label === 'MENU.BACK_TO_MENU'"
+                    [class.justify-between]="item.label === 'MENU.REPORTS'"
+                    [class.gap-3]="true"
+                    [class.text-left]="true"
+                    [class.text-chrome-muted]="item.label === 'MENU.BACK_TO_MENU'"
+                    [class.hover:text-chrome-text-bright]="item.label === 'MENU.BACK_TO_MENU'"
+                    nz-tooltip
+                    [nzTooltipTitle]="isSidebarCollapsed() ? (item.label! | translate) : ''"
+                    nzTooltipPlacement="right"
+                  >
+                    <span class="flex items-center gap-3">
+                      <span
+                        nz-icon
+                        [nzType]="item.icon!"
+                        nzTheme="outline"
+                        class="shrink-0"
+                        style="font-size: 20px"
+                      ></span>
+                      <span
+                        class="truncate whitespace-nowrap transition-opacity duration-300"
+                        [class.opacity-0]="isSidebarCollapsed()"
+                        [class.w-0]="isSidebarCollapsed()"
+                        >{{ item.label! | translate }}</span
+                      >
+                    </span>
+                    @if (item.label === 'MENU.REPORTS') {
+                      <span
+                        nz-icon
+                        nzType="right"
+                        nzTheme="outline"
+                        class="text-chrome-muted transition-opacity duration-300 shrink-0"
+                        style="font-size: 14px"
+                        [class.opacity-0]="isSidebarCollapsed()"
+                        [class.w-0]="isSidebarCollapsed()"
+                      ></span>
+                    }
+                  </button>
+                </div>
+              }
+            }
           }
-
-          <hr class="border-chrome-border my-2" />
-          <div
-            class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2"
-            [class.opacity-0]="isSidebarCollapsed()"
-          >
-            Transactions
-          </div>
-
-          <!-- Sales -->
-          @if (permissions.canRead('sales-invoices')) {
-            <a
-              routerLink="/sales-invoices"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SALES' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span nz-icon nzType="shopping-cart" nzTheme="outline" class="text-xl"></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.SALES' | translate }}</span
-              ></a
-            >
-          }
-
-          <!-- Purchase Invoices -->
-          @if (permissions.canRead('purchase-invoices')) {
-            <a
-              routerLink="/purchase-invoices"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.PURCHASE' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span nz-icon nzType="audit" nzTheme="outline" class="text-xl"></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.PURCHASE' | translate }}</span
-              ></a
-            >
-          }
-
-          <!-- Opening Stock -->
-          @if (permissions.canRead('stock-invoices')) {
-            <a
-              routerLink="/stock-invoices"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.OPENING_STOCK' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span
-                nz-icon
-                nzType="inbox"
-                nzTheme="outline"
-                class="shrink-0"
-                style="font-size: 20px"
-              ></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.OPENING_STOCK' | translate }}</span
-              ></a
-            >
-          }
-
-          <hr class="border-chrome-border my-2" />
-          <div
-            class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 whitespace-nowrap transition-opacity duration-300 mt-4 mb-2"
-            [class.opacity-0]="isSidebarCollapsed()"
-          >
-            Masters
-          </div>
-
-          <!-- Products -->
-          @if (permissions.canRead('products')) {
-            <a
-              routerLink="/products"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.PRODUCTS' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span
-                nz-icon
-                nzType="appstore"
-                nzTheme="outline"
-                class="shrink-0"
-                style="font-size: 20px"
-              ></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.PRODUCTS' | translate }}</span
-              ></a
-            >
-          }
-
-          <!-- Customers -->
-          @if (permissions.canRead('customers')) {
-            <a
-              routerLink="/customers"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.CUSTOMERS' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span nz-icon nzType="team" nzTheme="outline" class="text-xl"></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.CUSTOMERS' | translate }}</span
-              ></a
-            >
-          }
-
-          <!-- Suppliers -->
-          @if (permissions.canRead('suppliers')) {
-            <a
-              routerLink="/suppliers"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SUPPLIERS' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <!-- <svg
-                class="w-5 h-5 shrink-0"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-                />
-              </svg> -->
-              <span nz-icon nzType="bank" nzTheme="outline" class="text-xl"></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.SUPPLIERS' | translate }}</span
-              ></a
-            >
-          }
-
-          <!-- Users -->
-          @if (permissions.canRead('users')) {
-            <a
-              routerLink="/users"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.USERS' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span
-                nz-icon
-                nzType="user"
-                nzTheme="outline"
-                class="shrink-0"
-                style="font-size: 20px"
-              ></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.USERS' | translate }}</span
-              ></a
-            >
-          }
-
-          <hr class="border-chrome-border my-2" />
-          <button
-            (click)="switchMenu('reports')"
-            class="w-full flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden justify-between gap-3 text-left transition-colors relative"
-            nz-tooltip
-            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.REPORTS' | translate) : ''"
-            nzTooltipPlacement="right"
-          >
-            <span class="flex items-center gap-3">
-              <span
-                nz-icon
-                nzType="fund"
-                nzTheme="outline"
-                class="shrink-0"
-                style="font-size: 20px"
-              ></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.REPORTS' | translate }}</span
-              >
-            </span>
-            <span
-              nz-icon
-              nzType="right"
-              nzTheme="outline"
-              class="text-chrome-muted transition-opacity duration-300 shrink-0"
-              style="font-size: 14px"
-              [class.opacity-0]="isSidebarCollapsed()"
-              [class.w-0]="isSidebarCollapsed()"
-            ></span>
-          </button>
-
-          <hr class="border-chrome-border my-2" />
-          <!-- Product Settings-->
-          @if (
-            permissions.canRead('product-settings-categories') ||
-            permissions.canRead('product-settings-brands') ||
-            permissions.canRead('product-settings-attributes') ||
-            permissions.canRead('product-settings-templates')
-          ) {
-            <a
-              routerLink="/product-settings"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? 'Product Settings' : ''"
-              nzTooltipPlacement="right"
-            >
-              <span
-                nz-icon
-                nzType="appstore-add"
-                nzTheme="outline"
-                class="shrink-0"
-                style="font-size: 20px"
-              ></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >Product Settings</span
-              ></a
-            >
-          }
-          <!-- Settings -->
-          @if (
-            permissions.canRead('settings-general') ||
-            permissions.canRead('settings-serial') ||
-            permissions.canRead('settings-pricing') ||
-            permissions.canRead('settings-tax')
-          ) {
-            <a
-              routerLink="/tax-settings"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? 'Tax Settings' : ''"
-              nzTooltipPlacement="right"
-            >
-              <span nz-icon nzType="percentage" nzTheme="outline" class="text-xl"></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >Tax Settings</span
-              >
-            </a>
-
-            <a
-              routerLink="/settings"
-              routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-              class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SETTINGS' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span nz-icon nzType="setting" nzTheme="outline" class="text-xl"></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.SETTINGS' | translate }}</span
-              >
-            </a>
-          }
-        }
-
-        @if (currentMenu() === 'reports') {
-          <div class="mt-2 mb-2 px-1">
-            <button
-              (click)="switchMenu('main')"
-              class="w-full flex px-3 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative text-chrome-muted hover:text-chrome-text-bright"
-              nz-tooltip
-              [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.BACK_TO_MENU' | translate) : ''"
-              nzTooltipPlacement="right"
-            >
-              <span
-                nz-icon
-                nzType="arrow-left"
-                nzTheme="outline"
-                class="shrink-0"
-                style="font-size: 20px"
-              ></span>
-              <span
-                class="truncate whitespace-nowrap transition-opacity duration-300"
-                [class.opacity-0]="isSidebarCollapsed()"
-                [class.w-0]="isSidebarCollapsed()"
-                >{{ 'MENU.BACK_TO_MENU' | translate }}</span
-              >
-            </button>
-          </div>
-
-          <div
-            class="text-xs font-bold text-chrome-muted uppercase tracking-wider px-3 mb-2 flex items-center gap-2 whitespace-nowrap transition-opacity duration-300"
-            [class.opacity-0]="isSidebarCollapsed()"
-          >
-            Reports
-          </div>
-
-          <a
-            routerLink="/reports/sales"
-            routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-            nz-tooltip
-            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.SALES_REPORT' | translate) : ''"
-            nzTooltipPlacement="right"
-          >
-            <span nz-icon nzType="line-chart" nzTheme="outline" class="text-xl"></span>
-            <span
-              class="truncate whitespace-nowrap transition-opacity duration-300"
-              [class.opacity-0]="isSidebarCollapsed()"
-              [class.w-0]="isSidebarCollapsed()"
-              >{{ 'MENU.SALES_REPORT' | translate }}</span
-            >
-          </a>
-
-          <a
-            routerLink="/reports/stock"
-            routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-            nz-tooltip
-            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.STOCK_REPORT' | translate) : ''"
-            nzTooltipPlacement="right"
-          >
-            <span nz-icon nzType="bar-chart" nzTheme="outline" class="text-xl"></span>
-            <span
-              class="truncate whitespace-nowrap transition-opacity duration-300"
-              [class.opacity-0]="isSidebarCollapsed()"
-              [class.w-0]="isSidebarCollapsed()"
-              >{{ 'MENU.STOCK_REPORT' | translate }}</span
-            >
-          </a>
-
-          <a
-            routerLink="/reports/tax"
-            routerLinkActive="bg-chrome-hover font-semibold border-l-4 border-accent"
-            class="flex px-4 py-2 rounded hover:bg-chrome-hover items-center overflow-hidden gap-3 transition-colors relative"
-            nz-tooltip
-            [nzTooltipTitle]="isSidebarCollapsed() ? ('MENU.TAX_OUTPUT' | translate) : ''"
-            nzTooltipPlacement="right"
-          >
-            <span nz-icon nzType="file-done" nzTheme="outline" class="text-xl"></span>
-            <span
-              class="truncate whitespace-nowrap transition-opacity duration-300"
-              [class.opacity-0]="isSidebarCollapsed()"
-              [class.w-0]="isSidebarCollapsed()"
-              >{{ 'MENU.TAX_OUTPUT' | translate }}</span
-            >
-          </a>
         }
       </aside>
     }

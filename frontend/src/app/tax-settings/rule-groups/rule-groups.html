@@ -9,8 +9,7 @@
   ></nz-alert>
 }
 @if (permissionService.canAdd('settings-tax')) {
-  <nz-card nzSize="small" class="mb-4!">
-    <h3 class="text-sm font-semibold mb-3">{{ editingGroup ? 'Edit' : 'Add' }} Rule Group</h3>
+  <nz-card class="mb-4!" nzTitle="{{ editingGroup ? 'Edit' : 'Add' }} Rule Group">
     <form nz-form [nzLayout]="'vertical'">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <nz-form-item>
@@ -58,53 +57,54 @@
     </form>
   </nz-card>
 }
-
-<nz-table
-  #groupsTable
-  [nzData]="taxRuleGroups()"
-  [nzLoading]="loadingGroups"
-  nzSize="small"
-  [nzBordered]="true"
->
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Priority</th>
-      <th>Description</th>
-      <th nzAlign="center">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (g of groupsTable.data; track g.id) {
+<nz-card nzTitle="List of Rule Groups">
+  <nz-table
+    #groupsTable
+    [nzData]="taxRuleGroups()"
+    [nzLoading]="loadingGroups"
+    nzSize="small"
+    [nzBordered]="true"
+  >
+    <thead>
       <tr>
-        <td class="font-bold">{{ g.name }}</td>
-        <td>
-          <nz-tag nzColor="purple">{{ g.priority }}</nz-tag>
-        </td>
-        <td>{{ g.description }}</td>
-        <td nzAlign="center">
-          <button
-            nz-button
-            nzType="text"
-            nzSize="small"
-            (click)="startEditGroup(g)"
-            class="text-accent!"
-          >
-            <span nz-icon nzType="edit"></span>
-          </button>
-          <button
-            nz-button
-            nzType="text"
-            nzSize="small"
-            nzDanger
-            nz-popconfirm
-            nzPopconfirmTitle="Delete Group?"
-            (nzOnConfirm)="deleteGroup(g)"
-          >
-            <span nz-icon nzType="delete"></span>
-          </button>
-        </td>
+        <th>Name</th>
+        <th>Priority</th>
+        <th>Description</th>
+        <th nzAlign="center">Action</th>
       </tr>
-    }
-  </tbody>
-</nz-table>
+    </thead>
+    <tbody>
+      @for (g of groupsTable.data; track g.id) {
+        <tr>
+          <td class="font-bold">{{ g.name }}</td>
+          <td>
+            <nz-tag nzColor="purple">{{ g.priority }}</nz-tag>
+          </td>
+          <td>{{ g.description }}</td>
+          <td nzAlign="center">
+            <button
+              nz-button
+              nzType="text"
+              nzSize="small"
+              (click)="startEditGroup(g)"
+              class="text-accent!"
+            >
+              <span nz-icon nzType="edit"></span>
+            </button>
+            <button
+              nz-button
+              nzType="text"
+              nzSize="small"
+              nzDanger
+              nz-popconfirm
+              nzPopconfirmTitle="Delete Group?"
+              (nzOnConfirm)="deleteGroup(g)"
+            >
+              <span nz-icon nzType="delete"></span>
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </nz-table>
+</nz-card>
