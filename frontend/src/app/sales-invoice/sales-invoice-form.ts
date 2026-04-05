@@ -530,7 +530,7 @@ export class SalesInvoiceForm implements OnInit {
         if (item.productId) {
           const product = this.products().find(p => p.id === item.productId);
           if (product) {
-            item.taxPct = Number(product.taxRate || 0);
+            item.taxPct = this.getEffectiveTaxRate(product, Number(item.unitPrice || 0));
           }
         }
       }
@@ -553,7 +553,16 @@ export class SalesInvoiceForm implements OnInit {
 
   calculateLineTotal(item: EditableSalesInvoiceItem) {
     const qty = Number(item.qty || 0);
-    let price = Number(item.unitPrice || 0);
+    const price = Number(item.unitPrice || 0);
+
+    // Dynamically update tax percentage based on tax rules and current price
+    if (item.productId && this.editingInvoice.type !== 'estimate') {
+      const product = this.products().find(p => p.id === item.productId);
+      if (product) {
+        item.taxPct = this.getEffectiveTaxRate(product, price);
+      }
+    }
+
     const grossTotal = qty * price;
 
     // Apply discount
