@@ -31,11 +31,11 @@ export function renderCompanyHeader(pdf: PdfDocument, company: CompanyInfo): voi
     {
       text: contactLines.join('  |  '),
       alignment: 'center',
-      margin: [0, 0, 0, 5]
+      margin: [0, 0, 0, 2]
     },
     {
       canvas: [{ type: 'line', x1: 0, y1: 0, x2: pdf.usableWidth, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
-      margin: [0, 5, 0, 10]
+      margin: [0, 0, 0, 5]
     }
   ]);
 
@@ -50,17 +50,17 @@ export function renderReportMeta(pdf: PdfDocument, meta: ReportMeta): void {
   const rightMeta: any[] = [
     {
       columns: [
-        { text: 'Number:', bold: true, width: 60 },
+        { text: 'No.:', bold: true, width: 25 },
         { text: meta.number, width: '*' }
       ],
-      margin: [0, 0, 0, 2]
+      // margin: [0, 0, 0, 2]
     },
     {
       columns: [
-        { text: 'Date:', bold: true, width: 60 },
+        { text: 'Date:', bold: true, width: 25 },
         { text: meta.date, width: '*' }
       ],
-      margin: [0, 0, 0, 2]
+      // margin: [0, 0, 0, 2]
     }
   ];
 
@@ -68,10 +68,10 @@ export function renderReportMeta(pdf: PdfDocument, meta: ReportMeta): void {
     for (const extra of meta.extraMeta) {
       rightMeta.push({
         columns: [
-          { text: `${extra.label}:`, bold: true, width: 60 },
-          { text: extra.value, width: '*' }
+          { text: `${extra.label}:`, fontSize: 6, bold: true, width: 25 },
+          { text: extra.value, fontSize: 6, width: '*' }
         ],
-        margin: [0, 0, 0, 2]
+        // margin: [0, 0, 0, 2]
       });
     }
   }
@@ -86,12 +86,13 @@ export function renderReportMeta(pdf: PdfDocument, meta: ReportMeta): void {
       },
       {
         stack: rightMeta,
-        width: 130,
+        width: 95,
         fontSize: 9
       }
     ],
-    margin: [0, 0, 0, 10]
+    // margin: [0, 0, 0, 0]
   });
+
 }
 
 // --- Section 3: E-Invoice Block ---
@@ -105,8 +106,17 @@ export async function renderEInvoiceBlock(
   if (!irn) return;
 
   const row1Columns: any[] = [
-    { text: 'IRN:', bold: true, width: 30 },
-    { text: irn, width: 300 }
+    {
+      stack: [
+        { text: 'E-Invoice Details', bold: true, margin: [0, 0, 0, 2] },
+        { text: `IRN: ${irn}`, margin: [0, 0, 0, 2] },
+        // { text: irn, width: 300 },
+        { text: `Ack No: ${ackNo}`, margin: [0, 0, 0, 2] },
+        // { text: ackNo || '', width: 'auto' },
+        { text: `Ack Date: ${ackDate}`, margin: [0, 0, 0, 2] },
+        // { text: ackDate || '', width: 'auto' }
+      ]
+    }
   ];
 
   if (signedQrCode) {
@@ -129,24 +139,32 @@ export async function renderEInvoiceBlock(
     }
   }
 
-  const row2Columns = [
-    { text: 'Ack No:', bold: true, width: 40 },
-    { text: ackNo || '', width: 'auto', margin: [0, 0, 20, 0] },
-    { text: 'Ack Date:', bold: true, width: 50 },
-    { text: ackDate || '', width: 'auto' }
-  ];
+  // const row2Columns = [
+  //   {}
+  //   // { text: 'Ack No:', bold: true, width: 35 },
+  //   // { text: ackNo || '', width: 'auto', margin: [0, 0, 10, 0] },
+  //   // { text: 'Ack Date:', bold: true, width: 40 },
+  //   // { text: ackDate || '', width: 'auto' }
+  // ];
+
+  if (irn) {
+    pdf.addContent({
+      canvas: [{ type: 'line', x1: 0, y1: 0, x2: pdf.usableWidth, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
+      margin: [0, 5, 0, 0]
+    })
+  }
 
   pdf.addContent([
     {
       columns: row1Columns,
       fontSize: 8,
-      margin: [0, 0, 0, 5]
+      margin: [0, 5, 0, 0]
     },
-    {
-      columns: row2Columns,
-      fontSize: 8,
-      margin: [0, 0, 0, 10]
-    }
+    // {
+    //   columns: row2Columns,
+    //   fontSize: 8,
+    //   // margin: [0, 0, 0, 10]
+    // }
   ]);
 }
 
@@ -172,7 +190,7 @@ export function renderAddressBlock(
   const columns: any[] = [
     {
       stack: [
-        { text: leftLabel, bold: true, margin: [0, 0, 0, 5] },
+        { text: leftLabel, bold: true, margin: [0, 0, 0, 2] },
         { text: formatAddr(left) }
       ],
       width: '*'
@@ -182,7 +200,7 @@ export function renderAddressBlock(
   if (right) {
     columns.push({
       stack: [
-        { text: rightLabel, bold: true, margin: [0, 0, 0, 5] },
+        { text: rightLabel, bold: true, margin: [0, 0, 0, 2] },
         { text: formatAddr(right) }
       ],
       width: '*'
@@ -191,7 +209,7 @@ export function renderAddressBlock(
 
   pdf.addContent({
     columns,
-    margin: [0, 0, 0, 15]
+    margin: [0, 0, 0, 0]
   });
 }
 
@@ -206,7 +224,7 @@ export function renderItemsTable(
     bold: true,
     fillColor: '#CCCCCC',
     alignment: col.align || 'left',
-    margin: [2, 4, 2, 4]
+    margin: [2, 2, 2, 2]
   }));
 
   const tableWidths = columns.map(col => {
@@ -225,7 +243,7 @@ export function renderItemsTable(
         text: displayValue,
         alignment: col.align || 'left',
         fillColor: isOdd ? '#F7F7F7' : null,
-        margin: [2, 4, 2, 4]
+        margin: [2, 2, 2, 2]
       };
     });
   });
@@ -255,7 +273,7 @@ export function renderItemsTable(
       paddingTop: function () { return 2; },
       paddingBottom: function () { return 2; },
     },
-    margin: [0, 0, 0, 10]
+    margin: [0, 0, 0, 5]
   });
 }
 
@@ -296,9 +314,12 @@ export function renderTotals(
     ];
 
     if (isIgst) {
+      headerRow.push({ text: '%', bold: true, alignment: 'right' });
       headerRow.push({ text: 'IGST', bold: true, alignment: 'right' });
     } else {
+      headerRow.push({ text: '%', bold: true, alignment: 'right' });
       headerRow.push({ text: 'CGST', bold: true, alignment: 'right' });
+      headerRow.push({ text: '%', bold: true, alignment: 'right' });
       headerRow.push({ text: 'SGST', bold: true, alignment: 'right' });
     }
 
@@ -308,10 +329,13 @@ export function renderTotals(
         { text: fmt(hsn.taxableValue), alignment: 'right' }
       ];
       if (isIgst) {
-        row.push({ text: `${Number(hsn.taxPct).toFixed(1)}% - ${fmt(hsn.igstAmount)}`, alignment: 'right' });
+        row.push({ text: `${Number(hsn.taxPct).toFixed(1)}%`, alignment: 'right' });
+        row.push({ text: `${fmt(hsn.igstAmount)}`, alignment: 'right' });
       } else {
-        row.push({ text: `${(Number(hsn.taxPct) / 2).toFixed(1)}% - ${fmt(hsn.cgstAmount)}`, alignment: 'right' });
-        row.push({ text: `${(Number(hsn.taxPct) / 2).toFixed(1)}% - ${fmt(hsn.sgstAmount)}`, alignment: 'right' });
+        row.push({ text: `${(Number(hsn.taxPct / 2)).toFixed(1)}%`, alignment: 'right' });
+        row.push({ text: `${fmt(hsn.cgstAmount)}`, alignment: 'right' });
+        row.push({ text: `${(Number(hsn.taxPct / 2)).toFixed(1)}%`, alignment: 'right' });
+        row.push({ text: `${fmt(hsn.sgstAmount)}`, alignment: 'right' });
       }
       return row;
     });
@@ -319,7 +343,7 @@ export function renderTotals(
     hsnBlock = {
       table: {
         headerRows: 1,
-        widths: isIgst ? ['auto', 'auto', 'auto'] : ['auto', 'auto', 'auto', 'auto'],
+        widths: isIgst ? ['auto', 'auto', 'auto', 'auto'] : ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
         body: [headerRow, ...hsnBody],
         // lineWidth: 0.5,
         // lineColor: '#CCCCCC'
@@ -395,7 +419,7 @@ export function renderTotals(
   }
 
   totalsStack.push({
-    canvas: [{ type: 'line', x1: 0, y1: 0, x2: 200, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
+    canvas: [{ type: 'line', x1: 0, y1: 0, x2: 150, y2: 0, lineWidth: 0.5, lineColor: '#CCCCCC' }],
     margin: [0, 5, 0, 5],
     alignment: 'right'
   });
@@ -414,7 +438,7 @@ export function renderTotals(
       { width: '*', stack: hsnBlock ? [hsnBlock] : [] },
       { width: 205, stack: totalsStack }
     ],
-    margin: [0, 10, 0, 20]
+    margin: [0, 5, 0, 5]
   });
 }
 

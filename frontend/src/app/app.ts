@@ -101,7 +101,7 @@ export class App implements OnDestroy {
     { type: 'divider' },
     {
       type: 'link',
-      label: 'Product Settings',
+      label: 'Product Setup',
       icon: 'appstore-add',
       link: '/product-settings',
       permission: [
@@ -113,11 +113,12 @@ export class App implements OnDestroy {
     },
     {
       type: 'link',
-      label: 'Tax Settings',
-      icon: 'percentage',
+      label: 'Tax Engine',
+      icon: 'code-sandbox',
       link: '/tax-settings',
       permission: ['settings-general', 'settings-serial', 'settings-pricing', 'settings-tax'],
     },
+    { type: 'divider' },
     {
       type: 'link',
       label: 'MENU.SETTINGS',
@@ -180,7 +181,7 @@ export class App implements OnDestroy {
           const state = JSON.parse(storedSidebar);
           this.isSidebarCollapsed.set(state.collapsed ?? false);
           this.sidebarWidth.set(state.width ?? 260);
-        } catch (e) {}
+        } catch (e) { }
       }
     }
   }

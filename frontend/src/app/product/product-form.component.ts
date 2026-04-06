@@ -1,13 +1,28 @@
 import { NgSwitch, NgSwitchCase } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal, computed } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  inject,
+  signal,
+  computed,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { TranslatePipe } from '@ngx-translate/core';
 import { type Category, CategoryService } from '../product-settings/categories/category-service';
 import { type Brand, BrandService } from '../product-settings/brands/brand-service';
 import { type Product, ProductService } from './product-service';
 import { Attribute, AttributeService } from './attribute-service';
-import { ProductTemplate, ProductTemplateService } from '../product-settings/product-templates/product-template-service';
+import {
+  ProductTemplate,
+  ProductTemplateService,
+} from '../product-settings/product-templates/product-template-service';
 import { TaxRateService } from '../tax-settings/tax-rates/tax-rate-service';
 import { TaxRate } from '../tax-settings/tax.model';
 
@@ -30,10 +45,21 @@ import { CommonModule } from '@angular/common';
   selector: 'app-product-form',
   imports: [
     CommonModule,
-    FormsModule, NgSwitch, NgSwitchCase, TranslatePipe,
-    NzFormModule, NzInputModule, NzSelectModule, NzButtonModule,
-    NzAlertModule, NzIconModule, NzInputNumberModule, NzTooltipModule,
-    NzSwitchModule, NzRadioModule, NzTableModule
+    FormsModule,
+    NgSwitch,
+    NgSwitchCase,
+    TranslatePipe,
+    NzFormModule,
+    NzInputModule,
+    NzSelectModule,
+    NzButtonModule,
+    NzAlertModule,
+    NzIconModule,
+    NzInputNumberModule,
+    NzTooltipModule,
+    NzSwitchModule,
+    NzRadioModule,
+    NzTableModule,
   ],
   templateUrl: './product-form.component.html',
 })
@@ -55,18 +81,23 @@ export class ProductFormComponent implements OnInit, OnChanges {
 
   structuredCategories = computed(() => {
     const cats = this.categories();
-    const roots = cats.filter(c => !c.parentCategoryId);
+    const roots = cats.filter((c) => !c.parentCategoryId);
     const sorted: Category[] = [];
+
     for (const r of roots) {
       sorted.push(r);
-      const children = cats.filter(c => c.parentCategoryId === r.id);
+      const children = cats.filter((c) => c.parentCategoryId === r.id);
       for (const child of children) {
         sorted.push({ ...child, name: '  ⤿ ' + child.name });
       }
     }
     // append any unassigned/orphaned categories just in case
     for (const c of cats) {
-      if (c.parentCategoryId && !roots.find(r => r.id === c.parentCategoryId) && !sorted.find(s => s.id === c.id)) {
+      if (
+        c.parentCategoryId &&
+        !roots.find((r) => r.id === c.parentCategoryId) &&
+        !sorted.find((s) => s.id === c.id)
+      ) {
         sorted.push(c);
       }
     }
@@ -78,15 +109,11 @@ export class ProductFormComponent implements OnInit, OnChanges {
   brands = signal<Brand[]>([]);
   taxRates = signal<TaxRate[]>([]);
 
-  // useGlobalGtn = signal<boolean>(false);
-
   get filteredBrands(): Brand[] {
     const catId = this.product.categoryId;
     if (!catId) return this.brands();
-    return this.brands().filter(b =>
-      !b.categoryIds ||
-      b.categoryIds.length === 0 ||
-      b.categoryIds.includes(catId)
+    return this.brands().filter(
+      (b) => !b.categoryIds || b.categoryIds.length === 0 || b.categoryIds.includes(catId),
     );
   }
   loading = false;
@@ -98,40 +125,46 @@ export class ProductFormComponent implements OnInit, OnChanges {
   private defaultGtnSettings = {
     useGlobal: false,
     gtnMode: 'auto',
-    gtnGeneration: 'code'
+    gtnGeneration: 'code',
   };
 
   ngOnInit(): void {
+    // 1. Load global settings with defaults
     forkJoin({
-      useGlobalGtn: this.settings.getSetting('use_global_gtn'),
-      gtnMode: this.settings.getSetting('gtn_mode'),
-      gtnGeneration: this.settings.getSetting('gtn_generation')
-    }).subscribe({
-      next: (res) => {
-        this.defaultGtnSettings = {
-          useGlobal: res.useGlobalGtn?.value === 'true',
-          gtnMode: (res.gtnMode?.value as any) || 'auto',
-          gtnGeneration: (res.gtnGeneration?.value as any) || 'code'
-        };
+      useGlobalGtn: this.settings
+        .getSetting('use_global_gtn')
+        .pipe(catchError(() => of({ value: 'false' } as any))),
+      gtnMode: this.settings
+        .getSetting('gtn_mode')
+        .pipe(catchError(() => of({ value: 'auto' } as any))),
+      gtnGeneration: this.settings
+        .getSetting('gtn_generation')
+        .pipe(catchError(() => of({ value: 'code' } as any))),
+    }).subscribe((res) => {
+      this.defaultGtnSettings = {
+        useGlobal: res.useGlobalGtn?.value === 'true',
+        gtnMode: (res.gtnMode?.value as any) || 'auto',
+        gtnGeneration: (res.gtnGeneration?.value as any) || 'code',
+      };
 
-        // If it's a new product, re-initialize with defaults
-        if (!this.productId) {
-          this.product = this.blankProduct();
-        }
-
-        this.categoryService.getAll({ limit: 1000 }).subscribe((res) => this.categories.set(res.data));
-        this.attributeService.getAttributes().subscribe((res) => this.allAttributes.set(res));
-        this.templateService.getTemplates().subscribe((res) => this.templates.set(res));
-        this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
-        this.brandService.getAll({ limit: 1000 }).subscribe((res) => this.brands.set(res.data.filter(b => b.isActive)));
-        this.taxRateService.getAll().subscribe((res) => this.taxRates.set(res.data));
-        this.loadProduct();
-      },
-      error: () => {
-        // Fallback or handle error
-        this.loadProduct();
+      // If it's a new product, initialize with defaults from settings
+      if (!this.productId) {
+        this.product = this.blankProduct();
       }
     });
+
+    // 2. Load master data (independent of settings)
+    this.categoryService.getAll({ limit: 1000 }).subscribe((res) => this.categories.set(res.data));
+    this.attributeService.getAttributes().subscribe((res) => this.allAttributes.set(res));
+    this.templateService.getTemplates().subscribe((res) => this.templates.set(res));
+    this.productService.getAll({ limit: 1000 }).subscribe((res) => this.productList.set(res.data));
+    this.brandService
+      .getAll({ limit: 1000 })
+      .subscribe((res) => this.brands.set(res.data.filter((b) => b.isActive)));
+    this.taxRateService.getAll().subscribe((res) => this.taxRates.set(res.data));
+
+    // 3. Load product details if editing
+    this.loadProduct();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -162,7 +195,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
 
   onSubmit(): void {
     if (this.product.productType === 'simple' && this.product.parentId) {
-      const parentProd = this.productList().find(p => p.id === this.product.parentId);
+      const parentProd = this.productList().find((p) => p.id === this.product.parentId);
       if (parentProd && parentProd.templateId) {
         this.product.templateId = parentProd.templateId;
       }
@@ -211,7 +244,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
 
     // If simple, inherit template from parent
     if (this.product.productType === 'simple' && this.product.parentId) {
-      const parentProd = this.productList().find(p => p.id === this.product.parentId);
+      const parentProd = this.productList().find((p) => p.id === this.product.parentId);
       if (parentProd && parentProd.templateId) {
         tId = parentProd.templateId;
       }
@@ -219,17 +252,17 @@ export class ProductFormComponent implements OnInit, OnChanges {
 
     if (!tId) return [];
 
-    const tmpl = this.templates().find(t => t.id === tId);
+    const tmpl = this.templates().find((t) => t.id === tId);
     if (!tmpl || !tmpl.mappedAttributes) return [];
 
     // Map attributeIds back to full Attributes
     return tmpl.mappedAttributes
-      .map(ma => this.allAttributes().find(a => a.id === ma.attributeId))
+      .map((ma) => this.allAttributes().find((a) => a.id === ma.attributeId))
       .filter((a): a is Attribute => !!a);
   }
 
   getAttributeValue(attributeId: number): any {
-    const val = this.product.attributeValues?.find(v => v.attributeId === attributeId);
+    const val = this.product.attributeValues?.find((v) => v.attributeId === attributeId);
     return val ? val.value : null;
   }
 
@@ -237,7 +270,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
     if (!this.product.attributeValues) {
       this.product.attributeValues = [];
     }
-    const index = this.product.attributeValues.findIndex(v => v.attributeId === attributeId);
+    const index = this.product.attributeValues.findIndex((v) => v.attributeId === attributeId);
     if (index > -1) {
       this.product.attributeValues[index].value = value;
     } else {

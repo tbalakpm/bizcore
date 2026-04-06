@@ -1,0 +1,17 @@
+
+Selling price = Selling price - Discount - no discount = accounting made simple, simplified price calculation while returning
+Sales - Tax Amount <> CGST+SGST or IGST - bug
+
+Units Master from/for GST
+Customer Type = Retail, B2B, Export
+
+Product template - attributes can be ordered via drag and drop
+Product template - generate product name dynamically based on the variant defining attributes
+
+Sales - during save, if any line item has no product selected, it should be deleted before send to API
+
+Invoice printing - tag number font size can be reduced
+Invoice printing - make two lines for each item - first line product name, second line attributes
+
+HSN for products
+SAC for services

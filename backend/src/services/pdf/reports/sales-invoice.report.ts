@@ -99,7 +99,7 @@ export async function renderSalesInvoice(
     title: invoice.type === 'invoice' ? 'TAX INVOICE' : 'ESTIMATE',
     number: invoice.invoiceNumber,
     date: DateUtil.formatDDMMYYYY(invoice.invoiceDate),
-    extraMeta: invoice.refNumber ? [{ label: 'Ref No', value: invoice.refNumber + (invoice.refDate ? ` dt ${DateUtil.formatDDMMYYYY(invoice.refDate)}` : "") }] : [],
+    extraMeta: invoice.refNumber ? [{ label: 'Ref', value: invoice.refNumber + (invoice.refDate ? ` dt ${DateUtil.formatDDMMYYYY(invoice.refDate)}` : "") }] : [],
   });
 
   if (invoice.irn) {
